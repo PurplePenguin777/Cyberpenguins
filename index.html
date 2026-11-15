@@ -34,20 +34,9 @@
 <body class="font-sans antialiased">
   <div class="starfield" aria-hidden="true"></div>
 
-  <!-- Sugerencia de visualización horizontal en dispositivos verticales -->
-  <div id="orientation-banner"
-    class="orientation-banner fixed inset-0 z-50 items-center justify-center bg-slate-950/85 backdrop-blur-xl p-6">
-    <div class="squircle-panel max-w-xs w-full p-6 text-center flex flex-col items-center justify-center gap-4">
-      <svg viewBox="0 0 64 48" width="52" height="40" aria-hidden="true">
-        <rect x="6" y="8" width="52" height="32" rx="8" fill="none" stroke="#7ee8fa" stroke-width="2" />
-        <polygon points="28,20 38,24 28,28" fill="#ffbe76" />
-      </svg>
-      <p class="text-sm font-medium tracking-tight text-slate-100 text-center">Vista horizontal recomendada</p>
-      <button id="dismiss-orientation-btn" type="button"
-        class="squircle-btn inline-flex items-center justify-center text-center px-5 py-2 text-sm font-medium bg-white/90 hover:bg-white text-slate-950">
-        Continuar
-      </button>
-    </div>
+  <!-- Aviso de orientación (desactivado: interfaz completamente responsiva) -->
+  <div id="orientation-banner" class="orientation-banner hidden is-hidden" aria-hidden="true">
+    <button id="dismiss-orientation-btn" type="button" class="hidden"></button>
   </div>
 
   <!-- Cinemática Inicial: Plataforma de Lanzamiento en la Tierra -->

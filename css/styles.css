@@ -1411,22 +1411,11 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   Aviso de Orientación Horizontal
+   Aviso de Orientación Horizontal (Desactivado: interfaz 100% responsiva)
    ========================================================================== */
 
 .orientation-banner {
-  display: none;
-}
-
-@media (orientation: portrait) and (max-width: 900px) {
-  .orientation-banner:not(.dismissed) {
-    display: flex;
-  }
-
-  .iso-board {
-    width: 100%;
-    height: 100%;
-  }
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
