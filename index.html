@@ -288,14 +288,7 @@
     <div class="home-panel max-w-6xl w-full px-3 sm:px-6 py-4 sm:py-6 flex flex-col gap-6 sm:gap-8">
       <!-- Encabezado Minimalista -->
       <header class="relative flex items-center justify-center py-2">
-        <div class="flex items-center justify-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-white/[0.045] backdrop-blur-xl border border-white/[0.12] flex items-center justify-center shrink-0">
-            <svg viewBox="0 0 36 36" width="22" height="22" aria-hidden="true">
-              <polygon points="18,4 30,14 18,22 6,14" fill="#e2e8f0" />
-              <polygon points="6,14 18,22 18,32" fill="#38bdf8" opacity="0.85" />
-              <polygon points="30,14 18,22 18,32" fill="#0284c7" opacity="0.9" />
-            </svg>
-          </div>
+        <div class="flex items-center justify-center">
           <h1 class="text-2xl sm:text-[32px] font-semibold tracking-[-0.035em] text-white text-center">Cyberpenguins</h1>
         </div>
         <div class="absolute right-0 flex items-center gap-2">
@@ -318,31 +311,25 @@
 
       <!-- Dock Inferior Compacto (Pasaporte, Rango y Certificado) -->
       <footer class="home-dock grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4">
-        <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
+        <section class="home-dock-segment px-3 py-3 flex flex-col justify-center gap-3 text-center">
           <div class="w-full flex items-center justify-center relative">
             <span class="text-xs font-medium tracking-tight text-slate-200 text-center">Pasaporte</span>
             <span id="hud-passport-count" class="hidden">0/3</span>
           </div>
           <div id="home-passport-slots" class="w-full grid grid-cols-3 gap-1.5"></div>
-          <button id="open-passport-btn" type="button"
-            class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.14] text-slate-200">
-            Ver pasaporte
-          </button>
+          <button id="open-passport-btn" type="button" class="hidden">Ver pasaporte</button>
         </section>
 
-        <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
+        <section class="home-dock-segment px-3 py-3 flex flex-col justify-center gap-3 text-center">
           <div class="w-full flex items-center justify-center relative">
             <span id="hud-badge-name" class="text-xs font-medium tracking-tight text-cyan-200 text-center">Insignias</span>
             <span id="home-total-stars" class="hidden">★ 0/15</span>
           </div>
           <div id="home-badges-grid" class="w-full grid grid-cols-5 gap-1"></div>
-          <button id="open-badges-btn" type="button"
-            class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.14] text-slate-200">
-            Ver insignias
-          </button>
+          <button id="open-badges-btn" type="button" class="hidden">Ver insignias</button>
         </section>
 
-        <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
+        <section class="home-dock-segment px-3 py-3 flex flex-col justify-center gap-3 text-center">
           <div class="w-full flex items-center justify-center relative">
             <span class="text-xs font-medium tracking-tight text-slate-200 text-center">Certificado</span>
             <span id="home-chapters-completed-count" class="hidden">0/3</span>
