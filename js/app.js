@@ -237,23 +237,21 @@
     const pauseHome = document.getElementById('pause-home-btn');
     if (pauseHome) pauseHome.textContent = isEn ? '✕ Return to main map' : '✕ Volver al mapa principal';
 
-    // Textos de registro inicial de cadete
+    // Textos de registro inicial de cadete (minimalista en sentence case)
     if (dom.cadetIntroTitle) {
-      dom.cadetIntroTitle.textContent = isEn ? 'Welcome to Cyberpenguin!' : '¡Bienvenido(a) a Cyberpenguin!';
+      dom.cadetIntroTitle.textContent = isEn ? 'Welcome to Cyberpenguin' : 'Bienvenido a Cyberpenguin';
     }
     if (dom.cadetIntroSubtitle) {
-      dom.cadetIntroSubtitle.innerHTML = isEn
-        ? '<span class="text-cyan-300 font-semibold block mb-0.5">The Explorers We Must Never Forget</span>What is your name, Space Cadet? Enter your name to prepare your flight log and official NASA diploma.'
-        : '<span class="text-cyan-300 font-semibold block mb-0.5">The Explorers We Must Never Forget</span>¿Cómo te llamas, Cadete Espacial? Escribe tu nombre para preparar tu bitácora de vuelo y tu diploma oficial de la NASA.';
+      dom.cadetIntroSubtitle.textContent = isEn ? 'What is your name?' : '¿Cómo te llamas?';
     }
     if (dom.cadetIntroLabel) {
-      dom.cadetIntroLabel.textContent = isEn ? 'Astronaut Name:' : 'Nombre del Astronauta:';
+      dom.cadetIntroLabel.textContent = isEn ? 'Explorer name' : 'Nombre del explorador';
     }
     if (dom.cadetFirstNameInput) {
-      dom.cadetFirstNameInput.placeholder = isEn ? 'Enter your name or callsign...' : 'Escribe tu nombre aquí...';
+      dom.cadetFirstNameInput.placeholder = isEn ? 'Your name...' : 'Tu nombre...';
     }
     if (dom.cadetStartBtnText) {
-      dom.cadetStartBtnText.textContent = isEn ? 'Start Mission & Liftoff!' : '¡Comenzar Misión y Despegar!';
+      dom.cadetStartBtnText.textContent = isEn ? 'Start mission' : 'Comenzar misión';
     }
 
     // Textos del modal de Certificado / Diploma de Honor
@@ -506,7 +504,7 @@
 
     function submitCadetNameAndLaunch() {
       const inputVal = (dom.cadetFirstNameInput && dom.cadetFirstNameInput.value) ? dom.cadetFirstNameInput.value.trim() : '';
-      const fallbackName = (state.currentLanguage === 'en') ? 'Junior Cosmic Explorer' : 'Joven Explorador(a) Cósmico(a)';
+      const fallbackName = (state.currentLanguage === 'en') ? 'Cosmic explorer' : 'Explorador cósmico';
       state.cadetName = inputVal || state.cadetName || fallbackName;
       saveState();
 
@@ -3302,7 +3300,7 @@
     const totalStars = getTotalStars();
     const cadetName = (state.cadetName && state.cadetName.trim())
       ? state.cadetName.trim()
-      : (isEn ? 'Junior Cosmic Explorer' : 'Joven Explorador(a) Cósmico(a)');
+      : (isEn ? 'Cosmic explorer' : 'Explorador cósmico');
 
     const escapedName = cadetName
       .replace(/&/g, '&amp;')
