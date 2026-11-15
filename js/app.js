@@ -679,9 +679,9 @@
       if (dom.travelCinematicCaption) {
         if (step.quoteData) {
           dom.travelCinematicCaption.innerHTML = `
-            <p class="text-base sm:text-xl md:text-2xl font-medium tracking-tight text-white leading-snug drop-shadow-lg text-center">${step.quoteData.quote}</p>
-            <p class="text-sm sm:text-base md:text-lg font-semibold text-cyan-300 pt-0.5 sm:pt-1 text-center drop-shadow">${step.quoteData.name}</p>
-            <p class="text-xs sm:text-sm md:text-base font-normal text-slate-300/90 tracking-wide text-center">${step.quoteData.role}</p>
+            <p class="text-lg sm:text-2xl md:text-3xl font-semibold tracking-tight text-white leading-snug drop-shadow-xl text-center text-balance max-w-2xl mx-auto">${step.quoteData.quote}</p>
+            <p class="text-base sm:text-xl font-bold text-cyan-300 pt-1 text-center drop-shadow-md">${step.quoteData.name}</p>
+            <p class="text-xs sm:text-sm md:text-base font-medium text-slate-300/90 tracking-wide text-center">${step.quoteData.role}</p>
           `;
         } else {
           dom.travelCinematicCaption.innerHTML = `

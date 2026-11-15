@@ -245,12 +245,12 @@
 
           <!-- Horizonte lunar curvado low-poly de aproximación -->
           <g class="travel-planet-approach">
-            <path d="M -30,308 Q 450,230 930,308 L 930,454 L -30,454 Z" fill="#94a3b8" />
+            <path d="M -30,308 Q 450,230 930,308 L 930,600 L -30,600 Z" fill="#94a3b8" />
             <polygon points="-30,308 180,274 260,394 -30,420" fill="#cbd5e1" />
             <polygon points="180,274 450,256 490,382 260,394" fill="#dce5ef" />
             <polygon points="450,256 720,274 680,392 490,382" fill="#c3cfde" />
             <polygon points="720,274 930,308 930,420 680,392" fill="#9fb0c4" />
-            <polygon points="-30,420 260,394 490,382 680,392 930,420 930,454 -30,454" fill="#899ab0" />
+            <polygon points="-30,420 260,394 490,382 680,392 930,420 930,600 -30,600" fill="#899ab0" />
 
             <!-- Cráteres geométricos -->
             <g transform="translate(216, 356)">

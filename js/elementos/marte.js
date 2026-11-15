@@ -213,11 +213,12 @@
 
           <!-- Horizonte curvo marciano low-poly -->
           <g class="travel-planet-approach">
-            <path d="M -30,308 Q 450,224 930,308 L 930,454 L -30,454 Z" fill="#c25632" />
+            <path d="M -30,308 Q 450,224 930,308 L 930,600 L -30,600 Z" fill="#c25632" />
             <polygon points="-30,308 190,268 270,390 -30,420" fill="#df7141" />
             <polygon points="190,268 460,252 500,382 270,390" fill="#ea8850" />
             <polygon points="460,252 720,270 690,390 500,382" fill="#d16238" />
             <polygon points="720,270 930,308 930,420 690,390" fill="#ab4628" />
+            <polygon points="-30,420 270,390 500,382 690,390 930,420 930,600 -30,600" fill="#89321b" />
             <polygon points="310,336 424,316 532,340 486,386 356,386" fill="#9a3a20" />
             <polygon points="602,356 688,338 756,360 720,394 630,394" fill="#89321b" />
           </g>

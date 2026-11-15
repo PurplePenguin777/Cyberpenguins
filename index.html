@@ -77,14 +77,14 @@
 
     <!-- Cartela con frase motivadora en 3 líneas: Frase, Nombre y Cargo -->
     <div id="launch-title-card"
-      class="launch-title-card pointer-events-none relative z-10 text-center flex flex-col items-center justify-center gap-1 sm:gap-1.5 px-4 pt-3 sm:pt-4 max-w-2xl w-full mx-auto">
-      <p id="launch-quote-text" class="text-base sm:text-xl md:text-2xl font-medium tracking-tight text-white leading-snug drop-shadow-lg text-center">
+      class="launch-title-card pointer-events-none relative z-10 text-center flex flex-col items-center justify-center gap-1.5 sm:gap-2 px-4 pt-3 sm:pt-4 max-w-2xl w-full mx-auto">
+      <p id="launch-quote-text" class="text-lg sm:text-2xl md:text-3xl font-semibold tracking-tight text-white leading-snug drop-shadow-xl text-center text-balance">
         «Las cosas difíciles son las que más vale la pena intentar.»
       </p>
-      <p id="launch-quote-name" class="text-sm sm:text-base md:text-lg font-semibold text-cyan-300 pt-0.5 sm:pt-1 text-center drop-shadow">
+      <p id="launch-quote-name" class="text-base sm:text-xl font-bold text-cyan-300 pt-0.5 sm:pt-1 text-center drop-shadow-md">
         Margaret Hamilton
       </p>
-      <p id="launch-quote-role" class="text-xs sm:text-sm md:text-base font-normal text-slate-300/90 tracking-wide text-center">
+      <p id="launch-quote-role" class="text-xs sm:text-sm md:text-base font-medium text-slate-300/90 tracking-wide text-center">
         Directora de Software Apolo · NASA
       </p>
     </div>
@@ -170,20 +170,20 @@
   <!-- Cinemática de Viaje Espacial entre Destinos -->
   <section id="travel-cinematic" class="travel-cinematic is-hidden" aria-label="Viaje espacial">
     <div id="travel-cinematic-stage" class="travel-cinematic-stage"></div>
+    <button id="travel-skip-btn" type="button" aria-label="Saltar"
+      class="travel-skip-btn squircle-btn w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 text-slate-100 shrink-0">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" stroke="none" />
+        <line x1="19" y1="5" x2="19" y2="19" />
+      </svg>
+    </button>
     <div class="travel-cinematic-ui">
       <div class="travel-cinematic-meta">
         <div id="travel-cinematic-dots" class="travel-cinematic-dots" aria-hidden="true"></div>
         <div id="travel-cinematic-caption"
-          class="travel-cinematic-caption w-full flex flex-col items-center justify-center gap-1 sm:gap-1.5 text-center max-w-2xl mx-auto px-2"></div>
+          class="travel-cinematic-caption w-full flex flex-col items-center justify-center gap-1 sm:gap-2 text-center max-w-2xl mx-auto px-4"></div>
       </div>
-      <button id="travel-skip-btn" type="button" aria-label="Saltar"
-        class="squircle-btn w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 text-slate-100 shrink-0">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" stroke="none" />
-          <line x1="19" y1="5" x2="19" y2="19" />
-        </svg>
-      </button>
     </div>
   </section>
 
