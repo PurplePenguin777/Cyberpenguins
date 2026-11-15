@@ -192,16 +192,13 @@
     dom.penguinActor = document.getElementById('penguin-actor');
     dom.penguinSprite = document.getElementById('penguin-sprite');
 
-    // Cajón inferior automático de diálogo interactivo con TTS y selector de turnos
+    // Cajón inferior automático de diálogo interactivo con TTS y selector de temas
     dom.dialogueModal = document.getElementById('dialogue-modal');
     dom.dialogueBox = document.getElementById('dialogue-box');
     dom.dialogueMachinePreview = document.getElementById('dialogue-machine-preview');
     dom.dialogueMachineName = document.getElementById('dialogue-machine-name');
     dom.dialogueBlankSlot = document.getElementById('dialogue-blank-slot');
     dom.dialogueTopicsContainer = document.getElementById('dialogue-topics-container');
-    dom.dialogueStepCounter = document.getElementById('dialogue-step-counter');
-    dom.dialogueNextBtn = document.getElementById('dialogue-next-btn');
-    dom.dialogueCloseBtn = document.getElementById('dialogue-close-btn');
 
     dom.quizModal = document.getElementById('quiz-modal');
     dom.quizStarsBadge = document.getElementById('quiz-stars-badge');
@@ -262,21 +259,9 @@
     dom.badgesCloseBtn.addEventListener('click', () => hideModal(dom.badgesModal));
     dom.certificateCloseBtn.addEventListener('click', () => hideModal(dom.certificateModal));
 
-    if (dom.dialogueNextBtn) {
-      dom.dialogueNextBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        advanceDialogue();
-      });
-    }
-    if (dom.dialogueCloseBtn) {
-      dom.dialogueCloseBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeDialogueModal();
-      });
-    }
     if (dom.dialogueBox) {
       dom.dialogueBox.addEventListener('click', (e) => {
-        if (e.target.closest('#dialogue-close-btn') || e.target.closest('#dialogue-next-btn')) return;
+        if (e.target.closest('.dialogue-topic-btn')) return;
         advanceDialogue();
       });
     }
@@ -1792,7 +1777,7 @@
       if (visitedDialogueTopics.has(topic.id)) {
         btn.classList.add('is-visited');
       }
-      btn.innerHTML = `<span aria-hidden="true">${topic.icon || '💬'}</span><span>${topic.label || 'Pregunta'}</span>`;
+      btn.textContent = topic.label || 'Pregunta';
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         selectDialogueTopic(topic);
@@ -1915,20 +1900,6 @@
 
     if (dom.dialogueBlankSlot) {
       dom.dialogueBlankSlot.textContent = speakerText;
-    }
-
-    if (dom.dialogueStepCounter) {
-      if (activeDialogueTopic) {
-        dom.dialogueStepCounter.textContent = `${activeDialogueTopic.label || ''} · ${activeDialogueTurn + 1}/${turns.length}`;
-      } else {
-        dom.dialogueStepCounter.textContent = `${activeDialogueTurn + 1}/${turns.length}`;
-      }
-    }
-
-    if (dom.dialogueNextBtn) {
-      const isLastTurn = activeDialogueTurn + 1 === turns.length;
-      const hasMoreTopics = activeDialogueMachine.topics && activeDialogueMachine.topics.some((t) => !visitedDialogueTopics.has(t.id));
-      dom.dialogueNextBtn.textContent = isLastTurn && !hasMoreTopics ? '✓' : '▶';
     }
 
     renderDialogueTopics();

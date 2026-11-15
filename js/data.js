@@ -100,7 +100,7 @@
             {
               id: 'camera',
               icon: '📸',
-              label: 'Cámara lunar',
+              label: 'Cámara',
               dialogue: [
                 { speaker: 'penguin', text: 'Veo que tienes una cámara. ¿Qué fotografiabas?' },
                 { speaker: 'machine', text: 'Tomé miles de fotografías de las rocas y el horizonte y las transmití a la Tierra para que los científicos pudieran estudiar el paisaje lunar.' }
@@ -109,7 +109,7 @@
             {
               id: 'apollo12',
               icon: '👨‍🚀',
-              label: 'Visita de Apollo 12',
+              label: 'Apollo 12',
               dialogue: [
                 { speaker: 'penguin', text: '¿Es verdad que unos astronautas vinieron a visitarte?' },
                 { speaker: 'machine', text: '¡Sí! En noviembre de 1969, los astronautas de Apollo 12 aterrizaron cerca de mí, caminaron hasta aquí y llevaron mi cámara a la Tierra para estudiarla.' }
@@ -153,7 +153,7 @@
             {
               id: 'moonwalk',
               icon: '🌙',
-              label: 'Caminata lunar',
+              label: 'Caminata',
               dialogue: [
                 { speaker: 'penguin', text: '¿Qué hicieron en el Mar de la Tranquilidad?' },
                 { speaker: 'machine', text: 'Armstrong y Aldrin tomaron fotos históricas, instalaron experimentos y recolectaron más de 20 kilos de rocas y polvo lunar para la ciencia.' }
@@ -162,7 +162,7 @@
             {
               id: 'instruments',
               icon: '📡',
-              label: 'Instrumentos dejados',
+              label: 'Instrumentos',
               dialogue: [
                 { speaker: 'penguin', text: '¿La investigación continuó después del despegue?' },
                 { speaker: 'machine', text: '¡Sí! Dejamos un sismómetro para medir temblores y un reflector láser con el que los científicos aún hoy miden la distancia exacta entre la Tierra y la Luna.' }
@@ -266,7 +266,7 @@
             {
               id: 'life_search',
               icon: '🧪',
-              label: 'Búsqueda de vida',
+              label: '¿Vida en Marte?',
               dialogue: [
                 { speaker: 'penguin', text: '¿Es verdad que buscaste señales de vida marciana?' },
                 { speaker: 'machine', text: '¡Sí! Recogí suelo con mi brazo robótico e hice experimentos biológicos. Aunque no encontramos marcianos, aprendimos muchísimo sobre el clima y la química de Marte.' }
@@ -275,7 +275,7 @@
             {
               id: 'cameras_weather',
               icon: '📸',
-              label: 'Cámaras y clima',
+              label: 'Cámaras',
               dialogue: [
                 { speaker: 'penguin', text: '¿Qué descubriste con tus instrumentos en Chryse Planitia?' },
                 { speaker: 'machine', text: 'Fotografié por primera vez el paisaje marciano con cielo rosado y medí su viento y temperaturas extremas, abriendo el camino para futuras misiones.' }
@@ -310,7 +310,7 @@
             {
               id: 'wheels',
               icon: '🛞',
-              label: '6 ruedas y suspensión',
+              label: '6 ruedas',
               dialogue: [
                 { speaker: 'penguin', text: '¡Tienes seis ruedas! ¿Cómo haces para no volcarte?' },
                 { speaker: 'machine', text: 'Uso un sistema de suspensión balancín-bogie que permite a mis seis ruedas trepar rocas como «Barnacle Bill» y adaptarme al terreno sin perder el equilibrio.' }
@@ -319,7 +319,7 @@
             {
               id: 'apxs',
               icon: '🔬',
-              label: 'Instrumento APXS',
+              label: 'Espectrómetro',
               dialogue: [
                 { speaker: 'penguin', text: '¿Para qué sirve tu instrumento APXS?' },
                 { speaker: 'machine', text: 'Es un espectrómetro que pegaba a las rocas marcianas. Emitía rayos alfa y X para descubrir qué elementos químicos componen el suelo de Ares Vallis.' }
@@ -328,7 +328,7 @@
             {
               id: 'driving',
               icon: '🎮',
-              label: '¿Quién te manejaba?',
+              label: '¿Quién te guía?',
               dialogue: [
                 { speaker: 'penguin', text: '¿Tú decidías sola hacia dónde avanzar?' },
                 { speaker: 'machine', text: 'Los científicos en la Tierra me enviaban rutas cada día porque las señales tardan minutos en llegar. Yo usaba mis sensores láser para esquivar obstáculos.' }
@@ -374,7 +374,7 @@
             {
               id: 'jupiter',
               icon: '⚡',
-              label: 'Júpiter gigante',
+              label: 'Júpiter',
               dialogue: [
                 { speaker: 'penguin', text: '¿Qué descubriste al pasar cerca de Júpiter?' },
                 { speaker: 'machine', text: 'Descubrí que Júpiter es un planeta gigante gaseoso con intensos campos magnéticos, cinturones de radiación extrema y misteriosas lunas.' }
@@ -383,7 +383,7 @@
             {
               id: 'signal_delay',
               icon: '📡',
-              label: 'Señal a 11 horas',
+              label: 'Señal lejana',
               dialogue: [
                 { speaker: 'penguin', text: '¿Cuánto tardaban tus señales en llegar a casa?' },
                 { speaker: 'machine', text: 'En mi última señal en enero de 2003, mis datos viajando a la velocidad de la luz tardaron más de 11 horas y 20 minutos en llegar a la Tierra.' }
@@ -427,7 +427,7 @@
             {
               id: 'records',
               icon: '🛰️',
-              label: 'Dos grandes récords',
+              label: 'Dos récords',
               dialogue: [
                 { speaker: 'penguin', text: '¿Cuáles fueron tus mayores hazañas espaciales?' },
                 { speaker: 'machine', text: 'Fui la primera nave en orbitar un asteroide en el año 2000, y el 12 de febrero de 2001 me convertí en la primera en tocar su superficie con éxito.' }
@@ -436,7 +436,7 @@
             {
               id: 'sensors',
               icon: '🔦',
-              label: 'Láser y sensores',
+              label: 'Láser',
               dialogue: [
                 { speaker: 'penguin', text: '¿Cómo estudiaste la forma y minerales de Eros?' },
                 { speaker: 'machine', text: 'Usé un telémetro láser para mapear con precisión cada cráter y elevación, junto con cámaras y espectrómetros que analizaron su composición rocosa.' }
@@ -445,7 +445,7 @@
             {
               id: 'touchdown',
               icon: '🪨',
-              label: 'Aterrizaje suave',
+              label: 'Aterrizaje',
               dialogue: [
                 { speaker: 'penguin', text: '¿Sobreviviste al aterrizaje sobre la roca?' },
                 { speaker: 'machine', text: '¡Sí! Aunque no estaba diseñada para aterrizar, descendí tan suavemente que seguí transmitiendo datos desde la superficie durante dos semanas.' }
