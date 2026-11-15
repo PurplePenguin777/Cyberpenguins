@@ -121,9 +121,35 @@
 
   const dom = {};
 
+  function triggerHaptic(type) {
+    if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return;
+    try {
+      if (type === 'tap') {
+        navigator.vibrate(15);
+      } else if (type === 'jump') {
+        navigator.vibrate(25);
+      } else if (type === 'collect') {
+        navigator.vibrate([30, 40, 50]);
+      } else if (type === 'success') {
+        navigator.vibrate([40, 60, 40, 60, 80]);
+      } else {
+        navigator.vibrate(20);
+      }
+    } catch (_) {}
+  }
+
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && window.location && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+      if (document.readyState === 'complete') {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+    }
+
     cacheDom();
     if (FX && typeof FX.init === 'function') {
       FX.init({
@@ -192,6 +218,7 @@
     dom.stageLightingOverlay = document.getElementById('stage-lighting-overlay');
     dom.stageLocationPill = document.getElementById('stage-location-pill');
     dom.soundToggleBtn = document.getElementById('sound-toggle-btn');
+    dom.pauseBtn = document.getElementById('pause-btn');
     dom.chapterTitleCard = document.getElementById('chapter-title-card');
     dom.chapterCardNumeral = document.getElementById('chapter-card-numeral');
     dom.chapterCardTitle = document.getElementById('chapter-card-title');
@@ -242,6 +269,11 @@
     dom.certificatePaw = document.getElementById('certificate-paw');
     dom.downloadCertificateBtn = document.getElementById('download-certificate-btn');
     dom.certificateCloseBtn = document.getElementById('certificate-close-btn');
+
+    dom.pauseModal = document.getElementById('pause-modal');
+    dom.pauseResumeBtn = document.getElementById('pause-resume-btn');
+    dom.pauseSoundBtn = document.getElementById('pause-sound-btn');
+    dom.pauseHomeBtn = document.getElementById('pause-home-btn');
   }
 
   function bindEvents() {
@@ -309,13 +341,43 @@
       });
     }
 
+    if (dom.pauseBtn) {
+      dom.pauseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePauseModal();
+      });
+    }
+
+    if (dom.pauseResumeBtn) {
+      dom.pauseResumeBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        closePauseModal();
+      });
+    }
+
+    if (dom.pauseSoundBtn) {
+      dom.pauseSoundBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        toggleSound();
+      });
+    }
+
+    if (dom.pauseHomeBtn) {
+      dom.pauseHomeBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        closePauseModal();
+        showHomeScreen();
+      });
+    }
+
     // Cerrar modales al hacer clic fuera del panel
     [
       { el: dom.quizModal, onClose: closeQuizModal },
       { el: dom.passportModal, onClose: () => hideModal(dom.passportModal) },
       { el: dom.badgesModal, onClose: () => hideModal(dom.badgesModal) },
       { el: dom.certificateModal, onClose: () => hideModal(dom.certificateModal) },
-      { el: dom.sampleDiscoveryModal, onClose: () => hideModal(dom.sampleDiscoveryModal) }
+      { el: dom.sampleDiscoveryModal, onClose: () => hideModal(dom.sampleDiscoveryModal) },
+      { el: dom.pauseModal, onClose: closePauseModal }
     ].forEach(({ el, onClose }) => {
       if (!el) return;
       el.addEventListener('click', (event) => {
@@ -353,6 +415,7 @@
         event.target.closest('.stage-hotspot') ||
         event.target.closest('#penguin-actor') ||
         event.target.closest('.back-home-btn') ||
+        event.target.closest('.pause-btn') ||
         event.target.closest('.sound-toggle-btn')
       ) {
         return;
@@ -366,12 +429,18 @@
       routeAndMove(safeTarget.x, safeTarget.y, checkSurfaceProximity);
     });
 
-    // Teclado (Flechas / WASD para mover, Espacio para saltar)
+    // Teclado (Flechas / WASD para mover, Espacio para saltar, Escape para pausar o cerrar modales)
     document.addEventListener('keydown', (event) => {
-      if (isBlockingModalOpen() || dom.gameScreen.classList.contains('is-hidden')) {
-        if (event.key === 'Escape') {
+      if (event.key === 'Escape') {
+        if (isBlockingModalOpen()) {
           closeAllModals();
+        } else if (!dom.gameScreen.classList.contains('is-hidden')) {
+          togglePauseModal();
         }
+        return;
+      }
+
+      if (isBlockingModalOpen() || dom.gameScreen.classList.contains('is-hidden')) {
         return;
       }
 
@@ -1523,6 +1592,7 @@
     const chapter = getChapter(state.currentChapterId);
     if (!chapter || dom.gameScreen.classList.contains('is-hidden') || isBlockingModalOpen()) return;
     if (isJumping || !dom.penguinActor) return;
+    triggerHaptic('jump');
 
     const { activeMachine } = getActiveSite(chapter);
     const siteId = activeMachine ? activeMachine.siteId : '';
@@ -2251,6 +2321,7 @@
   function collectSample(chapter, sampleObj) {
     const targetSample = sampleObj || (chapter && chapter.sample);
     if (!chapter || !chapter.hasSurface || !targetSample) return;
+    triggerHaptic('collect');
     if (!state.collectedSamples.includes(targetSample.id)) {
       state.collectedSamples.push(targetSample.id);
       saveState();
@@ -2425,6 +2496,11 @@
     });
 
     const starsEarned = scoreCount === 2 ? 5 : scoreCount === 1 ? 3 : 0;
+    if (starsEarned > 0) {
+      triggerHaptic('success');
+    } else {
+      triggerHaptic('tap');
+    }
     state.chapterStars[activeQuizChapterId] = Math.max(
       state.chapterStars[activeQuizChapterId] || 0,
       starsEarned
@@ -2576,6 +2652,38 @@
     el.classList.add('is-hidden');
   }
 
+  function isPauseModalOpen() {
+    return Boolean(dom.pauseModal && !dom.pauseModal.classList.contains('is-hidden'));
+  }
+
+  function openPauseModal() {
+    if (!dom.pauseModal) return;
+    triggerHaptic('tap');
+    if (FX && typeof FX.pause === 'function') {
+      FX.pause();
+    }
+    TTS.stop();
+    showModal(dom.pauseModal);
+  }
+
+  function closePauseModal() {
+    if (!dom.pauseModal) return;
+    hideModal(dom.pauseModal);
+    if (dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden')) {
+      if (FX && typeof FX.resume === 'function') {
+        FX.resume();
+      }
+    }
+  }
+
+  function togglePauseModal() {
+    if (isPauseModalOpen()) {
+      closePauseModal();
+    } else {
+      openPauseModal();
+    }
+  }
+
   function isAnyModalOpen() {
     return [
       dom.dialogueModal,
@@ -2583,7 +2691,8 @@
       dom.passportModal,
       dom.badgesModal,
       dom.certificateModal,
-      dom.sampleDiscoveryModal
+      dom.sampleDiscoveryModal,
+      dom.pauseModal
     ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
@@ -2593,11 +2702,13 @@
       dom.passportModal,
       dom.badgesModal,
       dom.certificateModal,
-      dom.sampleDiscoveryModal
+      dom.sampleDiscoveryModal,
+      dom.pauseModal
     ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
   function closeAllModals() {
+    closePauseModal();
     closeDialogueModal();
     closeQuizModal();
     hideModal(dom.passportModal);

@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cyberpenguins</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="theme-color" content="#050714" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Cyberpenguins — Aventura Espacial Educativa" />
+  <meta property="og:description" content="Explora el sistema solar, recolecta muestras cósmicas y aprende astrofísica con Cyberpenguins." />
+  <meta property="og:image" content="favicon.svg" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -297,6 +303,15 @@
         <!-- Píldora minimalista de ubicación -->
         <div id="stage-location-pill" class="stage-location-pill" aria-live="polite"></div>
 
+        <!-- Botón de pausa rápida -->
+        <button id="pause-btn" type="button" aria-label="Menú de pausa" class="pause-btn squircle-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="9" y1="5" x2="9" y2="19" />
+            <line x1="15" y1="5" x2="15" y2="19" />
+          </svg>
+        </button>
+
         <!-- Control minimalista de paisaje sonoro ambiental -->
         <button id="sound-toggle-btn" type="button" aria-label="Alternar sonido ambiental" aria-pressed="true"
           class="sound-toggle-btn squircle-btn">
@@ -460,6 +475,30 @@
         <button id="download-certificate-btn" type="button" disabled
           class="squircle-btn rounded-full inline-flex items-center justify-center text-center px-4 py-2 text-xs font-medium bg-amber-300 hover:bg-amber-200 text-slate-950">
           Descargar certificado
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Menú de Pausa -->
+  <div id="pause-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Menú de pausa">
+    <div class="squircle-panel max-w-sm w-full p-6 flex flex-col gap-4 text-center relative">
+      <div class="relative w-full flex items-center justify-center">
+        <h2 class="text-xl font-bold tracking-tight text-white text-center">Misión en Pausa</h2>
+      </div>
+      <p class="text-xs text-slate-300">Exploración detenida temporalmente.</p>
+      <div class="flex flex-col gap-2.5 mt-2">
+        <button id="pause-resume-btn" type="button"
+          class="squircle-btn w-full py-2.5 px-4 text-sm font-semibold bg-cyan-400 hover:bg-cyan-300 text-slate-950 flex items-center justify-center gap-2">
+          ▶ Continuar misión
+        </button>
+        <button id="pause-sound-btn" type="button"
+          class="squircle-btn w-full py-2 px-4 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center gap-2">
+          🔊 Alternar sonido
+        </button>
+        <button id="pause-home-btn" type="button"
+          class="squircle-btn w-full py-2 px-4 text-xs font-medium bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 flex items-center justify-center gap-2">
+          ✕ Volver al mapa principal
         </button>
       </div>
     </div>

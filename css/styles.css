@@ -794,6 +794,7 @@ a:focus-visible {
 }
 
 .back-home-btn,
+.pause-btn,
 .sound-toggle-btn {
   position: absolute;
   top: 1rem;
@@ -815,11 +816,16 @@ a:focus-visible {
   left: 1rem;
 }
 
+.pause-btn {
+  right: 4.1rem;
+}
+
 .sound-toggle-btn {
   right: 1rem;
 }
 
 .back-home-btn:hover,
+.pause-btn:hover,
 .sound-toggle-btn:hover {
   background: rgba(255, 255, 255, 0.14);
   border-color: rgba(255, 255, 255, 0.28);
