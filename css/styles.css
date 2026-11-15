@@ -818,6 +818,8 @@ a:focus-visible {
 
 .back-home-btn {
   left: 1rem;
+  width: 42px;
+  height: 42px;
 }
 
 .pause-btn {
