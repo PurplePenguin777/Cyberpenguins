@@ -115,6 +115,8 @@
   let activeDialogueMachine = null;
   let activeDialogueTurn = 0;
   let activeDialogueToken = 0;
+  let activeDialogueTopic = null;
+  let visitedDialogueTopics = new Set();
   let activeQuizChapterId = state.currentChapterId;
 
   const dom = {};
@@ -196,6 +198,7 @@
     dom.dialogueMachinePreview = document.getElementById('dialogue-machine-preview');
     dom.dialogueMachineName = document.getElementById('dialogue-machine-name');
     dom.dialogueBlankSlot = document.getElementById('dialogue-blank-slot');
+    dom.dialogueTopicsContainer = document.getElementById('dialogue-topics-container');
     dom.dialogueStepCounter = document.getElementById('dialogue-step-counter');
     dom.dialogueNextBtn = document.getElementById('dialogue-next-btn');
     dom.dialogueCloseBtn = document.getElementById('dialogue-close-btn');
@@ -1752,6 +1755,12 @@
 
   function getMachineDialogueTurns(machine) {
     if (!machine) return [];
+    if (activeDialogueTopic && Array.isArray(activeDialogueTopic.dialogue) && activeDialogueTopic.dialogue.length > 0) {
+      return activeDialogueTopic.dialogue;
+    }
+    if (Array.isArray(machine.greeting) && machine.greeting.length > 0) {
+      return machine.greeting;
+    }
     if (Array.isArray(machine.dialogue) && machine.dialogue.length > 0) {
       return machine.dialogue;
     }
@@ -1765,10 +1774,48 @@
     return turns;
   }
 
+  function renderDialogueTopics() {
+    if (!dom.dialogueTopicsContainer) return;
+    dom.dialogueTopicsContainer.innerHTML = '';
+
+    if (!activeDialogueMachine || !Array.isArray(activeDialogueMachine.topics) || activeDialogueMachine.topics.length === 0) {
+      return;
+    }
+
+    activeDialogueMachine.topics.forEach((topic) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dialogue-topic-btn';
+      if (activeDialogueTopic && activeDialogueTopic.id === topic.id) {
+        btn.classList.add('is-active');
+      }
+      if (visitedDialogueTopics.has(topic.id)) {
+        btn.classList.add('is-visited');
+      }
+      btn.innerHTML = `<span aria-hidden="true">${topic.icon || '💬'}</span><span>${topic.label || 'Pregunta'}</span>`;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectDialogueTopic(topic);
+      });
+      dom.dialogueTopicsContainer.appendChild(btn);
+    });
+  }
+
+  function selectDialogueTopic(topic) {
+    if (!activeDialogueMachine) return;
+    activeDialogueTopic = topic;
+    activeDialogueTurn = 0;
+    visitedDialogueTopics.add(topic.id);
+    renderDialogueTopics();
+    renderAndPlayDialogueTurn();
+  }
+
   function openDialogueModal(machine) {
     activeDialogueMachine = machine;
+    activeDialogueTopic = null;
     activeDialogueTurn = 0;
     proximityMachineId = machine.id;
+    visitedDialogueTopics.clear();
 
     if (machine.id && machine.id !== 'final-scene' && !state.inspectedMachines.includes(machine.id)) {
       state.inspectedMachines.push(machine.id);
@@ -1777,6 +1824,7 @@
     }
 
     showModal(dom.dialogueModal);
+    renderDialogueTopics();
     renderAndPlayDialogueTurn();
   }
 
@@ -1787,8 +1835,11 @@
       dialogue: DATA.FINAL_DIALOGUE || []
     };
     activeDialogueMachine = finalMachine;
+    activeDialogueTopic = null;
     activeDialogueTurn = 0;
+    visitedDialogueTopics.clear();
     showModal(dom.dialogueModal);
+    renderDialogueTopics();
     renderAndPlayDialogueTurn();
   }
 
@@ -1799,6 +1850,13 @@
       activeDialogueTurn++;
       renderAndPlayDialogueTurn();
     } else {
+      if (activeDialogueMachine.topics && activeDialogueMachine.topics.length > 0) {
+        const nextTopic = activeDialogueMachine.topics.find((t) => !visitedDialogueTopics.has(t.id));
+        if (nextTopic) {
+          selectDialogueTopic(nextTopic);
+          return;
+        }
+      }
       closeDialogueModal();
     }
   }
@@ -1860,12 +1918,20 @@
     }
 
     if (dom.dialogueStepCounter) {
-      dom.dialogueStepCounter.textContent = `${activeDialogueTurn + 1}/${turns.length}`;
+      if (activeDialogueTopic) {
+        dom.dialogueStepCounter.textContent = `${activeDialogueTopic.label || ''} · ${activeDialogueTurn + 1}/${turns.length}`;
+      } else {
+        dom.dialogueStepCounter.textContent = `${activeDialogueTurn + 1}/${turns.length}`;
+      }
     }
 
     if (dom.dialogueNextBtn) {
-      dom.dialogueNextBtn.textContent = activeDialogueTurn + 1 === turns.length ? '✓' : '▶';
+      const isLastTurn = activeDialogueTurn + 1 === turns.length;
+      const hasMoreTopics = activeDialogueMachine.topics && activeDialogueMachine.topics.some((t) => !visitedDialogueTopics.has(t.id));
+      dom.dialogueNextBtn.textContent = isLastTurn && !hasMoreTopics ? '✓' : '▶';
     }
+
+    renderDialogueTopics();
 
     const handleTurnComplete = () => {
       if (turnToken !== activeDialogueToken || activeDialogueMachine !== machine) return;
@@ -1873,7 +1939,22 @@
         activeDialogueTurn++;
         renderAndPlayDialogueTurn();
       } else {
-        closeDialogueModal();
+        if (activeDialogueTopic) {
+          visitedDialogueTopics.add(activeDialogueTopic.id);
+          renderDialogueTopics();
+        }
+        if (activeDialogueMachine.topics && activeDialogueMachine.topics.length > 0) {
+          const hasMore = activeDialogueMachine.topics.some((t) => !visitedDialogueTopics.has(t.id));
+          if (!hasMore) {
+            dialogueAutoTimer = setTimeout(() => {
+              if (turnToken === activeDialogueToken && activeDialogueMachine === machine) {
+                closeDialogueModal();
+              }
+            }, 3200);
+          }
+        } else {
+          closeDialogueModal();
+        }
       }
     };
 
@@ -1895,7 +1976,12 @@
     clearTimeout(dialogueAutoTimer);
     TTS.stop();
     activeDialogueMachine = null;
+    activeDialogueTopic = null;
     activeDialogueTurn = 0;
+    visitedDialogueTopics.clear();
+    if (dom.dialogueTopicsContainer) {
+      dom.dialogueTopicsContainer.innerHTML = '';
+    }
     hideModal(dom.dialogueModal);
   }
 
