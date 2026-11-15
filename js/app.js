@@ -567,6 +567,14 @@
     dom.openBadgesBtn.addEventListener('click', openBadgesModal);
     dom.openCertificateBtn.addEventListener('click', openCertificateModal);
 
+    const homeCertCard = document.getElementById('home-certificate-preview');
+    if (homeCertCard) {
+      homeCertCard.addEventListener('click', () => {
+        triggerHaptic('tap');
+        openCertificateModal();
+      });
+    }
+
     if (dom.certificateCadetInput) {
       dom.certificateCadetInput.addEventListener('input', (e) => {
         state.cadetName = e.target.value;
@@ -2424,27 +2432,32 @@
     }
     const certPreview = document.getElementById('home-certificate-preview');
     if (certPreview) {
-      certPreview.classList.toggle('is-unlocked', allCompleted);
+      certPreview.classList.toggle('is-unlocked', true);
+      certPreview.title = isEn ? 'Tap to view diploma' : 'Toca para ver el diploma';
       certPreview.innerHTML = `
-        <div class="flex items-center justify-center">${MODELS.penguinPawStamp(allCompleted, 26)}</div>
+        <div class="flex items-center justify-center">${MODELS.penguinPawStamp(true, 26)}</div>
       `;
     }
     const certActions = document.getElementById('home-certificate-actions');
     if (dom.homeCertificateStatus) {
-      dom.homeCertificateStatus.textContent = allCompleted ? '' : 'Disponible al completar todos los capítulos';
-      dom.homeCertificateStatus.classList.toggle('hidden', allCompleted);
+      dom.homeCertificateStatus.textContent = allCompleted
+        ? (isEn ? 'Completed! Diploma ready' : '¡Completado! Diploma listo')
+        : (isEn ? 'Tap to view diploma' : 'Toca para ver el diploma');
+      dom.homeCertificateStatus.classList.remove('hidden');
     }
     if (certActions) {
-      certActions.classList.toggle('hidden', !allCompleted);
+      certActions.classList.remove('hidden');
     }
     if (dom.openCertificateBtn) {
-      dom.openCertificateBtn.disabled = !allCompleted;
+      dom.openCertificateBtn.disabled = false;
+      dom.openCertificateBtn.textContent = isEn ? 'View diploma' : 'Ver diploma';
     }
     if (dom.homeDownloadCertificateBtn) {
-      dom.homeDownloadCertificateBtn.disabled = !allCompleted;
+      dom.homeDownloadCertificateBtn.disabled = false;
+      dom.homeDownloadCertificateBtn.textContent = isEn ? 'Download' : 'Descargar';
     }
     if (dom.downloadCertificateBtn) {
-      dom.downloadCertificateBtn.disabled = !allCompleted;
+      dom.downloadCertificateBtn.disabled = false;
     }
 
     renderChapterNav();
@@ -3281,7 +3294,6 @@
   }
 
   function openCertificateModal() {
-    if (!areAllChaptersCompleted()) return;
     if (dom.certificateCadetInput) {
       dom.certificateCadetInput.value = state.cadetName || '';
     }
@@ -3530,7 +3542,6 @@
   }
 
   function downloadCertificate(format = 'png') {
-    if (!areAllChaptersCompleted()) return null;
     const svgMarkup = buildCertificateSvg();
 
     if (format === 'svg') {
