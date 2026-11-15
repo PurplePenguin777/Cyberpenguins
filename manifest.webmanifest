@@ -1,7 +1,7 @@
 {
-  "name": "Cyberpenguins · Exploración Espacial",
-  "short_name": "Cyberpenguins",
-  "description": "Exploración espacial interactiva por la Luna, Marte y la Frontera Espacial siguiendo misiones reales de la NASA.",
+  "name": "Cyberpenguin: The Explorers We Must Never Forget",
+  "short_name": "Cyberpenguin",
+  "description": "Exploración espacial interactiva por la Luna, Marte y el Espacio Profundo siguiendo las misiones históricas de la NASA.",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "landscape",

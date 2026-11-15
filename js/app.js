@@ -239,12 +239,12 @@
 
     // Textos de registro inicial de cadete
     if (dom.cadetIntroTitle) {
-      dom.cadetIntroTitle.textContent = isEn ? 'Welcome to Cyberpenguins!' : '¡Bienvenido(a) a Cyberpenguins!';
+      dom.cadetIntroTitle.textContent = isEn ? 'Welcome to Cyberpenguin!' : '¡Bienvenido(a) a Cyberpenguin!';
     }
     if (dom.cadetIntroSubtitle) {
-      dom.cadetIntroSubtitle.textContent = isEn
-        ? 'What is your name, Space Cadet? Enter your name to prepare your flight log and official NASA diploma.'
-        : '¿Cómo te llamas, Cadete Espacial? Escribe tu nombre para preparar tu bitácora de vuelo y tu diploma oficial de la NASA.';
+      dom.cadetIntroSubtitle.innerHTML = isEn
+        ? '<span class="text-cyan-300 font-semibold block mb-0.5">The Explorers We Must Never Forget</span>What is your name, Space Cadet? Enter your name to prepare your flight log and official NASA diploma.'
+        : '<span class="text-cyan-300 font-semibold block mb-0.5">The Explorers We Must Never Forget</span>¿Cómo te llamas, Cadete Espacial? Escribe tu nombre para preparar tu bitácora de vuelo y tu diploma oficial de la NASA.';
     }
     if (dom.cadetIntroLabel) {
       dom.cadetIntroLabel.textContent = isEn ? 'Astronaut Name:' : 'Nombre del Astronauta:';
@@ -262,8 +262,8 @@
     }
     if (dom.certModalSubtitle) {
       dom.certModalSubtitle.textContent = isEn
-        ? 'Cyberpenguins Mission & NASA Space Archives'
-        : 'Misión Cyberpenguins & Archivos Espaciales de la NASA';
+        ? 'Cyberpenguin: The Explorers We Must Never Forget · NASA Space Archives'
+        : 'Cyberpenguin: The Explorers We Must Never Forget · Archivos Espaciales de la NASA';
     }
     if (dom.certCadetLabel) {
       dom.certCadetLabel.textContent = isEn ? 'Astronaut Name on Diploma:' : 'Nombre del Astronauta en el Diploma:';
@@ -3324,8 +3324,8 @@
       : today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
     const txtAcademy = isEn
-      ? 'SPACE EXPLORATION ACADEMY · NASA ARCHIVES & CYBERPENGUINS'
-      : 'ACADEMIA DE EXPLORACIÓN ESPACIAL · NASA ARCHIVES & CYBERPENGUINS';
+      ? 'SPACE EXPLORATION ACADEMY · CYBERPENGUIN: THE EXPLORERS WE MUST NEVER FORGET'
+      : 'ACADEMIA DE EXPLORACIÓN ESPACIAL · CYBERPENGUIN: THE EXPLORERS WE MUST NEVER FORGET';
     const txtDiploma = isEn
       ? 'HONORARY ASTRONAUTICAL DIPLOMA'
       : 'DIPLOMA DE HONOR ASTRONÁUTICO';
@@ -3336,8 +3336,8 @@
       ? 'For outstanding bravery, scientific curiosity, and astrophysical dedication in completing'
       : 'Por su destacada valentía, curiosidad científica y dedicación astrofísica al completar';
     const txtBody2 = isEn
-      ? 'the interplanetary expedition across the Solar System aboard the Cyberpenguins spacecraft,'
-      : 'la gran expedición interplanetaria a través del Sistema Solar en la nave Cyberpenguins,';
+      ? 'the interplanetary expedition in Cyberpenguin: The Explorers We Must Never Forget,'
+      : 'la gran expedición en Cyberpenguin: The Explorers We Must Never Forget,';
     const txtBody3 = isEn
       ? 'investigating humanity\'s 6 pioneer space probes and collecting cosmic planetary samples.'
       : 'investigando las 6 sondas pioneras de la humanidad y recolectando valiosas muestras cósmicas.';
@@ -3351,7 +3351,7 @@
     const txtSignCommanderRole = isEn ? 'Chief of Planetary Exploration' : 'Jefe de Expedición Planetaria';
     const txtSignAI = isEn ? "Ship's AI (Paulina)" : 'IA de la Nave (Paulina)';
     const txtSignAIRole = isEn ? 'Mission Control & Telemetry' : 'Control de Misión & Telemetría';
-    const txtSeal = isEn ? 'OFFICIAL MISSION ARCHIVE · CYBERPENGUINS' : 'MISIÓN OFICIAL CYBERPENGUINS · NASA';
+    const txtSeal = 'CYBERPENGUIN: THE EXPLORERS WE MUST NEVER FORGET';
     const txtMissionId = isEn ? 'MISSION CODE: NASA-CP-2026-X89' : 'CÓDIGO DE MISIÓN: NASA-CP-2026-X89';
     const txtDateLabel = isEn ? `DATE: ${dateFormatted}` : `FECHA: ${dateFormatted}`;
 
@@ -3562,7 +3562,7 @@
 
           canvas.toBlob((blob) => {
             if (blob) {
-              triggerBlobDownload(blob, `diploma-cyberpenguins-${Date.now()}.png`);
+              triggerBlobDownload(blob, `diploma-cyberpenguin-${Date.now()}.png`);
             } else {
               downloadCertificate('svg');
             }
@@ -3609,7 +3609,7 @@
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Diploma Cyberpenguins</title>
+        <title>Diploma Cyberpenguin: The Explorers We Must Never Forget</title>
         <style>
           @page { size: landscape; margin: 0; }
           body {

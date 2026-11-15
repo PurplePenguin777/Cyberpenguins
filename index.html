@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cyberpenguins</title>
+  <title>Cyberpenguin: The Explorers We Must Never Forget</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <meta name="theme-color" content="#050714" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Cyberpenguins — Aventura Espacial Educativa" />
-  <meta property="og:description" content="Explora el sistema solar, recolecta muestras cósmicas y aprende astrofísica con Cyberpenguins." />
+  <meta property="og:title" content="Cyberpenguin: The Explorers We Must Never Forget" />
+  <meta property="og:description" content="Explora el sistema solar, recolecta muestras cósmicas y descubre las legendarias sondas espaciales que nunca debemos olvidar." />
   <meta property="og:image" content="favicon.svg" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -68,8 +68,9 @@
           🧑‍🚀
         </div>
         <div>
-          <h2 id="cadet-intro-title" class="text-xl sm:text-2xl font-bold tracking-tight text-white text-center">¡Bienvenido(a) a Cyberpenguins!</h2>
+          <h2 id="cadet-intro-title" class="text-xl sm:text-2xl font-bold tracking-tight text-white text-center">¡Bienvenido(a) a Cyberpenguin!</h2>
           <p id="cadet-intro-subtitle" class="text-xs sm:text-sm text-slate-300 mt-1.5 text-center leading-relaxed">
+            <span class="text-cyan-300 font-semibold block mb-0.5">The Explorers We Must Never Forget</span>
             ¿Cómo te llamas, Cadete Espacial? Escribe tu nombre para preparar tu bitácora de vuelo y tu diploma oficial de la NASA.
           </p>
         </div>
@@ -248,11 +249,15 @@
       preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
 
     <div class="home-panel max-w-6xl w-full px-3 sm:px-6 py-4 sm:py-6 flex flex-col gap-6 sm:gap-8">
-      <!-- Encabezado Minimalista -->
+      <!-- Encabezado Principal -->
       <header class="relative flex items-center justify-center py-2">
-        <div class="flex items-center justify-center">
-          <h1 class="text-2xl sm:text-[32px] font-semibold tracking-[-0.035em] text-white text-center">Cyberpenguins
+        <div class="flex flex-col items-center justify-center text-center px-4">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white text-center leading-tight">
+            Cyberpenguin
           </h1>
+          <p class="text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.14em] text-cyan-300 uppercase text-center mt-0.5">
+            The Explorers We Must Never Forget
+          </p>
         </div>
         <div class="absolute right-0 flex items-center gap-2">
           <button id="home-start-btn" type="button" aria-hidden="true" tabindex="-1" class="hidden">Explorar</button>
@@ -321,7 +326,7 @@
   </section>
 
   <!-- Escenario Principal del Juego (sin texto aparte de los diálogos y cartelas) -->
-  <main id="game-screen" class="game-shell is-hidden" aria-label="Cyberpenguins">
+  <main id="game-screen" class="game-shell is-hidden" aria-label="Cyberpenguin: The Explorers We Must Never Forget">
     <!-- Maqueta Isométrica Navegable -->
     <section class="stage-viewport">
       <div id="iso-board" class="iso-board" role="application" aria-label="Escenario espacial" tabindex="0">
@@ -547,7 +552,7 @@
           <span class="text-2xl" aria-hidden="true">🏆</span>
           <div class="text-left">
             <h2 id="cert-modal-title" class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">Diploma de Honor Astronáutico</h2>
-            <p id="cert-modal-subtitle" class="text-xs text-slate-400">Misión Cyberpenguins & Archivos Espaciales de la NASA</p>
+            <p id="cert-modal-subtitle" class="text-xs text-slate-400">Cyberpenguin: The Explorers We Must Never Forget · Archivos de la NASA</p>
           </div>
         </div>
         <button id="certificate-close-btn" type="button" aria-label="Cerrar"

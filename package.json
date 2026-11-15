@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Aventura espacial interactiva de Cyberpenguin por misiones reales de la NASA.",
+  "description": "Aventura espacial interactiva de Cyberpenguin: The Explorers We Must Never Forget.",
   "scripts": {
     "dev": "vite",
     "start": "vite",

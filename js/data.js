@@ -2230,7 +2230,7 @@ const CHAPTERS_EN = [
   "es": {
     "langBtnLabel": "English",
     "langBtnTitle": "Switch to English",
-    "homeTitle": "Cyberpenguins",
+    "homeTitle": "Cyberpenguin",
     "exploreBtn": "Explorar",
     "exploreAgainBtn": "Explorar de nuevo",
     "continueBtn": "Continuar",
@@ -2269,7 +2269,7 @@ const CHAPTERS_EN = [
   "en": {
     "langBtnLabel": "Español",
     "langBtnTitle": "Cambiar a Español",
-    "homeTitle": "Cyberpenguins",
+    "homeTitle": "Cyberpenguin",
     "exploreBtn": "Explore",
     "exploreAgainBtn": "Explore again",
     "continueBtn": "Continue",
@@ -2308,7 +2308,7 @@ const CHAPTERS_EN = [
 };
 
   global.CYBERPENGUINS_DATA = {
-    TITLE: 'Cyberpenguins',
+    TITLE: 'Cyberpenguin: The Explorers We Must Never Forget',
     STORAGE_KEY: 'cyberpenguins_progress_v1',
     MAX_STARS_PER_CHAPTER: 5,
     CHAPTERS,
