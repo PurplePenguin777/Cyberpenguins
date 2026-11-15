@@ -190,11 +190,15 @@
     dom.penguinActor = document.getElementById('penguin-actor');
     dom.penguinSprite = document.getElementById('penguin-sprite');
 
-    // Cajón inferior automático de diálogo (uno por turno, sin links ni botones)
+    // Cajón inferior automático de diálogo interactivo con TTS y selector de turnos
     dom.dialogueModal = document.getElementById('dialogue-modal');
+    dom.dialogueBox = document.getElementById('dialogue-box');
     dom.dialogueMachinePreview = document.getElementById('dialogue-machine-preview');
     dom.dialogueMachineName = document.getElementById('dialogue-machine-name');
     dom.dialogueBlankSlot = document.getElementById('dialogue-blank-slot');
+    dom.dialogueStepCounter = document.getElementById('dialogue-step-counter');
+    dom.dialogueNextBtn = document.getElementById('dialogue-next-btn');
+    dom.dialogueCloseBtn = document.getElementById('dialogue-close-btn');
 
     dom.quizModal = document.getElementById('quiz-modal');
     dom.quizStarsBadge = document.getElementById('quiz-stars-badge');
@@ -254,6 +258,25 @@
     dom.passportCloseBtn.addEventListener('click', () => hideModal(dom.passportModal));
     dom.badgesCloseBtn.addEventListener('click', () => hideModal(dom.badgesModal));
     dom.certificateCloseBtn.addEventListener('click', () => hideModal(dom.certificateModal));
+
+    if (dom.dialogueNextBtn) {
+      dom.dialogueNextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        advanceDialogue();
+      });
+    }
+    if (dom.dialogueCloseBtn) {
+      dom.dialogueCloseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeDialogueModal();
+      });
+    }
+    if (dom.dialogueBox) {
+      dom.dialogueBox.addEventListener('click', (e) => {
+        if (e.target.closest('#dialogue-close-btn') || e.target.closest('#dialogue-next-btn')) return;
+        advanceDialogue();
+      });
+    }
 
     // Cerrar modales al hacer clic fuera del panel
     [
@@ -1724,15 +1747,30 @@
   }
 
   /* ========================================================================
-     Diálogo en Plantilla (1 espacio en blanco por máquina) + TTS
+     Diálogo Interactivo con TTS y Diálogos Adaptados para 8-12 Años
      ======================================================================== */
+
+  function getMachineDialogueTurns(machine) {
+    if (!machine) return [];
+    if (Array.isArray(machine.dialogue) && machine.dialogue.length > 0) {
+      return machine.dialogue;
+    }
+    const turns = [];
+    if (machine.penguinText) {
+      turns.push({ speaker: 'penguin', text: machine.penguinText, audioUrl: machine.penguinAudioUrl || '' });
+    }
+    if (machine.dialogueText) {
+      turns.push({ speaker: 'machine', text: machine.dialogueText, audioUrl: machine.audioUrl || '' });
+    }
+    return turns;
+  }
 
   function openDialogueModal(machine) {
     activeDialogueMachine = machine;
     activeDialogueTurn = 0;
     proximityMachineId = machine.id;
 
-    if (!state.inspectedMachines.includes(machine.id)) {
+    if (machine.id && machine.id !== 'final-scene' && !state.inspectedMachines.includes(machine.id)) {
       state.inspectedMachines.push(machine.id);
       saveState();
       renderStageEntities(getChapter(state.currentChapterId));
@@ -1740,6 +1778,29 @@
 
     showModal(dom.dialogueModal);
     renderAndPlayDialogueTurn();
+  }
+
+  function openFinalDialogueModal() {
+    const finalMachine = {
+      id: 'final-scene',
+      name: 'Nave de Cyberpenguin',
+      dialogue: DATA.FINAL_DIALOGUE || []
+    };
+    activeDialogueMachine = finalMachine;
+    activeDialogueTurn = 0;
+    showModal(dom.dialogueModal);
+    renderAndPlayDialogueTurn();
+  }
+
+  function advanceDialogue() {
+    if (!activeDialogueMachine) return;
+    const turns = getMachineDialogueTurns(activeDialogueMachine);
+    if (activeDialogueTurn + 1 < turns.length) {
+      activeDialogueTurn++;
+      renderAndPlayDialogueTurn();
+    } else {
+      closeDialogueModal();
+    }
   }
 
   function renderAndPlayDialogueTurn() {
@@ -1750,24 +1811,66 @@
 
     TTS.stop();
 
-    const isPenguinTurn = activeDialogueTurn === 0;
-    const speakerText = isPenguinTurn ? (machine.penguinText || '') : (machine.dialogueText || '');
-    const speakerAudio = isPenguinTurn ? (machine.penguinAudioUrl || '') : (machine.audioUrl || '');
+    const turns = getMachineDialogueTurns(machine);
+    if (!turns || turns.length === 0 || activeDialogueTurn >= turns.length) {
+      closeDialogueModal();
+      return;
+    }
 
-    dom.dialogueMachineName.textContent = isPenguinTurn ? 'Cyberpenguin' : machine.name;
-    dom.dialogueMachineName.classList.toggle('dialogue-speaker-penguin', isPenguinTurn);
-    dom.dialogueMachineName.classList.toggle('dialogue-speaker-machine', !isPenguinTurn);
+    const currentTurn = turns[activeDialogueTurn];
+    const isPenguin = currentTurn.speaker === 'penguin';
+    const isShip = currentTurn.speaker === 'ship';
+    const speakerText = currentTurn.text || '';
+    const speakerAudio = currentTurn.audioUrl || '';
 
-    dom.dialogueMachinePreview.innerHTML = isPenguinTurn
-      ? MODELS.cyberpenguin('right')
-      : (MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '');
+    let speakerName = machine.name;
+    let previewSvg = '';
+    let pitch = 0.95;
+    let rate = 0.98;
 
-    dom.dialogueBlankSlot.textContent = speakerText;
+    if (isPenguin) {
+      speakerName = 'Cyberpenguin';
+      previewSvg = MODELS.cyberpenguin('right');
+      pitch = 1.22;
+      rate = 1.0;
+    } else if (isShip) {
+      speakerName = 'Nave de Cyberpenguin';
+      previewSvg = typeof MODELS.spaceship === 'function' ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true }) : '';
+      pitch = 0.92;
+      rate = 0.96;
+    } else {
+      speakerName = machine.name;
+      previewSvg = MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '';
+      pitch = 0.96;
+      rate = 0.98;
+    }
+
+    if (dom.dialogueMachineName) {
+      dom.dialogueMachineName.textContent = speakerName;
+      dom.dialogueMachineName.classList.toggle('dialogue-speaker-penguin', isPenguin);
+      dom.dialogueMachineName.classList.toggle('dialogue-speaker-machine', !isPenguin);
+    }
+
+    if (dom.dialogueMachinePreview) {
+      dom.dialogueMachinePreview.innerHTML = previewSvg;
+    }
+
+    if (dom.dialogueBlankSlot) {
+      dom.dialogueBlankSlot.textContent = speakerText;
+    }
+
+    if (dom.dialogueStepCounter) {
+      dom.dialogueStepCounter.textContent = `${activeDialogueTurn + 1}/${turns.length}`;
+    }
+
+    if (dom.dialogueNextBtn) {
+      dom.dialogueNextBtn.textContent = activeDialogueTurn + 1 === turns.length ? '✓' : '▶';
+    }
 
     const handleTurnComplete = () => {
       if (turnToken !== activeDialogueToken || activeDialogueMachine !== machine) return;
-      if (isPenguinTurn) {
-        activeDialogueTurn = 1;
+      if (activeDialogueTurn + 1 < turns.length) {
+        activeDialogueTurn++;
         renderAndPlayDialogueTurn();
       } else {
         closeDialogueModal();
@@ -1777,9 +1880,12 @@
     TTS.speak({
       text: speakerText,
       audioUrl: speakerAudio,
+      pitch,
+      rate,
       onEnd: handleTurnComplete,
       onEmpty: () => {
-        dialogueAutoTimer = setTimeout(handleTurnComplete, 1400);
+        const readingMs = Math.max(2600, Math.min(6500, speakerText.length * 60));
+        dialogueAutoTimer = setTimeout(handleTurnComplete, readingMs);
       }
     });
   }
@@ -1999,6 +2105,9 @@
       const liftoff = LIFTOFF_STEPS[currentId] ? [LIFTOFF_STEPS[currentId]] : [];
       playTravelSequence(liftoff, () => {
         showHomeScreen();
+        setTimeout(() => {
+          openFinalDialogueModal();
+        }, 700);
       });
       return;
     }

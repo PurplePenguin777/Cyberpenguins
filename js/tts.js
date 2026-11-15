@@ -19,7 +19,7 @@
     }
   }
 
-  function speak({ text, audioUrl, onStart, onEnd, onEmpty }) {
+  function speak({ text, audioUrl, pitch, rate, onStart, onEnd, onEmpty }) {
     stop();
 
     const cleanAudioUrl = (audioUrl || '').trim();
@@ -50,14 +50,18 @@
     }
 
     if (typeof global.speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') {
-      if (onEnd) onEnd();
+      if (onEmpty) {
+        onEmpty();
+      } else if (onEnd) {
+        setTimeout(onEnd, 1400);
+      }
       return false;
     }
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'es-ES';
-    utterance.rate = 0.96;
-    utterance.pitch = 1.05;
+    utterance.rate = typeof rate === 'number' ? rate : 0.96;
+    utterance.pitch = typeof pitch === 'number' ? pitch : 1.05;
     utterance.onstart = () => {
       if (onStart) onStart();
     };
