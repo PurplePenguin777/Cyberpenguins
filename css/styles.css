@@ -553,14 +553,120 @@ a:focus-visible {
 }
 
 .home-chapter-emblem {
-  width: auto;
-  min-width: 180px;
-  min-height: 108px;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+  min-width: 0;
 }
 
-.home-chapter-card:hover .home-chapter-emblem {
-  transform: translateY(-2px) scale(1.03);
+/* Fondo cósmico: versión horizontal o vertical según la orientación */
+.home-screen .cosmic-panorama-svg.is-portrait {
+  display: none;
+}
+
+@media (orientation: portrait) {
+  .home-screen .cosmic-panorama-svg.is-landscape {
+    display: none;
+  }
+
+  .home-screen .cosmic-panorama-svg.is-portrait {
+    display: block;
+  }
+}
+
+/* Escena por capas dentro de cada tarjeta */
+.chapter-scene {
+  --sx: 0;
+  --sy: 0;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 0 28px rgba(2, 6, 20, 0.5);
+  isolation: isolate;
+}
+
+.scene-layer {
+  position: absolute;
+  inset: -4% -6%;
+  width: 112%;
+  height: 108%;
+  pointer-events: none;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.scene-far {
+  transform: translate3d(calc(var(--sx) * -3px), calc(var(--sy) * -2px), 0);
+}
+
+.scene-mid {
+  transform: translate3d(calc(var(--sx) * -6px), calc(var(--sy) * -4px), 0);
+}
+
+.scene-ground {
+  transform: translate3d(calc(var(--sx) * -10px), calc(var(--sy) * -6px), 0);
+}
+
+.scene-machine {
+  position: absolute;
+  left: 50%;
+  bottom: 17%;
+  width: 27%;
+  z-index: 3;
+  pointer-events: none;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(calc(-50% + var(--sx) * -10px), calc(var(--sy) * -6px), 0) rotate(calc(var(--sx) * -1.5deg));
+  filter: drop-shadow(0 6px 8px rgba(2, 6, 20, 0.55));
+  will-change: transform;
+}
+
+.scene-machine-inner svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Sombra de contacto: la máquina se apoya sobre la superficie */
+.scene-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 13.5%;
+  width: 26%;
+  height: 7%;
+  z-index: 2;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(2, 6, 20, 0.62) 0%, rgba(2, 6, 20, 0) 72%);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(calc(-50% + var(--sx) * -10px), calc(var(--sy) * -6px), 0);
+}
+
+/* Frontera Espacial: sin superficie, la máquina flota en gravedad cero */
+.chapter-scene[data-scene="deep-space"] .scene-machine {
+  bottom: 28%;
+  transform: translate3d(calc(-50% + var(--sx) * -15px), calc(var(--sy) * -10px), 0) rotate(calc(var(--sx) * -4deg));
+}
+
+.chapter-scene[data-scene="deep-space"] .scene-machine-inner {
+  animation: sceneFloat 6s ease-in-out infinite alternate;
+}
+
+.scene-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 20%;
+  width: 34%;
+  height: 8%;
+  z-index: 2;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(126, 232, 250, 0.28) 0%, rgba(126, 232, 250, 0) 72%);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(calc(-50% + var(--sx) * -8px), calc(var(--sy) * -5px), 0);
+}
+
+@keyframes sceneFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-5px); }
 }
 
 .home-dock {

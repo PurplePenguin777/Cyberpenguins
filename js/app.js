@@ -161,6 +161,8 @@
     dom.travelSkipBtn = document.getElementById('travel-skip-btn');
 
     dom.homeScreen = document.getElementById('home-screen');
+    dom.homeBgLandscape = document.getElementById('home-bg-landscape');
+    dom.homeBgPortrait = document.getElementById('home-bg-portrait');
     dom.homeStartBtn = document.getElementById('home-start-btn');
     dom.homePassportSlots = document.getElementById('home-passport-slots');
     dom.homeTotalStars = document.getElementById('home-total-stars');
@@ -253,6 +255,8 @@
     dom.homeDownloadCertificateBtn.addEventListener('click', downloadCertificate);
     dom.downloadCertificateBtn.addEventListener('click', downloadCertificate);
     dom.resetProgressBtn.addEventListener('click', resetProgress);
+    renderHomeBackground();
+    bindChapterParallax();
 
     dom.quizCloseBtn.addEventListener('click', closeQuizModal);
     dom.quizValidateBtn.addEventListener('click', validateActiveQuiz);
@@ -1651,105 +1655,89 @@
     return isChapterCompleted(chapter.id) || chapter.machines.some((m) => state.inspectedMachines.includes(m.id));
   }
 
-  function isometricPedestalSvg(chapterId) {
-    if (chapterId === 'moon') {
-      return `
-        <svg class="mv-pedestal-svg" viewBox="0 0 210 76" width="204" height="74" aria-hidden="true">
-          <defs>
-            <linearGradient id="moonCurvedGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#e2e8f0" />
-              <stop offset="70%" stop-color="#94a3b8" />
-              <stop offset="100%" stop-color="#64748b" />
-            </linearGradient>
-            <linearGradient id="moonDepthGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#64748b" />
-              <stop offset="100%" stop-color="#1e293b" />
-            </linearGradient>
-          </defs>
-          <!-- Grosor y curvatura de la corteza lunar -->
-          <path d="M 18,34 C 18,52 192,52 192,34 L 192,44 C 192,64 18,64 18,44 Z" fill="url(#moonDepthGrad)" />
-          <!-- Superficie circular y curvada de la Luna -->
-          <ellipse cx="105" cy="34" rx="87" ry="20" fill="url(#moonCurvedGrad)" stroke="rgba(226, 232, 240, 0.45)" stroke-width="1.2" />
-          <!-- Cráteres lunares circulares -->
-          <ellipse cx="72" cy="33" rx="18" ry="7.5" fill="#64748b" />
-          <ellipse cx="73" cy="33.5" rx="14" ry="5.5" fill="#334155" />
-          <ellipse cx="71" cy="32" rx="13" ry="5" fill="#1e293b" opacity="0.6" />
-          <ellipse cx="140" cy="36" rx="13" ry="5.5" fill="#64748b" />
-          <ellipse cx="140" cy="36.5" rx="10" ry="4" fill="#334155" />
-          <ellipse cx="108" cy="24" rx="7" ry="3" fill="#475569" />
-          <!-- Resplandor tenue en el limbo curvo lunar -->
-          <path d="M 22,34 C 55,22 155,22 188,34" fill="none" stroke="#f8fafc" stroke-width="1.2" opacity="0.6" />
-        </svg>
-      `;
+  function renderHomeBackground() {
+    if (typeof MODELS.homeBackdrop !== 'function') return;
+    if (dom.homeBgLandscape) dom.homeBgLandscape.innerHTML = MODELS.homeBackdrop('landscape');
+    if (dom.homeBgPortrait) dom.homeBgPortrait.innerHTML = MODELS.homeBackdrop('portrait');
+  }
+
+  /* Profundidad en las tarjetas: al deslizar (pantalla vertical o táctil) o al pasar el mouse (horizontal) */
+
+  function isScrollParallaxMode() {
+    if (typeof global.matchMedia !== 'function') return false;
+    return (
+      global.matchMedia('(orientation: portrait)').matches ||
+      !global.matchMedia('(hover: hover) and (pointer: fine)').matches
+    );
+  }
+
+  function setSceneParallax(card, sx, sy) {
+    const scene = card && card.querySelector ? card.querySelector('.chapter-scene') : null;
+    if (!scene) return;
+    scene.style.setProperty('--sx', sx.toFixed(3));
+    scene.style.setProperty('--sy', sy.toFixed(3));
+  }
+
+  function clampUnit(v) {
+    return Math.max(-1, Math.min(1, v));
+  }
+
+  function updateScrollParallax() {
+    if (!dom.chapterNav || !dom.chapterNav.querySelectorAll) return;
+    const cards = dom.chapterNav.querySelectorAll('.home-chapter-card') || [];
+    const scrollMode = isScrollParallaxMode();
+    const vh = global.innerHeight || 800;
+    cards.forEach((card) => {
+      if (!scrollMode) {
+        setSceneParallax(card, 0, 0);
+        return;
+      }
+      const r = card.getBoundingClientRect();
+      const p = clampUnit((r.top + r.height / 2 - vh / 2) / (vh / 2));
+      setSceneParallax(card, p * 0.9, p);
+    });
+  }
+
+  function bindChapterParallax() {
+    if (!dom.chapterNav || typeof dom.chapterNav.addEventListener !== 'function') return;
+    let ticking = false;
+    const requestScrollUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      const run = () => {
+        ticking = false;
+        updateScrollParallax();
+      };
+      if (typeof global.requestAnimationFrame === 'function') global.requestAnimationFrame(run);
+      else run();
+    };
+
+    dom.chapterNav.addEventListener('pointermove', (e) => {
+      if (isScrollParallaxMode()) return;
+      const card = e.target && e.target.closest ? e.target.closest('.home-chapter-card') : null;
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const sx = clampUnit(((e.clientX - r.left) / r.width - 0.5) * 2);
+      const sy = clampUnit(((e.clientY - r.top) / r.height - 0.5) * 2);
+      setSceneParallax(card, sx, sy);
+    });
+
+    dom.chapterNav.addEventListener('pointerout', (e) => {
+      if (isScrollParallaxMode()) return;
+      const card = e.target && e.target.closest ? e.target.closest('.home-chapter-card') : null;
+      if (!card) return;
+      if (e.relatedTarget && card.contains && card.contains(e.relatedTarget)) return;
+      setSceneParallax(card, 0, 0);
+    });
+
+    if (dom.homeScreen && typeof dom.homeScreen.addEventListener === 'function') {
+      dom.homeScreen.addEventListener('scroll', requestScrollUpdate, { passive: true });
     }
-    if (chapterId === 'mars') {
-      return `
-        <svg class="mv-pedestal-svg" viewBox="0 0 210 76" width="204" height="74" aria-hidden="true">
-          <defs>
-            <linearGradient id="marsCurvedGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fb923c" />
-              <stop offset="65%" stop-color="#c2410c" />
-              <stop offset="100%" stop-color="#9a3412" />
-            </linearGradient>
-            <linearGradient id="marsDepthGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#9a3412" />
-              <stop offset="100%" stop-color="#431407" />
-            </linearGradient>
-          </defs>
-          <!-- Grosor y curvatura de la corteza marciana -->
-          <path d="M 18,34 C 18,52 192,52 192,34 L 192,44 C 192,64 18,64 18,44 Z" fill="url(#marsDepthGrad)" />
-          <!-- Superficie circular y curvada de Marte -->
-          <ellipse cx="105" cy="34" rx="87" ry="20" fill="url(#marsCurvedGrad)" stroke="rgba(254, 215, 170, 0.45)" stroke-width="1.2" />
-          <!-- Ondulaciones curvas de dunas marcianas -->
-          <path d="M 32,32 C 60,38 90,30 120,35 C 145,39 170,33 182,31" fill="none" stroke="#ea580c" stroke-width="2.2" opacity="0.75" />
-          <path d="M 45,38 C 75,44 110,38 145,42 C 160,43 170,41 176,38" fill="none" stroke="#7c2d12" stroke-width="1.8" opacity="0.65" />
-          <!-- Cráter circular marciano -->
-          <ellipse cx="138" cy="32" rx="14" ry="6" fill="#7c2d12" />
-          <ellipse cx="138" cy="32.5" rx="10.5" ry="4.2" fill="#431407" />
-          <!-- Resplandor en el limbo curvo de Marte -->
-          <path d="M 22,34 C 55,22 155,22 188,34" fill="none" stroke="#ffedd5" stroke-width="1.2" opacity="0.7" />
-        </svg>
-      `;
+    if (typeof global.addEventListener === 'function') {
+      global.addEventListener('resize', requestScrollUpdate);
+      global.addEventListener('orientationchange', requestScrollUpdate);
     }
-    return `
-      <svg class="mv-pedestal-svg" viewBox="0 0 210 76" width="204" height="74" aria-hidden="true">
-        <defs>
-          <linearGradient id="deepCurvedGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#1e293b" />
-            <stop offset="60%" stop-color="#0f172a" />
-            <stop offset="100%" stop-color="#050814" />
-          </linearGradient>
-          <linearGradient id="deepDepthGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#0f172a" />
-            <stop offset="100%" stop-color="#020617" />
-          </linearGradient>
-        </defs>
-        <!-- Estrellas a la lejanía en el vacío cósmico de la Frontera Espacial -->
-        <g fill="#f8fafc">
-          <circle cx="24" cy="14" r="1.1" opacity="0.75" />
-          <circle cx="48" cy="8" r="0.8" opacity="0.6" />
-          <circle cx="78" cy="16" r="1.3" fill="#7ee8fa" opacity="0.85" />
-          <circle cx="105" cy="6" r="0.9" opacity="0.55" />
-          <circle cx="136" cy="12" r="1.2" opacity="0.8" />
-          <circle cx="168" cy="8" r="1" fill="#fed7aa" opacity="0.75" />
-          <circle cx="188" cy="18" r="0.8" opacity="0.65" />
-          <circle cx="16" cy="52" r="0.9" opacity="0.5" />
-          <circle cx="38" cy="64" r="1.1" fill="#7ee8fa" opacity="0.7" />
-          <circle cx="174" cy="62" r="1.2" opacity="0.75" />
-          <circle cx="194" cy="50" r="0.8" fill="#bae6fd" opacity="0.6" />
-        </g>
-        <!-- Base de asteroide 433 Eros en el vacío -->
-        <path d="M 18,34 C 18,52 192,52 192,34 L 192,44 C 192,64 18,64 18,44 Z" fill="url(#deepDepthGrad)" />
-        <!-- Superficie de asteroide con borde de resplandor cósmico -->
-        <ellipse cx="105" cy="34" rx="87" ry="20" fill="url(#deepCurvedGrad)" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.2" />
-        <!-- Facetas de roca del asteroide -->
-        <polygon points="56,32 76,28 92,34 72,38" fill="#334155" opacity="0.7" />
-        <polygon points="118,34 140,29 158,35 136,39" fill="#1e293b" opacity="0.9" />
-        <polygon points="86,34 116,31 126,37 98,40" fill="#38bdf8" opacity="0.18" />
-        <!-- Resplandor tenue en el borde cósmico -->
-        <path d="M 22,34 C 55,22 155,22 188,34" fill="none" stroke="#38bdf8" stroke-width="1.2" opacity="0.65" />
-      </svg>
-    `;
   }
 
   function hasChapterProgress(chapterId) {
@@ -1773,11 +1761,7 @@
       const singleMachineSvg = firstMachine && typeof MODELS[firstMachine.modelKey] === 'function'
         ? MODELS[firstMachine.modelKey]()
         : '';
-      const machinePreview = `
-        <div class="w-20 h-20 flex items-center justify-center drop-shadow-[0_12px_18px_rgba(2,6,23,0.7)] [&_svg]:w-full [&_svg]:h-full">
-          ${singleMachineSvg}
-        </div>
-      `;
+      const sceneHtml = MODELS.chapterScene(chapter.id, singleMachineSvg);
 
       return `
         <div class="home-chapter-card p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
@@ -1787,9 +1771,8 @@
             <span class="text-[11px] font-medium uppercase tracking-[0.22em] text-slate-400 text-center">${chapter.name}</span>
           </div>
 
-          <div class="home-chapter-emblem relative flex flex-col items-center justify-end w-full pt-2">
-            <div class="relative z-10 flex items-end justify-center -mb-5">${machinePreview}</div>
-            ${isometricPedestalSvg(chapter.id)}
+          <div class="home-chapter-emblem relative w-full">
+            ${sceneHtml}
           </div>
 
           <div class="flex flex-col items-center gap-3 w-full">
@@ -1812,6 +1795,7 @@
         enterChapterFromHome(btn.dataset.enterChapter);
       });
     });
+    updateScrollParallax();
   }
 
   function updateHUD() {
