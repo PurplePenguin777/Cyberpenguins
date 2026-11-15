@@ -270,8 +270,8 @@
     }
     if (dom.certModalSubtitle) {
       dom.certModalSubtitle.textContent = isEn
-        ? 'Cyberpenguin: The Explorers We Must Never Forget · NASA Space Archives'
-        : 'Cyberpenguin: The Explorers We Must Never Forget · Archivos de la NASA';
+        ? 'Cyberpenguin: The Explorers We Must Never Forget · Space archives'
+        : 'Cyberpenguin: The Explorers We Must Never Forget · Archivos espaciales';
     }
     if (dom.certCadetLabel) {
       dom.certCadetLabel.textContent = isEn ? 'Astronaut name on diploma:' : 'Nombre del astronauta en el diploma:';
@@ -3439,7 +3439,9 @@
       ? today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
       : today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    const txtOverline = 'Cyberpenguin: The Explorers We Must Never Forget · Archivos de la NASA';
+    const txtOverline = isEn
+      ? 'Cyberpenguin: The Explorers We Must Never Forget · Space archives'
+      : 'Cyberpenguin: The Explorers We Must Never Forget · Archivos espaciales';
     const txtDiploma = isEn
       ? 'Honorary astronautical diploma'
       : 'Diploma de honor astronáutico';
@@ -3455,35 +3457,58 @@
     const txtSignCommander = isEn ? 'Flight commander' : 'Comandante de vuelo';
     const txtSignAI = isEn ? "Ship's AI (Paulina)" : 'IA de la nave (Paulina)';
     const txtSignAIRole = isEn ? 'Mission control' : 'Control de misión';
-    const txtMissionId = 'NASA-CP-2026-X89';
+    const txtMissionId = isEn ? 'Mission code: CP-2026-X89' : 'Código de misión: CP-2026-X89';
     const txtDateLabel = isEn ? `Date: ${dateFormatted}` : `Fecha: ${dateFormatted}`;
+
+    let certBackdrop = '';
+    if (MODELS && typeof MODELS.homeBackdrop === 'function') {
+      certBackdrop = MODELS.homeBackdrop('landscape')
+        .replace(/bgCosmosGrad-l/g, 'bgCosmosGrad-cert')
+        .replace(/bgmoonl/g, 'bgmooncert')
+        .replace(/bgearthl/g, 'bgearthcert')
+        .replace(/bgerosl/g, 'bgeroscert')
+        .replace(/bgmarsl/g, 'bgmarscert');
+    }
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700">
   <defs>
-    <linearGradient id="certBg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#090e22" />
-      <stop offset="100%" stop-color="#040612" />
+    <clipPath id="certCardClip">
+      <rect width="1000" height="700" rx="32" />
+    </clipPath>
+    <linearGradient id="certFallbackGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050814" />
+      <stop offset="42%" stop-color="#070c1d" />
+      <stop offset="85%" stop-color="#091228" />
+      <stop offset="100%" stop-color="#0d1834" />
     </linearGradient>
-    <radialGradient id="centerGlow" cx="50%" cy="40%" r="60%">
-      <stop offset="0%" stop-color="rgba(56,189,248,0.08)" />
-      <stop offset="100%" stop-color="rgba(56,189,248,0)" />
+    <radialGradient id="certVignette" cx="50%" cy="45%" r="62%">
+      <stop offset="0%" stop-color="#060a1a" stop-opacity="0.82" />
+      <stop offset="60%" stop-color="#060a1a" stop-opacity="0.65" />
+      <stop offset="100%" stop-color="#060a1a" stop-opacity="0.25" />
     </radialGradient>
   </defs>
 
-  <!-- Fondo Minimalista -->
-  <rect width="1000" height="700" rx="32" fill="url(#certBg)" />
-  <rect width="1000" height="700" rx="32" fill="url(#centerGlow)" />
+  <!-- Fondo de la Pantalla de Menú Inicial del Juego (Cosmos, Planetas y Órbitas) -->
+  <g clip-path="url(#certCardClip)">
+    ${certBackdrop ? `
+    <svg x="0" y="0" width="1000" height="700" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+      ${certBackdrop}
+    </svg>` : `
+    <rect width="1000" height="700" fill="url(#certFallbackGrad)" />`}
+    <!-- Velo de contraste y lectura centrado -->
+    <rect width="1000" height="700" fill="url(#certVignette)" />
+  </g>
 
   <!-- Marco Squircle Fino y Sofisticado -->
-  <rect x="28" y="28" width="944" height="644" rx="24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.2" />
-  <rect x="36" y="36" width="928" height="628" rx="18" fill="none" stroke="rgba(56,189,248,0.22)" stroke-width="0.8" />
+  <rect x="28" y="28" width="944" height="644" rx="24" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1.2" />
+  <rect x="36" y="36" width="928" height="628" rx="18" fill="none" stroke="rgba(56,189,248,0.25)" stroke-width="0.8" />
 
   <!-- Puntos astronómicos en las 4 esquinas -->
-  <circle cx="56" cy="56" r="2.5" fill="#38bdf8" opacity="0.6" />
-  <circle cx="944" cy="56" r="2.5" fill="#38bdf8" opacity="0.6" />
-  <circle cx="56" cy="644" r="2.5" fill="#38bdf8" opacity="0.6" />
-  <circle cx="944" cy="644" r="2.5" fill="#38bdf8" opacity="0.6" />
+  <circle cx="56" cy="56" r="2.5" fill="#38bdf8" opacity="0.75" />
+  <circle cx="944" cy="56" r="2.5" fill="#38bdf8" opacity="0.75" />
+  <circle cx="56" cy="644" r="2.5" fill="#38bdf8" opacity="0.75" />
+  <circle cx="944" cy="644" r="2.5" fill="#38bdf8" opacity="0.75" />
 
   <!-- Cabecera Discreta -->
   <circle cx="500" cy="80" r="3.5" fill="#38bdf8" />
@@ -3491,7 +3516,7 @@
 
   <!-- Título del Diploma -->
   <text x="500" y="160" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="700" letter-spacing="0.4" fill="#ffffff">${txtDiploma}</text>
-  <line x1="430" y1="182" x2="570" y2="182" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+  <line x1="430" y1="182" x2="570" y2="182" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
 
   <!-- Concesión -->
   <text x="500" y="222" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13.5" font-weight="400" fill="#94a3b8">${txtConferred}</text>
@@ -3504,14 +3529,14 @@
 
   <!-- Píldora de Rango y Estrellas -->
   <g transform="translate(340, 356)">
-    <rect x="0" y="0" width="320" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+    <rect x="0" y="0" width="320" height="34" rx="17" fill="rgba(12, 18, 36, 0.65)" stroke="rgba(255,255,255,0.14)" stroke-width="1" />
     <text x="160" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="600" fill="#fde047">${txtStars}</text>
   </g>
 
   <!-- Sello Central Oficial con Huella del Pingüino -->
   <g transform="translate(500, 464)">
-    <circle cx="0" cy="0" r="42" fill="rgba(56,189,248,0.06)" stroke="rgba(56,189,248,0.3)" stroke-width="1.2" />
-    <circle cx="0" cy="0" r="36" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="3 2" />
+    <circle cx="0" cy="0" r="42" fill="rgba(56,189,248,0.08)" stroke="rgba(56,189,248,0.35)" stroke-width="1.2" />
+    <circle cx="0" cy="0" r="36" fill="rgba(12, 18, 36, 0.4)" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" stroke-dasharray="3 2" />
     <g transform="translate(-28, -28)">
       ${innerPaw}
     </g>
