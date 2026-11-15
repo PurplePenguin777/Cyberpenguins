@@ -104,4 +104,5 @@
   }
 
   M.surveyor3 = surveyor3;
+  M.surveyor1 = surveyor3; // Alias para compatibilidad con la misión Surveyor 1
 })(typeof window !== 'undefined' ? window : globalThis);

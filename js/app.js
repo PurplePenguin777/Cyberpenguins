@@ -234,6 +234,20 @@
     dom.dialogueBlankSlot = document.getElementById('dialogue-blank-slot');
     dom.dialogueTopicsContainer = document.getElementById('dialogue-topics-container');
 
+    // Globos de diálogo sobre personajes (Estilo Animal Crossing)
+    dom.stageSpeechBubble = document.getElementById('stage-speech-bubble');
+    dom.speechBubbleAvatar = document.getElementById('speech-bubble-avatar');
+    dom.speechBubbleName = document.getElementById('speech-bubble-name');
+    dom.speechBubbleText = document.getElementById('speech-bubble-text');
+    dom.speechBubbleOptions = document.getElementById('speech-bubble-options');
+    dom.speechBubbleNextBtn = document.getElementById('speech-bubble-next-btn');
+    dom.speechBubbleCloseBtn = document.getElementById('speech-bubble-close-btn');
+    dom.speechBubbleActionRow = document.getElementById('speech-bubble-action-row');
+
+    // Globo de pensamiento de Cyberpenguin (💭)
+    dom.stageThoughtBubble = document.getElementById('stage-thought-bubble');
+    dom.thoughtBubbleText = document.getElementById('thought-bubble-text');
+
     dom.stageActionPrompt = document.getElementById('stage-action-prompt');
     dom.stageActionBtn = document.getElementById('stage-action-btn');
     dom.stageActionIcon = document.getElementById('stage-action-icon');
@@ -333,6 +347,13 @@
     dom.passportCloseBtn.addEventListener('click', () => hideModal(dom.passportModal));
     dom.badgesCloseBtn.addEventListener('click', () => hideModal(dom.badgesModal));
     dom.certificateCloseBtn.addEventListener('click', () => hideModal(dom.certificateModal));
+
+    if (dom.speechBubbleCloseBtn) {
+      dom.speechBubbleCloseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeDialogueModal();
+      });
+    }
 
     if (dom.dialogueBox) {
       dom.dialogueBox.addEventListener('click', (e) => {
@@ -1649,6 +1670,13 @@
       FX.emitBurst(penguinPos, chapter.hasSurface ? 'jump' : 'rcs', chapter.id, siteId);
     }
 
+    // Globo de pensamiento ambiental sobre Cyberpenguin al saltar en gravedad especial
+    if (DATA.AMBIENT_THOUGHTS && DATA.AMBIENT_THOUGHTS[chapter.id]) {
+      const thoughts = DATA.AMBIENT_THOUGHTS[chapter.id];
+      const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
+      showPenguinThought(thought);
+    }
+
     if (!chapter.hasSurface) {
       startEvaTetherLoop(profile.jumpDurationMs + 120);
     }
@@ -2071,27 +2099,335 @@
   }
 
   /* ========================================================================
-     Diálogo Interactivo con TTS y Diálogos Adaptados para 8-12 Años
+     Globos de Diálogo Encima de los Personajes (Estilo Animal Crossing)
      ======================================================================== */
 
-  function getMachineDialogueTurns(machine) {
-    if (!machine) return [];
-    if (Array.isArray(machine.dialogue) && machine.dialogue.length > 0) {
-      return machine.dialogue;
+  let activeBranchState = null;
+  let thoughtBubbleTimer = null;
+
+  function positionSpeechBubble(x, y) {
+    if (!dom.stageSpeechBubble) return;
+    const clampedX = Math.max(22, Math.min(78, x));
+    const isFlipped = y < 30;
+    dom.stageSpeechBubble.classList.toggle('bubble-flipped', isFlipped);
+    dom.stageSpeechBubble.style.left = `${clampedX}%`;
+    const targetY = isFlipped ? Math.min(78, y + 8) : Math.max(15, y - 8);
+    dom.stageSpeechBubble.style.top = `${targetY}%`;
+  }
+
+  function hideSpeechBubble() {
+    if (dom.stageSpeechBubble) {
+      dom.stageSpeechBubble.classList.add('is-hidden');
     }
-    const turns = [];
-    if (machine.penguinText) {
-      turns.push({ speaker: 'penguin', text: machine.penguinText, audioUrl: machine.penguinAudioUrl || '' });
+    clearTimeout(dialogueAutoTimer);
+    TTS.stop();
+  }
+
+  function showPenguinThought(text) {
+    if (!dom.stageThoughtBubble || !dom.thoughtBubbleText || !text) return;
+    clearTimeout(thoughtBubbleTimer);
+
+    dom.thoughtBubbleText.textContent = text;
+    const clampedX = Math.max(18, Math.min(82, penguinPos.x));
+    const targetY = Math.max(12, penguinPos.y - 12);
+    dom.stageThoughtBubble.style.left = `${clampedX}%`;
+    dom.stageThoughtBubble.style.top = `${targetY}%`;
+    dom.stageThoughtBubble.classList.remove('is-hidden');
+
+    thoughtBubbleTimer = setTimeout(() => {
+      if (dom.stageThoughtBubble) {
+        dom.stageThoughtBubble.classList.add('is-hidden');
+      }
+    }, 4200);
+  }
+
+  function showSpeechBubbleStep({ speaker, name, avatarSvg, text, audioUrl, anchorPos, choices, onNext, onChoice }) {
+    if (!dom.stageSpeechBubble) return;
+    const turnToken = ++activeDialogueToken;
+    clearTimeout(dialogueAutoTimer);
+    TTS.stop();
+
+    const isPenguin = speaker === 'penguin';
+    const isShip = speaker === 'ship';
+
+    dom.stageSpeechBubble.classList.remove('speaker-is-penguin', 'speaker-is-machine', 'speaker-is-ship');
+    if (isPenguin) dom.stageSpeechBubble.classList.add('speaker-is-penguin');
+    else if (isShip) dom.stageSpeechBubble.classList.add('speaker-is-ship');
+    else dom.stageSpeechBubble.classList.add('speaker-is-machine');
+
+    if (dom.speechBubbleAvatar) {
+      dom.speechBubbleAvatar.innerHTML = avatarSvg || '';
     }
-    if (machine.dialogueText) {
-      turns.push({ speaker: 'machine', text: machine.dialogueText, audioUrl: machine.audioUrl || '' });
+    if (dom.speechBubbleName) {
+      dom.speechBubbleName.textContent = name || (isPenguin ? 'Cyberpenguin' : isShip ? 'Nave de Cyberpenguin' : 'Máquina');
     }
-    return turns;
+    if (dom.speechBubbleText) {
+      const cleanText = (text || '').trim();
+      if (cleanText) {
+        dom.speechBubbleText.textContent = cleanText;
+        dom.speechBubbleText.style.display = 'block';
+      } else {
+        dom.speechBubbleText.textContent = '';
+        dom.speechBubbleText.style.display = 'none';
+      }
+    }
+
+    // Ubicar el globo justo encima del personaje que habla
+    const anchor = anchorPos || (isPenguin ? penguinPos : { x: 50, y: 50 });
+    positionSpeechBubble(anchor.x, anchor.y);
+
+    // Renderizar opciones interactivas de respuesta estilo Animal Crossing
+    if (dom.speechBubbleOptions) {
+      dom.speechBubbleOptions.innerHTML = '';
+      if (Array.isArray(choices) && choices.length > 0) {
+        choices.forEach((c) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'speech-choice-btn';
+          btn.textContent = c.label || c.text;
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            triggerHaptic('tap');
+            playHarmony('step');
+            if (onChoice) onChoice(c);
+          });
+          dom.speechBubbleOptions.appendChild(btn);
+        });
+      }
+    }
+
+    // Botón de continuar cuando no hay opciones múltiples
+    if (dom.speechBubbleActionRow && dom.speechBubbleNextBtn) {
+      if (Array.isArray(choices) && choices.length > 0) {
+        dom.speechBubbleActionRow.style.display = 'none';
+      } else {
+        dom.speechBubbleActionRow.style.display = 'flex';
+        dom.speechBubbleNextBtn.onclick = (e) => {
+          e.stopPropagation();
+          triggerHaptic('tap');
+          if (onNext) onNext();
+        };
+      }
+    }
+
+    dom.stageSpeechBubble.classList.remove('is-hidden');
+
+    const pitch = isPenguin ? 1.22 : isShip ? 0.92 : 0.98;
+    const rate = isPenguin ? 1.0 : 0.98;
+
+    if (text && text.trim()) {
+      TTS.speak({
+        text,
+        audioUrl: audioUrl || '',
+        pitch,
+        rate,
+        onEnd: () => {
+          // En diálogos con botón siguiente, el usuario pulsa para avanzar
+        },
+        onEmpty: () => {
+          // Fallback
+        }
+      });
+    }
+  }
+
+  function startBranchingDialogue(machine) {
+    activeDialogueMachine = machine;
+    const branch = machine.branchingDialogue;
+    if (!branch) {
+      fallbackLinearDialogue(machine);
+      return;
+    }
+
+    activeBranchState = {
+      machine,
+      step: 'greeting',
+      choice1: null,
+      choice2: null
+    };
+
+    renderBranchStep();
+  }
+
+  function renderBranchStep() {
+    if (!activeBranchState || !activeBranchState.machine) return;
+    const { machine, step, choice1, choice2 } = activeBranchState;
+    const branch = machine.branchingDialogue;
+    const machineSvg = MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '';
+    const penguinSvg = MODELS.cyberpenguin ? MODELS.cyberpenguin('right') : '';
+
+    if (step === 'greeting') {
+      showSpeechBubbleStep({
+        speaker: 'machine',
+        name: machine.name,
+        avatarSvg: machineSvg,
+        text: branch.greeting.text,
+        audioUrl: branch.greeting.audioUrl,
+        anchorPos: machine.pos,
+        onNext: () => {
+          activeBranchState.step = 'decision1';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'decision1') {
+      showSpeechBubbleStep({
+        speaker: 'penguin',
+        name: 'Cyberpenguin',
+        avatarSvg: penguinSvg,
+        text: '',
+        anchorPos: penguinPos,
+        choices: branch.decision1.choices,
+        onChoice: (chosen) => {
+          activeBranchState.choice1 = chosen;
+          activeBranchState.step = 'decision1_spoken';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'decision1_spoken') {
+      showSpeechBubbleStep({
+        speaker: 'penguin',
+        name: 'Cyberpenguin',
+        avatarSvg: penguinSvg,
+        text: choice1.penguinText || choice1.label,
+        audioUrl: choice1.audioPenguin,
+        anchorPos: penguinPos,
+        onNext: () => {
+          activeBranchState.step = 'reply1';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'reply1') {
+      showSpeechBubbleStep({
+        speaker: 'machine',
+        name: machine.name,
+        avatarSvg: machineSvg,
+        text: choice1.reply,
+        audioUrl: choice1.audioReply,
+        anchorPos: machine.pos,
+        onNext: () => {
+          activeBranchState.step = 'commonBridge';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'commonBridge') {
+      showSpeechBubbleStep({
+        speaker: 'machine',
+        name: machine.name,
+        avatarSvg: machineSvg,
+        text: branch.commonBridge.text,
+        audioUrl: branch.commonBridge.audioUrl,
+        anchorPos: machine.pos,
+        onNext: () => {
+          activeBranchState.step = 'decision2';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'decision2') {
+      showSpeechBubbleStep({
+        speaker: 'penguin',
+        name: 'Cyberpenguin',
+        avatarSvg: penguinSvg,
+        text: '',
+        anchorPos: penguinPos,
+        choices: branch.decision2.choices,
+        onChoice: (chosen) => {
+          activeBranchState.choice2 = chosen;
+          activeBranchState.step = 'decision2_spoken';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'decision2_spoken') {
+      showSpeechBubbleStep({
+        speaker: 'penguin',
+        name: 'Cyberpenguin',
+        avatarSvg: penguinSvg,
+        text: choice2.penguinText || choice2.label,
+        audioUrl: choice2.audioPenguin,
+        anchorPos: penguinPos,
+        onNext: () => {
+          activeBranchState.step = 'reply2';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'reply2') {
+      showSpeechBubbleStep({
+        speaker: 'machine',
+        name: machine.name,
+        avatarSvg: machineSvg,
+        text: choice2.reply,
+        audioUrl: choice2.audioReply,
+        anchorPos: machine.pos,
+        onNext: () => {
+          activeBranchState.step = 'closing';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'closing') {
+      showSpeechBubbleStep({
+        speaker: 'machine',
+        name: machine.name,
+        avatarSvg: machineSvg,
+        text: branch.closing.text,
+        audioUrl: branch.closing.audioUrl,
+        anchorPos: machine.pos,
+        onNext: () => {
+          activeBranchState.step = 'farewellPenguin';
+          renderBranchStep();
+        }
+      });
+    } else if (step === 'farewellPenguin') {
+      showSpeechBubbleStep({
+        speaker: 'penguin',
+        name: 'Cyberpenguin',
+        avatarSvg: penguinSvg,
+        text: branch.farewellPenguin.text,
+        audioUrl: branch.farewellPenguin.audioUrl,
+        anchorPos: penguinPos,
+        onNext: () => {
+          closeDialogueModal();
+        }
+      });
+    }
+  }
+
+  function fallbackLinearDialogue(machine) {
+    const turns = getMachineDialogueTurns(machine);
+    let turnIdx = 0;
+
+    const renderTurn = () => {
+      if (turnIdx >= turns.length) {
+        closeDialogueModal();
+        return;
+      }
+      const t = turns[turnIdx];
+      const isPenguin = t.speaker === 'penguin';
+      const isShip = t.speaker === 'ship';
+      const anchor = isPenguin ? penguinPos : (machine.pos || { x: 50, y: 50 });
+      const avatar = isPenguin
+        ? MODELS.cyberpenguin('right')
+        : isShip
+        ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true })
+        : (MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '');
+
+      showSpeechBubbleStep({
+        speaker: t.speaker,
+        name: isPenguin ? 'Cyberpenguin' : (isShip ? 'Nave de Cyberpenguin' : machine.name),
+        avatarSvg: avatar,
+        text: t.text,
+        audioUrl: t.audioUrl,
+        anchorPos: anchor,
+        onNext: () => {
+          turnIdx++;
+          renderTurn();
+        }
+      });
+    };
+
+    renderTurn();
   }
 
   function openDialogueModal(machine) {
     activeDialogueMachine = machine;
-    activeDialogueTurn = 0;
     proximityMachineId = machine.id;
 
     if (machine.id && machine.id !== 'final-scene' && !state.inspectedMachines.includes(machine.id)) {
@@ -2101,132 +2437,123 @@
       checkSurfaceProximity();
     }
 
-    showModal(dom.dialogueModal);
-    renderAndPlayDialogueTurn();
+    startBranchingDialogue(machine);
   }
 
   function openFinalDialogueModal() {
-    const finalMachine = {
-      id: 'final-scene',
-      name: 'Nave de Cyberpenguin',
-      dialogue: DATA.FINAL_DIALOGUE || []
-    };
-    activeDialogueMachine = finalMachine;
-    activeDialogueTurn = 0;
-    showModal(dom.dialogueModal);
-    renderAndPlayDialogueTurn();
-  }
+    const chapter = getChapter(state.currentChapterId);
+    const shipPos = (chapter && chapter.shipPos) || { x: 22, y: 58 };
+    const finalTree = DATA.FINAL_BRANCHING_DIALOGUE;
 
-  function advanceDialogue() {
-    if (!activeDialogueMachine) return;
-    const turns = getMachineDialogueTurns(activeDialogueMachine);
-    if (activeDialogueTurn + 1 < turns.length) {
-      activeDialogueTurn++;
-      renderAndPlayDialogueTurn();
-    } else {
-      closeDialogueModal();
-    }
-  }
-
-  function renderAndPlayDialogueTurn() {
-    if (!activeDialogueMachine) return;
-    const machine = activeDialogueMachine;
-    const turnToken = ++activeDialogueToken;
-    clearTimeout(dialogueAutoTimer);
-
-    TTS.stop();
-
-    const turns = getMachineDialogueTurns(machine);
-    if (!turns || turns.length === 0 || activeDialogueTurn >= turns.length) {
-      closeDialogueModal();
+    if (!finalTree) {
+      fallbackLinearDialogue({
+        id: 'final-scene',
+        name: 'Nave de Cyberpenguin',
+        dialogue: DATA.FINAL_DIALOGUE || []
+      });
       return;
     }
 
-    const currentTurn = turns[activeDialogueTurn];
-    const isPenguin = currentTurn.speaker === 'penguin';
-    const isShip = currentTurn.speaker === 'ship';
-    const speakerText = currentTurn.text || '';
-    const speakerAudio = currentTurn.audioUrl || '';
+    activeDialogueMachine = { id: 'final-scene', name: 'Nave de Cyberpenguin' };
+    const shipSvg = MODELS.spaceship ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true }) : '';
+    const penguinSvg = MODELS.cyberpenguin ? MODELS.cyberpenguin('right') : '';
 
-    let speakerName = machine.name;
-    let previewSvg = '';
-    let pitch = 0.95;
-    let rate = 0.98;
+    let finalStep = 'greeting';
+    let chosenReflection = null;
 
-    if (isPenguin) {
-      speakerName = 'Cyberpenguin';
-      previewSvg = MODELS.cyberpenguin('right');
-      pitch = 1.22;
-      rate = 1.0;
-    } else if (isShip) {
-      speakerName = 'Nave de Cyberpenguin';
-      previewSvg = typeof MODELS.spaceship === 'function' ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true }) : '';
-      pitch = 0.92;
-      rate = 0.96;
-    } else {
-      speakerName = machine.name;
-      previewSvg = MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '';
-      pitch = 0.96;
-      rate = 0.98;
-    }
-
-    if (dom.dialogueMachineName) {
-      dom.dialogueMachineName.textContent = speakerName;
-      dom.dialogueMachineName.classList.toggle('dialogue-speaker-penguin', isPenguin);
-      dom.dialogueMachineName.classList.toggle('dialogue-speaker-machine', !isPenguin);
-    }
-
-    if (dom.dialogueMachinePreview) {
-      dom.dialogueMachinePreview.innerHTML = previewSvg;
-    }
-
-    if (dom.dialogueBlankSlot) {
-      dom.dialogueBlankSlot.textContent = speakerText;
-    }
-
-    let promptBtn = null;
-    if (dom.dialogueTopicsContainer) {
-      dom.dialogueTopicsContainer.innerHTML = '';
-      if (currentTurn.nextPrompt) {
-        promptBtn = document.createElement('button');
-        promptBtn.type = 'button';
-        promptBtn.className = 'dialogue-topic-btn';
-        promptBtn.textContent = currentTurn.nextPrompt;
-        promptBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          advanceDialogue();
+    const renderFinal = () => {
+      if (finalStep === 'greeting') {
+        showSpeechBubbleStep({
+          speaker: 'ship',
+          name: 'Nave de Cyberpenguin',
+          avatarSvg: shipSvg,
+          text: finalTree.greeting.text,
+          audioUrl: finalTree.greeting.audioUrl,
+          anchorPos: shipPos,
+          onNext: () => {
+            finalStep = 'penguinIntro';
+            renderFinal();
+          }
         });
-        dom.dialogueTopicsContainer.appendChild(promptBtn);
-      }
-    }
-
-    const handleTurnComplete = () => {
-      if (turnToken !== activeDialogueToken || activeDialogueMachine !== machine) return;
-      if (currentTurn.nextPrompt) {
-        if (promptBtn) {
-          promptBtn.classList.add('is-ready');
-        }
-        return;
-      }
-      if (activeDialogueTurn + 1 < turns.length) {
-        activeDialogueTurn++;
-        renderAndPlayDialogueTurn();
-      } else {
-        closeDialogueModal();
+      } else if (finalStep === 'penguinIntro') {
+        showSpeechBubbleStep({
+          speaker: 'penguin',
+          name: 'Cyberpenguin',
+          avatarSvg: penguinSvg,
+          text: finalTree.penguinIntro.text,
+          audioUrl: finalTree.penguinIntro.audioUrl,
+          anchorPos: shipPos,
+          onNext: () => {
+            finalStep = 'decision';
+            renderFinal();
+          }
+        });
+      } else if (finalStep === 'decision') {
+        showSpeechBubbleStep({
+          speaker: 'penguin',
+          name: 'Cyberpenguin',
+          avatarSvg: penguinSvg,
+          text: '',
+          anchorPos: shipPos,
+          choices: finalTree.decision.choices,
+          onChoice: (chosen) => {
+            chosenReflection = chosen;
+            finalStep = 'decision_spoken';
+            renderFinal();
+          }
+        });
+      } else if (finalStep === 'decision_spoken') {
+        showSpeechBubbleStep({
+          speaker: 'penguin',
+          name: 'Cyberpenguin',
+          avatarSvg: penguinSvg,
+          text: chosenReflection.penguinText,
+          audioUrl: chosenReflection.audioPenguin,
+          anchorPos: shipPos,
+          onNext: () => {
+            finalStep = 'reply';
+            renderFinal();
+          }
+        });
+      } else if (finalStep === 'reply') {
+        showSpeechBubbleStep({
+          speaker: 'penguin',
+          name: 'Cyberpenguin',
+          avatarSvg: penguinSvg,
+          text: chosenReflection.reply,
+          audioUrl: chosenReflection.audioReply,
+          anchorPos: shipPos,
+          onNext: () => {
+            finalStep = 'closing';
+            renderFinal();
+          }
+        });
+      } else if (finalStep === 'closing') {
+        showSpeechBubbleStep({
+          speaker: 'penguin',
+          name: 'Cyberpenguin',
+          avatarSvg: penguinSvg,
+          text: finalTree.closing.text,
+          audioUrl: finalTree.closing.audioUrl,
+          anchorPos: shipPos,
+          onNext: () => {
+            closeDialogueModal();
+            playHarmony('victory');
+            if (dom.certificateModal) {
+              showModal(dom.certificateModal);
+            }
+          }
+        });
       }
     };
 
-    TTS.speak({
-      text: speakerText,
-      audioUrl: speakerAudio,
-      pitch,
-      rate,
-      onEnd: handleTurnComplete,
-      onEmpty: () => {
-        const readingMs = Math.max(2600, Math.min(6500, speakerText.length * 60));
-        dialogueAutoTimer = setTimeout(handleTurnComplete, readingMs);
-      }
-    });
+    renderFinal();
+  }
+
+  function advanceDialogue() {
+    if (dom.speechBubbleNextBtn && dom.speechBubbleActionRow && dom.speechBubbleActionRow.style.display !== 'none') {
+      dom.speechBubbleNextBtn.click();
+    }
   }
 
   function closeDialogueModal() {
@@ -2234,11 +2561,8 @@
     clearTimeout(dialogueAutoTimer);
     TTS.stop();
     activeDialogueMachine = null;
-    activeDialogueTurn = 0;
-    if (dom.dialogueTopicsContainer) {
-      dom.dialogueTopicsContainer.innerHTML = '';
-    }
-    hideModal(dom.dialogueModal);
+    activeBranchState = null;
+    hideSpeechBubble();
   }
 
   /* ========================================================================
@@ -2706,6 +3030,9 @@
   }
 
   function isAnyModalOpen() {
+    if (dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden')) {
+      return true;
+    }
     return [
       dom.dialogueModal,
       dom.quizModal,
@@ -2718,6 +3045,9 @@
   }
 
   function isBlockingModalOpen() {
+    if (dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden')) {
+      return true;
+    }
     return [
       dom.quizModal,
       dom.passportModal,
