@@ -250,8 +250,18 @@
     if (dom.cadetFirstNameInput) {
       dom.cadetFirstNameInput.placeholder = isEn ? 'Your name...' : 'Tu nombre...';
     }
+    if (dom.cadetSkipBtnText) {
+      dom.cadetSkipBtnText.textContent = isEn ? 'Skip cinematic' : 'Saltar cinemática';
+    }
     if (dom.cadetStartBtnText) {
-      dom.cadetStartBtnText.textContent = isEn ? 'Start mission' : 'Comenzar misión';
+      dom.cadetStartBtnText.textContent = isEn ? 'Start' : 'Comenzar';
+    }
+    if (dom.launchBtnText) {
+      dom.launchBtnText.textContent = isEn ? 'Skip cinematic' : 'Saltar cinemática';
+    }
+    if (dom.launchBtn) {
+      dom.launchBtn.title = isEn ? 'Skip cinematic' : 'Saltar cinemática';
+      dom.launchBtn.setAttribute('aria-label', dom.launchBtn.title);
     }
 
     // Textos del modal de Certificado / Diploma de Honor
@@ -345,7 +355,9 @@
     if (FX && typeof FX.pause === 'function') {
       FX.pause();
     }
-    if (state.launched) {
+    if (state.launched || (state.cadetName && state.cadetName.trim())) {
+      state.launched = true;
+      saveState();
       dom.launchScreen.classList.add('hidden-screen', 'is-hidden');
       showHomeScreen();
     } else {
@@ -371,6 +383,7 @@
     dom.launchShipWrapper = document.getElementById('launch-ship-wrapper');
     dom.launchShipSvg = document.getElementById('launch-ship-svg');
     dom.launchBtn = document.getElementById('launch-btn');
+    dom.launchBtnText = document.getElementById('launch-btn-text');
     dom.cadetIntroCard = document.getElementById('cadet-intro-card');
     dom.cadetIntroTitle = document.getElementById('cadet-intro-title');
     dom.cadetIntroSubtitle = document.getElementById('cadet-intro-subtitle');
@@ -378,6 +391,8 @@
     dom.cadetFirstNameInput = document.getElementById('cadet-first-name-input');
     dom.cadetStartBtn = document.getElementById('cadet-start-btn');
     dom.cadetStartBtnText = document.getElementById('cadet-start-btn-text');
+    dom.cadetSkipBtn = document.getElementById('cadet-skip-btn');
+    dom.cadetSkipBtnText = document.getElementById('cadet-skip-btn-text');
 
     dom.travelCinematic = document.getElementById('travel-cinematic');
     dom.travelCinematicStage = document.getElementById('travel-cinematic-stage');
@@ -506,6 +521,7 @@
       const inputVal = (dom.cadetFirstNameInput && dom.cadetFirstNameInput.value) ? dom.cadetFirstNameInput.value.trim() : '';
       const fallbackName = (state.currentLanguage === 'en') ? 'Cosmic explorer' : 'Explorador cósmico';
       state.cadetName = inputVal || state.cadetName || fallbackName;
+      state.launched = true;
       saveState();
 
       if (dom.cadetIntroCard) {
@@ -516,11 +532,32 @@
       startLaunchCinematic();
     }
 
+    function skipOpeningLaunch() {
+      triggerHaptic('tap');
+      const inputVal = (dom.cadetFirstNameInput && dom.cadetFirstNameInput.value) ? dom.cadetFirstNameInput.value.trim() : '';
+      const fallbackName = (state.currentLanguage === 'en') ? 'Cosmic explorer' : 'Explorador cósmico';
+      state.cadetName = inputVal || state.cadetName || fallbackName;
+      state.launched = true;
+      saveState();
+
+      if (dom.cadetIntroCard) {
+        dom.cadetIntroCard.classList.add('is-hidden');
+      }
+      finishOpeningLaunch();
+    }
+
     if (dom.cadetStartBtn) {
       dom.cadetStartBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         triggerHaptic('tap');
         submitCadetNameAndLaunch();
+      });
+    }
+
+    if (dom.cadetSkipBtn) {
+      dom.cadetSkipBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        skipOpeningLaunch();
       });
     }
 
@@ -534,15 +571,7 @@
     }
 
     dom.launchBtn.addEventListener('click', () => {
-      if (dom.cadetIntroCard && !dom.cadetIntroCard.classList.contains('is-hidden')) {
-        submitCadetNameAndLaunch();
-        return;
-      }
-      if (isOpeningLaunch) {
-        finishOpeningLaunch();
-      } else {
-        startLaunchCinematic();
-      }
+      skipOpeningLaunch();
     });
     dom.travelSkipBtn.addEventListener('click', skipTravelSequence);
 
@@ -910,6 +939,7 @@
     dom.gameScreen.classList.add('is-hidden');
     dom.launchScreen.classList.add('is-hidden');
     dom.homeScreen.classList.remove('is-hidden');
+    renderChapterNav();
     updateHUD();
   }
 
@@ -1049,6 +1079,8 @@
   function finishOpeningLaunch() {
     isOpeningLaunch = false;
     clearLaunchTimers();
+    state.launched = true;
+    saveState();
     dom.launchScreen.classList.add('hidden-screen');
     dom.launchScreen.classList.add('is-hidden');
     showHomeScreen();
