@@ -276,7 +276,7 @@
     },
     {
       id: 'deep-space',
-      name: 'Espacio Profundo',
+      name: 'Frontera Espacial',
       hasSurface: false,
       shipPos: { x: 22, y: 58 },
       spawnPos: { x: 22, y: 58 },
@@ -427,7 +427,7 @@
     },
     'deep-space': {
       chapterId: 'deep-space',
-      chapterName: 'Espacio Profundo',
+      chapterName: 'Frontera Espacial',
       questions: [
         {
           id: 'q-deep-1',
