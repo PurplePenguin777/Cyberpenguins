@@ -8,7 +8,7 @@ function copyStaticCyberpenguinsAssets() {
     closeBundle() {
       const rootDir = process.cwd();
       const distDir = path.resolve(rootDir, 'dist');
-      const entries = ['css', 'js', 'manifest.webmanifest', '.htaccess'];
+      const entries = ['css', 'js', 'audio', 'manifest.webmanifest', 'favicon.svg', 'sw.js', '.htaccess'];
       entries.forEach((entry) => {
         const src = path.join(rootDir, entry);
         const dest = path.join(distDir, entry);
