@@ -1412,10 +1412,15 @@
     });
   }
 
+  let lastRenderedDir = null;
+
   function renderPenguin(animateDescend) {
     dom.penguinActor.style.left = `${penguinPos.x}%`;
     dom.penguinActor.style.top = `${penguinPos.y}%`;
-    dom.penguinSprite.innerHTML = MODELS.cyberpenguin(penguinDir);
+    if (penguinDir !== lastRenderedDir || !dom.penguinSprite.firstElementChild) {
+      dom.penguinSprite.innerHTML = MODELS.cyberpenguin(penguinDir);
+      lastRenderedDir = penguinDir;
+    }
     updateDepthSorting();
     if (FX && typeof FX.setPenguinTarget === 'function') {
       FX.setPenguinTarget(penguinPos);

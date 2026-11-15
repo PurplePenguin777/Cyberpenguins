@@ -1190,16 +1190,104 @@ a:focus-visible {
   transition-duration: 0.74s, 0.74s, 0.3s;
 }
 
-.penguin-actor.walking .penguin-sprite {
-  animation: penguinHop 0.26s ease-in-out infinite alternate;
+/* Articulaciones anatómicas de Cyberpenguin */
+.cp-leg-left {
+  transform-origin: 44px 86px;
 }
 
-.penguin-actor.walking.gravity-moon .penguin-sprite {
-  animation: penguinMoonLope 0.52s cubic-bezier(0.22, 0.82, 0.36, 1) infinite alternate;
+.cp-leg-right {
+  transform-origin: 66px 86px;
 }
 
-.penguin-actor.walking.gravity-mars .penguin-sprite {
-  animation: penguinHop 0.28s ease-in-out infinite alternate;
+.cp-arm-front {
+  transform-origin: 36px 60px;
+}
+
+.cp-arm-back {
+  transform-origin: 75px 60px;
+}
+
+.cp-body {
+  transform-origin: 55px 90px;
+}
+
+.cp-shadow {
+  transform-origin: 55px 114px;
+}
+
+/* Ciclo de caminata: Bamboleo corporal (Waddle) + Zancadas alternadas + Balanceo de aletas */
+.penguin-actor.walking .cp-body {
+  animation: cpBodyWaddle 0.30s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking .cp-leg-left {
+  animation: cpLegStepL 0.30s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking .cp-leg-right {
+  animation: cpLegStepR 0.30s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking .cp-arm-front {
+  animation: cpArmSwingFront 0.30s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking .cp-arm-back {
+  animation: cpArmSwingBack 0.30s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking .cp-shadow {
+  animation: cpShadowPulse 0.30s ease-in-out infinite alternate;
+}
+
+/* Caminata Lunar: Moon Lope a dos tiempos (el galope elástico de Apolo) */
+.penguin-actor.walking.gravity-moon .cp-body {
+  animation: cpBodyMoonLope 0.52s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
+}
+
+.penguin-actor.walking.gravity-moon .cp-leg-left {
+  animation: cpLegMoonL 0.52s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
+}
+
+.penguin-actor.walking.gravity-moon .cp-leg-right {
+  animation: cpLegMoonR 0.52s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
+}
+
+.penguin-actor.walking.gravity-moon .cp-arm-front {
+  animation: cpArmMoonFront 0.52s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking.gravity-moon .cp-arm-back {
+  animation: cpArmMoonBack 0.52s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking.gravity-moon .cp-shadow {
+  animation: cpShadowMoon 0.52s ease-in-out infinite alternate;
+}
+
+/* Caminata Marciana: Paso ágil y dinámico */
+.penguin-actor.walking.gravity-mars .cp-body {
+  animation: cpBodyWaddle 0.26s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking.gravity-mars .cp-leg-left {
+  animation: cpLegStepL 0.26s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking.gravity-mars .cp-leg-right {
+  animation: cpLegStepR 0.26s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking.gravity-mars .cp-arm-front {
+  animation: cpArmSwingFront 0.26s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking.gravity-mars .cp-arm-back {
+  animation: cpArmSwingBack 0.26s ease-in-out infinite alternate;
+}
+
+.penguin-actor.walking.gravity-mars .cp-shadow {
+  animation: cpShadowPulse 0.26s ease-in-out infinite alternate;
 }
 
 .penguin-actor.gravity-eros .penguin-sprite,
@@ -1243,23 +1331,145 @@ a:focus-visible {
   animation: penguinDescend 0.75s var(--spring-smooth);
 }
 
-@keyframes penguinHop {
-  from {
-    transform: translateY(0px) rotate(-2deg);
+/* Bamboleo de pingüino (Waddle) */
+@keyframes cpBodyWaddle {
+  0% {
+    transform: translateY(0px) rotate(-5deg);
   }
-
-  to {
-    transform: translateY(-5px) rotate(2deg);
+  50% {
+    transform: translateY(-5px) rotate(0deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(5deg);
   }
 }
 
-@keyframes penguinMoonLope {
-  from {
-    transform: translateY(0px) rotate(-2.5deg);
+/* Zancadas alternadas de piernas */
+@keyframes cpLegStepL {
+  0% {
+    transform: rotate(-18deg) translateY(-2px);
   }
+  50% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  100% {
+    transform: rotate(18deg) translateY(2px);
+  }
+}
 
-  to {
-    transform: translateY(-15px) rotate(2.5deg);
+@keyframes cpLegStepR {
+  0% {
+    transform: rotate(18deg) translateY(2px);
+  }
+  50% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  100% {
+    transform: rotate(-18deg) translateY(-2px);
+  }
+}
+
+/* Balanceo de aletas para equilibrar la mochila de soporte vital */
+@keyframes cpArmSwingFront {
+  0% {
+    transform: rotate(-14deg);
+  }
+  100% {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes cpArmSwingBack {
+  0% {
+    transform: rotate(14deg);
+  }
+  100% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes cpShadowPulse {
+  0% {
+    transform: scaleX(0.88) scaleY(0.9);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scaleX(1.1) scaleY(1.05);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scaleX(0.88) scaleY(0.9);
+    opacity: 0.55;
+  }
+}
+
+/* Galope lunar elástico (Moon Lope estilo Apolo 11) */
+@keyframes cpBodyMoonLope {
+  0% {
+    transform: translateY(0px) rotate(-3.5deg);
+  }
+  40% {
+    transform: translateY(-13px) rotate(1deg);
+  }
+  100% {
+    transform: translateY(1px) rotate(3.5deg);
+  }
+}
+
+@keyframes cpLegMoonL {
+  0% {
+    transform: rotate(-24deg) translateY(-4px);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-8px);
+  }
+  100% {
+    transform: rotate(20deg) translateY(0px);
+  }
+}
+
+@keyframes cpLegMoonR {
+  0% {
+    transform: rotate(20deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(-4deg) translateY(-8px);
+  }
+  100% {
+    transform: rotate(-24deg) translateY(-4px);
+  }
+}
+
+@keyframes cpArmMoonFront {
+  0% {
+    transform: rotate(-18deg);
+  }
+  100% {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes cpArmMoonBack {
+  0% {
+    transform: rotate(18deg);
+  }
+  100% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes cpShadowMoon {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.65;
+  }
+  45% {
+    transform: scale(0.7);
+    opacity: 0.32;
+  }
+  100% {
+    transform: scale(1.06);
+    opacity: 0.75;
   }
 }
 

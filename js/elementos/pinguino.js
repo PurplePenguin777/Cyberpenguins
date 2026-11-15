@@ -55,103 +55,111 @@
           </linearGradient>
         </defs>
         <g ${flip}>
-          <!-- Sombra suave de contacto -->
-          <ellipse cx="55" cy="114" rx="26" ry="7.5" fill="url(#${id}-shadow)" />
+          <!-- Sombra suave de contacto dinámica -->
+          <g class="cp-shadow">
+            <ellipse cx="55" cy="114" rx="26" ry="7.5" fill="url(#${id}-shadow)" />
+          </g>
 
-          <!-- Mochila azul cobalto (PLSS) estilizada tras la espalda -->
-          <polygon points="22,52 38,49 39,87 24,87 20,81" fill="url(#${id}-cobalt)" stroke="#172554" stroke-width="1.1" stroke-linejoin="round" />
-          <polygon points="22,55 30,54 30,83 22,82" fill="#3b82f6" opacity="0.55" />
-          <rect x="24" y="60" width="8" height="4" rx="1" fill="#7ee8fa" />
-          <circle cx="27" cy="77" r="1.8" fill="#fbbf24" />
-
-          <!-- Patitas / Botas naranjas geométricas -->
-          <polygon points="35,104 49,104 51,111 33,111 32,107" fill="#ff8b29" stroke="#9a3412" stroke-width="1" stroke-linejoin="round" />
-          <polygon points="35,104 48,104 45,107 34,107" fill="#ffb86b" />
-          <polygon points="60,104 75,104 78,108 75,112 58,111" fill="#ff8b29" stroke="#9a3412" stroke-width="1" stroke-linejoin="round" />
-          <polygon points="61,104 74,104 75,107 60,107" fill="#ffb86b" />
-
-          <!-- Piernas segmentadas de astronauta -->
-          <g stroke="#64748b" stroke-width="1" stroke-linejoin="round">
-            <!-- Pierna izquierda -->
-            <polygon points="37,86 52,86 50,104 36,104" fill="url(#${id}-suit)" />
+          <!-- Pierna y bota izquierda articulada -->
+          <g class="cp-leg cp-leg-left">
+            <polygon points="37,86 52,86 50,104 36,104" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
             <polygon points="36,94 51,94 50.5,98 36,98" fill="#1e293b" />
             <polygon points="37,88 45,88 44,103 36,103" fill="#ffffff" opacity="0.45" />
-            <!-- Pierna derecha -->
-            <polygon points="58,86 73,86 74,104 60,104" fill="url(#${id}-suit)" />
+            <polygon points="35,104 49,104 51,111 33,111 32,107" fill="#ff8b29" stroke="#9a3412" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="35,104 48,104 45,107 34,107" fill="#ffb86b" />
+          </g>
+
+          <!-- Pierna y bota derecha articulada -->
+          <g class="cp-leg cp-leg-right">
+            <polygon points="58,86 73,86 74,104 60,104" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
             <polygon points="59,94 73.5,94 74,98 59.5,98" fill="#1e293b" />
             <polygon points="59,88 66,88 66,103 60,103" fill="#ffffff" opacity="0.45" />
+            <polygon points="60,104 75,104 78,108 75,112 58,111" fill="#ff8b29" stroke="#9a3412" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="61,104 74,104 75,107 60,107" fill="#ffb86b" />
           </g>
 
-          <!-- Brazo trasero / derecho -->
-          <polygon points="73,59 86,70 83,84 72,82 70,69" fill="#cbd5e1" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
-          <polygon points="74,80 84,81 85,89 79,92 73,88" fill="#1e293b" stroke="#0f172a" stroke-width="1" />
-
-          <!-- Torso blanco facetado del traje EVA -->
-          <polygon points="36,56 74,56 76,87 55,90 34,87" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1.1" stroke-linejoin="round" />
-          <polygon points="36,56 56,56 55,89 34,87" fill="#ffffff" opacity="0.48" />
-          <!-- Parche azul de misión en pecho izquierdo -->
-          <polygon points="62,62 69,62 70,68 65.5,71 61,68" fill="#2563eb" stroke="#93c5fd" stroke-width="0.8" />
-          <!-- Cinturón técnico gris con hebilla -->
-          <polygon points="34,76 76,76 76,81 34,81" fill="#64748b" stroke="#334155" stroke-width="0.9" />
-          <rect x="51" y="75" width="9" height="7" rx="1.2" fill="#cbd5e1" stroke="#334155" stroke-width="0.9" />
-          <rect x="53.5" y="77" width="4" height="3" fill="#38bdf8" />
-
-          <!-- Brazo izquierdo (primer plano) con parche de hombro azul -->
-          <polygon points="36,59 24,71 27,84 38,81 39,68" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
-          <polygon points="28,67 34,64 35,70 29,72" fill="#2563eb" />
-          <!-- Guante azul marino oscuro -->
-          <polygon points="26,81 37,80 39,88 33,92 26,88" fill="#1e293b" stroke="#0f172a" stroke-width="1" />
-
-          <!-- Collarín grueso azul cobalto brillante -->
-          <polygon points="33,50 77,50 79,57 55,61 31,57" fill="url(#${id}-cobalt)" stroke="#1e3a8a" stroke-width="1.1" stroke-linejoin="round" />
-          <polygon points="35,51 64,51 55,55 34,54" fill="#60a5fa" opacity="0.55" />
-
-          <!-- Auriculares laterales rectangulares del casco -->
-          <g>
-            <rect x="24" y="25" width="9" height="16" rx="3" fill="#e2e8f0" stroke="#64748b" stroke-width="1" />
-            <rect x="26" y="29" width="2.2" height="8" rx="1" fill="#2563eb" />
-            <rect x="29.5" y="29" width="2" height="8" rx="1" fill="#38bdf8" />
-
-            <rect x="77" y="25" width="9" height="16" rx="3" fill="#cbd5e1" stroke="#64748b" stroke-width="1" />
-            <rect x="78.5" y="29" width="2" height="8" rx="1" fill="#38bdf8" />
-            <rect x="81.8" y="29" width="2.2" height="8" rx="1" fill="#2563eb" />
+          <!-- Brazo / Aleta trasera articulada -->
+          <g class="cp-arm cp-arm-back">
+            <polygon points="73,59 86,70 83,84 72,82 70,69" fill="#cbd5e1" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="74,80 84,81 85,89 79,92 73,88" fill="#1e293b" stroke="#0f172a" stroke-width="1" />
           </g>
 
-          <!-- Carcasa exterior blanca facetada del casco -->
-          <path d="M 30,32 C 30,14 42,7 55,7 C 68,7 80,14 80,32 C 80,45 72,53 55,53 C 38,53 30,45 30,32 Z" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1.2" />
-          <path d="M 33,27 C 35,13 46,9 58,10 C 48,14 39,20 35,30 Z" fill="#ffffff" opacity="0.85" />
+          <!-- Cuerpo superior (Torso, Casco y Mochila PLSS con balanceo waddle) -->
+          <g class="cp-body">
+            <!-- Mochila azul cobalto (PLSS) estilizada tras la espalda -->
+            <polygon points="22,52 38,49 39,87 24,87 20,81" fill="url(#${id}-cobalt)" stroke="#172554" stroke-width="1.1" stroke-linejoin="round" />
+            <polygon points="22,55 30,54 30,83 22,82" fill="#3b82f6" opacity="0.55" />
+            <rect x="24" y="60" width="8" height="4" rx="1" fill="#7ee8fa" />
+            <circle cx="27" cy="77" r="1.8" fill="#fbbf24" />
 
-          <!-- Visor oscuro interior -->
-          <rect x="35" y="15" width="40" height="32" rx="14" fill="url(#${id}-visor)" stroke="#94a3b8" stroke-width="1.4" />
+            <!-- Torso blanco facetado del traje EVA -->
+            <polygon points="36,56 74,56 76,87 55,90 34,87" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1.1" stroke-linejoin="round" />
+            <polygon points="36,56 56,56 55,89 34,87" fill="#ffffff" opacity="0.48" />
+            <!-- Parche azul de misión en pecho izquierdo -->
+            <polygon points="62,62 69,62 70,68 65.5,71 61,68" fill="#2563eb" stroke="#93c5fd" stroke-width="0.8" />
+            <!-- Cinturón técnico gris con hebilla -->
+            <polygon points="34,76 76,76 76,81 34,81" fill="#64748b" stroke="#334155" stroke-width="0.9" />
+            <rect x="51" y="75" width="9" height="7" rx="1.2" fill="#cbd5e1" stroke="#334155" stroke-width="0.9" />
+            <rect x="53.5" y="77" width="4" height="3" fill="#38bdf8" />
 
-          <!-- Cabeza azul marino oscuro del pingüino dentro del casco -->
-          <path d="M 38,32 C 38,20 45,16 55,16 C 65,16 72,20 72,32 C 72,41 65,45 55,45 C 45,45 38,41 38,32 Z" fill="#172b59" />
+            <!-- Collarín grueso azul cobalto brillante -->
+            <polygon points="33,50 77,50 79,57 55,61 31,57" fill="url(#${id}-cobalt)" stroke="#1e3a8a" stroke-width="1.1" stroke-linejoin="round" />
+            <polygon points="35,51 64,51 55,55 34,54" fill="#60a5fa" opacity="0.55" />
 
-          <!-- Máscara facial blanca en forma de corazón -->
-          <path d="M 40,32 C 40,24 46,21 52,24 C 54,25.5 55,27 56,27 C 57,27 58,25.5 60,24 C 66,21 71,25 71,32 C 71,40 64,44 55,44 C 46,44 40,40 40,32 Z" fill="#f8fafc" />
-          <path d="M 41,37 Q 55,45 70,37 Q 63,44 55,44 Q 47,44 41,37 Z" fill="#e2e8f0" />
+            <!-- Auriculares laterales rectangulares del casco -->
+            <g>
+              <rect x="24" y="25" width="9" height="16" rx="3" fill="#e2e8f0" stroke="#64748b" stroke-width="1" />
+              <rect x="26" y="29" width="2.2" height="8" rx="1" fill="#2563eb" />
+              <rect x="29.5" y="29" width="2" height="8" rx="1" fill="#38bdf8" />
 
-          <!-- Grandes ojos expresivos -->
-          <circle cx="48" cy="31.5" r="4.4" fill="#090f24" />
-          <circle cx="48" cy="31.5" r="3.3" fill="#162954" />
-          <circle cx="48" cy="31.8" r="2.2" fill="#060914" />
-          <circle cx="46.6" cy="30.0" r="1.4" fill="#ffffff" />
-          <circle cx="49.5" cy="33.2" r="0.65" fill="#7ee8fa" />
+              <rect x="77" y="25" width="9" height="16" rx="3" fill="#cbd5e1" stroke="#64748b" stroke-width="1" />
+              <rect x="78.5" y="29" width="2" height="8" rx="1" fill="#38bdf8" />
+              <rect x="81.8" y="29" width="2.2" height="8" rx="1" fill="#2563eb" />
+            </g>
 
-          <circle cx="64.5" cy="31.5" r="4.2" fill="#090f24" />
-          <circle cx="64.5" cy="31.5" r="3.1" fill="#162954" />
-          <circle cx="64.5" cy="31.8" r="2.1" fill="#060914" />
-          <circle cx="63.1" cy="30.0" r="1.3" fill="#ffffff" />
-          <circle cx="65.9" cy="33.2" r="0.6" fill="#7ee8fa" />
+            <!-- Carcasa exterior blanca facetada del casco -->
+            <path d="M 30,32 C 30,14 42,7 55,7 C 68,7 80,14 80,32 C 80,45 72,53 55,53 C 38,53 30,45 30,32 Z" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1.2" />
+            <path d="M 33,27 C 35,13 46,9 58,10 C 48,14 39,20 35,30 Z" fill="#ffffff" opacity="0.85" />
 
-          <!-- Pico triangular facetado naranja -->
-          <polygon points="52,35.5 58,34 65,37.5 57.5,41 52,38.5" fill="url(#${id}-beak)" stroke="#9a3412" stroke-width="0.7" stroke-linejoin="round" />
-          <polygon points="52.5,35.6 58,34.4 63.5,37.2 57.5,37.8" fill="#ffb86b" opacity="0.75" />
+            <!-- Visor oscuro interior -->
+            <rect x="35" y="15" width="40" height="32" rx="14" fill="url(#${id}-visor)" stroke="#94a3b8" stroke-width="1.4" />
 
-          <!-- Cúpula cristalina del visor con brillo diagonal -->
-          <rect x="35" y="15" width="40" height="32" rx="14" fill="url(#${id}-glass)" stroke="#bae6fd" stroke-width="1.3" />
-          <path d="M 41,19 Q 51,16 61,19" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round" />
-        </g>
+            <!-- Cabeza azul marino oscuro del pingüino dentro del casco -->
+            <path d="M 38,32 C 38,20 45,16 55,16 C 65,16 72,20 72,32 C 72,41 65,45 55,45 C 45,45 38,41 38,32 Z" fill="#172b59" />
+
+            <!-- Máscara facial blanca en forma de corazón -->
+            <path d="M 40,32 C 40,24 46,21 52,24 C 54,25.5 55,27 56,27 C 57,27 58,25.5 60,24 C 66,21 71,25 71,32 C 71,40 64,44 55,44 C 46,44 40,40 40,32 Z" fill="#f8fafc" />
+            <path d="M 41,37 Q 55,45 70,37 Q 63,44 55,44 Q 47,44 41,37 Z" fill="#e2e8f0" />
+
+            <!-- Grandes ojos expresivos -->
+            <circle cx="48" cy="31.5" r="4.4" fill="#090f24" />
+            <circle cx="48" cy="31.5" r="3.3" fill="#162954" />
+            <circle cx="48" cy="31.8" r="2.2" fill="#060914" />
+            <circle cx="46.6" cy="30.0" r="1.4" fill="#ffffff" />
+            <circle cx="49.5" cy="33.2" r="0.65" fill="#7ee8fa" />
+
+            <circle cx="64.5" cy="31.5" r="4.2" fill="#090f24" />
+            <circle cx="64.5" cy="31.5" r="3.1" fill="#162954" />
+            <circle cx="64.5" cy="31.8" r="2.1" fill="#060914" />
+            <circle cx="63.1" cy="30.0" r="1.3" fill="#ffffff" />
+            <circle cx="65.9" cy="33.2" r="0.6" fill="#7ee8fa" />
+
+            <!-- Pico triangular facetado naranja -->
+            <polygon points="52,35.5 58,34 65,37.5 57.5,41 52,38.5" fill="url(#${id}-beak)" stroke="#9a3412" stroke-width="0.7" stroke-linejoin="round" />
+            <polygon points="52.5,35.6 58,34.4 63.5,37.2 57.5,37.8" fill="#ffb86b" opacity="0.75" />
+
+            <!-- Cúpula cristalina del visor con brillo diagonal -->
+            <rect x="35" y="15" width="40" height="32" rx="14" fill="url(#${id}-glass)" stroke="#bae6fd" stroke-width="1.3" />
+            <path d="M 41,19 Q 51,16 61,19" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round" />
+          </g>
+
+          <!-- Brazo / Aleta delantera articulada -->
+          <g class="cp-arm cp-arm-front">
+            <polygon points="36,59 24,71 27,84 38,81 39,68" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="28,67 34,64 35,70 29,72" fill="#2563eb" />
+            <!-- Guante azul marino oscuro -->
+            <polygon points="26,81 37,80 39,88 33,92 26,88" fill="#1e293b" stroke="#0f172a" stroke-width="1" />
+          </g>
       </svg>
     `;
   }
