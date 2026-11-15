@@ -81,50 +81,33 @@
           spawnPos: { x: 30, y: 72 },
           penguinText: '¡Hola! Soy Cyberpenguin. ¿Quién eres y qué haces en la Luna?',
           penguinAudioUrl: '',
-          dialogueText: '¡Bip, bip! Soy Surveyor 3. La NASA me envió en abril de 1967 para investigar si el suelo lunar era firme o si una nave se volcaría al aterrizar.',
+          dialogueText: '¡Bip, bip! Soy Surveyor 3. La NASA me envió en abril de 1967 para estudiar la superficie lunar y comprobar si una nave podía aterrizar aquí sin hundirse ni volcarse.',
           audioUrl: '',
-          greeting: [
-            { speaker: 'penguin', text: '¡Hola! Soy Cyberpenguin. ¿Quién eres y qué haces en la Luna?' },
-            { speaker: 'machine', text: '¡Bip, bip! Soy Surveyor 3. La NASA me envió en abril de 1967 para investigar si el suelo lunar era firme o si una nave se volcaría al aterrizar.' }
-          ],
-          topics: [
-            {
-              id: 'shovel',
-              icon: '🚜',
-              label: 'Pala robótica',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Para qué sirve esa especie de brazo con pala?' },
-                { speaker: 'machine', text: '¡Es mi pala para probar el suelo! Cavé cuatro zanjas para demostrar que el terreno era lo bastante sólido para que aterrizara una nave tripulada.' }
-              ]
-            },
-            {
-              id: 'camera',
-              icon: '📸',
-              label: 'Cámara',
-              dialogue: [
-                { speaker: 'penguin', text: 'Veo que tienes una cámara. ¿Qué fotografiabas?' },
-                { speaker: 'machine', text: 'Tomé miles de fotografías de las rocas y el horizonte y las transmití a la Tierra para que los científicos pudieran estudiar el paisaje lunar.' }
-              ]
-            },
-            {
-              id: 'apollo12',
-              icon: '👨‍🚀',
-              label: 'Apollo 12',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Es verdad que unos astronautas vinieron a visitarte?' },
-                { speaker: 'machine', text: '¡Sí! En noviembre de 1969, los astronautas de Apollo 12 aterrizaron cerca de mí, caminaron hasta aquí y llevaron mi cámara a la Tierra para estudiarla.' }
-              ]
-            }
-          ],
           dialogue: [
             { speaker: 'penguin', text: '¡Hola! Soy Cyberpenguin. ¿Quién eres y qué haces en la Luna?' },
-            { speaker: 'machine', text: '¡Bip, bip! Soy Surveyor 3. La NASA me envió en abril de 1967 para investigar si el suelo lunar era firme o si una nave se volcaría al aterrizar.' }
+            {
+              speaker: 'machine',
+              text: '¡Bip, bip! Soy Surveyor 3. La NASA me envió en abril de 1967 para estudiar la superficie lunar y comprobar si una nave podía aterrizar aquí sin hundirse ni volcarse.',
+              nextPrompt: '¿Para qué usabas tu cámara y tu pala robótica? →'
+            },
+            { speaker: 'penguin', text: '¿Para qué usabas tu cámara y tu pala robótica?' },
+            {
+              speaker: 'machine',
+              text: 'Tomaba fotografías de las rocas y los cráteres, y con mi pala robótica cavé cuatro pequeñas zanjas para hacer pruebas. ¡Así demostré que el suelo era firme para las misiones Apollo!',
+              nextPrompt: '¿Alguien vino a visitarte después? →'
+            },
+            { speaker: 'penguin', text: '¿Alguien vino a visitarte después?' },
+            {
+              speaker: 'machine',
+              text: '¡Sí! En noviembre de 1969, los astronautas de Apollo 12 aterrizaron cerca de mí y caminaron hasta aquí para estudiar mis piezas. ¡Antes de aterrizar, siempre hay que conocer bien el terreno!',
+              nextPrompt: '¡Gracias, Surveyor 3! ✓'
+            }
           ]
         },
         {
           id: 'apollo-11-eagle',
           modelKey: 'apolloEagle',
-          name: 'Módulo Lunar Eagle (Apollo 11)',
+          name: 'Módulo Lunar Eagle',
           siteId: 'mare-tranquillitatis',
           locationShort: 'Mar de la Tranquilidad',
           locationDetail: 'Módulo Lunar Eagle: cerca del borde sur del Mar de la Tranquilidad',
@@ -134,44 +117,27 @@
           spawnPos: { x: 30, y: 72 },
           penguinText: '¡Qué máquina tan especial! ¿Quién eres?',
           penguinAudioUrl: '',
-          dialogueText: '¡Hola, explorador! Soy Eagle, el módulo lunar de Apollo 11. El 20 de julio de 1969 llevé a Neil Armstrong y Buzz Aldrin a pisar la Luna por primera vez.',
+          dialogueText: '¡Hola, explorador! Soy Eagle, el módulo lunar de la misión Apollo 11. El 20 de julio de 1969 llevé a Neil Armstrong y Buzz Aldrin a caminar sobre la Luna en el Mar de la Tranquilidad.',
           audioUrl: '',
-          greeting: [
-            { speaker: 'penguin', text: '¡Qué máquina tan especial! ¿Quién eres?' },
-            { speaker: 'machine', text: '¡Hola, explorador! Soy Eagle, el módulo lunar de Apollo 11. El 20 de julio de 1969 llevé a Neil Armstrong y Buzz Aldrin a pisar la Luna por primera vez.' }
-          ],
-          topics: [
-            {
-              id: 'stages',
-              icon: '🚀',
-              label: 'Dos etapas',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Cómo pudiste aterrizar y luego despegar de la Luna?' },
-                { speaker: 'machine', text: 'Tenía dos partes: la etapa de descenso (abajo, con las patas) se quedó aquí para siempre, y la etapa de ascenso (arriba) despegó con los astronautas.' }
-              ]
-            },
-            {
-              id: 'moonwalk',
-              icon: '🌙',
-              label: 'Caminata',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Qué hicieron en el Mar de la Tranquilidad?' },
-                { speaker: 'machine', text: 'Armstrong y Aldrin tomaron fotos históricas, instalaron experimentos y recolectaron más de 20 kilos de rocas y polvo lunar para la ciencia.' }
-              ]
-            },
-            {
-              id: 'instruments',
-              icon: '📡',
-              label: 'Instrumentos',
-              dialogue: [
-                { speaker: 'penguin', text: '¿La investigación continuó después del despegue?' },
-                { speaker: 'machine', text: '¡Sí! Dejamos un sismómetro para medir temblores y un reflector láser con el que los científicos aún hoy miden la distancia exacta entre la Tierra y la Luna.' }
-              ]
-            }
-          ],
           dialogue: [
             { speaker: 'penguin', text: '¡Qué máquina tan especial! ¿Quién eres?' },
-            { speaker: 'machine', text: '¡Hola, explorador! Soy Eagle, el módulo lunar de Apollo 11. El 20 de julio de 1969 llevé a Neil Armstrong y Buzz Aldrin a pisar la Luna por primera vez.' }
+            {
+              speaker: 'machine',
+              text: '¡Hola, explorador! Soy Eagle, el módulo lunar de la misión Apollo 11. El 20 de julio de 1969 llevé a Neil Armstrong y Buzz Aldrin a caminar sobre la Luna en el Mar de la Tranquilidad.',
+              nextPrompt: '¿Cómo pudiste aterrizar y después despegar? →'
+            },
+            { speaker: 'penguin', text: '¿Cómo pudiste aterrizar y después despegar?' },
+            {
+              speaker: 'machine',
+              text: 'Estaba formado por dos partes: la parte de abajo, llamada etapa de descenso, tenía las patas y se quedó en la Luna; la parte de arriba, la etapa de ascenso, despegó con los astronautas.',
+              nextPrompt: '¿Qué dejaron los astronautas en la superficie? →'
+            },
+            { speaker: 'penguin', text: '¿Qué dejaron los astronautas en la superficie?' },
+            {
+              speaker: 'machine',
+              text: 'Recogieron rocas lunares y dejaron instrumentos científicos para medir vibraciones del suelo y calcular la distancia a la Tierra. ¡Los grandes logros se consiguen trabajando en equipo!',
+              nextPrompt: '¡Gracias, Eagle! ✓'
+            }
           ]
         }
       ]
@@ -247,44 +213,27 @@
           spawnPos: { x: 30, y: 72 },
           penguinText: '¡Hola! ¡Por fin estoy en Marte! ¿Quién eres?',
           penguinAudioUrl: '',
-          dialogueText: '¡Bienvenido! Soy Viking 1. Llegué en julio de 1976 y fui la primera misión que operó exitosamente en la superficie de Marte.',
+          dialogueText: '¡Bienvenido! Soy Viking 1, una misión de la NASA que llegó a Marte en julio de 1976 para investigar su paisaje, su clima y su suelo rojizo.',
           audioUrl: '',
-          greeting: [
-            { speaker: 'penguin', text: '¡Hola! ¡Por fin estoy en Marte! ¿Quién eres?' },
-            { speaker: 'machine', text: '¡Bienvenido! Soy Viking 1. Llegué en julio de 1976 y fui la primera misión que operó exitosamente en la superficie de Marte.' }
-          ],
-          topics: [
-            {
-              id: 'parts',
-              icon: '🛰️',
-              label: 'Dos partes',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Cómo pudiste estudiar tantas cosas a la vez?' },
-                { speaker: 'machine', text: '¡Tenía dos partes! Un orbitador que daba vueltas tomando fotos globales desde el espacio, y mi módulo de aterrizaje que trabajaba directamente en el suelo.' }
-              ]
-            },
-            {
-              id: 'life_search',
-              icon: '🧪',
-              label: '¿Vida en Marte?',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Es verdad que buscaste señales de vida marciana?' },
-                { speaker: 'machine', text: '¡Sí! Recogí suelo con mi brazo robótico e hice experimentos biológicos. Aunque no encontramos marcianos, aprendimos muchísimo sobre el clima y la química de Marte.' }
-              ]
-            },
-            {
-              id: 'cameras_weather',
-              icon: '📸',
-              label: 'Cámaras',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Qué descubriste con tus instrumentos en Chryse Planitia?' },
-                { speaker: 'machine', text: 'Fotografié por primera vez el paisaje marciano con cielo rosado y medí su viento y temperaturas extremas, abriendo el camino para futuras misiones.' }
-              ]
-            }
-          ],
           dialogue: [
             { speaker: 'penguin', text: '¡Hola! ¡Por fin estoy en Marte! ¿Quién eres?' },
-            { speaker: 'machine', text: '¡Bienvenido! Soy Viking 1. Llegué en julio de 1976 y fui la primera misión que operó exitosamente en la superficie de Marte.' }
+            {
+              speaker: 'machine',
+              text: '¡Bienvenido! Soy Viking 1, una misión de la NASA que llegó a Marte en julio de 1976 para investigar su paisaje, su clima y su suelo rojizo.',
+              nextPrompt: '¿Cómo estudiabas Marte desde arriba y en el suelo? →'
+            },
+            { speaker: 'penguin', text: '¿Cómo estudiabas Marte desde arriba y en el suelo?' },
+            {
+              speaker: 'machine',
+              text: 'Mi misión tenía dos partes principales: un orbitador que fotografiaba Marte desde el espacio y este módulo de aterrizaje que analizaba el suelo directamente en la superficie.',
+              nextPrompt: '¡¿Y encontraste marcianos en el suelo?! →'
+            },
+            { speaker: 'penguin', text: '¡¿Y encontraste marcianos en el suelo?!' },
+            {
+              speaker: 'machine',
+              text: '¡Ja, ja! Con mi brazo robótico recogí muestras y busqué señales de vida. No encontré marcianos, pero descubrimos cómo es el ambiente de Marte. ¡En ciencia siempre aprendemos al investigar!',
+              nextPrompt: '¡Gracias, Viking 1! ✓'
+            }
           ]
         },
         {
@@ -298,46 +247,29 @@
           pos: { x: 66, y: 62 },
           shipPos: { x: 20, y: 66 },
           spawnPos: { x: 30, y: 72 },
-          penguinText: '¡Qué pequeño eres! ¿Eres un robot con ruedas?',
+          penguinText: '¡Qué pequeño eres! ¿Eres un robot explorador?',
           penguinAudioUrl: '',
-          dialogueText: '¡Hola! Cuidado con mis ruedas. Soy Sojourner, el primer rover que recorrió la superficie de Marte en julio de 1997 con la misión Mars Pathfinder.',
+          dialogueText: '¡Hola! ¡Cuidado con mis ruedas! Soy Sojourner, el primer rover que recorrió Marte. Llegué el 4 de julio de 1997 con la misión Mars Pathfinder para explorar distintas rocas.',
           audioUrl: '',
-          greeting: [
-            { speaker: 'penguin', text: '¡Qué pequeño eres! ¿Eres un robot con ruedas?' },
-            { speaker: 'machine', text: '¡Hola! Cuidado con mis ruedas. Soy Sojourner, el primer rover que recorrió la superficie de Marte en julio de 1997 con la misión Mars Pathfinder.' }
-          ],
-          topics: [
-            {
-              id: 'wheels',
-              icon: '🛞',
-              label: '6 ruedas',
-              dialogue: [
-                { speaker: 'penguin', text: '¡Tienes seis ruedas! ¿Cómo haces para no volcarte?' },
-                { speaker: 'machine', text: 'Uso un sistema de suspensión balancín-bogie que permite a mis seis ruedas trepar rocas como «Barnacle Bill» y adaptarme al terreno sin perder el equilibrio.' }
-              ]
-            },
-            {
-              id: 'apxs',
-              icon: '🔬',
-              label: 'Espectrómetro',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Para qué sirve tu instrumento APXS?' },
-                { speaker: 'machine', text: 'Es un espectrómetro que pegaba a las rocas marcianas. Emitía rayos alfa y X para descubrir qué elementos químicos componen el suelo de Ares Vallis.' }
-              ]
-            },
-            {
-              id: 'driving',
-              icon: '🎮',
-              label: '¿Quién te guía?',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Tú decidías sola hacia dónde avanzar?' },
-                { speaker: 'machine', text: 'Los científicos en la Tierra me enviaban rutas cada día porque las señales tardan minutos en llegar. Yo usaba mis sensores láser para esquivar obstáculos.' }
-              ]
-            }
-          ],
           dialogue: [
-            { speaker: 'penguin', text: '¡Qué pequeño eres! ¿Eres un robot con ruedas?' },
-            { speaker: 'machine', text: '¡Hola! Cuidado con mis ruedas. Soy Sojourner, el primer rover que recorrió la superficie de Marte en julio de 1997 con la misión Mars Pathfinder.' }
+            { speaker: 'penguin', text: '¡Qué pequeño eres! ¿Eres un robot explorador?' },
+            {
+              speaker: 'machine',
+              text: '¡Hola! ¡Cuidado con mis ruedas! Soy Sojourner, el primer rover que recorrió Marte. Llegué el 4 de julio de 1997 con la misión Mars Pathfinder para explorar distintas rocas.',
+              nextPrompt: '¿Cómo investigabas las rocas y pasabas sobre ellas? →'
+            },
+            { speaker: 'penguin', text: '¿Cómo investigabas las rocas y pasabas sobre ellas?' },
+            {
+              speaker: 'machine',
+              text: 'Mis seis ruedas con suspensión me ayudaban a avanzar por terreno irregular, y con mi instrumento APXS analizaba de qué elementos estaban hechas las rocas y el suelo marciano.',
+              nextPrompt: '¿Tú sola decidías hacia dónde ir? →'
+            },
+            { speaker: 'penguin', text: '¿Tú sola decidías hacia dónde ir?' },
+            {
+              speaker: 'machine',
+              text: 'Los científicos en la Tierra revisaban mis fotografías y me enviaban instrucciones para avanzar con cuidado. ¡Recuerda: no necesitas ser grande para lograr algo muy importante!',
+              nextPrompt: '¡Gracias, Sojourner! ✓'
+            }
           ]
         }
       ]
@@ -362,46 +294,29 @@
           pos: { x: 64, y: 46 },
           shipPos: { x: 22, y: 58 },
           spawnPos: { x: 22, y: 58 },
-          penguinText: '¡Hola! ¿Qué haces tan lejos de la Tierra?',
+          penguinText: '¡Hola! ¿Qué haces viajando tan lejos de la Tierra?',
           penguinAudioUrl: '',
-          dialogueText: 'Soy Pioneer 10. Fui la primera nave en cruzar el cinturón de asteroides y en visitar el gigante Júpiter en diciembre de 1973.',
+          dialogueText: 'Soy Pioneer 10. Despegué en 1972, fui la primera nave en cruzar el cinturón de asteroides y la primera en estudiar de cerca el gigante planeta Júpiter.',
           audioUrl: '',
-          greeting: [
-            { speaker: 'penguin', text: '¡Hola! ¿Qué haces tan lejos de la Tierra?' },
-            { speaker: 'machine', text: 'Soy Pioneer 10. Fui la primera nave en cruzar el cinturón de asteroides y en visitar el gigante Júpiter en diciembre de 1973.' }
-          ],
-          topics: [
-            {
-              id: 'jupiter',
-              icon: '⚡',
-              label: 'Júpiter',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Qué descubriste al pasar cerca de Júpiter?' },
-                { speaker: 'machine', text: 'Descubrí que Júpiter es un planeta gigante gaseoso con intensos campos magnéticos, cinturones de radiación extrema y misteriosas lunas.' }
-              ]
-            },
-            {
-              id: 'signal_delay',
-              icon: '📡',
-              label: 'Señal lejana',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Cuánto tardaban tus señales en llegar a casa?' },
-                { speaker: 'machine', text: 'En mi última señal en enero de 2003, mis datos viajando a la velocidad de la luz tardaron más de 11 horas y 20 minutos en llegar a la Tierra.' }
-              ]
-            },
-            {
-              id: 'plaque',
-              icon: '💌',
-              label: 'Placa dorada',
-              dialogue: [
-                { speaker: 'penguin', text: 'Veo una placa dorada con dibujos. ¿Qué mensaje lleva?' },
-                { speaker: 'machine', text: 'Es un mensaje para civilizaciones lejanas con dibujos de un hombre y una mujer, nuestro sistema solar y la ubicación de la Tierra en la galaxia.' }
-              ]
-            }
-          ],
           dialogue: [
-            { speaker: 'penguin', text: '¡Hola! ¿Qué haces tan lejos de la Tierra?' },
-            { speaker: 'machine', text: 'Soy Pioneer 10. Fui la primera nave en cruzar el cinturón de asteroides y en visitar el gigante Júpiter en diciembre de 1973.' }
+            { speaker: 'penguin', text: '¡Hola! ¿Qué haces viajando tan lejos de la Tierra?' },
+            {
+              speaker: 'machine',
+              text: 'Soy Pioneer 10. Despegué en 1972, fui la primera nave en cruzar el cinturón de asteroides y la primera en estudiar de cerca el gigante planeta Júpiter.',
+              nextPrompt: '¿Qué estudiaste en Júpiter y cómo enviabas datos? →'
+            },
+            { speaker: 'penguin', text: '¿Qué estudiaste en Júpiter y cómo enviabas datos?' },
+            {
+              speaker: 'machine',
+              text: 'Observé su atmósfera, su radiación y sus lunas, y enviaba todo con mi gran antena. ¡Estaba tan lejos que mi última señal en 2003 tardó más de 11 horas en llegar a la Tierra!',
+              nextPrompt: '¿Llevas algún mensaje especial contigo? →'
+            },
+            { speaker: 'penguin', text: '¿Llevas algún mensaje especial contigo?' },
+            {
+              speaker: 'machine',
+              text: '¡Sí! Llevo una placa metálica con dibujos de un hombre y una mujer, nuestro sistema solar y pistas sobre dónde está la Tierra, como una carta para quien me encuentre en el futuro.',
+              nextPrompt: '¡Buen viaje, Pioneer 10! ✓'
+            }
           ]
         },
         {
@@ -417,44 +332,27 @@
           spawnPos: { x: 22, y: 58 },
           penguinText: '¡Hola! Este lugar no parece un planeta. ¿Dónde estoy?',
           penguinAudioUrl: '',
-          dialogueText: '¡Bienvenido al asteroide 433 Eros! Soy NEAR Shoemaker, la primera nave de la historia en orbitar y aterrizar sobre un asteroide.',
+          dialogueText: '¡Bienvenido al asteroide Eros! Soy NEAR Shoemaker y fui enviada por la NASA para estudiar de cerca estas enormes rocas espaciales que giran alrededor del Sol.',
           audioUrl: '',
-          greeting: [
-            { speaker: 'penguin', text: '¡Hola! Este lugar no parece un planeta. ¿Dónde estoy?' },
-            { speaker: 'machine', text: '¡Bienvenido al asteroide 433 Eros! Soy NEAR Shoemaker, la primera nave de la historia en orbitar y aterrizar sobre un asteroide.' }
-          ],
-          topics: [
-            {
-              id: 'records',
-              icon: '🛰️',
-              label: 'Dos récords',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Cuáles fueron tus mayores hazañas espaciales?' },
-                { speaker: 'machine', text: 'Fui la primera nave en orbitar un asteroide en el año 2000, y el 12 de febrero de 2001 me convertí en la primera en tocar su superficie con éxito.' }
-              ]
-            },
-            {
-              id: 'sensors',
-              icon: '🔦',
-              label: 'Láser',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Cómo estudiaste la forma y minerales de Eros?' },
-                { speaker: 'machine', text: 'Usé un telémetro láser para mapear con precisión cada cráter y elevación, junto con cámaras y espectrómetros que analizaron su composición rocosa.' }
-              ]
-            },
-            {
-              id: 'touchdown',
-              icon: '🪨',
-              label: 'Aterrizaje',
-              dialogue: [
-                { speaker: 'penguin', text: '¿Sobreviviste al aterrizaje sobre la roca?' },
-                { speaker: 'machine', text: '¡Sí! Aunque no estaba diseñada para aterrizar, descendí tan suavemente que seguí transmitiendo datos desde la superficie durante dos semanas.' }
-              ]
-            }
-          ],
           dialogue: [
             { speaker: 'penguin', text: '¡Hola! Este lugar no parece un planeta. ¿Dónde estoy?' },
-            { speaker: 'machine', text: '¡Bienvenido al asteroide 433 Eros! Soy NEAR Shoemaker, la primera nave de la historia en orbitar y aterrizar sobre un asteroide.' }
+            {
+              speaker: 'machine',
+              text: '¡Bienvenido al asteroide Eros! Soy NEAR Shoemaker y fui enviada por la NASA para estudiar de cerca estas enormes rocas espaciales que giran alrededor del Sol.',
+              nextPrompt: '¿Qué instrumentos usaste para estudiar el asteroide? →'
+            },
+            { speaker: 'penguin', text: '¿Qué instrumentos usaste para estudiar el asteroide?' },
+            {
+              speaker: 'machine',
+              text: 'En febrero del año 2000 entré en órbita alrededor de Eros y usé cámaras, sensores de minerales y un láser para medir su forma y descubrir cómo se formó el sistema solar.',
+              nextPrompt: '¿Y qué logro histórico conseguiste al final? →'
+            },
+            { speaker: 'penguin', text: '¿Y qué logro histórico conseguiste al final?' },
+            {
+              speaker: 'machine',
+              text: '¡Fui la primera nave en orbitar un asteroide y el 12 de febrero de 2001 me convertí en la primera en aterrizar en él! Incluso seguí enviando datos desde su superficie durante dos semanas.',
+              nextPrompt: '¡Gracias, NEAR Shoemaker! ✓'
+            }
           ]
         }
       ]
@@ -483,7 +381,7 @@
         {
           id: 'q-moon-2',
           hardwareId: 'apollo-11-eagle',
-          hardwareName: 'Módulo Lunar Eagle (Apollo 11)',
+          hardwareName: 'Módulo Lunar Eagle',
           question: '¿Qué ocurrió con las dos partes de Eagle después de aterrizar?',
           options: [
             'La parte de abajo se quedó en la Luna y la de arriba despegó con los astronautas.',
