@@ -160,16 +160,16 @@
   function updateLanguageUI() {
     const isEn = (state.currentLanguage === 'en');
 
-    // Actualizar botones de idioma (en Home y en Stage)
+    // Actualizar botones de idioma (en Home y en Stage) con la palabra completa
     if (dom.langBtnText) {
-      dom.langBtnText.textContent = isEn ? 'ES' : 'EN';
+      dom.langBtnText.textContent = isEn ? 'Español' : 'English';
     }
     if (dom.langToggleBtn) {
       dom.langToggleBtn.title = isEn ? 'Cambiar a Español' : 'Switch to English';
       dom.langToggleBtn.setAttribute('aria-label', isEn ? 'Cambiar a Español' : 'Switch to English');
     }
     if (dom.stageLangBtnText) {
-      dom.stageLangBtnText.textContent = isEn ? 'ES' : 'EN';
+      dom.stageLangBtnText.textContent = isEn ? 'Español' : 'English';
     }
     if (dom.stageLangToggleBtn) {
       dom.stageLangToggleBtn.title = isEn ? 'Cambiar a Español' : 'Switch to English';
@@ -433,7 +433,9 @@
     dom.openCertificateBtn.addEventListener('click', openCertificateModal);
     dom.homeDownloadCertificateBtn.addEventListener('click', downloadCertificate);
     dom.downloadCertificateBtn.addEventListener('click', downloadCertificate);
-    dom.resetProgressBtn.addEventListener('click', resetProgress);
+    if (dom.resetProgressBtn) {
+      dom.resetProgressBtn.addEventListener('click', resetProgress);
+    }
 
     if (dom.stageActionBtn) {
       dom.stageActionBtn.addEventListener('click', (e) => {

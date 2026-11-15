@@ -2228,7 +2228,7 @@ const CHAPTERS_EN = [
 
   const UI_STRINGS = {
   "es": {
-    "langBtnLabel": "EN",
+    "langBtnLabel": "English",
     "langBtnTitle": "Switch to English",
     "homeTitle": "Cyberpenguins",
     "exploreBtn": "Explorar",
@@ -2267,7 +2267,7 @@ const CHAPTERS_EN = [
     "certLevelPrefix": "Rango: "
   },
   "en": {
-    "langBtnLabel": "ES",
+    "langBtnLabel": "Español",
     "langBtnTitle": "Cambiar a Español",
     "homeTitle": "Cyberpenguins",
     "exploreBtn": "Explore",
