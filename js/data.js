@@ -71,7 +71,7 @@
         {
           id: 'surveyor-3',
           modelKey: 'surveyor3',
-          name: 'Surveyor 1',
+          name: 'Surveyor 3',
           siteId: 'oceanus-procellarum',
           locationShort: 'Océano de las Tormentas',
           locationDetail: 'Surveyor 1 / 3: Océano de las Tormentas de la Luna',

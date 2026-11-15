@@ -527,11 +527,11 @@
      ======================================================================== */
 
   const ARRIVAL_STEPS = {
-    moon: { key: 'moon-arrival', label: 'La Luna · Océano de las Tormentas', duration: 1350 },
-    mars: { key: 'mars-arrival', label: 'Marte · Chryse Planitia', duration: 1350 },
+    moon: { key: 'moon-arrival', label: 'Surveyor 3', duration: 1350 },
+    mars: { key: 'mars-arrival', label: 'Viking 1', duration: 1350 },
     'deep-space': {
       key: 'deep-space-arrival',
-      label: 'Espacio Profundo · Aldebarán',
+      label: 'Pioneer 10',
       duration: 1400
     }
   };
@@ -707,24 +707,24 @@
     const steps = [];
     if (chapter.id === 'moon') {
       steps.push(
-        { key: 'moon-liftoff', label: `La Luna · ${fromMachine.locationShort}`, duration: 1150 },
-        { key: 'moon-suborbital', label: `La Luna · ${toMachine.locationShort}`, duration: 1350 },
-        { key: 'moon-arrival', label: `La Luna · ${toMachine.locationShort}`, duration: 1150 }
+        { key: 'moon-liftoff', label: fromMachine.name, duration: 1150 },
+        { key: 'moon-suborbital', label: toMachine.name, duration: 1350 },
+        { key: 'moon-arrival', label: toMachine.name, duration: 1150 }
       );
     } else if (chapter.id === 'mars') {
       steps.push(
-        { key: 'mars-liftoff', label: `Marte · ${fromMachine.locationShort}`, duration: 1150 },
-        { key: 'mars-suborbital', label: `Marte · ${toMachine.locationShort}`, duration: 1350 },
-        { key: 'mars-arrival', label: `Marte · ${toMachine.locationShort}`, duration: 1150 }
+        { key: 'mars-liftoff', label: fromMachine.name, duration: 1150 },
+        { key: 'mars-suborbital', label: toMachine.name, duration: 1350 },
+        { key: 'mars-arrival', label: toMachine.name, duration: 1150 }
       );
     } else {
       steps.push(
         {
           key: 'deep-space-eros-transit',
-          label: `Espacio Profundo · ${toMachine.locationShort}`,
+          label: toMachine.name,
           duration: 1350
         },
-        { key: 'deep-space-arrival', label: `Espacio Profundo · ${toMachine.locationShort}`, duration: 1150 }
+        { key: 'deep-space-arrival', label: toMachine.name, duration: 1150 }
       );
     }
 
@@ -769,10 +769,10 @@
       dom.chapterCardNumeral.textContent = '';
     }
     if (dom.chapterCardTitle) {
-      dom.chapterCardTitle.textContent = chapter.name;
+      dom.chapterCardTitle.textContent = activeMachine ? activeMachine.name : chapter.name;
     }
     if (dom.chapterCardSubtitle) {
-      dom.chapterCardSubtitle.textContent = activeMachine ? (activeMachine.locationShort || '') : '';
+      dom.chapterCardSubtitle.textContent = chapter.name;
     }
     dom.chapterTitleCard.classList.remove('is-hidden');
     void dom.chapterTitleCard.offsetWidth;
@@ -819,8 +819,7 @@
 
   function updateLocationPill(chapter, activeMachine) {
     if (!dom.stageLocationPill || !chapter) return;
-    const stopText = activeMachine && activeMachine.locationShort ? ` · ${activeMachine.locationShort}` : '';
-    dom.stageLocationPill.textContent = `${chapter.name}${stopText}`;
+    dom.stageLocationPill.textContent = activeMachine ? activeMachine.name : chapter.name;
   }
 
   function loadChapterScene(chapterId, animateDescend) {
@@ -1133,7 +1132,7 @@
     const isFirstStop = siteIdx === 0 && chapter.machines.length > 1;
     const nextMachine = isFirstStop ? chapter.machines[1] : null;
     const hatchAriaLabel = isFirstStop && nextMachine
-      ? `Escotilla · Viajar a ${nextMachine.locationShort}`
+      ? `Escotilla · Viajar a ${nextMachine.name}`
       : 'Escotilla · Quiz y Viaje';
 
     // 1. Nave de Cyberpenguin (con escotilla abierta para descenso o EVA)
@@ -1588,39 +1587,67 @@
     return isChapterCompleted(chapter.id) || chapter.machines.some((m) => state.inspectedMachines.includes(m.id));
   }
 
+  function monumentPedestalSvg(chapterId) {
+    const palettes = {
+      moon: { top: '#cbd5e1', left: '#94a3b8', right: '#475569', stepTop: '#e2e8f0', rim: 'rgba(126, 232, 250, 0.36)' },
+      mars: { top: '#ea8850', left: '#c25632', right: '#7c2e22', stepTop: '#fda876', rim: 'rgba(255, 190, 118, 0.36)' },
+      'deep-space': { top: '#38bdf8', left: '#1d4ed8', right: '#1e1b4b', stepTop: '#7dd3fc', rim: 'rgba(126, 232, 250, 0.42)' }
+    };
+    const p = palettes[chapterId] || palettes.moon;
+    return `
+      <svg class="mv-pedestal-svg" viewBox="0 0 210 68" width="204" height="66" aria-hidden="true">
+        <!-- Base arquitectónica isométrica estilo Monument Valley -->
+        <polygon points="105,6 196,26 105,46 14,26" fill="${p.top}" stroke="${p.rim}" stroke-width="1" />
+        <polygon points="14,26 105,46 105,58 14,38" fill="${p.left}" />
+        <polygon points="196,26 105,46 105,58 196,38" fill="${p.right}" />
+        <!-- Escalón inferior desplazado para profundidad geométrica -->
+        <polygon points="105,58 164,45 164,53 105,66" fill="${p.right}" opacity="0.88" />
+        <polygon points="105,58 46,45 46,53 105,66" fill="${p.left}" opacity="0.88" />
+        <polygon points="105,12 172,26 105,40 38,26" fill="${p.stepTop}" opacity="0.28" />
+      </svg>
+    `;
+  }
+
   function renderChapterNav() {
     dom.chapterNav.innerHTML = DATA.CHAPTERS.map((chapter) => {
       const isActive = chapter.id === state.currentChapterId;
       const stars = state.chapterStars[chapter.id] || 0;
       const completed = isChapterCompleted(chapter.id);
-      const emblemSvg = typeof MODELS.chapterEmblem === 'function' ? MODELS.chapterEmblem(chapter.id) : '';
-      const sitePills = chapter.machines.map((m) => `
-        <span class="squircle-pill inline-flex items-center justify-center text-center px-2.5 py-0.5 text-[11px] font-normal bg-white/[0.05] border border-white/[0.08] text-slate-300">
-          ${m.locationShort || m.name}
-        </span>
-      `).join('');
+      const machinesPreviewSvg = chapter.machines.map((m) => {
+        const svg = typeof MODELS[m.modelKey] === 'function' ? MODELS[m.modelKey]() : '';
+        return `<div class="w-16 h-16 flex items-center justify-center drop-shadow-[0_10px_14px_rgba(2,6,23,0.65)] [&_svg]:w-full [&_svg]:h-full" title="${m.name}">${svg}</div>`;
+      }).join('');
 
       return `
-        <div class="squircle-card home-chapter-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
-          isActive ? 'is-active border-cyan-300/45' : ''
+        <div class="home-chapter-card p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
+          isActive ? 'is-active' : ''
         }">
-          <span class="squircle-pill inline-flex items-center justify-center text-center px-3 py-0.5 text-[11px] font-medium ${
-            completed ? 'bg-emerald-300/15 text-emerald-200 border border-emerald-300/20' : 'bg-amber-300/10 text-amber-200 border border-amber-300/20'
-          }">★ ${stars}/5</span>
-          <div class="flex flex-col items-center justify-center text-center gap-2.5">
-            ${emblemSvg ? `<div class="home-chapter-emblem flex items-center justify-center">${emblemSvg}</div>` : ''}
-            <h2 class="text-lg sm:text-xl font-semibold tracking-tight text-white text-center">${chapter.name}</h2>
-            <div class="flex flex-wrap items-center justify-center gap-1.5">${sitePills}</div>
+          <div class="w-full flex items-center justify-between gap-2">
+            <span class="text-[10.5px] font-medium uppercase tracking-[0.22em] text-slate-400">${chapter.name}</span>
+            <span class="text-[11px] font-medium tabular-nums ${
+              completed ? 'text-emerald-300' : 'text-amber-200/90'
+            }">★ ${stars}/5</span>
           </div>
-          <button type="button"
-            class="squircle-btn w-full inline-flex items-center justify-center text-center py-2.5 text-xs sm:text-sm font-medium ${
-              isActive
-                ? 'bg-white text-slate-950 hover:bg-cyan-100'
-                : 'bg-white/[0.08] hover:bg-white/[0.16] text-slate-100'
-            }"
-            data-enter-chapter="${chapter.id}">
-            ${completed ? 'Explorar de nuevo' : isActive ? 'Continuar' : 'Explorar'}
-          </button>
+
+          <div class="home-chapter-emblem relative flex flex-col items-center justify-end w-full pt-2">
+            <div class="relative z-10 flex items-end justify-center gap-5 -mb-5">${machinesPreviewSvg}</div>
+            ${monumentPedestalSvg(chapter.id)}
+          </div>
+
+          <div class="flex flex-col items-center gap-3 w-full">
+            <h2 class="text-[15px] sm:text-base font-medium tracking-[-0.02em] text-white/95 text-center leading-snug">
+              ${chapter.machines.map((m) => m.name).join(' · ')}
+            </h2>
+            <button type="button"
+              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2 text-xs sm:text-sm font-medium ${
+                isActive
+                  ? 'bg-white text-slate-950 hover:bg-cyan-50'
+                  : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-100'
+              }"
+              data-enter-chapter="${chapter.id}">
+              ${completed ? 'Explorar de nuevo' : isActive ? 'Continuar' : 'Explorar'}
+            </button>
+          </div>
         </div>
       `;
     }).join('');
@@ -1652,9 +1679,9 @@
       dom.homePassportSlots.innerHTML = DATA.CHAPTERS.map((chapter) => {
         const stamped = hasChapterPassportStamp(chapter);
         return `
-          <div class="rounded-2xl bg-white/[0.045] border border-white/[0.06] min-h-[96px] p-2.5 flex flex-col items-center justify-center gap-1.5 text-center">
-            <div class="flex items-center justify-center">${MODELS.penguinPawStamp(stamped, 38)}</div>
-            <span class="text-[11px] font-medium text-slate-200 text-center leading-tight">${chapter.name}</span>
+          <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-1.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center">
+            <div class="flex items-center justify-center">${MODELS.penguinPawStamp(stamped, 24)}</div>
+            <span class="text-[10px] font-normal text-slate-300 text-center leading-tight">${chapter.name}</span>
           </div>
         `;
       }).join('');
@@ -1663,11 +1690,11 @@
       dom.homeBadgesGrid.innerHTML = DATA.BADGES.map((item) => {
         const unlocked = totalStars >= item.minStars;
         return `
-          <div class="rounded-2xl bg-white/[0.045] border border-white/[0.06] min-h-[96px] px-1 py-2 flex flex-col items-center justify-center gap-1.5 text-center ${
-            unlocked ? '' : 'opacity-45'
+          <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-0.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center ${
+            unlocked ? '' : 'opacity-40'
           }" title="${item.name}">
-            <div class="w-9 h-9 flex items-center justify-center [&_svg]:w-8 [&_svg]:h-8">${MODELS.badgeIcon(item.id, unlocked)}</div>
-            <span class="text-[9.5px] sm:text-[10.5px] font-medium text-slate-200 text-center leading-tight">${item.name}</span>
+            <div class="w-6 h-6 flex items-center justify-center [&_svg]:w-6 [&_svg]:h-6">${MODELS.badgeIcon(item.id, unlocked)}</div>
+            <span class="text-[9px] font-normal text-slate-300 text-center leading-tight">${item.name}</span>
           </div>
         `;
       }).join('');
@@ -1676,7 +1703,7 @@
     if (certPreview) {
       certPreview.classList.toggle('is-unlocked', allCompleted);
       certPreview.innerHTML = `
-        <div class="flex items-center justify-center">${MODELS.penguinPawStamp(allCompleted, 42)}</div>
+        <div class="flex items-center justify-center">${MODELS.penguinPawStamp(allCompleted, 26)}</div>
         <span class="text-xs font-medium text-center ${allCompleted ? 'text-amber-200' : 'text-slate-300'}">${badge.name}</span>
       `;
     }
@@ -1852,7 +1879,7 @@
       return `
         <span class="squircle-pill px-3 py-1 text-xs font-medium inline-flex items-center justify-center text-center gap-1.5 bg-white/[0.07] text-slate-200 border border-white/10">
           <span class="entity-dot ${inspected ? 'done' : ''}"></span>
-          <span class="text-center">${machine.locationShort || machine.name}</span>
+          <span class="text-center">${machine.name}</span>
         </span>
       `;
     }).join('');
@@ -1862,7 +1889,7 @@
         ? `
           <button id="quiz-return-stop1-btn" type="button"
             class="squircle-btn inline-flex items-center justify-center text-center px-3 py-1 text-xs font-medium bg-cyan-300/15 hover:bg-cyan-300/25 border border-cyan-300/30 text-cyan-200">
-            ✈ ${chapter.machines[0].locationShort}
+            ✈ ${chapter.machines[0].name}
           </button>
         `
         : '';

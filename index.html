@@ -193,160 +193,125 @@
     </div>
   </section>
 
-  <!-- Pantalla Inicial: Avances de Misión y Descarga de Certificado -->
+  <!-- Pantalla Inicial: Dioramas Low-Poly y Dock Minimalista estilo Apple -->
   <section id="home-screen" class="home-screen is-hidden" aria-label="Pantalla inicial">
     <svg class="cosmic-panorama-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs>
-        <radialGradient id="bgNebulaCyan" cx="18%" cy="22%" r="48%">
-          <stop offset="0%" stop-color="rgba(56, 189, 248, 0.24)" />
-          <stop offset="45%" stop-color="rgba(37, 99, 235, 0.12)" />
-          <stop offset="100%" stop-color="rgba(6, 9, 20, 0)" />
-        </radialGradient>
-        <radialGradient id="bgNebulaViolet" cx="56%" cy="46%" r="52%">
-          <stop offset="0%" stop-color="rgba(139, 92, 246, 0.2)" />
-          <stop offset="48%" stop-color="rgba(59, 130, 246, 0.08)" />
-          <stop offset="100%" stop-color="rgba(6, 9, 20, 0)" />
-        </radialGradient>
-        <radialGradient id="bgNebulaAmber" cx="84%" cy="74%" r="46%">
-          <stop offset="0%" stop-color="rgba(251, 146, 60, 0.2)" />
-          <stop offset="50%" stop-color="rgba(180, 83, 9, 0.09)" />
-          <stop offset="100%" stop-color="rgba(6, 9, 20, 0)" />
-        </radialGradient>
-        <radialGradient id="bgEarthAtmosphere" cx="18%" cy="96%" r="42%">
-          <stop offset="0%" stop-color="rgba(126, 232, 250, 0.55)" />
-          <stop offset="32%" stop-color="rgba(37, 99, 235, 0.34)" />
-          <stop offset="68%" stop-color="rgba(15, 23, 42, 0.14)" />
-          <stop offset="100%" stop-color="rgba(6, 9, 20, 0)" />
-        </radialGradient>
-        <radialGradient id="bgEarthDisc" cx="35%" cy="28%" r="72%">
-          <stop offset="0%" stop-color="#1e40af" />
-          <stop offset="55%" stop-color="#0f2354" />
-          <stop offset="100%" stop-color="#040817" />
-        </radialGradient>
-        <radialGradient id="bgMoonDisc" cx="34%" cy="32%" r="68%">
-          <stop offset="0%" stop-color="#dbe4f7" />
-          <stop offset="48%" stop-color="#8b96b3" />
-          <stop offset="86%" stop-color="#3c4663" />
-          <stop offset="100%" stop-color="#171d33" />
-        </radialGradient>
-        <radialGradient id="bgMarsDisc" cx="32%" cy="32%" r="70%">
-          <stop offset="0%" stop-color="#fdbb8c" />
-          <stop offset="42%" stop-color="#d4663f" />
-          <stop offset="82%" stop-color="#6b2318" />
-          <stop offset="100%" stop-color="#1f0a10" />
-        </radialGradient>
-        <radialGradient id="bgAldebaranGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="rgba(255, 240, 204, 0.95)" />
-          <stop offset="18%" stop-color="rgba(255, 185, 110, 0.52)" />
-          <stop offset="52%" stop-color="rgba(234, 88, 12, 0.16)" />
-          <stop offset="100%" stop-color="rgba(234, 88, 12, 0)" />
-        </radialGradient>
-        <linearGradient id="bgErosGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#9ca6bf" />
-          <stop offset="55%" stop-color="#5d657d" />
-          <stop offset="100%" stop-color="#272d3d" />
+        <linearGradient id="bgCosmosGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#050814" />
+          <stop offset="52%" stop-color="#070c1d" />
+          <stop offset="100%" stop-color="#0b1329" />
+        </linearGradient>
+        <linearGradient id="bgAtmoRim" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.34" />
+          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
         </linearGradient>
       </defs>
 
-      <!-- Nebulosas volumétricas de fondo -->
-      <rect width="1920" height="1080" fill="url(#bgNebulaCyan)" />
-      <rect width="1920" height="1080" fill="url(#bgNebulaViolet)" />
-      <rect width="1920" height="1080" fill="url(#bgNebulaAmber)" />
-      <path d="M -80,920 C 320,660 660,540 1060,420 C 1380,320 1650,180 2020,-40"
-        fill="none" stroke="rgba(126, 232, 250, 0.08)" stroke-width="190" stroke-linecap="round" />
-      <path d="M 140,1040 C 560,760 880,620 1340,460 C 1580,375 1820,250 1980,90"
-        fill="none" stroke="rgba(167, 139, 250, 0.07)" stroke-width="120" stroke-linecap="round" />
+      <!-- Espacio negativo profundo estilo Monument Valley nocturno -->
+      <rect width="1920" height="1080" fill="url(#bgCosmosGrad)" />
 
-      <!-- Arcos orbitales continuos muy sutiles -->
-      <ellipse cx="960" cy="600" rx="1080" ry="390" transform="rotate(-14 960 600)"
-        fill="none" stroke="rgba(126, 232, 250, 0.08)" stroke-width="1.2" />
-      <ellipse cx="980" cy="560" rx="840" ry="270" transform="rotate(8 980 560)"
-        fill="none" stroke="rgba(255, 190, 118, 0.07)" stroke-width="1" />
+      <!-- Planos geométricos arquitectónicos ultra tenues en las esquinas -->
+      <polygon points="0,0 640,0 280,460 0,320" fill="#0f172a" opacity="0.32" />
+      <polygon points="1920,1080 1240,1080 1560,640 1920,740" fill="#1e1b4b" opacity="0.22" />
 
-      <!-- Campo estelar profundo -->
+      <!-- Arcos orbitales limpios muy sutiles -->
+      <ellipse cx="960" cy="560" rx="1020" ry="340" transform="rotate(-12 960 560)"
+        fill="none" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
+      <ellipse cx="960" cy="540" rx="760" ry="230" transform="rotate(7 960 540)"
+        fill="none" stroke="rgba(126, 232, 250, 0.06)" stroke-width="1" />
+
+      <!-- Campo estelar discreto en perímetro -->
       <g fill="#f8fafc">
-        <circle cx="96" cy="118" r="1.4" opacity="0.72" />
-        <circle cx="242" cy="74" r="1.1" opacity="0.58" />
-        <circle cx="388" cy="196" r="1.7" fill="#bae6fd" opacity="0.82" />
-        <circle cx="512" cy="92" r="1.2" opacity="0.62" />
-        <circle cx="678" cy="154" r="1.5" fill="#fde68a" opacity="0.76" />
-        <circle cx="845" cy="84" r="1.2" opacity="0.54" />
-        <circle cx="1014" cy="128" r="1.6" fill="#ddd6fe" opacity="0.78" />
-        <circle cx="1180" cy="68" r="1.1" opacity="0.55" />
-        <circle cx="1340" cy="148" r="1.5" opacity="0.68" />
-        <circle cx="1495" cy="88" r="1.3" fill="#bae6fd" opacity="0.74" />
-        <circle cx="1790" cy="126" r="1.6" opacity="0.72" />
-        <circle cx="142" cy="390" r="1.3" opacity="0.65" />
-        <circle cx="88" cy="585" r="1.6" fill="#7ee8fa" opacity="0.76" />
-        <circle cx="176" cy="740" r="1.2" opacity="0.58" />
-        <circle cx="1835" cy="410" r="1.5" opacity="0.72" />
-        <circle cx="1765" cy="680" r="1.3" fill="#fed7aa" opacity="0.74" />
-        <circle cx="1862" cy="915" r="1.6" opacity="0.68" />
-        <circle cx="1420" cy="990" r="1.4" fill="#bae6fd" opacity="0.72" />
-        <circle cx="1065" cy="1015" r="1.2" opacity="0.6" />
-        <circle cx="720" cy="995" r="1.5" opacity="0.65" />
+        <circle cx="96" cy="118" r="1.2" opacity="0.65" />
+        <circle cx="482" cy="82" r="1.1" opacity="0.45" />
+        <circle cx="960" cy="54" r="1.4" fill="#bae6fd" opacity="0.6" />
+        <circle cx="1340" cy="96" r="1.3" opacity="0.52" />
+        <circle cx="1824" cy="390" r="1.3" opacity="0.58" />
+        <circle cx="88" cy="560" r="1.4" fill="#7ee8fa" opacity="0.64" />
+        <circle cx="1765" cy="640" r="1.2" fill="#fed7aa" opacity="0.56" />
+        <circle cx="1180" cy="1020" r="1.2" opacity="0.46" />
       </g>
 
-      <!-- La Luna en el cuadrante superior izquierdo -->
-      <g opacity="0.86">
-        <circle cx="215" cy="205" r="118" fill="rgba(126, 232, 250, 0.08)" />
-        <circle cx="215" cy="205" r="88" fill="url(#bgMoonDisc)" />
-        <ellipse cx="185" cy="176" rx="22" ry="15" fill="rgba(51, 65, 95, 0.35)" />
-        <ellipse cx="238" cy="222" rx="18" ry="22" fill="rgba(51, 65, 95, 0.28)" />
-        <circle cx="172" cy="228" r="11" fill="rgba(71, 85, 118, 0.45)" stroke="rgba(226, 232, 240, 0.25)" stroke-width="1" />
-        <circle cx="228" cy="168" r="8" fill="rgba(71, 85, 118, 0.38)" />
-        <path d="M 236,120 A 88,88 0 0,1 236,290 A 56,88 0 0,0 236,120 Z" fill="rgba(6, 9, 20, 0.48)" />
+      <!-- La Luna low-poly poliédrica (cuadrante superior izquierdo) -->
+      <g transform="translate(215, 200)" opacity="0.82">
+        <polygon points="0,-88 62,-62 88,0 62,62 0,88 -62,62 -88,0 -62,-62" fill="#64748b" />
+        <polygon points="0,-88 -62,-62 -24,-22 26,-32" fill="#e2e8f0" />
+        <polygon points="-62,-62 -88,0 -34,14 -24,-22" fill="#cbd5e1" />
+        <polygon points="0,-88 62,-62 26,-32" fill="#94a3b8" />
+        <polygon points="62,-62 88,0 44,24 26,-32" fill="#475569" />
+        <polygon points="-24,-22 -34,14 14,28 26,-32" fill="#94a3b8" />
+        <polygon points="-88,0 -62,62 -16,44 -34,14" fill="#64748b" />
+        <polygon points="14,28 44,24 62,62 0,88" fill="#1e293b" />
+        <polygon points="-16,44 14,28 0,88 -62,62" fill="#334155" />
+        <polygon points="44,24 88,0 62,62" fill="#0f172a" />
+        <!-- Cráter geométrico -->
+        <polygon points="-44,-28 -26,-36 -18,-20 -34,-14" fill="#64748b" opacity="0.7" />
       </g>
 
-      <!-- Limbo atmosférico de La Tierra en la esquina inferior izquierda -->
+      <!-- Limbo terrestre low-poly (esquina inferior izquierda) -->
       <g>
-        <circle cx="210" cy="1130" r="420" fill="url(#bgEarthAtmosphere)" />
-        <circle cx="210" cy="1130" r="345" fill="url(#bgEarthDisc)" />
-        <path d="M -80,990 A 345,345 0 0,1 515,965" fill="none" stroke="rgba(126, 232, 250, 0.55)" stroke-width="5" />
-        <path d="M 25,950 Q 175,905 325,935" fill="none" stroke="rgba(255, 255, 255, 0.22)" stroke-width="12" stroke-linecap="round" />
+        <polygon points="-40,1080 -40,860 155,895 360,968 510,1080" fill="#172554" />
+        <polygon points="-40,860 155,895 85,1010 -40,985" fill="#1d4ed8" />
+        <polygon points="155,895 360,968 235,1055 85,1010" fill="#1e40af" />
+        <polygon points="360,968 510,1080 235,1055" fill="#0f172a" />
+        <polyline points="-40,860 155,895 360,968 510,1080" fill="none" stroke="url(#bgAtmoRim)" stroke-width="4" />
       </g>
 
-      <!-- Aldebarán y Asteroide 433 Eros en el sector superior derecho -->
+      <!-- Aldebarán en estrella romboidal y Asteroide 433 Eros facetado (superior derecho) -->
       <g>
-        <circle cx="1685" cy="195" r="135" fill="url(#bgAldebaranGlow)" />
-        <circle cx="1685" cy="195" r="14" fill="#ffe1a8" />
-        <circle cx="1685" cy="195" r="7" fill="#fffaf0" />
-        <g transform="translate(1525, 245) rotate(-16)" opacity="0.82">
-          <path d="M -26,4 C -24,-10 -8,-17 12,-14 C 28,-11 36,-1 30,9 C 22,18 -6,19 -20,14 C -26,11 -27,8 -26,4 Z"
-            fill="url(#bgErosGrad)" stroke="rgba(203, 213, 225, 0.3)" stroke-width="1.2" />
-          <ellipse cx="-6" cy="-1" rx="6" ry="3.5" fill="rgba(15, 23, 42, 0.5)" />
+        <g transform="translate(1690, 185)">
+          <polygon points="0,-24 6,-6 24,0 6,6 0,24 -6,6 -24,0 -6,-6" fill="#fb923c" opacity="0.55" />
+          <polygon points="0,-13 3.5,-3.5 13,0 3.5,3.5 0,13 -3.5,3.5 -13,0 -3.5,-3.5" fill="#fef08a" />
+          <polygon points="0,-5 5,0 0,5 -5,0" fill="#ffffff" />
+        </g>
+        <g transform="translate(1525, 240) rotate(-14)" opacity="0.82">
+          <polygon points="-30,-4 -15,-14 2,-9 18,-14 32,-3 26,9 10,13 -8,9 -24,11" fill="#64748b" />
+          <polygon points="-15,-14 2,-9 -3,3 -22,2" fill="#cbd5e1" />
+          <polygon points="2,-9 18,-14 20,2 -3,3" fill="#94a3b8" />
+          <polygon points="-22,2 -3,3 -8,9 -24,11 -30,-4" fill="#334155" />
+          <polygon points="-3,3 20,2 26,9 10,13 -8,9" fill="#1e293b" />
         </g>
       </g>
 
-      <!-- Marte en el sector derecho inferior -->
-      <g opacity="0.88">
-        <circle cx="1745" cy="790" r="188" fill="rgba(249, 115, 22, 0.14)" />
-        <circle cx="1745" cy="790" r="138" fill="url(#bgMarsDisc)" />
-        <path d="M 1645,785 Q 1740,758 1848,796 Q 1795,826 1672,812 Z" fill="rgba(69, 20, 14, 0.42)" />
-        <path d="M 1695,660 Q 1745,680 1795,660 Q 1745,648 1695,660 Z" fill="rgba(255, 244, 236, 0.45)" />
-        <path d="M 1775,656 A 138,138 0 0,1 1775,924 A 88,138 0 0,0 1775,656 Z" fill="rgba(6, 9, 20, 0.56)" />
+      <!-- Marte low-poly poliédrico (sector inferior derecho) -->
+      <g transform="translate(1745, 790)" opacity="0.84">
+        <polygon points="0,-128 90,-90 128,0 90,90 0,128 -90,90 -128,0 -90,-90" fill="#9a3412" />
+        <polygon points="0,-128 -90,-90 -36,-32 38,-44" fill="#fdba74" />
+        <polygon points="-90,-90 -128,0 -52,20 -36,-32" fill="#fb923c" />
+        <polygon points="0,-128 90,-90 38,-44" fill="#ea580c" />
+        <polygon points="-36,-32 -52,20 22,38 38,-44" fill="#c2410c" />
+        <polygon points="38,-44 90,-90 128,0 64,28" fill="#7c2d12" />
+        <polygon points="-128,0 -90,90 -24,62 -52,20" fill="#9a3412" />
+        <polygon points="22,38 64,28 90,90 0,128" fill="#431407" />
+        <polygon points="-24,62 22,38 0,128 -90,90" fill="#5c1d0c" />
+        <polygon points="64,28 128,0 90,90" fill="#270c05" />
+        <!-- Casquete polar geométrico -->
+        <polygon points="0,-128 -36,-110 38,-112" fill="#fff7ed" opacity="0.72" />
       </g>
     </svg>
-    <div class="squircle-panel home-panel max-w-6xl w-full p-6 sm:p-9 lg:p-10 flex flex-col gap-6 sm:gap-7">
-      <header class="flex flex-wrap items-center justify-between gap-4 text-center">
-        <div class="flex items-center justify-center gap-3.5 text-center">
-          <div class="w-11 h-11 rounded-2xl bg-cyan-300/10 border border-cyan-300/25 flex items-center justify-center shrink-0">
-            <svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true">
-              <circle cx="20" cy="20" r="13" fill="none" stroke="#7ee8fa" stroke-width="1.6" stroke-opacity="0.7" />
-              <ellipse cx="20" cy="20" rx="17" ry="6.5" transform="rotate(-24 20 20)" fill="none" stroke="#ffbe76" stroke-width="1.5" />
-              <circle cx="20" cy="20" r="4.5" fill="#7ee8fa" />
+
+    <div class="home-panel max-w-6xl w-full px-3 sm:px-6 py-4 sm:py-6 flex flex-col gap-6 sm:gap-8">
+      <!-- Encabezado Minimalista Apple -->
+      <header class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-2xl bg-white/[0.045] backdrop-blur-xl border border-white/[0.12] flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 36 36" width="22" height="22" aria-hidden="true">
+              <polygon points="18,4 30,14 18,22 6,14" fill="#e2e8f0" />
+              <polygon points="6,14 18,22 18,32" fill="#38bdf8" opacity="0.85" />
+              <polygon points="30,14 18,22 18,32" fill="#0284c7" opacity="0.9" />
             </svg>
           </div>
-          <h1 class="text-2xl sm:text-4xl font-semibold tracking-[-0.03em] text-white text-center">Cyberpenguins</h1>
+          <h1 class="text-2xl sm:text-[32px] font-semibold tracking-[-0.035em] text-white">Cyberpenguins</h1>
         </div>
-        <div class="flex items-center justify-center gap-3">
+        <div class="flex items-center gap-2.5">
           <button id="home-start-btn" type="button"
-            class="squircle-btn inline-flex items-center justify-center text-center px-6 py-3 text-sm sm:text-base font-medium bg-white text-slate-950 hover:bg-cyan-100 shadow-lg shadow-cyan-500/10">
+            class="squircle-btn rounded-full inline-flex items-center justify-center text-center px-6 py-2.5 text-sm font-medium bg-white text-slate-950 hover:bg-cyan-50 shadow-[0_8px_28px_rgba(255,255,255,0.14)]">
             Explorar
           </button>
           <button id="reset-progress-btn" type="button" title="Reiniciar" aria-label="Reiniciar"
-            class="squircle-btn w-11 h-11 inline-flex items-center justify-center text-center bg-white/[0.08] hover:bg-rose-400/20 border border-white/15 text-slate-200">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9"
+            class="squircle-btn rounded-full w-10 h-10 inline-flex items-center justify-center text-center bg-white/[0.05] hover:bg-rose-400/20 border border-white/[0.1] text-slate-300">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
               <path d="M3 3v5h5" />
@@ -355,60 +320,60 @@
         </div>
       </header>
 
-      <!-- Avances por Destino -->
-      <section id="home-chapters-grid" aria-label="Lugares">
+      <!-- Trío de Dioramas Isométricos Low-Poly (Estilo Monument Valley) -->
+      <section id="home-chapters-grid" aria-label="Naves y misiones">
         <div id="chapter-nav" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 items-stretch"></div>
       </section>
 
-      <!-- Pasaporte, Insignias y Certificado -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 items-stretch">
-        <section class="squircle-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full">
-          <div class="w-full flex items-center justify-center gap-2 text-center">
-            <span class="text-sm sm:text-base font-medium text-slate-100 text-center">Pasaporte</span>
+      <!-- Dock Inferior Compacto estilo Apple (Pasaporte, Rango y Certificado) -->
+      <footer class="home-apple-dock grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4">
+        <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
+          <div class="w-full flex items-center justify-between gap-2">
+            <span class="text-xs font-medium tracking-tight text-slate-200">Pasaporte</span>
             <span id="hud-passport-count"
-              class="squircle-pill inline-flex items-center justify-center text-center px-2.5 py-0.5 text-[11px] font-medium bg-amber-300/10 text-amber-200 border border-amber-300/20">0/3</span>
+              class="squircle-pill inline-flex items-center justify-center text-center px-2 py-0.5 text-[11px] font-medium bg-white/[0.07] text-amber-200 border border-white/10">0/3</span>
           </div>
-          <div id="home-passport-slots" class="w-full grid grid-cols-3 gap-2"></div>
+          <div id="home-passport-slots" class="w-full grid grid-cols-3 gap-1.5"></div>
           <button id="open-passport-btn" type="button"
-            class="squircle-btn w-full inline-flex items-center justify-center text-center px-3 py-2.5 text-xs sm:text-sm font-medium bg-white/[0.08] hover:bg-white/[0.15] text-slate-100">
+            class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.14] text-slate-200">
             Ver pasaporte
           </button>
         </section>
 
-        <section class="squircle-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full">
-          <div class="w-full flex items-center justify-center gap-2 text-center">
-            <span id="hud-badge-name" class="text-sm sm:text-base font-medium text-cyan-200 text-center">Aprendiz</span>
+        <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
+          <div class="w-full flex items-center justify-between gap-2">
+            <span id="hud-badge-name" class="text-xs font-medium tracking-tight text-cyan-200">Aprendiz</span>
             <span id="home-total-stars"
-              class="squircle-pill inline-flex items-center justify-center text-center px-2.5 py-0.5 text-[11px] font-medium bg-amber-300/10 text-amber-200 border border-amber-300/20">★ 0/15</span>
+              class="squircle-pill inline-flex items-center justify-center text-center px-2 py-0.5 text-[11px] font-medium bg-white/[0.07] text-amber-200 border border-white/10">★ 0/15</span>
           </div>
-          <div id="home-badges-grid" class="w-full grid grid-cols-5 gap-1.5"></div>
+          <div id="home-badges-grid" class="w-full grid grid-cols-5 gap-1"></div>
           <button id="open-badges-btn" type="button"
-            class="squircle-btn w-full inline-flex items-center justify-center text-center px-3 py-2.5 text-xs sm:text-sm font-medium bg-white/[0.08] hover:bg-white/[0.15] text-slate-100">
+            class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.14] text-slate-200">
             Ver insignias
           </button>
         </section>
 
-        <section class="squircle-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full">
-          <div class="w-full flex items-center justify-center gap-2 text-center">
-            <span class="text-sm sm:text-base font-medium text-slate-100 text-center">Certificado</span>
+        <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
+          <div class="w-full flex items-center justify-between gap-2">
+            <span class="text-xs font-medium tracking-tight text-slate-200">Certificado</span>
             <span id="home-chapters-completed-count"
-              class="squircle-pill inline-flex items-center justify-center text-center px-2.5 py-0.5 text-[11px] font-medium bg-cyan-300/10 text-cyan-200 border border-cyan-300/20">0/3</span>
+              class="squircle-pill inline-flex items-center justify-center text-center px-2 py-0.5 text-[11px] font-medium bg-white/[0.07] text-cyan-200 border border-white/10">0/3</span>
           </div>
           <div id="home-certificate-preview"
-            class="certificate-card-preview w-full min-h-[96px] rounded-2xl bg-white/[0.045] border border-white/[0.08] p-3 flex flex-col items-center justify-center gap-1.5 text-center"></div>
+            class="certificate-card-preview w-full min-h-[54px] rounded-2xl bg-white/[0.03] border border-white/[0.07] px-3 py-2 flex items-center justify-center gap-2.5 text-center"></div>
           <p id="home-certificate-status" class="text-xs font-normal text-slate-400 text-center empty:hidden"></p>
-          <div class="w-full flex flex-wrap items-center justify-center gap-2.5">
+          <div class="w-full flex items-center justify-center gap-2">
             <button id="open-certificate-btn" type="button" disabled
-              class="squircle-btn flex-1 inline-flex items-center justify-center text-center px-3 py-2.5 text-xs sm:text-sm font-medium bg-white/[0.08] hover:bg-white/[0.15] text-slate-100">
+              class="squircle-btn rounded-full flex-1 inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.14] text-slate-200">
               Ver
             </button>
             <button id="home-download-certificate-btn" type="button" disabled
-              class="squircle-btn flex-1 inline-flex items-center justify-center text-center px-3 py-2.5 text-xs sm:text-sm font-medium bg-amber-300 hover:bg-amber-200 text-slate-950">
+              class="squircle-btn rounded-full flex-1 inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-amber-300/90 hover:bg-amber-200 text-slate-950">
               Descargar
             </button>
           </div>
         </section>
-      </div>
+      </footer>
     </div>
   </section>
 
@@ -572,6 +537,19 @@
   </div>
 
   <script defer src="js/data.js"></script>
+  <script defer src="js/elementos/pinguino.js"></script>
+  <script defer src="js/elementos/nave-pinguino.js"></script>
+  <script defer src="js/elementos/surveyor-3.js"></script>
+  <script defer src="js/elementos/apollo-11-eagle.js"></script>
+  <script defer src="js/elementos/viking-1.js"></script>
+  <script defer src="js/elementos/sojourner.js"></script>
+  <script defer src="js/elementos/pioneer-10.js"></script>
+  <script defer src="js/elementos/near-shoemaker.js"></script>
+  <script defer src="js/elementos/tierra.js"></script>
+  <script defer src="js/elementos/luna.js"></script>
+  <script defer src="js/elementos/marte.js"></script>
+  <script defer src="js/elementos/asteroide-eros.js"></script>
+  <script defer src="js/elementos/espacio-profundo.js"></script>
   <script defer src="js/models.js"></script>
   <script defer src="js/tts.js"></script>
   <script defer src="js/fx.js"></script>

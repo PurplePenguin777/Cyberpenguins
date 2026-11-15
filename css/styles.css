@@ -469,7 +469,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   Pantalla Inicial (Bento Minimalista Apple)
+   Pantalla Inicial (Minimalismo Apple + Low-Poly Monument Valley)
    ========================================================================== */
 
 .home-screen {
@@ -494,35 +494,72 @@ a:focus-visible {
   position: relative;
   z-index: 2;
   margin: auto;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   animation: panelRiseIn 0.55s var(--spring-apple) both;
 }
 
 .home-chapter-card {
   position: relative;
+  border-radius: 28px;
+  background: rgba(12, 18, 36, 0.42);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 18px 40px rgba(2, 6, 20, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition:
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .home-chapter-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(126, 232, 250, 0.34);
-  background: rgba(28, 38, 74, 0.72);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(18, 27, 52, 0.56);
   box-shadow:
-    0 18px 42px rgba(4, 9, 26, 0.48),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 24px 52px rgba(2, 6, 20, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .home-chapter-card.is-active {
-  background: rgba(24, 34, 68, 0.76);
+  background: rgba(16, 25, 50, 0.58);
+  border-color: rgba(126, 232, 250, 0.36);
   box-shadow:
-    0 16px 38px rgba(14, 165, 233, 0.14),
-    inset 0 1px 0 rgba(126, 232, 250, 0.22);
+    0 20px 44px rgba(14, 165, 233, 0.14),
+    inset 0 1px 0 rgba(126, 232, 250, 0.24);
 }
 
 .home-chapter-emblem {
-  transition: transform 0.38s var(--spring-apple);
+  width: auto;
+  min-width: 180px;
+  min-height: 108px;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .home-chapter-card:hover .home-chapter-emblem {
-  transform: scale(1.06);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.home-apple-dock {
+  border-radius: 24px;
+  background: rgba(12, 18, 36, 0.48);
+  backdrop-filter: blur(28px) saturate(165%);
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  box-shadow:
+    0 18px 44px rgba(2, 6, 20, 0.46),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.home-dock-segment {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.055);
 }
 
 .certificate-card-preview.is-unlocked {
