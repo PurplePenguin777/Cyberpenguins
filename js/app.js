@@ -1648,10 +1648,23 @@
     `;
   }
 
+  function hasChapterProgress(chapterId) {
+    const chapter = getChapter(chapterId);
+    if (!chapter) return false;
+    const hasInspected = chapter.machines.some((m) => state.inspectedMachines.includes(m.id));
+    const samples = getChapterSamples(chapter);
+    const hasSample = samples.some((s) => state.collectedSamples.includes(s.id));
+    const hasStars = (state.chapterStars && (state.chapterStars[chapterId] || 0) > 0);
+    const hasQuiz = Boolean(state.quizAnswers && state.quizAnswers[chapterId] && state.quizAnswers[chapterId].some((a) => a !== null));
+    const siteIdx = (state.currentSiteByChapter && state.currentSiteByChapter[chapterId]) || 0;
+    return hasInspected || hasSample || hasStars || hasQuiz || siteIdx > 0;
+  }
+
   function renderChapterNav() {
     dom.chapterNav.innerHTML = DATA.CHAPTERS.map((chapter) => {
-      const isActive = chapter.id === state.currentChapterId;
       const completed = isChapterCompleted(chapter.id);
+      const inProgress = !completed && hasChapterProgress(chapter.id);
+      const isCardActive = inProgress && chapter.id === state.currentChapterId;
       const firstMachine = chapter.machines[0];
       const singleMachineSvg = firstMachine && typeof MODELS[firstMachine.modelKey] === 'function'
         ? MODELS[firstMachine.modelKey]()
@@ -1664,7 +1677,7 @@
 
       return `
         <div class="home-chapter-card p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
-          isActive ? 'is-active' : ''
+          isCardActive ? 'is-active' : ''
         }">
           <div class="w-full flex items-center justify-center">
             <span class="text-[11px] font-medium uppercase tracking-[0.22em] text-slate-400 text-center">${chapter.name}</span>
@@ -1678,12 +1691,12 @@
           <div class="flex flex-col items-center gap-3 w-full">
             <button type="button"
               class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 text-xs sm:text-sm font-medium ${
-                isActive
+                isCardActive
                   ? 'bg-white text-slate-950 hover:bg-cyan-50'
                   : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-100'
               }"
               data-enter-chapter="${chapter.id}">
-              ${completed ? 'Explorar de nuevo' : isActive ? 'Continuar' : 'Explorar'}
+              ${completed ? 'Explorar de nuevo' : inProgress ? 'Continuar' : 'Explorar'}
             </button>
           </div>
         </div>
