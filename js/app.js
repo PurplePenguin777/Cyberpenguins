@@ -14,7 +14,7 @@
 
   const DEFAULT_STATE = {
     launched: false,
-    currentLanguage: 'es',
+    currentLanguage: 'en', // Predeterminada en inglés si no se detecta español
     currentChapterId: 'moon',
     currentSiteByChapter: {
       moon: 0,
@@ -151,11 +151,17 @@
 
   function toggleLanguage() {
     const nextLang = (state.currentLanguage === 'en') ? 'es' : 'en';
-    setLanguage(nextLang);
+    setLanguage(nextLang, true);
   }
 
-  function setLanguage(lang) {
+  function setLanguage(lang, isManual = true) {
+    if (lang !== 'es' && lang !== 'en') lang = 'en';
     state.currentLanguage = lang;
+    if (isManual) {
+      try {
+        global.localStorage.setItem('cyberpenguins_lang_manual', 'true');
+      } catch (_e) {}
+    }
     saveState();
     updateLanguageUI();
   }
@@ -163,20 +169,29 @@
   function updateLanguageUI() {
     const isEn = (state.currentLanguage === 'en');
 
-    // Actualizar botones de idioma (en Home y en Stage) con la palabra completa
-    if (dom.langBtnText) {
-      dom.langBtnText.textContent = isEn ? 'Español' : 'English';
-    }
-    if (dom.langToggleBtn) {
-      dom.langToggleBtn.title = isEn ? 'Cambiar a Español' : 'Switch to English';
-      dom.langToggleBtn.setAttribute('aria-label', isEn ? 'Cambiar a Español' : 'Switch to English');
-    }
-    if (dom.stageLangBtnText) {
-      dom.stageLangBtnText.textContent = isEn ? 'Español' : 'English';
-    }
-    if (dom.stageLangToggleBtn) {
-      dom.stageLangToggleBtn.title = isEn ? 'Cambiar a Español' : 'Switch to English';
-      dom.stageLangToggleBtn.setAttribute('aria-label', isEn ? 'Cambiar a Español' : 'Switch to English');
+    // Sincronizar selectores de idioma izquierda/derecha (Home y Stage)
+    const langBtns = document.querySelectorAll('.lang-selector-btn');
+    langBtns.forEach((btn) => {
+      const btnLang = btn.getAttribute('data-lang');
+      const isActive = (btnLang === state.currentLanguage);
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+
+      if (btnLang === 'es') {
+        btn.title = isActive
+          ? (isEn ? 'Current language: Spanish' : 'Idioma actual: Español')
+          : (isEn ? 'Switch to Spanish' : 'Cambiar a Español');
+        btn.setAttribute('aria-label', btn.title);
+      } else if (btnLang === 'en') {
+        btn.title = isActive
+          ? (isEn ? 'Current language: English' : 'Idioma actual: Inglés')
+          : (isEn ? 'Switch to English' : 'Cambiar a English');
+        btn.setAttribute('aria-label', btn.title);
+      }
+    });
+
+    if (document.documentElement) {
+      document.documentElement.lang = state.currentLanguage;
     }
 
     // Actualizar títulos del dock inferior en pantalla principal
@@ -337,10 +352,8 @@
     dom.stageLocationPill = document.getElementById('stage-location-pill');
     dom.soundToggleBtn = document.getElementById('sound-toggle-btn');
     dom.pauseBtn = document.getElementById('pause-btn');
-    dom.langToggleBtn = document.getElementById('lang-toggle-btn');
-    dom.langBtnText = document.getElementById('lang-btn-text');
-    dom.stageLangToggleBtn = document.getElementById('stage-lang-toggle-btn');
-    dom.stageLangBtnText = document.getElementById('stage-lang-btn-text');
+    dom.homeLangSelector = document.getElementById('home-lang-selector');
+    dom.stageLangSelector = document.getElementById('stage-lang-selector');
     dom.chapterTitleCard = document.getElementById('chapter-title-card');
     dom.chapterCardNumeral = document.getElementById('chapter-card-numeral');
     dom.chapterCardTitle = document.getElementById('chapter-card-title');
@@ -431,20 +444,17 @@
     if (dom.soundToggleBtn) {
       dom.soundToggleBtn.addEventListener('click', toggleSound);
     }
-    if (dom.langToggleBtn) {
-      dom.langToggleBtn.addEventListener('click', (e) => {
+    const langSelectorButtons = document.querySelectorAll('.lang-selector-btn');
+    langSelectorButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        triggerHaptic('tap');
-        toggleLanguage();
+        const targetLang = btn.getAttribute('data-lang');
+        if (targetLang && targetLang !== state.currentLanguage) {
+          triggerHaptic('tap');
+          setLanguage(targetLang, true);
+        }
       });
-    }
-    if (dom.stageLangToggleBtn) {
-      dom.stageLangToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        triggerHaptic('tap');
-        toggleLanguage();
-      });
-    }
+    });
 
     dom.openPassportBtn.addEventListener('click', openPassportModal);
     dom.openBadgesBtn.addEventListener('click', openBadgesModal);
@@ -641,26 +651,59 @@
   }
 
   /* ========================================================================
-     Persistencia en localStorage
+     Persistencia en localStorage y Detección de Idioma
      ======================================================================== */
+
+  function detectDeviceLanguage() {
+    try {
+      const nav = (typeof window !== 'undefined' && window.navigator)
+        ? window.navigator
+        : (typeof navigator !== 'undefined' ? navigator : null);
+      if (!nav) return 'en';
+
+      const rawLangs = (Array.isArray(nav.languages) && nav.languages.length > 0)
+        ? nav.languages
+        : [nav.language || nav.userLanguage || nav.browserLanguage];
+
+      for (const item of rawLangs) {
+        if (typeof item === 'string') {
+          const code = item.trim().toLowerCase();
+          if (code.startsWith('es')) return 'es';
+          if (code.startsWith('en')) return 'en';
+        }
+      }
+    } catch (_e) {}
+    // Si no es detectable o es otro idioma: predeterminada en inglés
+    return 'en';
+  }
 
   function loadState() {
     try {
-      let savedLang = 'es';
+      let isManualChoice = false;
+      let manualLang = null;
       try {
-        savedLang = global.localStorage.getItem('cyberpenguins_lang') || 'es';
+        isManualChoice = global.localStorage.getItem('cyberpenguins_lang_manual') === 'true';
+        manualLang = global.localStorage.getItem('cyberpenguins_lang');
       } catch (_e) {}
+
+      const detectedLang = detectDeviceLanguage();
+      const resolvedLang = (isManualChoice && (manualLang === 'es' || manualLang === 'en'))
+        ? manualLang
+        : detectedLang;
+
       const raw = global.localStorage.getItem(DATA.STORAGE_KEY);
       if (!raw) {
         const def = cloneDefaultState();
-        def.currentLanguage = savedLang;
+        def.currentLanguage = resolvedLang;
         return def;
       }
       const parsed = JSON.parse(raw);
       return {
         ...cloneDefaultState(),
-        currentLanguage: parsed.currentLanguage || savedLang || 'es',
         ...parsed,
+        currentLanguage: (isManualChoice && (parsed.currentLanguage === 'es' || parsed.currentLanguage === 'en'))
+          ? parsed.currentLanguage
+          : resolvedLang,
         currentSiteByChapter: {
           ...DEFAULT_STATE.currentSiteByChapter,
           ...(parsed.currentSiteByChapter || {})
@@ -670,7 +713,9 @@
         quizAnswers: { ...DEFAULT_STATE.quizAnswers, ...(parsed.quizAnswers || {}) }
       };
     } catch (_err) {
-      return cloneDefaultState();
+      const def = cloneDefaultState();
+      def.currentLanguage = detectDeviceLanguage();
+      return def;
     }
   }
 
@@ -681,7 +726,7 @@
   function saveState() {
     try {
       global.localStorage.setItem(DATA.STORAGE_KEY, JSON.stringify(state));
-      global.localStorage.setItem('cyberpenguins_lang', state.currentLanguage || 'es');
+      global.localStorage.setItem('cyberpenguins_lang', state.currentLanguage || 'en');
     } catch (_err) {
       // Ignorar si almacenamiento privado bloquea escritura
     }

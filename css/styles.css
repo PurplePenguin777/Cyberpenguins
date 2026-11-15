@@ -794,7 +794,6 @@ a:focus-visible {
 }
 
 .back-home-btn,
-.stage-lang-toggle-btn,
 .pause-btn,
 .sound-toggle-btn {
   position: absolute;
@@ -821,15 +820,6 @@ a:focus-visible {
   left: 1rem;
 }
 
-.stage-lang-toggle-btn {
-  right: 7.2rem;
-  width: auto;
-  min-width: 78px;
-  padding: 0 0.85rem;
-  border-radius: 16px / 14px;
-  color: #38bdf8;
-}
-
 .pause-btn {
   right: 4.1rem;
 }
@@ -839,11 +829,123 @@ a:focus-visible {
 }
 
 .back-home-btn:hover,
-.stage-lang-toggle-btn:hover,
 .pause-btn:hover,
 .sound-toggle-btn:hover {
   background: rgba(255, 255, 255, 0.14);
   border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* ==========================================================================
+   Selector de Idioma Izquierda/Derecha (Segmented Control ES | EN)
+   ========================================================================== */
+
+.lang-selector-group {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  padding: 3px;
+  background: rgba(14, 19, 40, 0.6);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  gap: 3px;
+  user-select: none;
+}
+
+.lang-selector-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 30px;
+  padding: 0 0.8rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(203, 213, 225, 0.72);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-selector-btn:not(.is-active):hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.lang-selector-btn.is-active {
+  color: #ffffff;
+  background: rgba(56, 189, 248, 0.24);
+  border-color: rgba(56, 189, 248, 0.65);
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.32), inset 0 0 10px rgba(56, 189, 248, 0.16);
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.45);
+  cursor: default;
+}
+
+.lang-selector-btn.is-active::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+  margin-right: 0.12rem;
+}
+
+.lang-opt-short {
+  display: none;
+}
+
+.lang-opt-long {
+  display: inline;
+}
+
+@media (max-width: 540px) {
+  .lang-opt-long {
+    display: none;
+  }
+  .lang-opt-short {
+    display: inline;
+    font-weight: 700;
+    font-size: 0.72rem;
+  }
+  .lang-selector-btn {
+    padding: 0 0.55rem;
+    height: 28px;
+  }
+}
+
+.stage-lang-selector {
+  position: absolute;
+  top: 1rem;
+  right: 7.2rem;
+  z-index: 95;
+  height: 40px;
+  padding: 4px;
+}
+
+.stage-lang-selector .lang-selector-btn {
+  height: 32px;
+}
+
+@media (max-width: 480px) {
+  .stage-lang-selector {
+    right: 6.8rem;
+    height: 36px;
+    padding: 3px;
+  }
+  .stage-lang-selector .lang-selector-btn {
+    height: 28px;
+    padding: 0 0.45rem;
+  }
 }
 
 .voice-status-badge {

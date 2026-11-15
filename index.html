@@ -216,11 +216,16 @@
         </div>
         <div class="absolute right-0 flex items-center gap-2">
           <button id="home-start-btn" type="button" aria-hidden="true" tabindex="-1" class="hidden">Explorar</button>
-          <button id="lang-toggle-btn" type="button" title="Switch to English" aria-label="Cambiar idioma"
-            class="lang-toggle-btn squircle-btn px-4 h-9 inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-cyan-400/20 border border-white/[0.12] text-cyan-200 hover:text-white transition-all text-xs sm:text-sm font-semibold shadow-sm">
-            <span class="lang-icon text-sm" aria-hidden="true">🌐</span>
-            <span id="lang-btn-text">English</span>
-          </button>
+          <div id="home-lang-selector" class="lang-selector-group" role="group" aria-label="Selector de idioma / Language selector">
+            <button id="home-lang-es" type="button" class="lang-selector-btn is-active" data-lang="es" aria-pressed="true" title="Idioma actual: Español">
+              <span class="lang-opt-long">Español</span>
+              <span class="lang-opt-short">ES</span>
+            </button>
+            <button id="home-lang-en" type="button" class="lang-selector-btn" data-lang="en" aria-pressed="false" title="Switch to English">
+              <span class="lang-opt-long">English</span>
+              <span class="lang-opt-short">EN</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -300,11 +305,17 @@
         <!-- Píldora minimalista de ubicación -->
         <div id="stage-location-pill" class="stage-location-pill" aria-live="polite"></div>
 
-        <!-- Botón para alternar idioma en juego -->
-        <button id="stage-lang-toggle-btn" type="button" aria-label="Cambiar idioma" title="Switch to English"
-          class="stage-lang-toggle-btn squircle-btn">
-          <span id="stage-lang-btn-text">English</span>
-        </button>
+        <!-- Selector de idioma izquierda/derecha en juego -->
+        <div id="stage-lang-selector" class="stage-lang-selector lang-selector-group" role="group" aria-label="Selector de idioma / Language selector">
+          <button id="stage-lang-es" type="button" class="lang-selector-btn is-active" data-lang="es" aria-pressed="true" title="Idioma actual: Español">
+            <span class="lang-opt-long">Español</span>
+            <span class="lang-opt-short">ES</span>
+          </button>
+          <button id="stage-lang-en" type="button" class="lang-selector-btn" data-lang="en" aria-pressed="false" title="Switch to English">
+            <span class="lang-opt-long">English</span>
+            <span class="lang-opt-short">EN</span>
+          </button>
+        </div>
 
         <!-- Botón de pausa rápida -->
         <button id="pause-btn" type="button" aria-label="Menú de pausa" class="pause-btn squircle-btn">
