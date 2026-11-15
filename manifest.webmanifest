@@ -1,0 +1,11 @@
+{
+  "name": "Cyberpenguins · Exploración Espacial",
+  "short_name": "Cyberpenguins",
+  "description": "Exploración espacial interactiva por la Luna, Marte y el Espacio Profundo siguiendo misiones reales de la NASA.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#050714",
+  "theme_color": "#050714",
+  "lang": "es"
+}
