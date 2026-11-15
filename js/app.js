@@ -599,6 +599,7 @@
     const homeCertCard = document.getElementById('home-certificate-preview');
     if (homeCertCard) {
       homeCertCard.addEventListener('click', () => {
+        if (!areAllChaptersCompleted()) return;
         triggerHaptic('tap');
         openCertificateModal();
       });
@@ -2464,32 +2465,34 @@
     }
     const certPreview = document.getElementById('home-certificate-preview');
     if (certPreview) {
-      certPreview.classList.toggle('is-unlocked', true);
-      certPreview.title = isEn ? 'Tap to view diploma' : 'Toca para ver el diploma';
+      certPreview.classList.toggle('is-unlocked', allCompleted);
+      certPreview.title = allCompleted
+        ? (isEn ? 'Tap to view diploma' : 'Toca para ver el diploma')
+        : (isEn ? 'Available upon completing all chapters' : 'Disponible al completar todos los capítulos');
       certPreview.innerHTML = `
-        <div class="flex items-center justify-center">${MODELS.penguinPawStamp(true, 26)}</div>
+        <div class="flex items-center justify-center">${MODELS.penguinPawStamp(allCompleted, 26)}</div>
       `;
     }
     const certActions = document.getElementById('home-certificate-actions');
     if (dom.homeCertificateStatus) {
       dom.homeCertificateStatus.textContent = allCompleted
         ? (isEn ? 'Completed! Diploma ready' : '¡Completado! Diploma listo')
-        : (isEn ? 'Tap to view diploma' : 'Toca para ver el diploma');
+        : (isEn ? 'Available upon completing all chapters' : 'Disponible al completar todos los capítulos');
       dom.homeCertificateStatus.classList.remove('hidden');
     }
     if (certActions) {
-      certActions.classList.remove('hidden');
+      certActions.classList.toggle('hidden', !allCompleted);
     }
     if (dom.openCertificateBtn) {
-      dom.openCertificateBtn.disabled = false;
+      dom.openCertificateBtn.disabled = !allCompleted;
       dom.openCertificateBtn.textContent = isEn ? 'View diploma' : 'Ver diploma';
     }
     if (dom.homeDownloadCertificateBtn) {
-      dom.homeDownloadCertificateBtn.disabled = false;
+      dom.homeDownloadCertificateBtn.disabled = !allCompleted;
       dom.homeDownloadCertificateBtn.textContent = isEn ? 'Download' : 'Descargar';
     }
     if (dom.downloadCertificateBtn) {
-      dom.downloadCertificateBtn.disabled = false;
+      dom.downloadCertificateBtn.disabled = !allCompleted;
     }
 
     renderChapterNav();
@@ -3396,6 +3399,7 @@
   }
 
   function openCertificateModal() {
+    if (!areAllChaptersCompleted()) return;
     if (dom.certificateCadetInput) {
       dom.certificateCadetInput.value = state.cadetName || '';
     }
@@ -3435,215 +3439,107 @@
       ? today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
       : today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    const txtAcademy = isEn
-      ? 'Space Exploration Academy · Cyberpenguin: The Explorers We Must Never Forget'
-      : 'Academia de exploración espacial · Cyberpenguin: The Explorers We Must Never Forget';
+    const txtOverline = 'Cyberpenguin: The Explorers We Must Never Forget · Archivos de la NASA';
     const txtDiploma = isEn
       ? 'Honorary astronautical diploma'
       : 'Diploma de honor astronáutico';
     const txtConferred = isEn
-      ? 'Conferred with official distinction and highest merit to:'
-      : 'Conferido con distinción oficial y máximo mérito científico a:';
-    const txtBody1 = isEn
-      ? 'For outstanding bravery, scientific curiosity, and astrophysical dedication in completing'
-      : 'Por su destacada valentía, curiosidad científica y dedicación astrofísica al completar';
-    const txtBody2 = isEn
-      ? 'the interplanetary expedition in Cyberpenguin: The Explorers We Must Never Forget,'
-      : 'la gran expedición en Cyberpenguin: The Explorers We Must Never Forget,';
-    const txtBody3 = isEn
-      ? 'investigating humanity\'s 6 pioneer space probes and collecting cosmic planetary samples.'
-      : 'investigando las 6 sondas pioneras de la humanidad y recolectando valiosas muestras cósmicas.';
-    const txtMoon = isEn ? 'The Moon · Surveyor 3 & Apollo 11' : 'La Luna · Surveyor 3 & Apollo 11';
-    const txtMars = isEn ? 'Mars · Viking 1 & Sojourner' : 'Marte · Viking 1 & Sojourner';
-    const txtDeep = isEn ? 'Deep space · Pioneer 10 & NEAR' : 'Espacio profundo · Pioneer 10 & NEAR';
+      ? 'Conferred with merit to:'
+      : 'Conferido con mérito a:';
+    const txtBody = isEn
+      ? 'For successfully completing the cosmic expedition and exploring the 6 pioneer space probes.'
+      : 'Por completar con éxito la expedición cósmica y explorar las 6 sondas espaciales pioneras.';
     const txtStars = isEn
       ? `★ ${totalStars}/15 cosmic stars · Rank: ${badge.name}`
       : `★ ${totalStars}/15 estrellas cósmicas · Rango: ${badge.name}`;
     const txtSignCommander = isEn ? 'Flight commander' : 'Comandante de vuelo';
-    const txtSignCommanderRole = isEn ? 'Chief of planetary exploration' : 'Jefe de expedición planetaria';
     const txtSignAI = isEn ? "Ship's AI (Paulina)" : 'IA de la nave (Paulina)';
-    const txtSignAIRole = isEn ? 'Mission control & telemetry' : 'Control de misión & telemetría';
-    const txtSeal = 'Cyberpenguin: The Explorers We Must Never Forget';
-    const txtMissionId = isEn ? 'Mission code: NASA-CP-2026-X89' : 'Código de misión: NASA-CP-2026-X89';
+    const txtSignAIRole = isEn ? 'Mission control' : 'Control de misión';
+    const txtMissionId = 'NASA-CP-2026-X89';
     const txtDateLabel = isEn ? `Date: ${dateFormatted}` : `Fecha: ${dateFormatted}`;
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700">
   <defs>
-    <linearGradient id="certBg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#050817" />
-      <stop offset="45%" stop-color="#0c1638" />
-      <stop offset="100%" stop-color="#040714" />
+    <linearGradient id="certBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#090e22" />
+      <stop offset="100%" stop-color="#040612" />
     </linearGradient>
-    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="0.6">
-      <stop offset="0%" stop-color="#fef9c3" />
-      <stop offset="25%" stop-color="#fde047" />
-      <stop offset="50%" stop-color="#eab308" />
-      <stop offset="75%" stop-color="#ca8a04" />
-      <stop offset="100%" stop-color="#fef08a" />
-    </linearGradient>
-    <linearGradient id="goldBorderGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fef08a" />
-      <stop offset="25%" stop-color="#eab308" />
-      <stop offset="50%" stop-color="#fef9c3" />
-      <stop offset="75%" stop-color="#ca8a04" />
-      <stop offset="100%" stop-color="#fef08a" />
-    </linearGradient>
-    <linearGradient id="sealGoldGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fffbeb" />
-      <stop offset="35%" stop-color="#fde047" />
-      <stop offset="70%" stop-color="#d97706" />
-      <stop offset="100%" stop-color="#78350f" />
-    </linearGradient>
-    <linearGradient id="ribbonGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#e11d48" />
-      <stop offset="100%" stop-color="#881337" />
-    </linearGradient>
-    <radialGradient id="nebulaCyan" cx="20%" cy="30%" r="50%">
-      <stop offset="0%" stop-color="rgba(56,189,248,0.12)" />
+    <radialGradient id="centerGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="rgba(56,189,248,0.08)" />
       <stop offset="100%" stop-color="rgba(56,189,248,0)" />
     </radialGradient>
-    <radialGradient id="nebulaGold" cx="80%" cy="75%" r="45%">
-      <stop offset="0%" stop-color="rgba(251,191,36,0.1)" />
-      <stop offset="100%" stop-color="rgba(251,191,36,0)" />
-    </radialGradient>
-    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
 
-  <!-- Fondo Cósmico Profundo con Nebulosas -->
+  <!-- Fondo Minimalista -->
   <rect width="1000" height="700" rx="32" fill="url(#certBg)" />
-  <rect width="1000" height="700" rx="32" fill="url(#nebulaCyan)" />
-  <rect width="1000" height="700" rx="32" fill="url(#nebulaGold)" />
+  <rect width="1000" height="700" rx="32" fill="url(#centerGlow)" />
 
-  <!-- Constelaciones y Polvo Estelar Geométrico -->
-  <g fill="#ffffff" opacity="0.45">
-    <circle cx="85" cy="85" r="1.5" /><circle cx="160" cy="110" r="1.2" /><circle cx="210" cy="70" r="1.8" />
-    <circle cx="915" cy="85" r="1.5" /><circle cx="840" cy="115" r="1.2" /><circle cx="790" cy="65" r="1.7" />
-    <circle cx="90" cy="610" r="1.3" /><circle cx="140" cy="580" r="1.7" /><circle cx="195" cy="630" r="1.1" />
-    <circle cx="910" cy="610" r="1.4" /><circle cx="860" cy="580" r="1.8" /><circle cx="805" cy="630" r="1.2" />
-    <circle cx="500" cy="65" r="1.4" /><circle cx="340" cy="180" r="1.0" /><circle cx="660" cy="180" r="1.1" />
-  </g>
-  <g stroke="#38bdf8" stroke-width="0.7" opacity="0.25">
-    <line x1="85" y1="85" x2="160" y2="110" /><line x1="160" y1="110" x2="210" y2="70" />
-    <line x1="915" y1="85" x2="840" y2="115" /><line x1="840" y1="115" x2="790" y2="65" />
-    <line x1="90" y1="610" x2="140" y2="580" /><line x1="140" y1="580" x2="195" y2="630" />
-    <line x1="910" y1="610" x2="860" y2="580" /><line x1="860" y1="580" x2="805" y2="630" />
-  </g>
+  <!-- Marco Squircle Fino y Sofisticado -->
+  <rect x="28" y="28" width="944" height="644" rx="24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.2" />
+  <rect x="36" y="36" width="928" height="628" rx="18" fill="none" stroke="rgba(56,189,248,0.22)" stroke-width="0.8" />
 
-  <!-- Marco de Honor: Doble Filete Metálico Dorado y Acento Cian -->
-  <rect x="22" y="22" width="956" height="656" rx="24" fill="none" stroke="url(#goldBorderGrad)" stroke-width="2.6" filter="url(#goldGlow)" />
-  <rect x="34" y="34" width="932" height="632" rx="18" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.45" stroke-dasharray="12 6" />
+  <!-- Puntos astronómicos en las 4 esquinas -->
+  <circle cx="56" cy="56" r="2.5" fill="#38bdf8" opacity="0.6" />
+  <circle cx="944" cy="56" r="2.5" fill="#38bdf8" opacity="0.6" />
+  <circle cx="56" cy="644" r="2.5" fill="#38bdf8" opacity="0.6" />
+  <circle cx="944" cy="644" r="2.5" fill="#38bdf8" opacity="0.6" />
 
-  <!-- Esquinas Astronómicas Art-Déco Doradas -->
-  <g stroke="url(#goldBorderGrad)" stroke-width="1.8" fill="none">
-    <path d="M 38 70 L 70 70 L 70 38" /><circle cx="70" cy="70" r="3" fill="#fde047" />
-    <path d="M 962 70 L 930 70 L 930 38" /><circle cx="930" cy="70" r="3" fill="#fde047" />
-    <path d="M 38 630 L 70 630 L 70 662" /><circle cx="70" cy="630" r="3" fill="#fde047" />
-    <path d="M 962 630 L 930 630 L 930 662" /><circle cx="930" cy="630" r="3" fill="#fde047" />
-  </g>
+  <!-- Cabecera Discreta -->
+  <circle cx="500" cy="80" r="3.5" fill="#38bdf8" />
+  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="500" letter-spacing="1.2" fill="#7ee8fa">${txtOverline}</text>
 
-  <!-- Emblema Superior: Alas Cósmicas & Estrella Central -->
-  <g transform="translate(500, 72)" text-anchor="middle">
-    <path d="M -42 0 Q -20 -14 0 -4 Q 20 -14 42 0 Q 20 -6 0 -1 Q -20 -6 -42 0 Z" fill="url(#goldGrad)" opacity="0.9" />
-    <polygon points="0,-12 4,-2 14,0 4,2 0,12 -4,2 -14,0 -4,-2" fill="#ffffff" />
-  </g>
+  <!-- Título del Diploma -->
+  <text x="500" y="160" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="700" letter-spacing="0.4" fill="#ffffff">${txtDiploma}</text>
+  <line x1="430" y1="182" x2="570" y2="182" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
 
-  <!-- Encabezado de la Academia -->
-  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="#7ee8fa" opacity="0.92">${txtAcademy}</text>
+  <!-- Concesión -->
+  <text x="500" y="222" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13.5" font-weight="400" fill="#94a3b8">${txtConferred}</text>
 
-  <!-- Título Principal del Diploma -->
-  <text x="500" y="152" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="0.5" fill="url(#goldGrad)" filter="url(#goldGlow)">${txtDiploma}</text>
+  <!-- Nombre del Cadete -->
+  <text x="500" y="278" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="36" font-weight="800" fill="#ffffff">${escapedName}</text>
 
-  <!-- Divisor Ornamental Central -->
-  <g transform="translate(500, 172)" stroke="url(#goldBorderGrad)" stroke-width="1.2">
-    <line x1="-160" y1="0" x2="-20" y2="0" />
-    <polygon points="0,-4 4,0 0,4 -4,0" fill="#fde047" stroke="none" />
-    <line x1="20" y1="0" x2="160" y2="0" />
+  <!-- Mérito Educativo -->
+  <text x="500" y="324" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="400" fill="#cbd5e1">${txtBody}</text>
+
+  <!-- Píldora de Rango y Estrellas -->
+  <g transform="translate(340, 356)">
+    <rect x="0" y="0" width="320" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+    <text x="160" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="600" fill="#fde047">${txtStars}</text>
   </g>
 
-  <!-- Texto de Concesión -->
-  <text x="500" y="206" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="14.5" font-weight="500" fill="#94a3b8">${txtConferred}</text>
-
-  <!-- Nombre del Cadete / Astronauta (Gran Protagonista) -->
-  <text x="500" y="262" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="38" font-weight="800" letter-spacing="0.8" fill="#ffffff" filter="url(#goldGlow)">${escapedName}</text>
-  <path d="M 320 278 Q 500 286 680 278" fill="none" stroke="url(#goldBorderGrad)" stroke-width="2" opacity="0.75" />
-
-  <!-- Mérito Académico y Misiones (Narrativa Educativa NASA) -->
-  <text x="500" y="312" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="400" fill="#cbd5e1" opacity="0.95">${txtBody1}</text>
-  <text x="500" y="332" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="400" fill="#cbd5e1" opacity="0.95">${txtBody2}</text>
-  <text x="500" y="352" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="400" fill="#cbd5e1" opacity="0.95">${txtBody3}</text>
-
-  <!-- Tríptico de Mundos Explorados (Píldoras de Credenciales) -->
-  <g transform="translate(140, 376)">
-    <!-- Luna -->
-    <rect x="0" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
-    <text x="112" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🌕 ${txtMoon}</text>
-    <!-- Marte -->
-    <rect x="247" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
-    <text x="360" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🔴 ${txtMars}</text>
-    <!-- Espacio Profundo -->
-    <rect x="495" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
-    <text x="607" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🌌 ${txtDeep}</text>
-  </g>
-
-  <!-- Píldora de Rango Oficial y Estrellas Obtenidas -->
-  <g transform="translate(260, 428)">
-    <rect x="0" y="0" width="480" height="32" rx="16" fill="rgba(234,179,8,0.12)" stroke="rgba(234,179,8,0.4)" stroke-width="1.2" />
-    <text x="240" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="0.8" fill="#fde047">${txtStars}</text>
-  </g>
-
-  <!-- SELLO DORADO HOLOGRÁFICO CON HUELLA OFICIAL (CENTRO) -->
-  <g transform="translate(500, 555)">
-    <!-- Cintas rojas inferiores del sello -->
-    <path d="M -16 32 L -28 72 L -8 60 L 0 72 L 0 32 Z" fill="url(#ribbonGrad)" opacity="0.95" />
-    <path d="M 16 32 L 28 72 L 8 60 L 0 72 L 0 32 Z" fill="url(#ribbonGrad)" opacity="0.95" />
-    <path d="M -28 72 L -8 60 L 0 72 L 8 60 L 28 72" fill="none" stroke="#fde047" stroke-width="1.5" />
-
-    <!-- Medallón Dorado Dentado -->
-    <circle cx="0" cy="0" r="54" fill="url(#sealGoldGrad)" stroke="#fef08a" stroke-width="2.5" filter="url(#goldGlow)" />
-    <circle cx="0" cy="0" r="47" fill="none" stroke="#78350f" stroke-width="1.2" stroke-dasharray="4 2" />
-    <circle cx="0" cy="0" r="43" fill="#1e1b4b" stroke="#fde047" stroke-width="1.4" />
-
-    <!-- Huella palmeada de Cyberpenguin en el centro del sello -->
-    <g transform="translate(-34, -34)">
+  <!-- Sello Central Oficial con Huella del Pingüino -->
+  <g transform="translate(500, 464)">
+    <circle cx="0" cy="0" r="42" fill="rgba(56,189,248,0.06)" stroke="rgba(56,189,248,0.3)" stroke-width="1.2" />
+    <circle cx="0" cy="0" r="36" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="3 2" />
+    <g transform="translate(-28, -28)">
       ${innerPaw}
     </g>
   </g>
-  <!-- Texto circular alrededor del sello -->
-  <text x="500" y="632" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="800" letter-spacing="0.8" fill="#fef08a">${txtSeal}</text>
 
-  <!-- FIRMA IZQUIERDA: COMANDANTE CYBERPENGUIN -->
-  <g transform="translate(180, 525)">
-    <!-- Firma manuscrita estilizada -->
-    <path d="M 20 20 Q 40 -8 55 12 T 85 8 T 115 16 Q 135 4 150 18" fill="none" stroke="#7ee8fa" stroke-width="2.2" stroke-linecap="round" />
-    <path d="M 65 6 Q 72 26 80 4" fill="none" stroke="#7ee8fa" stroke-width="1.8" />
-    <circle cx="152" cy="18" r="2.2" fill="#ffbe76" />
-    <line x1="0" y1="36" x2="190" y2="36" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
-    <text x="95" y="52" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">Cyberpenguin</text>
-    <text x="95" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#94a3b8">${txtSignCommander}</text>
-    <text x="95" y="78" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="400" fill="#64748b">${txtSignCommanderRole}</text>
+  <!-- Firmas Minimalistas -->
+  <!-- Izquierda: Cyberpenguin -->
+  <g transform="translate(260, 560)">
+    <line x1="-80" y1="0" x2="80" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+    <text x="0" y="20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="600" fill="#f8fafc">Cyberpenguin</text>
+    <text x="0" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="400" fill="#94a3b8">${txtSignCommander}</text>
   </g>
 
-  <!-- FIRMA DERECHA: IA DE LA NAVE (CONTROL DE MISIÓN) -->
-  <g transform="translate(630, 525)">
-    <!-- Forma de onda osciloscópica / cuántica -->
-    <path d="M 10 20 L 40 20 L 50 2 L 60 38 L 70 8 L 80 30 L 90 20 L 120 20 L 130 10 L 140 28 L 150 20 L 180 20" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-    <line x1="0" y1="36" x2="190" y2="36" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
-    <text x="95" y="52" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">${txtSignAI}</text>
-    <text x="95" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#94a3b8">${txtSignAIRole}</text>
-    <text x="95" y="78" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="400" fill="#64748b">NASA Deep Space Network</text>
+  <!-- Derecha: IA de la Nave -->
+  <g transform="translate(740, 560)">
+    <line x1="-80" y1="0" x2="80" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+    <text x="0" y="20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="600" fill="#f8fafc">${txtSignAI}</text>
+    <text x="0" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="400" fill="#94a3b8">${txtSignAIRole}</text>
   </g>
 
-  <!-- Pie de Página: Código Único de Bitácora y Fecha de Emisión -->
-  <text x="50" y="664" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="0.8" fill="#64748b">${txtMissionId}</text>
-  <text x="950" y="664" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="0.8" fill="#64748b">${txtDateLabel}</text>
+  <!-- Pie de Página -->
+  <text x="50" y="650" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#64748b">${txtMissionId}</text>
+  <text x="950" y="650" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#64748b">${txtDateLabel}</text>
 </svg>`;
   }
 
   function downloadCertificate(format = 'png') {
+    if (!areAllChaptersCompleted()) return null;
     const svgMarkup = buildCertificateSvg();
 
     if (format === 'svg') {
