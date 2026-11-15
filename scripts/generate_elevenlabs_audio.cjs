@@ -14,7 +14,7 @@ if (!API_KEY) {
 }
 
 // Mapeo de personajes a Voice IDs asignados por el usuario
-const VOICE_MAP = {
+const VOICE_MAP_ES = {
   'Cyberpenguin': 'ihKwLOjVUMG4lgUI6meZ',          // Leo – Curious Character
   'Surveyor 3': 'JZeTbA8jDZKTeMBPNXrK',            // Marco
   'Eagle': 'hAUJJty85xYTBnGyEWzw',                 // César Augusto – Spanish Neutral
@@ -27,6 +27,20 @@ const VOICE_MAP = {
   "Ship's AI": 'A9OFofjAh6JEy1MNk5Mz'             // Paulina – Cálida y Comercial
 };
 
+const VOICE_MAP_EN = {
+  'Cyberpenguin': '0zj1iWvloMkAXydIFsJR',          // Leo / Curious Explorer (English)
+  'Surveyor 3': 'eY7L7u95SA4iCJN5wCSV',            // Surveyor 3 (English)
+  'Eagle': 'j9qIyycr9PcZ7d4yj21f',                 // Eagle Apollo 11 (English)
+  'Eagle (Apollo 11)': 'j9qIyycr9PcZ7d4yj21f',     // Eagle Apollo 11 (English)
+  'Viking 1': 'b8JMPeNuVrqqWExQc8e9',              // Viking 1 (English)
+  'Sojourner': 'bxu4ptGyGRXdGcFkahWB',             // Sojourner Rover (English)
+  'Sojourner Rover': 'bxu4ptGyGRXdGcFkahWB',       // Sojourner Rover (English)
+  'Pioneer 10': 'fA4eSDsx5xNZ1RV7zEu5',            // Pioneer 10 (English)
+  'NEAR Shoemaker': '1kvnzrSTos1KbmLKMLCC',        // NEAR Shoemaker (English)
+  'IA de la Nave': '15M6OJD6hSZpYqHQEBKA',         // Ship's AI (English)
+  "Ship's AI": '15M6OJD6hSZpYqHQEBKA'             // Ship's AI (English)
+};
+
 // Ajustes de voz recomendados por personaje para máxima expresividad
 const SETTINGS_MAP = {
   'Cyberpenguin': { stability: 0.38, similarity_boost: 0.78, style: 0.45 },
@@ -34,6 +48,7 @@ const SETTINGS_MAP = {
   'Eagle': { stability: 0.65, similarity_boost: 0.80, style: 0.25 },
   'Eagle (Apollo 11)': { stability: 0.65, similarity_boost: 0.80, style: 0.25 },
   'Viking 1': { stability: 0.50, similarity_boost: 0.75, style: 0.35 },
+  'Sojourner': { stability: 0.35, similarity_boost: 0.75, style: 0.55 },
   'Sojourner Rover': { stability: 0.35, similarity_boost: 0.75, style: 0.55 },
   'Pioneer 10': { stability: 0.68, similarity_boost: 0.82, style: 0.20 },
   'NEAR Shoemaker': { stability: 0.45, similarity_boost: 0.75, style: 0.40 },
@@ -42,6 +57,7 @@ const SETTINGS_MAP = {
 };
 
 const isEnglish = process.argv.includes('--lang=en') || process.argv.includes('-en');
+const VOICE_MAP = isEnglish ? VOICE_MAP_EN : VOICE_MAP_ES;
 const SCRIPT_PATH = path.join(__dirname, '..', isEnglish ? 'ELEVENLABS_GUION_VOCES_EN.md' : 'ELEVENLABS_GUION_VOCES.md');
 const AUDIO_DIR = path.join(__dirname, '..', 'audio');
 
@@ -152,15 +168,19 @@ async function generateAudio(item, index, total) {
 
 async function main() {
   const items = parseScript();
-  console.log(`🚀 Iniciando generación con ElevenLabs API...`);
-  console.log(`Total de archivos en el guion: ${items.length}\n`);
+  const limitArg = process.argv.find(a => a.startsWith('--limit='));
+  const limitCount = limitArg ? parseInt(limitArg.split('=')[1], 10) : items.length;
+  const itemsToProcess = items.slice(0, limitCount);
+
+  console.log(`🚀 Iniciando generación con ElevenLabs API (${isEnglish ? 'English' : 'Español'})...`);
+  console.log(`Total de archivos en el guion: ${items.length} (procesando ${itemsToProcess.length})\n`);
 
   let successCount = 0;
   let failCount = 0;
 
-  for (let i = 0; i < items.length; i++) {
+  for (let i = 0; i < itemsToProcess.length; i++) {
     try {
-      const ok = await generateAudio(items[i], i, items.length);
+      const ok = await generateAudio(itemsToProcess[i], i, itemsToProcess.length);
       if (ok) successCount++;
       else failCount++;
       // Pequeña pausa entre peticiones

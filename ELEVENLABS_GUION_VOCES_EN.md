@@ -17,14 +17,14 @@
 
 | Character | Selected Voice | Voice ID | Archetype | Recommended Settings (Stability / Similarity / Style) | Tone & Acting Direction |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Cyberpenguin** | Leo – Curious Character | `ihKwLOjVUMG4lgUI6meZ` | Curious young explorer (8-11 yrs) | Stability: `0.38`<br>Similarity: `0.78`<br>Style: `0.45` | Very expressive, awestruck, cheerful, and full of energy. |
-| **Surveyor 3** | Marco | `JZeTbA8jDZKTeMBPNXrK` | Vintage 1960s helpful robot | Stability: `0.55`<br>Similarity: `0.75`<br>Style: `0.30` | Methodical pauses, polite, neat. "Beep beep" sounds. |
-| **Eagle (Apollo 11)** | César Augusto – Spanish Neutral | `hAUJJty85xYTBnGyEWzw` | Legendary space commander | Stability: `0.65`<br>Similarity: `0.80`<br>Style: `0.25` | Calm, noble, reliable, heroic NASA radio voice. |
-| **Viking 1** | Natalia – Doblaje Versátil | `zJtOCbdQjTZt7YZtkRDP` | Martian chemistry lab computer | Stability: `0.50`<br>Similarity: `0.75`<br>Style: `0.35` | Elegant, analytical, enthusiastic about science. |
-| **Sojourner Rover** | Betty – Quirky, Cartoonish & Warm | `iV6xDQ4wcM3ZcXDx30GB` | Hyperactive little robot brother | Stability: `0.35`<br>Similarity: `0.75`<br>Style: `0.55` | Quick, funny, sweet, very proud of its 6 wheels. |
-| **Pioneer 10** | Hanna – Warm, Deep, Inspiring | `c338PHkXJ2cW8fdMPhzP` | Deep space wise traveler | Stability: `0.68`<br>Similarity: `0.82`<br>Style: `0.20` | Gentle, warm, poetic, gazing toward the stars. |
-| **NEAR Shoemaker** | Jorge | `MXbNlTMQcU6GZQlRkXHB` | Daring, witty adventurer | Stability: `0.45`<br>Similarity: `0.75`<br>Style: `0.40` | Joyful, humorous, proud of landing without legs. |
-| **Ship's AI** | Paulina – Cálida y Comercial | `A9OFofjAh6JEy1MNk5Mz` | Holographic flight assistant | Stability: `0.60`<br>Similarity: `0.80`<br>Style: `0.20` | Pristine, modern, comforting, and professional. |
+| **Cyberpenguin** | Leo / Curious Explorer | `0zj1iWvloMkAXydIFsJR` | Curious young explorer (8-11 yrs) | Stability: `0.38`<br>Similarity: `0.78`<br>Style: `0.45` | Very expressive, awestruck, cheerful, and full of energy. |
+| **Surveyor 3** | Vintage Robot | `eY7L7u95SA4iCJN5wCSV` | Vintage 1960s helpful robot | Stability: `0.55`<br>Similarity: `0.75`<br>Style: `0.30` | Methodical pauses, polite, neat. "Beep beep" sounds. |
+| **Eagle (Apollo 11)** | Commander Radio | `j9qIyycr9PcZ7d4yj21f` | Legendary space commander | Stability: `0.65`<br>Similarity: `0.80`<br>Style: `0.25` | Calm, noble, reliable, heroic NASA radio voice. |
+| **Viking 1** | Analytical Lab | `b8JMPeNuVrqqWExQc8e9` | Martian chemistry lab computer | Stability: `0.50`<br>Similarity: `0.75`<br>Style: `0.35` | Elegant, analytical, enthusiastic about science. |
+| **Sojourner Rover** | Quirky Wheeled Explorer | `bxu4ptGyGRXdGcFkahWB` | Hyperactive little robot brother | Stability: `0.35`<br>Similarity: `0.75`<br>Style: `0.55` | Quick, funny, sweet, very proud of its 6 wheels. |
+| **Pioneer 10** | Wise Cosmic Traveler | `fA4eSDsx5xNZ1RV7zEu5` | Deep space wise traveler | Stability: `0.68`<br>Similarity: `0.82`<br>Style: `0.20` | Gentle, warm, poetic, gazing toward the stars. |
+| **NEAR Shoemaker** | Bold Asteroid Touchdown | `1kvnzrSTos1KbmLKMLCC` | Daring, witty adventurer | Stability: `0.45`<br>Similarity: `0.75`<br>Style: `0.40` | Joyful, humorous, proud of landing without legs. |
+| **Ship's AI** | Holographic Assistant | `15M6OJD6hSZpYqHQEBKA` | Holographic flight assistant | Stability: `0.60`<br>Similarity: `0.80`<br>Style: `0.20` | Pristine, modern, comforting, and professional. |
 
 ---
 

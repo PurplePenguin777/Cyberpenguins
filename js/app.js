@@ -2318,9 +2318,6 @@
     else dom.stageSpeechBubble.classList.add('speaker-is-machine');
 
     const isEnglish = (state.currentLanguage === 'en');
-    const voiceBadge = isEnglish
-      ? '<span class="voice-status-badge">(voice currently being created)</span>'
-      : '';
 
     if (dom.speechBubbleAvatar) {
       dom.speechBubbleAvatar.innerHTML = avatarSvg || '';
@@ -2331,7 +2328,7 @@
         : isShip
         ? (isEnglish ? "Cyberpenguin's Ship" : 'Nave de Cyberpenguin')
         : (isEnglish ? 'Spacecraft' : 'Máquina');
-      dom.speechBubbleName.innerHTML = (name || defaultName) + (name || isPenguin || isShip ? voiceBadge : '');
+      dom.speechBubbleName.textContent = name || defaultName;
     }
     if (dom.speechBubbleText) {
       const cleanText = (text || '').trim();
