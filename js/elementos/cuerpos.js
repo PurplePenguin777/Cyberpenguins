@@ -253,7 +253,10 @@
     return `
       <g>
         <defs><clipPath id="clip-${uid}"><polygon points="${polyStr(boundary)}" /></clipPath></defs>
-        <g clip-path="url(#clip-${uid})">${faces}${extras}</g>
+        <g clip-path="url(#clip-${uid})">
+          ${faces}${extras}
+          ${typeof M.reliefShape === 'function' ? M.reliefShape(polyStr(boundary), a, seed) : ''}
+        </g>
         <polygon points="${polyStr(boundary)}" fill="none" stroke="#0b1220" stroke-opacity="0.45" stroke-width="0.7" stroke-linejoin="round" />
       </g>
     `;

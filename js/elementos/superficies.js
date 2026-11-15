@@ -492,6 +492,7 @@
           ${featuresSvg}
           <!-- Terminador nocturno y sombreado esférico tridimensional -->
           ${M.facetShade ? M.facetShade(r, { seed: seed + 7, strength: kind === 'earth' ? 0.12 : 0.18 }) : ''}
+          ${typeof M.reliefCircle === 'function' ? M.reliefCircle(r, seed, kind) : ''}
           <circle r="${n(r)}" fill="url(#sphereShade-${uid})" />
         </g>
       </g>
