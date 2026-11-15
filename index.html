@@ -75,13 +75,22 @@
       <path d="M 0,625 Q 600,595 1200,625 L 1200,700 L 0,700 Z" fill="#0f182e" />
     </svg>
 
-    <!-- Cartela minimalista de apertura (oculta para mostrar únicamente la animación pura) -->
-    <div id="launch-title-card" class="launch-title-card hidden" aria-hidden="true"></div>
+    <!-- Cartela minimalista con frase motivadora de ingeniería espacial NASA -->
+    <div id="launch-title-card"
+      class="launch-title-card pointer-events-none relative z-10 text-center flex flex-col items-center justify-center gap-1 px-4 pt-2 max-w-lg w-full mx-auto">
+      <span class="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.22em] text-cyan-300/80 text-center">NASA · Curiosidad y Exploración</span>
+      <p id="launch-quote-text" class="text-xs sm:text-sm md:text-base font-medium text-slate-100 text-center leading-snug drop-shadow-md">
+        «Las cosas difíciles son las que más vale la pena intentar.»
+      </p>
+      <span id="launch-quote-author" class="text-[10px] sm:text-[11px] text-cyan-200/70 text-center font-normal">
+        Margaret Hamilton · Directora de Software Apolo, NASA
+      </span>
+    </div>
 
-    <div class="relative z-10 w-full flex flex-col items-center justify-center my-auto">
+    <div class="relative z-10 w-full flex flex-col items-center justify-center my-auto scale-90 sm:scale-100 transition-transform">
       <div class="relative flex items-end justify-center">
         <!-- Torre umbilical con brazos retráctiles -->
-        <svg viewBox="0 0 110 230" width="92" height="200" aria-hidden="true" class="-mr-12 mb-7 opacity-95">
+        <svg viewBox="0 0 110 230" width="92" height="200" aria-hidden="true" class="-mr-8 sm:-mr-12 mb-5 sm:mb-7 opacity-95 w-16 sm:w-[92px] h-auto">
           <defs>
             <linearGradient id="towerGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stop-color="#5d6ea3" />
@@ -125,7 +134,7 @@
       </div>
 
       <!-- Plataforma técnica con trinchera de llamas -->
-      <svg viewBox="0 0 360 76" width="320" height="68" aria-hidden="true" class="-mt-7">
+      <svg viewBox="0 0 360 76" width="320" height="68" aria-hidden="true" class="-mt-5 sm:-mt-7 max-w-[85vw] sm:max-w-xs h-auto">
         <defs>
           <linearGradient id="padSurface" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#455587" />
@@ -163,7 +172,7 @@
       <div class="travel-cinematic-meta">
         <div id="travel-cinematic-dots" class="travel-cinematic-dots" aria-hidden="true"></div>
         <p id="travel-cinematic-caption"
-          class="travel-cinematic-caption text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] text-slate-200/90"></p>
+          class="travel-cinematic-caption text-xs sm:text-sm font-medium tracking-normal text-slate-100/95 max-w-xl text-center leading-relaxed"></p>
       </div>
       <button id="travel-skip-btn" type="button" aria-label="Saltar"
         class="squircle-btn w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 text-slate-100 shrink-0">

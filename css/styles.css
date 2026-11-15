@@ -220,8 +220,8 @@ a:focus-visible {
 
 .launch-ship-wrapper {
   position: relative;
-  width: min(300px, 56vw);
-  height: min(280px, 46vh);
+  width: min(260px, 50vw);
+  height: min(240px, 36vh);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,7 +239,7 @@ a:focus-visible {
 
 .launch-steam {
   position: relative;
-  width: 280px;
+  width: min(280px, 75vw);
   height: 22px;
   margin-top: -18px;
   pointer-events: none;
@@ -399,8 +399,10 @@ a:focus-visible {
 
 .travel-cinematic-caption {
   margin: 0;
-  min-height: 1rem;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  min-height: 1.25rem;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 #travel-skip-btn {

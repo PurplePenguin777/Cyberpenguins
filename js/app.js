@@ -572,6 +572,12 @@
     showHomeScreen();
   }
 
+  const NASA_INSPIRATIONAL_QUOTES = [
+    { quote: '«Las cosas difíciles son las que más vale la pena intentar.»', author: 'Margaret Hamilton · Directora de Software Apolo, NASA' },
+    { quote: '«El trabajo en equipo y la curiosidad convierten lo imposible en realidad.»', author: 'Gene Kranz · Director de Vuelo Apolo 11' },
+    { quote: '«Apunta a las estrellas: con dedicación y ciencia no existen límites.»', author: 'Katherine Johnson · Matemática e Ingeniera de la NASA' }
+  ];
+
   function startLaunchCinematic() {
     clearLaunchTimers();
     isOpeningLaunch = true;
@@ -579,6 +585,13 @@
     dom.gameScreen.classList.add('is-hidden');
     dom.launchScreen.classList.remove('hidden-screen', 'is-hidden', 'igniting-pad');
     dom.launchShipWrapper.classList.remove('igniting', 'blasting-off');
+
+    const quoteEl = document.getElementById('launch-quote-text');
+    const authorEl = document.getElementById('launch-quote-author');
+    if (quoteEl && authorEl) {
+      quoteEl.textContent = NASA_INSPIRATIONAL_QUOTES[0].quote;
+      authorEl.textContent = NASA_INSPIRATIONAL_QUOTES[0].author;
+    }
 
     dom.launchScreen.classList.add('igniting-pad');
     dom.launchShipWrapper.classList.add('igniting');
@@ -595,9 +608,9 @@
       dom.launchScreen.classList.add('hidden-screen', 'is-hidden');
 
       playTravelSequence([
-        { key: 'earth-liftoff', label: 'La Tierra', duration: 1350 },
-        { key: 'atmosphere-exit', label: 'Órbita Terrestre', duration: 1400 },
-        ARRIVAL_STEPS.moon
+        { key: 'earth-liftoff', label: NASA_INSPIRATIONAL_QUOTES[0].quote, duration: 1750 },
+        { key: 'atmosphere-exit', label: NASA_INSPIRATIONAL_QUOTES[1].quote, duration: 1750 },
+        { key: 'moon-arrival', label: NASA_INSPIRATIONAL_QUOTES[2].quote, duration: 1750 }
       ], () => {
         finishOpeningLaunch();
       });
