@@ -1674,30 +1674,46 @@
     if (!dom.stageActionPrompt || !dom.stageActionBtn) return;
     activeInteractable = { type, target, onAction };
 
-    let icon = '💬';
     let label = 'Interactuar';
     if (type === 'sample') {
-      icon = '🎒';
       label = 'Guardar en la mochila';
     } else if (type === 'machine') {
-      icon = '💬';
       label = `Hablar con ${target.name || 'sonda'}`;
     } else if (type === 'ship-travel') {
-      icon = '🚀';
-      label = 'Siguiente parada de la misión';
+      label = 'Siguiente parada';
     } else if (type === 'ship-leave') {
-      icon = '🚀';
-      label = 'Abordar nave y continuar';
+      label = 'Entrar a la nave';
     } else if (type === 'ship-locked') {
-      icon = '🔒';
-      label = 'Misión pendiente';
+      label = 'Completa la misión anterior para poder entrar';
     }
 
-    if (dom.stageActionIcon) dom.stageActionIcon.textContent = icon;
+    if (dom.stageActionIcon) dom.stageActionIcon.textContent = '';
     if (dom.stageActionLabel) dom.stageActionLabel.textContent = label;
 
-    const px = Math.max(10, Math.min(90, penguinPos.x));
-    const py = Math.max(18, Math.min(84, penguinPos.y - 13));
+    // Ubicación sobre el objeto objetivo (no sobre el pingüino)
+    let objX = penguinPos.x;
+    let objY = penguinPos.y;
+    let offsetY = -10;
+
+    if (type === 'sample' && target && target.pos) {
+      objX = target.pos.x;
+      objY = target.pos.y;
+      offsetY = -8;
+    } else if (type === 'machine' && target && target.pos) {
+      objX = target.pos.x;
+      objY = target.pos.y;
+      offsetY = -12;
+    } else if (type.startsWith('ship')) {
+      const chapter = getChapter(state.currentChapterId);
+      const { activeMachine } = getActiveSite(chapter);
+      const shipPos = activeMachine && activeMachine.shipPos ? activeMachine.shipPos : (chapter ? chapter.shipPos : penguinPos);
+      objX = shipPos.x;
+      objY = shipPos.y;
+      offsetY = -12;
+    }
+
+    const px = Math.max(8, Math.min(92, objX));
+    const py = Math.max(10, Math.min(88, objY + offsetY));
     dom.stageActionPrompt.style.left = `${px}%`;
     dom.stageActionPrompt.style.top = `${py}%`;
     dom.stageActionPrompt.classList.remove('is-hidden');
@@ -2232,63 +2248,63 @@
   const SAMPLE_DETAILS = {
     'sample-moon-1': {
       title: 'Basalto lunar',
-      site: 'Océano de las Tormentas · La Luna',
-      desc: '¡Lava enfriada de volcanes lunares! Hace miles de millones de años, en la Luna había volcanes que expulsaban ríos de fuego.'
+      site: 'Océano de las Tormentas, La Luna',
+      desc: 'Lava antigua de volcanes lunares que se enfrió hace millones de años formando roca oscura.'
     },
     'sample-moon-2': {
-      title: 'Roca de impacto',
-      site: 'Cráter Surveyor · La Luna',
-      desc: '¡Un meteorito chocó con fuerza brutal contra la Luna! El calor fundió las rocas y las pegó como piezas de un rompecabezas.'
+      title: 'Roca de choque',
+      site: 'Cráter Surveyor, La Luna',
+      desc: 'Piedras que se fundieron y quedaron pegadas por el calor cuando un meteorito chocó contra la Luna.'
     },
     'sample-moon-3': {
       title: 'Polvo de cristales',
-      site: 'Suelo lunar · La Luna',
-      desc: 'Diminutos cristales brillantes que forman el suelo de la Luna. Se trituraron durante eones por piedritas del espacio.'
+      site: 'Suelo lunar, La Luna',
+      desc: 'Granos brillantes triturados por pequeñas piedras del espacio que cayeron durante miles de años.'
     },
     'sample-moon-4': {
-      title: 'Mineral con oxígeno',
-      site: 'Mar de la Tranquilidad · La Luna',
-      desc: '¡Un mineral oscuro muy valioso! Los astronautas lo descubrieron y los científicos pueden sacar oxígeno de él para respirar.'
+      title: 'Ilmenita con oxígeno',
+      site: 'Mar de la Tranquilidad, La Luna',
+      desc: 'Mineral oscuro que los científicos pueden calentar para obtener oxígeno y respirar en futuras bases.'
     },
     'sample-moon-5': {
-      title: 'Roca del Génesis',
-      site: 'Tierras altas · La Luna',
-      desc: 'Un pedacito de la corteza original de la Luna. Es más vieja que los dinosaurios y casi cualquier roca de la Tierra: ¡4,000 millones de años!'
+      title: 'Roca de la corteza antigua',
+      site: 'Tierras altas, La Luna',
+      desc: 'Un trozo de la primera superficie lunar de hace 4,000 millones de años, más vieja que los dinosaurios.'
     },
     'sample-moon-6': {
-      title: 'Perla de cristal',
-      site: 'Zona Apolo 11 · La Luna',
-      desc: 'Una pequeña canica de cristal brillante. Se formó en el frío del espacio cuando una fuente de lava volcánica explotó al cielo.'
+      title: 'Esferita de vidrio',
+      site: 'Zona Apolo 11, La Luna',
+      desc: 'Una bolita de vidrio natural que se formó cuando gotas de lava ardiente salieron disparadas al espacio frío.'
     },
     'sample-mars-1': {
-      title: 'Piedra con burbujas',
-      site: 'Chryse Planitia · Marte',
-      desc: 'Lava marciana con agujeritos. Cuando el volcán la expulsó, los gases calientes formaron burbujas como en una esponja.'
+      title: 'Lava con burbujas',
+      site: 'Chryse Planitia, Marte',
+      desc: 'Piedra volcánica con agujeros dejados por gases calientes que escaparon de la lava de Marte.'
     },
     'sample-mars-2': {
-      title: 'Arándano de Marte',
-      site: 'Llanuras de Chryse · Marte',
-      desc: '¡Una bolita mineral redonda! Los científicos las llaman «arándanos» y demuestran que antes había agua líquida corriendo en Marte.'
+      title: 'Arándano de hematita',
+      site: 'Llanuras de Chryse, Marte',
+      desc: 'Pequeña esfera mineral que se formó dentro del agua, demostrando que Marte tuvo lagos en el pasado.'
     },
     'sample-mars-3': {
-      title: 'Costra de sal marciana',
-      site: 'Suelo de Viking 1 · Marte',
-      desc: 'La pala del robot Viking 1 rascó el suelo y encontró esta sal dorada. Quedó aquí cuando un lago marciano se secó bajo el Sol.'
+      title: 'Costra de sal mineral',
+      site: 'Suelo de Viking 1, Marte',
+      desc: 'Capa de sales descubierta por el robot Viking 1 cuando un antiguo lago marciano se evaporó.'
     },
     'sample-mars-4': {
       title: 'Roca Barnacle Bill',
-      site: 'Canal de Ares Vallis · Marte',
-      desc: 'La primera roca que tocó el rover Sojourner en 1997. ¡El pequeño robot la olió con su rayo láser para descubrir sus secretos!'
+      site: 'Canal de Ares Vallis, Marte',
+      desc: 'La primera roca que tocó el robot Sojourner en 1997 para analizar de qué minerales está hecho Marte.'
     },
     'sample-mars-5': {
-      title: 'Roca gigante Yogi',
-      site: 'Valle de Ares · Marte',
-      desc: 'Una roca enorme con forma de oso. Un río gigante y veloz en el Marte antiguo la arrastró y la pulió como piedra de río.'
+      title: 'Bloque pulido Yogi',
+      site: 'Valle de Ares, Marte',
+      desc: 'Una gran roca redondeada y pulida por una fuerte corriente de agua que inundó este valle marciano.'
     },
     'sample-mars-6': {
-      title: 'Roca Scooby Doo',
-      site: 'Campamento Pathfinder · Marte',
-      desc: 'Una roca tan dura y resistente que cuando el rover intentó rasparla con sus ruedas metálicas, ¡no le hizo ni una sola marca!'
+      title: 'Suelo duro Scooby Doo',
+      site: 'Campamento Pathfinder, Marte',
+      desc: 'Capa de suelo tan firme y compacta que las ruedas de metal del rover no pudieron rayarla.'
     }
   };
 
@@ -2298,7 +2314,7 @@
     const details = SAMPLE_DETAILS[sampleObj.id] || {
       title: sampleObj.label || 'Roca espacial',
       site: chapter.name,
-      desc: '¡Un fascinante tesoro cósmico! Guárdalo en tu mochila para completar las misiones de tu pasaporte de Cyberpenguin.'
+      desc: 'Un fragmento de roca recogido en la superficie para guardar y analizar en tu pasaporte.'
     };
 
     if (dom.sampleDiscoveryTitle) {

@@ -343,8 +343,8 @@
         <!-- Prompt flotante de interacción contextual -->
         <div id="stage-action-prompt" class="stage-action-prompt is-hidden" aria-live="polite">
           <button id="stage-action-btn" type="button" class="stage-action-btn squircle-btn">
-            <span id="stage-action-icon" class="stage-action-icon">💬</span>
-            <span id="stage-action-label" class="stage-action-label">Hablar</span>
+            <span id="stage-action-icon" class="stage-action-icon hidden"></span>
+            <span id="stage-action-label" class="stage-action-label">Guardar en la mochila</span>
           </button>
         </div>
       </div>
@@ -355,24 +355,24 @@
   <div id="sample-discovery-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true"
     aria-labelledby="sample-discovery-title">
     <div
-      class="sample-discovery-card squircle-panel max-w-[320px] w-full p-5 sm:p-6 flex flex-col items-center text-center gap-3 relative">
-      <span class="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">
-        ✨ ¡Roca espacial!
+      class="sample-discovery-card squircle-panel max-w-[310px] w-full p-5 flex flex-col items-center text-center gap-3 relative">
+      <span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+        Muestra de roca
       </span>
       <div id="sample-discovery-crystal"
-        class="sample-discovery-crystal w-20 h-20 flex items-center justify-center py-1">
+        class="sample-discovery-crystal w-20 h-16 flex items-center justify-center py-1">
       </div>
       <div class="flex flex-col items-center gap-0.5">
-        <h3 id="sample-discovery-title" class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+        <h3 id="sample-discovery-title" class="text-base font-semibold text-white tracking-tight leading-snug">
         </h3>
-        <span id="sample-discovery-site" class="text-[11px] text-cyan-300/80 font-medium"></span>
+        <span id="sample-discovery-site" class="text-xs text-slate-400 font-normal"></span>
       </div>
       <p id="sample-discovery-desc"
-        class="text-xs sm:text-[13px] text-slate-200 leading-relaxed bg-white/[0.04] border border-white/[0.06] rounded-xl p-3 w-full">
+        class="text-xs text-slate-300 leading-relaxed bg-slate-900/60 border border-slate-700/50 rounded-lg p-3 w-full text-left">
       </p>
       <button id="sample-discovery-collect-btn" type="button"
-        class="squircle-btn rounded-full w-full py-2.5 px-4 text-xs sm:text-sm font-semibold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-lg shadow-cyan-500/25 active:scale-95">
-        🎒 Guardar en la mochila
+        class="squircle-btn w-full py-2.5 px-4 text-xs font-semibold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-colors rounded-xl">
+        Guardar en la mochila
       </button>
     </div>
   </div>
