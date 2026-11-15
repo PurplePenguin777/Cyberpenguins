@@ -119,6 +119,9 @@
   let activeQuizChapterId = state.currentChapterId;
   let activeInteractable = null;
   let pendingSampleToCollect = null;
+  let activeBranchState = null;
+  let thoughtBubbleTimer = null;
+  let lastRenderedDir = null;
 
   const dom = {};
 
@@ -276,6 +279,7 @@
     renderLaunchShip();
     updateHUD();
     loadChapterScene(state.currentChapterId, false);
+    updateLanguageUI();
     if (FX && typeof FX.pause === 'function') {
       FX.pause();
     }
@@ -426,6 +430,20 @@
     dom.backHomeBtn.addEventListener('click', showHomeScreen);
     if (dom.soundToggleBtn) {
       dom.soundToggleBtn.addEventListener('click', toggleSound);
+    }
+    if (dom.langToggleBtn) {
+      dom.langToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerHaptic('tap');
+        toggleLanguage();
+      });
+    }
+    if (dom.stageLangToggleBtn) {
+      dom.stageLangToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerHaptic('tap');
+        toggleLanguage();
+      });
     }
 
     dom.openPassportBtn.addEventListener('click', openPassportModal);
@@ -1568,8 +1586,6 @@
     });
   }
 
-  let lastRenderedDir = null;
-
   function renderPenguin(animateDescend) {
     dom.penguinActor.style.left = `${penguinPos.x}%`;
     dom.penguinActor.style.top = `${penguinPos.y}%`;
@@ -2250,9 +2266,6 @@
   /* ========================================================================
      Globos de Diálogo Encima de los Personajes (Estilo Animal Crossing)
      ======================================================================== */
-
-  let activeBranchState = null;
-  let thoughtBubbleTimer = null;
 
   function positionSpeechBubble(x, y) {
     if (!dom.stageSpeechBubble) return;
