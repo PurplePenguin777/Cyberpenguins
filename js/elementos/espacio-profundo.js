@@ -150,7 +150,8 @@
     const id = M.uid('trdp');
 
     return `
-      <svg class="travel-scene-svg" viewBox="0 0 900 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <!-- Vista horizontal -->
+      <svg class="travel-scene-svg is-landscape" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <defs>
           <linearGradient id="${id}-bg" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#02040d" />
@@ -163,12 +164,11 @@
           </linearGradient>
         </defs>
 
-        <rect width="900" height="440" fill="url(#${id}-bg)" />
-        <path d="M -80,-40 L 180,-40 L 980,410 L 980,490 L 720,490 L -80,80 Z" fill="url(#${id}-mw)" />
+        <rect width="960" height="540" fill="url(#${id}-bg)" />
+        <path d="M -80,-40 L 180,-40 L 1020,430 L 1020,520 L 720,520 L -80,80 Z" fill="url(#${id}-mw)" />
 
-        <!-- Aldebarán (sin líneas de trayectoria) y Júpiter distante atrás -->
-        ${distantAldebaranStar(762, 96, 1.05)}
-        ${distantJupiterGroup(168, 352, 0.85)}
+        ${distantAldebaranStar(810, 102, 1.1)}
+        ${distantJupiterGroup(178, 380, 0.9)}
 
         <g class="travel-stars-warp" fill="#ffffff">
           <circle cx="82" cy="142" r="1.4" opacity="0.86" />
@@ -182,7 +182,44 @@
           <circle cx="786" cy="312" r="1.2" opacity="0.74" />
         </g>
 
-        <g class="travel-ship-cruise" transform="translate(418, 146) rotate(64) scale(0.84)">
+        <g class="travel-ship-cruise" transform="translate(440, 156) rotate(64) scale(0.86)">
+          ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+        </g>
+      </svg>
+
+      <!-- Vista vertical -->
+      <svg class="travel-scene-svg is-portrait" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="${id}-bg-p" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#02030a" />
+            <stop offset="100%" stop-color="#091432" />
+          </linearGradient>
+          <linearGradient id="${id}-mw-p" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0" />
+            <stop offset="50%" stop-color="#4f46e5" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#02030a" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+
+        <rect width="540" height="960" fill="url(#${id}-bg-p)" />
+        <path d="M -50,-20 L 150,-20 L 590,920 L 590,990 L 390,990 L -50,120 Z" fill="url(#${id}-mw-p)" />
+
+        ${distantAldebaranStar(430, 140, 1.2)}
+        ${distantJupiterGroup(130, 680, 1.1)}
+
+        <g class="travel-stars-warp" fill="#ffffff">
+          <circle cx="68" cy="80" r="1.5" opacity="0.9" />
+          <circle cx="160" cy="140" r="1.2" opacity="0.75" />
+          <circle cx="270" cy="62" r="1.6" opacity="0.92" />
+          <circle cx="380" cy="110" r="1.3" opacity="0.78" />
+          <circle cx="90" cy="280" r="1.2" opacity="0.72" />
+          <circle cx="460" cy="320" r="1.5" opacity="0.85" />
+          <circle cx="120" cy="480" r="1.4" opacity="0.78" />
+          <circle cx="410" cy="540" r="1.3" opacity="0.75" />
+        </g>
+
+        <!-- Nave Cyberpenguin rumbo a Aldebarán -->
+        <g class="travel-ship-cruise" transform="translate(260, 260) rotate(58) scale(1.05)">
           ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
         </g>
       </svg>

@@ -325,10 +325,39 @@ a:focus-visible {
   overflow: hidden;
 }
 
-.travel-scene-svg {
+.cine-crossfade,
+.cine-camera-drift {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
+}
+
+.travel-scene-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.travel-scene-svg.is-portrait {
+  display: none !important;
+}
+
+.travel-scene-svg.is-landscape {
+  display: block !important;
+}
+
+@media (orientation: portrait) {
+  .travel-scene-svg.is-landscape {
+    display: none !important;
+  }
+
+  .travel-scene-svg.is-portrait {
+    display: block !important;
+  }
 }
 
 .travel-skip-btn {
@@ -339,14 +368,10 @@ a:focus-visible {
 }
 
 .cine-crossfade {
-  width: 100%;
-  height: 100%;
   animation: cineCrossfade 0.55s var(--spring-smooth) both;
 }
 
 .cine-camera-drift {
-  width: 100%;
-  height: 100%;
   animation: cineCameraDrift 1.6s ease-out forwards;
 }
 
@@ -421,10 +446,6 @@ a:focus-visible {
   letter-spacing: normal;
 }
 
-#travel-skip-btn {
-  grid-column: 3;
-  justify-self: end;
-}
 
 .cine-ship-ascend {
   animation: cineAscend 1.35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;

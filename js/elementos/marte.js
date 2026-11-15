@@ -192,7 +192,8 @@
 
     if (phaseKey === 'mars-arrival') {
       return `
-        <svg class="travel-scene-svg" viewBox="0 0 900 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <!-- Vista horizontal -->
+        <svg class="travel-scene-svg is-landscape" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <defs>
             <linearGradient id="${id}-sky" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#080514" />
@@ -200,7 +201,7 @@
               <stop offset="100%" stop-color="#7c2e22" />
             </linearGradient>
           </defs>
-          <rect width="900" height="440" fill="url(#${id}-sky)" />
+          <rect width="960" height="540" fill="url(#${id}-sky)" />
           <g class="travel-stars-drift" fill="#fef3c7">
             <circle cx="96" cy="48" r="1.4" opacity="0.82" />
             <circle cx="212" cy="84" r="1.1" opacity="0.68" />
@@ -209,22 +210,73 @@
             <circle cx="776" cy="48" r="1.5" opacity="0.88" />
           </g>
 
-          ${facetedPhobos(762, 102, 1.0)}
+          ${facetedPhobos(790, 102, 1.0)}
 
-          <!-- Horizonte curvo marciano low-poly -->
+          <!-- Horizonte curvo marciano low-poly hasta la base -->
           <g class="travel-planet-approach">
-            <path d="M -30,308 Q 450,224 930,308 L 930,600 L -30,600 Z" fill="#c25632" />
-            <polygon points="-30,308 190,268 270,390 -30,420" fill="#df7141" />
-            <polygon points="190,268 460,252 500,382 270,390" fill="#ea8850" />
-            <polygon points="460,252 720,270 690,390 500,382" fill="#d16238" />
-            <polygon points="720,270 930,308 930,420 690,390" fill="#ab4628" />
-            <polygon points="-30,420 270,390 500,382 690,390 930,420 930,600 -30,600" fill="#89321b" />
-            <polygon points="310,336 424,316 532,340 486,386 356,386" fill="#9a3a20" />
-            <polygon points="602,356 688,338 756,360 720,394 630,394" fill="#89321b" />
+            <path d="M -30,340 Q 480,248 990,340 L 990,560 L -30,560 Z" fill="#c25632" />
+            <polygon points="-30,340 200,295 285,425 -30,460" fill="#df7141" />
+            <polygon points="200,295 480,278 525,418 285,425" fill="#ea8850" />
+            <polygon points="480,278 750,298 720,425 525,418" fill="#d16238" />
+            <polygon points="750,298 990,340 990,460 720,425" fill="#ab4628" />
+            <polygon points="-30,460 285,425 525,418 720,425 990,460 990,560 -30,560" fill="#89321b" />
+            <polygon points="325,365 445,342 560,370 510,420 375,420" fill="#9a3a20" />
+            <polygon points="635,385 725,366 795,390 760,426 665,426" fill="#89321b" />
           </g>
 
-          <g class="travel-ship-descent" transform="translate(384, 70) scale(0.86)">
+          <g class="travel-ship-descent" transform="translate(410, 78) scale(0.92)">
             ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+        </svg>
+
+        <!-- Vista vertical -->
+        <svg class="travel-scene-svg is-portrait" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="${id}-sky-p" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#070412" />
+              <stop offset="45%" stop-color="#220e1c" />
+              <stop offset="75%" stop-color="#5a1d17" />
+              <stop offset="100%" stop-color="#993822" />
+            </linearGradient>
+          </defs>
+          <rect width="540" height="960" fill="url(#${id}-sky-p)" />
+
+          <!-- Estrellas en el cielo marciano -->
+          <g class="travel-stars-drift" fill="#fef3c7">
+            <circle cx="68" cy="64" r="1.5" opacity="0.85" />
+            <circle cx="178" cy="112" r="1.2" opacity="0.7" />
+            <circle cx="290" cy="52" r="1.6" opacity="0.9" />
+            <circle cx="396" cy="88" r="1.3" opacity="0.75" />
+            <circle cx="82" cy="220" r="1.2" opacity="0.7" />
+            <circle cx="454" cy="240" r="1.4" opacity="0.8" />
+          </g>
+
+          ${facetedPhobos(420, 118, 1.15)}
+
+          <g class="travel-ship-descent" transform="translate(216, 200) scale(1.08)">
+            ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+
+          <!-- Gran superficie marciana cubriendo de 490 a 980 -->
+          <g class="travel-planet-approach">
+            <path d="M -20,500 Q 270,430 560,500 L 560,980 L -20,980 Z" fill="#89321b" />
+            <polygon points="-20,500 120,470 190,580 -20,610" fill="#df7141" />
+            <polygon points="120,470 270,450 330,575 190,580" fill="#ea8850" />
+            <polygon points="270,450 430,475 390,580 330,575" fill="#d16238" />
+            <polygon points="430,475 560,500 560,610 390,580" fill="#ab4628" />
+            <polygon points="-20,610 190,580 330,575 390,580 560,610 560,740 -20,740" fill="#a03c20" />
+            <polygon points="-20,740 160,715 310,735 460,710 560,740 560,980 -20,980" fill="#782914" />
+
+            <!-- Grieta tipo cañón Valles Marineris y cráter -->
+            <polygon points="90,640 240,625 360,650 280,680 150,670" fill="#581a0c" />
+            <g transform="translate(180, 580)">
+              <polygon points="-42,-6 -18,-15 20,-14 42,-4 30,12 -6,15 -34,9" fill="#9a3a20" />
+              <polygon points="-28,-2 -12,-9 14,-8 28,-1 18,7 -4,9 -22,5" fill="#581a0c" />
+            </g>
+            <g transform="translate(390, 560)">
+              <polygon points="-50,-6 -22,-18 24,-16 50,-4 36,13 -6,17 -40,10" fill="#9a3a20" />
+              <polygon points="-34,-2 -14,-11 16,-10 34,-1 24,8 -4,11 -26,6" fill="#581a0c" />
+            </g>
           </g>
         </svg>
       `;
@@ -232,7 +284,8 @@
 
     if (phaseKey === 'mars-liftoff') {
       return `
-        <svg class="travel-scene-svg" viewBox="0 0 900 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <!-- Vista horizontal -->
+        <svg class="travel-scene-svg is-landscape" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <defs>
             <linearGradient id="${id}-sky" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#090616" />
@@ -240,7 +293,7 @@
               <stop offset="100%" stop-color="#9e412c" />
             </linearGradient>
           </defs>
-          <rect width="900" height="440" fill="url(#${id}-sky)" />
+          <rect width="960" height="540" fill="url(#${id}-sky)" />
           <g fill="#fde68a">
             <circle cx="88" cy="52" r="1.4" opacity="0.82" />
             <circle cx="248" cy="42" r="1.5" opacity="0.86" />
@@ -248,21 +301,53 @@
             <circle cx="808" cy="46" r="1.6" opacity="0.88" />
           </g>
 
-          <!-- Mesas Twin Peaks y suelo marciano -->
+          <!-- Mesas Twin Peaks y suelo marciano completo -->
           <g class="travel-horizon-drop">
-            <polygon points="-20,334 140,282 280,322 610,318 754,274 920,336 920,452 -20,452" fill="#a84326" />
-            <polygon points="-20,334 140,282 230,420 -20,452" fill="#cf6137" />
-            <polygon points="280,322 610,318 590,428 230,420" fill="#e27a46" />
-            <polygon points="754,274 920,336 920,452 590,428" fill="#b84d2c" />
+            <polygon points="-20,350 150,295 300,340 640,335 790,288 980,352 980,560 -20,560" fill="#a84326" />
+            <polygon points="-20,350 150,295 240,440 -20,480" fill="#cf6137" />
+            <polygon points="300,340 640,335 620,450 240,440" fill="#e27a46" />
+            <polygon points="790,288 980,352 980,560 620,450" fill="#b84d2c" />
+            <polygon points="-20,480 240,440 620,450 980,560 -20,560" fill="#89321b" />
           </g>
 
-          <!-- Expansión radial de polvo marciano a ras de suelo en el despegue -->
           <g opacity="0.75">
-            <polygon points="360,374 450,360 540,374 500,392 400,392" fill="#e27a46" opacity="0.65" />
+            <polygon points="380,400 480,385 580,400 535,420 425,420" fill="#e27a46" opacity="0.65" />
           </g>
 
-          <g class="travel-ship-liftoff" transform="translate(384, 88) scale(0.88)">
+          <g class="travel-ship-liftoff" transform="translate(410, 96) scale(0.92)">
             ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+        </svg>
+
+        <!-- Vista vertical -->
+        <svg class="travel-scene-svg is-portrait" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="${id}-sky-lp" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#080514" />
+              <stop offset="40%" stop-color="#2a1222" />
+              <stop offset="80%" stop-color="#7a2a1a" />
+              <stop offset="100%" stop-color="#b84a2d" />
+            </linearGradient>
+          </defs>
+          <rect width="540" height="960" fill="url(#${id}-sky-lp)" />
+          <g fill="#fde68a">
+            <circle cx="68" cy="64" r="1.5" opacity="0.85" />
+            <circle cx="180" cy="50" r="1.2" opacity="0.7" />
+            <circle cx="360" cy="74" r="1.5" opacity="0.88" />
+            <circle cx="470" cy="110" r="1.4" opacity="0.8" />
+          </g>
+
+          <g class="travel-ship-liftoff" transform="translate(216, 250) scale(1.08)">
+            ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+
+          <!-- Suelo marciano y mesas inferiores completas -->
+          <g class="travel-horizon-drop">
+            <polygon points="-20,540 110,490 220,530 380,520 480,475 560,540 560,980 -20,980" fill="#a84326" />
+            <polygon points="-20,540 110,490 190,620 -20,660" fill="#cf6137" />
+            <polygon points="220,530 380,520 360,630 190,620" fill="#e27a46" />
+            <polygon points="480,475 560,540 560,660 360,630" fill="#b84d2c" />
+            <polygon points="-20,660 190,620 360,630 560,660 560,980 -20,980" fill="#89321b" />
           </g>
         </svg>
       `;
@@ -270,14 +355,15 @@
 
     if (phaseKey === 'mars-suborbital') {
       return `
-        <svg class="travel-scene-svg" viewBox="0 0 900 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <!-- Vista horizontal -->
+        <svg class="travel-scene-svg is-landscape" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <defs>
             <linearGradient id="${id}-sky" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="#070411" />
               <stop offset="100%" stop-color="#2c1220" />
             </linearGradient>
           </defs>
-          <rect width="900" height="440" fill="url(#${id}-sky)" />
+          <rect width="960" height="540" fill="url(#${id}-sky)" />
           <g class="travel-stars-warp" fill="#fef3c7">
             <circle cx="96" cy="52" r="1.4" opacity="0.86" />
             <circle cx="234" cy="96" r="1.2" opacity="0.72" />
@@ -286,19 +372,51 @@
             <circle cx="764" cy="54" r="1.5" opacity="0.88" />
           </g>
 
-          ${facetedPhobos(164, 92, 0.9)}
+          ${facetedPhobos(176, 96, 0.95)}
 
           <g>
-            <path d="M -40,352 Q 450,234 940,352 L 940,456 L -40,456 Z" fill="#c25632" />
-            <polygon points="-40,352 240,288 320,456 -40,456" fill="#df7141" />
-            <polygon points="240,288 520,276 550,456 320,456" fill="#eb8a52" />
-            <polygon points="520,276 760,298 730,456 550,456" fill="#cf6238" />
-            <polygon points="760,298 940,352 940,456 730,456" fill="#a84326" />
-            <polygon points="368,354 446,334 504,358 470,388 386,388" fill="#8f361d" />
+            <path d="M -40,370 Q 480,248 1000,370 L 1000,560 L -40,560 Z" fill="#c25632" />
+            <polygon points="-40,370 250,305 340,480 -40,480" fill="#df7141" />
+            <polygon points="250,305 540,290 570,480 340,480" fill="#eb8a52" />
+            <polygon points="540,290 800,315 765,480 570,480" fill="#cf6238" />
+            <polygon points="800,315 1000,370 1000,480 765,480" fill="#a84326" />
+            <polygon points="-40,480 340,480 570,480 765,480 1000,480 1000,560 -40,560" fill="#802e17" />
+            <polygon points="384,370 466,350 526,375 490,406 402,406" fill="#8f361d" />
           </g>
 
-          <g class="travel-ship-cruise" transform="translate(468, 92) rotate(72) scale(0.76)">
+          <g class="travel-ship-cruise" transform="translate(498, 100) rotate(72) scale(0.82)">
             ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+        </svg>
+
+        <!-- Vista vertical -->
+        <svg class="travel-scene-svg is-portrait" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="${id}-sky-sop" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#06030e" />
+              <stop offset="100%" stop-color="#240c19" />
+            </linearGradient>
+          </defs>
+          <rect width="540" height="960" fill="url(#${id}-sky-sop)" />
+          <g class="travel-stars-warp" fill="#fef3c7">
+            <circle cx="68" cy="62" r="1.5" opacity="0.88" />
+            <circle cx="180" cy="112" r="1.2" opacity="0.75" />
+            <circle cx="340" cy="50" r="1.6" opacity="0.9" />
+            <circle cx="468" cy="94" r="1.3" opacity="0.8" />
+          </g>
+
+          ${facetedPhobos(128, 120, 1.05)}
+
+          <g class="travel-ship-cruise" transform="translate(270, 240) rotate(60) scale(0.95)">
+            ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+
+          <g>
+            <path d="M -20,520 Q 270,450 560,520 L 560,980 L -20,980 Z" fill="#c25632" />
+            <polygon points="-20,520 140,480 220,620 -20,650" fill="#df7141" />
+            <polygon points="140,480 380,470 340,620 220,620" fill="#eb8a52" />
+            <polygon points="380,470 560,520 560,650 340,620" fill="#cf6238" />
+            <polygon points="-20,650 220,620 340,620 560,650 560,980 -20,980" fill="#802e17" />
           </g>
         </svg>
       `;

@@ -229,42 +229,109 @@
 
     if (phaseKey === 'moon-arrival') {
       return `
-        <svg class="travel-scene-svg" viewBox="0 0 900 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <rect width="900" height="440" fill="#040816" />
+        <!-- Vista horizontal / panorámica -->
+        <svg class="travel-scene-svg is-landscape" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="960" height="540" fill="#040816" />
           <g class="travel-stars-drift" fill="#ffffff">
-            <circle cx="88" cy="54" r="1.4" opacity="0.9" />
-            <circle cx="234" cy="92" r="1.1" opacity="0.74" />
-            <circle cx="348" cy="48" r="1.6" opacity="0.92" />
-            <circle cx="546" cy="74" r="1.2" opacity="0.78" />
-            <circle cx="678" cy="44" r="1.6" opacity="0.92" />
-            <circle cx="792" cy="112" r="1.3" opacity="0.82" />
-            <circle cx="854" cy="64" r="1.1" opacity="0.72" />
+            <circle cx="94" cy="58" r="1.4" opacity="0.9" />
+            <circle cx="248" cy="98" r="1.1" opacity="0.74" />
+            <circle cx="368" cy="52" r="1.6" opacity="0.92" />
+            <circle cx="582" cy="78" r="1.2" opacity="0.78" />
+            <circle cx="724" cy="48" r="1.6" opacity="0.92" />
+            <circle cx="844" cy="118" r="1.3" opacity="0.82" />
+            <circle cx="912" cy="68" r="1.1" opacity="0.72" />
           </g>
 
-          ${facetedEarthGroup(136, 94, 34)}
+          ${facetedEarthGroup(146, 102, 38)}
 
-          <!-- Horizonte lunar curvado low-poly de aproximación -->
+          <!-- Horizonte lunar curvado low-poly y superficie completa -->
           <g class="travel-planet-approach">
-            <path d="M -30,308 Q 450,230 930,308 L 930,600 L -30,600 Z" fill="#94a3b8" />
-            <polygon points="-30,308 180,274 260,394 -30,420" fill="#cbd5e1" />
-            <polygon points="180,274 450,256 490,382 260,394" fill="#dce5ef" />
-            <polygon points="450,256 720,274 680,392 490,382" fill="#c3cfde" />
-            <polygon points="720,274 930,308 930,420 680,392" fill="#9fb0c4" />
-            <polygon points="-30,420 260,394 490,382 680,392 930,420 930,600 -30,600" fill="#899ab0" />
+            <path d="M -30,340 Q 480,260 990,340 L 990,560 L -30,560 Z" fill="#94a3b8" />
+            <polygon points="-30,340 190,305 275,430 -30,460" fill="#cbd5e1" />
+            <polygon points="190,305 480,285 520,418 275,430" fill="#dce5ef" />
+            <polygon points="480,285 765,305 725,428 520,418" fill="#c3cfde" />
+            <polygon points="765,305 990,340 990,460 725,428" fill="#9fb0c4" />
+            <polygon points="-30,460 275,430 520,418 725,428 990,460 990,560 -30,560" fill="#899ab0" />
 
-            <!-- Cráteres geométricos -->
-            <g transform="translate(216, 356)">
-              <polygon points="-58,-6 -24,-20 26,-18 58,-4 42,16 -8,20 -46,12" fill="#64748b" />
-              <polygon points="-42,-2 -16,-12 18,-11 40,-1 26,9 -6,12 -32,6" fill="#475569" />
+            <!-- Cráteres lunares con relieve facetado y sombra -->
+            <g transform="translate(230, 390)">
+              <polygon points="-62,-7 -26,-22 28,-20 62,-4 45,18 -9,22 -50,13" fill="#64748b" />
+              <polygon points="-45,-2 -17,-13 19,-12 43,-1 28,10 -6,13 -34,7" fill="#475569" />
+              <polygon points="-4,2 6,-2 8,6 0,8" fill="#cbd5e1" opacity="0.6" />
             </g>
-            <g transform="translate(658, 348)">
-              <polygon points="-76,-8 -32,-26 36,-24 76,-6 54,20 -8,26 -62,16" fill="#64748b" />
-              <polygon points="-54,-3 -20,-16 26,-14 54,-2 36,12 -6,16 -42,9" fill="#475569" />
+            <g transform="translate(700, 382)">
+              <polygon points="-80,-9 -34,-28 38,-26 80,-6 57,22 -9,28 -66,17" fill="#64748b" />
+              <polygon points="-58,-3 -22,-17 28,-15 58,-2 39,13 -6,17 -45,10" fill="#475569" />
+              <polygon points="-2,1 8,-3 10,7 1,9" fill="#cbd5e1" opacity="0.6" />
             </g>
           </g>
 
-          <g class="travel-ship-descent" transform="translate(384, 72) scale(0.86)">
+          <g class="travel-ship-descent" transform="translate(410, 80) scale(0.92)">
             ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+        </svg>
+
+        <!-- Vista vertical / responsiva (móviles y tablets en vertical) -->
+        <svg class="travel-scene-svg is-portrait" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="${id}-space-p" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#02040b" />
+              <stop offset="55%" stop-color="#060c1d" />
+              <stop offset="100%" stop-color="#0a1632" />
+            </linearGradient>
+          </defs>
+          <rect width="540" height="960" fill="url(#${id}-space-p)" />
+          <!-- Estrellas en el espacio superior -->
+          <g class="travel-stars-drift" fill="#ffffff">
+            <circle cx="56" cy="74" r="1.5" opacity="0.9" />
+            <circle cx="168" cy="48" r="1.2" opacity="0.75" />
+            <circle cx="230" cy="110" r="1.6" opacity="0.9" />
+            <circle cx="340" cy="56" r="1.4" opacity="0.8" />
+            <circle cx="440" cy="98" r="1.7" opacity="0.92" />
+            <circle cx="504" cy="42" r="1.2" opacity="0.7" />
+            <circle cx="86" cy="220" r="1.3" opacity="0.76" />
+            <circle cx="460" cy="240" r="1.5" opacity="0.85" />
+            <circle cx="130" cy="340" r="1.2" opacity="0.7" />
+            <circle cx="410" cy="360" r="1.4" opacity="0.78" />
+          </g>
+          <!-- Tierra visible arriba a la izquierda (Earthrise) -->
+          ${facetedEarthGroup(118, 126, 38)}
+          <!-- Cohete Cyberpenguin en descenso vertical en el tercio superior -->
+          <g class="travel-ship-descent" transform="translate(216, 200) scale(1.08)">
+            ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+          <!-- Gran relieve lunar que cubre toda la mitad inferior de 480 a 960 -->
+          <g class="travel-planet-approach">
+            <!-- Horizonte curvo lunar -->
+            <path d="M -20,510 Q 270,440 560,510 L 560,980 L -20,980 Z" fill="#899ab0" />
+            <!-- Crestas y laderas low-poly -->
+            <polygon points="-20,510 110,480 180,590 -20,620" fill="#cbd5e1" />
+            <polygon points="110,480 270,455 320,580 180,590" fill="#dce5ef" />
+            <polygon points="270,455 430,480 390,585 320,580" fill="#c3cfde" />
+            <polygon points="430,480 560,510 560,620 390,585" fill="#9fb0c4" />
+            <polygon points="-20,620 180,590 320,580 390,585 560,620 560,760 -20,760" fill="#8294aa" />
+            <!-- Mesetas intermedias y mares oscuros -->
+            <polygon points="-20,760 140,730 290,750 450,725 560,760 560,980 -20,980" fill="#6f8196" />
+            <!-- Mare Tranquillitatis / regolito profundo -->
+            <polygon points="60,660 170,640 230,690 140,720" fill="#475569" opacity="0.7" />
+            <polygon points="320,645 440,635 480,695 360,710" fill="#475569" opacity="0.65" />
+            <!-- Cráteres lunares con relieve, borde iluminado y foso de sombra -->
+            <g transform="translate(145, 595)">
+              <polygon points="-52,-6 -22,-18 24,-16 52,-4 38,14 -8,18 -42,11" fill="#64748b" />
+              <polygon points="-38,-2 -14,-11 16,-10 36,-1 24,9 -5,11 -29,6" fill="#334155" />
+              <polygon points="-3,2 6,-2 8,5 0,7" fill="#cbd5e1" opacity="0.65" />
+            </g>
+            <g transform="translate(385, 570)">
+              <polygon points="-65,-7 -28,-22 31,-20 65,-5 46,17 -7,22 -53,13" fill="#64748b" />
+              <polygon points="-47,-3 -18,-13 23,-12 47,-2 32,10 -5,14 -37,8" fill="#334155" />
+              <polygon points="-2,1 7,-2 9,6 1,8" fill="#cbd5e1" opacity="0.65" />
+            </g>
+            <!-- Cráter secundario en primer plano -->
+            <g transform="translate(260, 780)">
+              <polygon points="-75,-8 -32,-25 36,-23 75,-6 53,19 -8,25 -61,15" fill="#5a6a7e" />
+              <polygon points="-54,-3 -20,-15 26,-13 54,-2 37,12 -6,16 -42,9" fill="#293548" />
+              <polygon points="-3,2 8,-2 10,7 1,9" fill="#94a3b8" opacity="0.7" />
+            </g>
           </g>
         </svg>
       `;
@@ -272,8 +339,9 @@
 
     if (phaseKey === 'moon-liftoff') {
       return `
-        <svg class="travel-scene-svg" viewBox="0 0 900 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <rect width="900" height="440" fill="#050a18" />
+        <!-- Vista horizontal -->
+        <svg class="travel-scene-svg is-landscape" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="960" height="540" fill="#050a18" />
           <g fill="#ffffff">
             <circle cx="94" cy="48" r="1.4" opacity="0.88" />
             <circle cx="212" cy="86" r="1.2" opacity="0.74" />
@@ -283,27 +351,55 @@
             <circle cx="836" cy="46" r="1.6" opacity="0.92" />
           </g>
 
-          ${facetedEarthGroup(748, 88, 36)}
+          ${facetedEarthGroup(788, 92, 38)}
 
-          <!-- Relieve lunar bajo el despegue -->
+          <!-- Relieve lunar bajo el despegue que llena hasta la base -->
           <g class="travel-horizon-drop">
-            <polygon points="-20,334 180,296 360,312 580,298 780,316 920,336 920,452 -20,452" fill="#9fb0c4" />
-            <polygon points="-20,334 180,296 290,418 -20,452" fill="#bac8d8" />
-            <polygon points="180,296 580,298 540,420 290,418" fill="#cbd5e1" />
-            <polygon points="580,298 920,336 920,452 540,420" fill="#90a2b8" />
-            <g transform="translate(450, 380)">
+            <polygon points="-20,350 180,312 360,328 580,314 780,332 980,352 980,560 -20,560" fill="#9fb0c4" />
+            <polygon points="-20,350 180,312 290,440 -20,480" fill="#bac8d8" />
+            <polygon points="180,312 580,314 540,442 290,440" fill="#cbd5e1" />
+            <polygon points="580,314 980,352 980,560 540,442" fill="#90a2b8" />
+            <polygon points="-20,480 290,440 540,442 980,560 -20,560" fill="#75869c" />
+            <g transform="translate(480, 410)">
               <polygon points="-84,-8 -36,-24 38,-24 84,-8 62,18 -4,24 -66,16" fill="#64748b" />
               <polygon points="-58,-4 -24,-14 26,-14 58,-4 42,10 -4,14 -44,9" fill="#475569" />
             </g>
           </g>
 
-          <!-- Dispersión radial de regolito a ras de superficie en el despegue -->
-          <g opacity="0.6">
-            <polygon points="370,376 450,364 530,376 490,392 410,392" fill="#cbd5e1" opacity="0.55" />
+          <g class="travel-ship-liftoff" transform="translate(414, 96) scale(0.92)">
+            ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+        </svg>
+
+        <!-- Vista vertical -->
+        <svg class="travel-scene-svg is-portrait" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="540" height="960" fill="#040816" />
+          <g fill="#ffffff">
+            <circle cx="68" cy="74" r="1.5" opacity="0.9" />
+            <circle cx="184" cy="52" r="1.2" opacity="0.75" />
+            <circle cx="376" cy="68" r="1.6" opacity="0.92" />
+            <circle cx="478" cy="112" r="1.4" opacity="0.8" />
+            <circle cx="92" cy="240" r="1.3" opacity="0.75" />
+            <circle cx="452" cy="260" r="1.5" opacity="0.85" />
           </g>
 
-          <g class="travel-ship-liftoff" transform="translate(384, 88) scale(0.88)">
+          ${facetedEarthGroup(412, 134, 38)}
+
+          <g class="travel-ship-liftoff" transform="translate(216, 260) scale(1.08)">
             ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+
+          <!-- Relieve lunar inferior completo -->
+          <g class="travel-horizon-drop">
+            <polygon points="-20,550 120,520 270,535 420,515 560,550 560,980 -20,980" fill="#9fb0c4" />
+            <polygon points="-20,550 120,520 200,640 -20,680" fill="#bac8d8" />
+            <polygon points="120,520 420,515 370,645 200,640" fill="#cbd5e1" />
+            <polygon points="420,515 560,550 560,680 370,645" fill="#90a2b8" />
+            <polygon points="-20,680 200,640 370,645 560,680 560,980 -20,980" fill="#75869c" />
+            <g transform="translate(270, 620)">
+              <polygon points="-74,-8 -32,-22 34,-22 74,-8 55,16 -4,22 -58,14" fill="#64748b" />
+              <polygon points="-52,-4 -21,-13 23,-13 52,-4 37,9 -4,13 -39,8" fill="#475569" />
+            </g>
           </g>
         </svg>
       `;
@@ -311,14 +407,15 @@
 
     if (phaseKey === 'moon-suborbital') {
       return `
-        <svg class="travel-scene-svg" viewBox="0 0 900 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <!-- Vista horizontal -->
+        <svg class="travel-scene-svg is-landscape" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <defs>
             <linearGradient id="${id}-orb" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="#030712" />
               <stop offset="100%" stop-color="#0d1a38" />
             </linearGradient>
           </defs>
-          <rect width="900" height="440" fill="url(#${id}-orb)" />
+          <rect width="960" height="540" fill="url(#${id}-orb)" />
           <g class="travel-stars-warp" fill="#ffffff">
             <circle cx="96" cy="54" r="1.4" opacity="0.9" />
             <circle cx="192" cy="116" r="1.2" opacity="0.76" />
@@ -328,22 +425,55 @@
             <circle cx="776" cy="126" r="1.3" opacity="0.82" />
           </g>
 
-          ${facetedEarthGroup(148, 86, 32)}
+          ${facetedEarthGroup(158, 92, 34)}
 
           <!-- Arco orbital lunar low-poly debajo de la nave -->
           <g>
-            <path d="M -40,350 Q 450,236 940,350 L 940,456 L -40,456 Z" fill="#9fb0c4" />
-            <polygon points="-40,350 220,290 310,456 -40,456" fill="#cbd5e1" />
-            <polygon points="220,290 480,276 520,456 310,456" fill="#dce5ef" />
-            <polygon points="480,276 740,298 710,456 520,456" fill="#b4c2d4" />
-            <polygon points="740,298 940,350 940,456 710,456" fill="#899ab0" />
-            <polygon points="344,352 418,332 478,354 446,386 364,386" fill="#64748b" />
-            <polygon points="622,366 678,350 726,368 702,394 640,394" fill="#64748b" />
+            <path d="M -40,370 Q 480,250 1000,370 L 1000,560 L -40,560 Z" fill="#9fb0c4" />
+            <polygon points="-40,370 230,305 325,480 -40,480" fill="#cbd5e1" />
+            <polygon points="230,305 510,290 550,480 325,480" fill="#dce5ef" />
+            <polygon points="510,290 780,315 750,480 550,480" fill="#b4c2d4" />
+            <polygon points="780,315 1000,370 1000,480 750,480" fill="#899ab0" />
+            <polygon points="-40,480 325,480 550,480 750,480 1000,480 1000,560 -40,560" fill="#6f8196" />
+            <polygon points="364,372 438,352 498,374 466,406 384,406" fill="#64748b" />
+            <polygon points="652,386 708,370 756,388 732,414 670,414" fill="#64748b" />
           </g>
 
-          <!-- Cohete en vuelo suborbital horizontal -->
-          <g class="travel-ship-cruise" transform="translate(468, 92) rotate(72) scale(0.76)">
+          <g class="travel-ship-cruise" transform="translate(498, 102) rotate(72) scale(0.82)">
             ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+        </svg>
+
+        <!-- Vista vertical -->
+        <svg class="travel-scene-svg is-portrait" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="${id}-orb-p" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#02040b" />
+              <stop offset="100%" stop-color="#0a1532" />
+            </linearGradient>
+          </defs>
+          <rect width="540" height="960" fill="url(#${id}-orb-p)" />
+          <g class="travel-stars-warp" fill="#ffffff">
+            <circle cx="68" cy="64" r="1.5" opacity="0.9" />
+            <circle cx="184" cy="116" r="1.2" opacity="0.75" />
+            <circle cx="340" cy="52" r="1.6" opacity="0.92" />
+            <circle cx="468" cy="98" r="1.3" opacity="0.8" />
+          </g>
+
+          ${facetedEarthGroup(118, 118, 36)}
+
+          <g class="travel-ship-cruise" transform="translate(270, 240) rotate(60) scale(0.95)">
+            ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+          </g>
+
+          <!-- Arco lunar cubriendo la base -->
+          <g>
+            <path d="M -20,530 Q 270,460 560,530 L 560,980 L -20,980 Z" fill="#9fb0c4" />
+            <polygon points="-20,530 140,490 220,630 -20,660" fill="#cbd5e1" />
+            <polygon points="140,490 380,480 340,630 220,630" fill="#dce5ef" />
+            <polygon points="380,480 560,530 560,660 340,630" fill="#b4c2d4" />
+            <polygon points="-20,660 220,630 340,630 560,660 560,980 -20,980" fill="#75869c" />
+            <polygon points="220,580 290,560 340,580 310,610 240,610" fill="#64748b" />
           </g>
         </svg>
       `;

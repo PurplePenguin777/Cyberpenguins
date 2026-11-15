@@ -92,7 +92,8 @@
     const id = M.uid('treros');
 
     return `
-      <svg class="travel-scene-svg" viewBox="0 0 900 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <!-- Vista horizontal -->
+      <svg class="travel-scene-svg is-landscape" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <defs>
           <linearGradient id="${id}-bg" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#02040a" />
@@ -100,9 +101,8 @@
           </linearGradient>
         </defs>
 
-        <rect width="900" height="440" fill="url(#${id}-bg)" />
+        <rect width="960" height="540" fill="url(#${id}-bg)" />
 
-        <!-- Campo estelar espacial limpio (Eros es un asteroide solitario cercano a la Tierra) -->
         <g class="travel-stars-warp" fill="#ffffff">
           <circle cx="82" cy="54" r="1.5" opacity="0.9" />
           <circle cx="176" cy="118" r="1.2" opacity="0.74" />
@@ -115,8 +115,8 @@
           <circle cx="468" cy="382" r="1.4" opacity="0.8" />
         </g>
 
-        <!-- Asteroide 433 Eros low-poly en forma de cacahuate aproximándose al costado derecho -->
-        <g class="travel-planet-approach" transform="translate(716, 254)">
+        <!-- Asteroide 433 Eros low-poly -->
+        <g class="travel-planet-approach" transform="translate(740, 270)">
           <polygon points="-148,-24 -86,-78 24,-54 128,-74 176,12 136,84 18,72 -108,78 -162,18" fill="#475569" />
           <polygon points="-86,-78 24,-54 42,-8 -96,-14" fill="#cbd5e1" />
           <polygon points="24,-54 128,-74 114,22 42,-8" fill="#94a3b8" />
@@ -124,14 +124,52 @@
           <polygon points="-96,-14 42,-8 18,72 -108,78" fill="#64748b" />
           <polygon points="42,-8 114,22 136,84 18,72" fill="#526278" />
           <polygon points="128,-74 176,12 136,84 114,22" fill="#334155" />
-          <!-- Depresión Himeros sobre Eros -->
           <polygon points="-24,-26 14,-34 38,-18 18,-4 -20,-8" fill="#64748b" />
           <polygon points="-12,-22 12,-26 26,-16 12,-8 -10,-10" fill="#334155" />
         </g>
 
-        <!-- Cohete Cyberpenguin navegando hacia Eros -->
-        <g class="travel-ship-cruise" transform="translate(344, 152) rotate(58) scale(0.8)">
+        <g class="travel-ship-cruise" transform="translate(360, 160) rotate(58) scale(0.85)">
           ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+        </g>
+      </svg>
+
+      <!-- Vista vertical -->
+      <svg class="travel-scene-svg is-portrait" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="${id}-bg-p" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#020308" />
+            <stop offset="100%" stop-color="#09142b" />
+          </linearGradient>
+        </defs>
+
+        <rect width="540" height="960" fill="url(#${id}-bg-p)" />
+
+        <g class="travel-stars-warp" fill="#ffffff">
+          <circle cx="68" cy="74" r="1.5" opacity="0.9" />
+          <circle cx="160" cy="120" r="1.2" opacity="0.75" />
+          <circle cx="280" cy="52" r="1.6" opacity="0.92" />
+          <circle cx="420" cy="98" r="1.3" opacity="0.78" />
+          <circle cx="82" cy="240" r="1.2" opacity="0.7" />
+          <circle cx="460" cy="280" r="1.5" opacity="0.85" />
+          <circle cx="120" cy="420" r="1.3" opacity="0.75" />
+        </g>
+
+        <!-- Cohete Cyberpenguin en crucero vertical -->
+        <g class="travel-ship-cruise" transform="translate(240, 260) rotate(52) scale(1.05)">
+          ${M.spaceship({ hatchOpen: false, launching: true, inSpaceFlight: true })}
+        </g>
+
+        <!-- Asteroide 433 Eros en la mitad inferior -->
+        <g class="travel-planet-approach" transform="translate(270, 680) scale(1.35)">
+          <polygon points="-148,-24 -86,-78 24,-54 128,-74 176,12 136,84 18,72 -108,78 -162,18" fill="#475569" />
+          <polygon points="-86,-78 24,-54 42,-8 -96,-14" fill="#cbd5e1" />
+          <polygon points="24,-54 128,-74 114,22 42,-8" fill="#94a3b8" />
+          <polygon points="-148,-24 -86,-78 -96,-14 -162,18" fill="#94a3b8" />
+          <polygon points="-96,-14 42,-8 18,72 -108,78" fill="#64748b" />
+          <polygon points="42,-8 114,22 136,84 18,72" fill="#526278" />
+          <polygon points="128,-74 176,12 136,84 114,22" fill="#334155" />
+          <polygon points="-24,-26 14,-34 38,-18 18,-4 -20,-8" fill="#64748b" />
+          <polygon points="-12,-22 12,-26 26,-16 12,-8 -10,-10" fill="#334155" />
         </g>
       </svg>
     `;
