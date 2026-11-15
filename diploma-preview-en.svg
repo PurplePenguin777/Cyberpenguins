@@ -83,10 +83,10 @@
   </g>
 
   <!-- Encabezado de la Academia -->
-  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" letter-spacing="3.5" fill="#7ee8fa" opacity="0.92">SPACE EXPLORATION ACADEMY · CYBERPENGUIN: THE EXPLORERS WE MUST NEVER FORGET</text>
+  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="#7ee8fa" opacity="0.92">Space Exploration Academy · Cyberpenguin: The Explorers We Must Never Forget</text>
 
   <!-- Título Principal del Diploma -->
-  <text x="500" y="152" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="1.2" fill="url(#goldGrad)" filter="url(#goldGlow)">HONORARY ASTRONAUTICAL DIPLOMA</text>
+  <text x="500" y="152" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="0.5" fill="url(#goldGrad)" filter="url(#goldGlow)">Honorary astronautical diploma</text>
 
   <!-- Divisor Ornamental Central -->
   <g transform="translate(500, 172)" stroke="url(#goldBorderGrad)" stroke-width="1.2">
@@ -99,7 +99,7 @@
   <text x="500" y="206" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="14.5" font-weight="500" fill="#94a3b8">Conferred with official distinction and highest merit to:</text>
 
   <!-- Nombre del Cadete / Astronauta (Gran Protagonista) -->
-  <text x="500" y="262" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="38" font-weight="800" letter-spacing="0.8" fill="#ffffff" filter="url(#goldGlow)">Sofía Martínez</text>
+  <text x="500" y="262" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="38" font-weight="800" letter-spacing="0.8" fill="#ffffff" filter="url(#goldGlow)">Cosmic explorer</text>
   <path d="M 320 278 Q 500 286 680 278" fill="none" stroke="url(#goldBorderGrad)" stroke-width="2" opacity="0.75" />
 
   <!-- Mérito Académico y Misiones (Narrativa Educativa NASA) -->
@@ -111,19 +111,19 @@
   <g transform="translate(140, 376)">
     <!-- Luna -->
     <rect x="0" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
-    <text x="112" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🌕 THE MOON · Surveyor 3 & Apollo 11</text>
+    <text x="112" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🌕 The Moon · Surveyor 3 & Apollo 11</text>
     <!-- Marte -->
     <rect x="247" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
-    <text x="360" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🔴 MARS · Viking 1 & Sojourner</text>
+    <text x="360" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🔴 Mars · Viking 1 & Sojourner</text>
     <!-- Espacio Profundo -->
     <rect x="495" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
-    <text x="607" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🌌 DEEP SPACE · Pioneer 10 & NEAR</text>
+    <text x="607" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🌌 Deep space · Pioneer 10 & NEAR</text>
   </g>
 
   <!-- Píldora de Rango Oficial y Estrellas Obtenidas -->
   <g transform="translate(260, 428)">
     <rect x="0" y="0" width="480" height="32" rx="16" fill="rgba(234,179,8,0.12)" stroke="rgba(234,179,8,0.4)" stroke-width="1.2" />
-    <text x="240" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="1.2" fill="#fde047">★ 15/15 COSMIC STARS · RANK: COMMANDER</text>
+    <text x="240" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="0.8" fill="#fde047">★ 0/15 cosmic stars · Rank: Apprentice</text>
   </g>
 
   <!-- SELLO DORADO HOLOGRÁFICO CON HUELLA OFICIAL (CENTRO) -->
@@ -144,7 +144,7 @@
     </g>
   </g>
   <!-- Texto circular alrededor del sello -->
-  <text x="500" y="632" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="800" letter-spacing="2" fill="#fef08a">CYBERPENGUIN: THE EXPLORERS WE MUST NEVER FORGET</text>
+  <text x="500" y="632" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="800" letter-spacing="0.8" fill="#fef08a">Cyberpenguin: The Explorers We Must Never Forget</text>
 
   <!-- FIRMA IZQUIERDA: COMANDANTE CYBERPENGUIN -->
   <g transform="translate(180, 525)">
@@ -154,8 +154,8 @@
     <circle cx="152" cy="18" r="2.2" fill="#ffbe76" />
     <line x1="0" y1="36" x2="190" y2="36" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
     <text x="95" y="52" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">Cyberpenguin</text>
-    <text x="95" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#94a3b8">Flight Commander</text>
-    <text x="95" y="78" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="400" fill="#64748b">Chief of Planetary Exploration</text>
+    <text x="95" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#94a3b8">Flight commander</text>
+    <text x="95" y="78" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="400" fill="#64748b">Chief of planetary exploration</text>
   </g>
 
   <!-- FIRMA DERECHA: IA DE LA NAVE (CONTROL DE MISIÓN) -->
@@ -164,11 +164,11 @@
     <path d="M 10 20 L 40 20 L 50 2 L 60 38 L 70 8 L 80 30 L 90 20 L 120 20 L 130 10 L 140 28 L 150 20 L 180 20" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
     <line x1="0" y1="36" x2="190" y2="36" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
     <text x="95" y="52" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">Ship's AI (Paulina)</text>
-    <text x="95" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#94a3b8">Mission Control & Telemetry</text>
+    <text x="95" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#94a3b8">Mission control & telemetry</text>
     <text x="95" y="78" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="400" fill="#64748b">NASA Deep Space Network</text>
   </g>
 
   <!-- Pie de Página: Código Único de Bitácora y Fecha de Emisión -->
-  <text x="50" y="664" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="1.5" fill="#64748b">MISSION CODE: NASA-CP-2026-X89</text>
-  <text x="950" y="664" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="1.5" fill="#64748b">DATE: November 15, 2026</text>
+  <text x="50" y="664" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="0.8" fill="#64748b">Mission code: NASA-CP-2026-X89</text>
+  <text x="950" y="664" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="0.8" fill="#64748b">Date: November 15, 2026</text>
 </svg>

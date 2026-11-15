@@ -990,8 +990,8 @@ a:focus-visible {
   color: rgba(245, 247, 255, 0.85);
   font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
   white-space: nowrap;
   pointer-events: none;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
@@ -1032,8 +1032,8 @@ a:focus-visible {
 .chapter-card-numeral {
   font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-transform: none;
   color: rgba(126, 232, 250, 0.88);
 }
 
@@ -1072,8 +1072,8 @@ a:focus-visible {
   margin: 0;
   font-size: 0.8rem;
   font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
   color: rgba(245, 247, 255, 0.78);
 }
 
@@ -2016,8 +2016,8 @@ a:focus-visible {
 .dialogue-speaker-tag {
   font-size: 0.76rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
   text-align: center;
   white-space: nowrap;
   flex-shrink: 0;
@@ -2241,8 +2241,8 @@ a:focus-visible {
 .speech-bubble-name {
   font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;

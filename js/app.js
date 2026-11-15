@@ -227,7 +227,7 @@
     if (quizTravelBtn) quizTravelBtn.textContent = isEn ? 'Travel' : 'Viajar';
 
     const pauseTitle = dom.pauseModal ? dom.pauseModal.querySelector('h2') : null;
-    if (pauseTitle) pauseTitle.textContent = isEn ? 'Mission Paused' : 'Misión en Pausa';
+    if (pauseTitle) pauseTitle.textContent = isEn ? 'Mission paused' : 'Misión en pausa';
     const pauseSub = dom.pauseModal ? dom.pauseModal.querySelector('p') : null;
     if (pauseSub) pauseSub.textContent = isEn ? 'Exploration temporarily on hold.' : 'Exploración detenida temporalmente.';
     const pauseResume = document.getElementById('pause-resume-btn');
@@ -256,15 +256,15 @@
 
     // Textos del modal de Certificado / Diploma de Honor
     if (dom.certModalTitle) {
-      dom.certModalTitle.textContent = isEn ? 'Honorary Astronautical Diploma' : 'Diploma de Honor Astronáutico';
+      dom.certModalTitle.textContent = isEn ? 'Honorary astronautical diploma' : 'Diploma de honor astronáutico';
     }
     if (dom.certModalSubtitle) {
       dom.certModalSubtitle.textContent = isEn
         ? 'Cyberpenguin: The Explorers We Must Never Forget · NASA Space Archives'
-        : 'Cyberpenguin: The Explorers We Must Never Forget · Archivos Espaciales de la NASA';
+        : 'Cyberpenguin: The Explorers We Must Never Forget · Archivos de la NASA';
     }
     if (dom.certCadetLabel) {
-      dom.certCadetLabel.textContent = isEn ? 'Astronaut Name on Diploma:' : 'Nombre del Astronauta en el Diploma:';
+      dom.certCadetLabel.textContent = isEn ? 'Astronaut name on diploma:' : 'Nombre del astronauta en el diploma:';
     }
     if (dom.certificateCadetInput) {
       dom.certificateCadetInput.placeholder = isEn ? 'Your name...' : 'Tu nombre...';
@@ -276,7 +276,7 @@
       dom.downloadSvgText.textContent = isEn ? 'Download SVG' : 'Descargar SVG';
     }
     if (dom.downloadPngText) {
-      dom.downloadPngText.textContent = isEn ? 'Download Diploma (PNG)' : 'Descargar Diploma (PNG)';
+      dom.downloadPngText.textContent = isEn ? 'Download diploma (PNG)' : 'Descargar diploma (PNG)';
     }
 
     if (dom.certificateModal && !dom.certificateModal.classList.contains('is-hidden')) {
@@ -1058,17 +1058,17 @@
     {
       quote: '«Las cosas difíciles son las que más vale la pena intentar»',
       name: 'Margaret Hamilton',
-      role: 'Directora de Software Apolo · NASA'
+      role: 'Directora de software Apolo · NASA'
     },
     {
       quote: '«El trabajo en equipo y la curiosidad convierten lo imposible en realidad»',
       name: 'Gene Kranz',
-      role: 'Director de Vuelo Apolo 11 · NASA'
+      role: 'Director de vuelo Apolo 11 · NASA'
     },
     {
       quote: '«Apunta a las estrellas: con dedicación y ciencia no existen límites»',
       name: 'Katherine Johnson',
-      role: 'Matemática e Ingeniera de la NASA'
+      role: 'Matemática e ingeniera de la NASA'
     }
   ];
 
@@ -1169,7 +1169,7 @@
           `;
         } else {
           dom.travelCinematicCaption.innerHTML = `
-            <p class="text-sm sm:text-base font-medium uppercase tracking-[0.2em] text-slate-200/90 text-center">${step.label || ''}</p>
+            <p class="text-sm sm:text-base font-medium tracking-wide text-slate-200/90 text-center">${step.label || ''}</p>
           `;
         }
       }
@@ -2965,7 +2965,7 @@
       desc: 'Muestra traída por Neil Armstrong. Es muy rica en ilmenita, un mineral de hierro y titanio del que los científicos pueden extraer oxígeno para respirar.'
     },
     'sample-moon-5': {
-      title: 'Anortosita (Corteza primordial)',
+      title: 'Anortosita (corteza primordial)',
       site: 'Tierras altas lunares · La Luna',
       desc: 'Un pedazo de la corteza original de la Luna de hace 4,400 millones de años. Flotó sobre un océano global de magma cuando la Luna recién se había formado.'
     },
@@ -2980,7 +2980,7 @@
       desc: 'Piedra de lava volcánica llena de agujeros formados por gases calientes. Su tono rojizo proviene del polvo de óxido de hierro que cubre todo el planeta.'
     },
     'sample-mars-2': {
-      title: 'Concreción de hematita («Arándano»)',
+      title: 'Concreción de hematita («arándano»)',
       site: 'Llanuras sedimentarias · Marte',
       desc: 'Pequeña esfera mineral de óxido de hierro. Solo puede crecer dentro de agua líquida subterránea, demostrando que Marte tuvo agua en su pasado remoto.'
     },
@@ -3006,17 +3006,84 @@
     }
   };
 
+  const SAMPLE_DETAILS_EN = {
+    'sample-moon-1': {
+      title: 'Olivine lunar basalt',
+      site: 'Apollo 12 mission · Oceanus Procellarum',
+      desc: 'Dark volcanic rock rich in iron and magnesium. Formed 3.2 billion years ago when massive rivers of liquid lava flooded this lunar plain.'
+    },
+    'sample-moon-2': {
+      title: 'Lunar impact breccia',
+      site: 'Surveyor Crater · The Moon',
+      desc: 'Fragments of varied rocks pulverized and fused together by immense heat and pressure when an asteroid struck the lunar surface.'
+    },
+    'sample-moon-3': {
+      title: 'Agglutinate lunar regolith',
+      site: 'Procellarum Plains · The Moon',
+      desc: 'Fine soil composed of pulverized dust and tiny crystals created over billions of years by micrometeorite impacts in the vacuum of space.'
+    },
+    'sample-moon-4': {
+      title: 'Ilmenite basalt (titanium-rich)',
+      site: 'Apollo 11 mission · Mare Tranquillitatis',
+      desc: 'Sample retrieved by Neil Armstrong. Abundant in ilmenite, an iron-titanium mineral from which future explorers can extract breathable oxygen.'
+    },
+    'sample-moon-5': {
+      title: 'Anorthosite (primordial crust)',
+      site: 'Lunar highlands · The Moon',
+      desc: 'A piece of the Moon\'s original crust dating back 4.4 billion years. It floated atop a global magma ocean when the Moon was newly formed.'
+    },
+    'sample-moon-6': {
+      title: 'Volcanic glass spherule',
+      site: 'Apollo 11 mission · Mare Tranquillitatis',
+      desc: 'Tiny natural glass bead. Created when ancient lunar fire fountains sprayed molten droplets into the freeze of space, chilling before hitting the ground.'
+    },
+    'sample-mars-1': {
+      title: 'Martian vesicular basalt',
+      site: 'Viking 1 mission · Chryse Planitia',
+      desc: 'Volcanic lava rock dotted with gas bubbles. Its rusty tone comes from iron oxide dust covering the entire planet.'
+    },
+    'sample-mars-2': {
+      title: 'Hematite concretion («blueberry»)',
+      site: 'Sedimentary plains · Mars',
+      desc: 'Small spherical iron oxide mineral. Only forms in the presence of liquid groundwater, proving that Mars was once a watery world.'
+    },
+    'sample-mars-3': {
+      title: 'Duricrust sulfate crust',
+      site: 'Viking 1 mission · Chryse Planitia',
+      desc: 'Hardened salt crust uncovered by Viking 1\'s robotic arm. Left behind as ancient mineral-rich Martian lakes evaporated.'
+    },
+    'sample-mars-4': {
+      title: 'Andesite rock «Barnacle Bill»',
+      site: 'Mars Pathfinder / Sojourner · Ares Vallis',
+      desc: 'The very first extraterrestrial rock analyzed by Sojourner in 1997. High silica content revealed complex volcanic evolution on Mars.'
+    },
+    'sample-mars-5': {
+      title: 'Basaltic megaboulder «Yogi»',
+      site: 'Mars Pathfinder / Sojourner · Ares Vallis',
+      desc: 'A 1.5-meter-high volcanic boulder smoothed and dragged by a catastrophic ancient flood that surged through Ares Vallis millions of years ago.'
+    },
+    'sample-mars-6': {
+      title: 'Cemented sediment «Scooby Doo»',
+      site: 'Mars Pathfinder · Ares Vallis',
+      desc: 'Tough, hard mineral crust. When Sojourner attempted to scrape it with its metal wheels, the rock stood firm without a scratch.'
+    }
+  };
+
   function openSampleDiscoveryModal(chapter, sampleObj) {
     if (!chapter || !sampleObj) return;
     pendingSampleToCollect = { chapter, sampleObj };
-    const details = SAMPLE_DETAILS[sampleObj.id] || {
-      title: sampleObj.label || 'Roca espacial',
+    const isEn = (state.currentLanguage === 'en');
+    const detailsMap = isEn ? SAMPLE_DETAILS_EN : SAMPLE_DETAILS;
+    const details = detailsMap[sampleObj.id] || {
+      title: sampleObj.label || (isEn ? 'Space rock' : 'Roca espacial'),
       site: chapter.name,
-      desc: 'Un fragmento de roca recogido en la superficie para guardar y analizar en tu pasaporte.'
+      desc: isEn
+        ? 'A rock fragment gathered on the surface to keep and analyze in your passport.'
+        : 'Un fragmento de roca recogido en la superficie para guardar y analizar en tu pasaporte.'
     };
 
     if (dom.sampleDiscoveryTitle) {
-      dom.sampleDiscoveryTitle.textContent = details.title || sampleObj.label || 'Roca espacial';
+      dom.sampleDiscoveryTitle.textContent = details.title || sampleObj.label || (isEn ? 'Space rock' : 'Roca espacial');
     }
     if (dom.sampleDiscoverySite) {
       dom.sampleDiscoverySite.textContent = details.site || chapter.name;
@@ -3025,7 +3092,10 @@
       dom.sampleDiscoveryDesc.textContent = details.desc;
     }
     if (dom.sampleDiscoveryType) {
-      dom.sampleDiscoveryType.textContent = details.type || '';
+      dom.sampleDiscoveryType.textContent = isEn ? 'Rock sample' : 'Muestra de roca';
+    }
+    if (dom.sampleDiscoveryCollectBtn) {
+      dom.sampleDiscoveryCollectBtn.textContent = isEn ? 'Store in backpack' : 'Guardar en la mochila';
     }
     if (dom.sampleDiscoveryCrystal) {
       const variant = typeof sampleObj.variant === 'number' ? sampleObj.variant : 0;
@@ -3334,11 +3404,11 @@
       : today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
     const txtAcademy = isEn
-      ? 'SPACE EXPLORATION ACADEMY · CYBERPENGUIN: THE EXPLORERS WE MUST NEVER FORGET'
-      : 'ACADEMIA DE EXPLORACIÓN ESPACIAL · CYBERPENGUIN: THE EXPLORERS WE MUST NEVER FORGET';
+      ? 'Space Exploration Academy · Cyberpenguin: The Explorers We Must Never Forget'
+      : 'Academia de exploración espacial · Cyberpenguin: The Explorers We Must Never Forget';
     const txtDiploma = isEn
-      ? 'HONORARY ASTRONAUTICAL DIPLOMA'
-      : 'DIPLOMA DE HONOR ASTRONÁUTICO';
+      ? 'Honorary astronautical diploma'
+      : 'Diploma de honor astronáutico';
     const txtConferred = isEn
       ? 'Conferred with official distinction and highest merit to:'
       : 'Conferido con distinción oficial y máximo mérito científico a:';
@@ -3351,19 +3421,19 @@
     const txtBody3 = isEn
       ? 'investigating humanity\'s 6 pioneer space probes and collecting cosmic planetary samples.'
       : 'investigando las 6 sondas pioneras de la humanidad y recolectando valiosas muestras cósmicas.';
-    const txtMoon = isEn ? 'THE MOON · Surveyor 3 & Apollo 11' : 'LUNA · Surveyor 3 & Apollo 11';
-    const txtMars = isEn ? 'MARS · Viking 1 & Sojourner' : 'MARTE · Viking 1 & Sojourner';
-    const txtDeep = isEn ? 'DEEP SPACE · Pioneer 10 & NEAR' : 'ESPACIO PROFUNDO · Pioneer 10 & NEAR';
+    const txtMoon = isEn ? 'The Moon · Surveyor 3 & Apollo 11' : 'La Luna · Surveyor 3 & Apollo 11';
+    const txtMars = isEn ? 'Mars · Viking 1 & Sojourner' : 'Marte · Viking 1 & Sojourner';
+    const txtDeep = isEn ? 'Deep space · Pioneer 10 & NEAR' : 'Espacio profundo · Pioneer 10 & NEAR';
     const txtStars = isEn
-      ? `★ ${totalStars}/15 COSMIC STARS · RANK: ${badge.name.toUpperCase()}`
-      : `★ ${totalStars}/15 ESTRELLAS CÓSMICAS · RANGO: ${badge.name.toUpperCase()}`;
-    const txtSignCommander = isEn ? 'Flight Commander' : 'Comandante de Vuelo';
-    const txtSignCommanderRole = isEn ? 'Chief of Planetary Exploration' : 'Jefe de Expedición Planetaria';
-    const txtSignAI = isEn ? "Ship's AI (Paulina)" : 'IA de la Nave (Paulina)';
-    const txtSignAIRole = isEn ? 'Mission Control & Telemetry' : 'Control de Misión & Telemetría';
-    const txtSeal = 'CYBERPENGUIN: THE EXPLORERS WE MUST NEVER FORGET';
-    const txtMissionId = isEn ? 'MISSION CODE: NASA-CP-2026-X89' : 'CÓDIGO DE MISIÓN: NASA-CP-2026-X89';
-    const txtDateLabel = isEn ? `DATE: ${dateFormatted}` : `FECHA: ${dateFormatted}`;
+      ? `★ ${totalStars}/15 cosmic stars · Rank: ${badge.name}`
+      : `★ ${totalStars}/15 estrellas cósmicas · Rango: ${badge.name}`;
+    const txtSignCommander = isEn ? 'Flight commander' : 'Comandante de vuelo';
+    const txtSignCommanderRole = isEn ? 'Chief of planetary exploration' : 'Jefe de expedición planetaria';
+    const txtSignAI = isEn ? "Ship's AI (Paulina)" : 'IA de la nave (Paulina)';
+    const txtSignAIRole = isEn ? 'Mission control & telemetry' : 'Control de misión & telemetría';
+    const txtSeal = 'Cyberpenguin: The Explorers We Must Never Forget';
+    const txtMissionId = isEn ? 'Mission code: NASA-CP-2026-X89' : 'Código de misión: NASA-CP-2026-X89';
+    const txtDateLabel = isEn ? `Date: ${dateFormatted}` : `Fecha: ${dateFormatted}`;
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700">
@@ -3450,10 +3520,10 @@
   </g>
 
   <!-- Encabezado de la Academia -->
-  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" letter-spacing="3.5" fill="#7ee8fa" opacity="0.92">${txtAcademy}</text>
+  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="#7ee8fa" opacity="0.92">${txtAcademy}</text>
 
   <!-- Título Principal del Diploma -->
-  <text x="500" y="152" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="1.2" fill="url(#goldGrad)" filter="url(#goldGlow)">${txtDiploma}</text>
+  <text x="500" y="152" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="0.5" fill="url(#goldGrad)" filter="url(#goldGlow)">${txtDiploma}</text>
 
   <!-- Divisor Ornamental Central -->
   <g transform="translate(500, 172)" stroke="url(#goldBorderGrad)" stroke-width="1.2">
@@ -3490,7 +3560,7 @@
   <!-- Píldora de Rango Oficial y Estrellas Obtenidas -->
   <g transform="translate(260, 428)">
     <rect x="0" y="0" width="480" height="32" rx="16" fill="rgba(234,179,8,0.12)" stroke="rgba(234,179,8,0.4)" stroke-width="1.2" />
-    <text x="240" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="1.2" fill="#fde047">${txtStars}</text>
+    <text x="240" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="0.8" fill="#fde047">${txtStars}</text>
   </g>
 
   <!-- SELLO DORADO HOLOGRÁFICO CON HUELLA OFICIAL (CENTRO) -->
@@ -3511,7 +3581,7 @@
     </g>
   </g>
   <!-- Texto circular alrededor del sello -->
-  <text x="500" y="632" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="800" letter-spacing="2" fill="#fef08a">${txtSeal}</text>
+  <text x="500" y="632" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="800" letter-spacing="0.8" fill="#fef08a">${txtSeal}</text>
 
   <!-- FIRMA IZQUIERDA: COMANDANTE CYBERPENGUIN -->
   <g transform="translate(180, 525)">
@@ -3536,8 +3606,8 @@
   </g>
 
   <!-- Pie de Página: Código Único de Bitácora y Fecha de Emisión -->
-  <text x="50" y="664" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="1.5" fill="#64748b">${txtMissionId}</text>
-  <text x="950" y="664" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="1.5" fill="#64748b">${txtDateLabel}</text>
+  <text x="50" y="664" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="0.8" fill="#64748b">${txtMissionId}</text>
+  <text x="950" y="664" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="0.8" fill="#64748b">${txtDateLabel}</text>
 </svg>`;
   }
 
