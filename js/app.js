@@ -573,9 +573,21 @@
   }
 
   const NASA_INSPIRATIONAL_QUOTES = [
-    { quote: '«Las cosas difíciles son las que más vale la pena intentar.»', author: 'Margaret Hamilton · Directora de Software Apolo, NASA' },
-    { quote: '«El trabajo en equipo y la curiosidad convierten lo imposible en realidad.»', author: 'Gene Kranz · Director de Vuelo Apolo 11' },
-    { quote: '«Apunta a las estrellas: con dedicación y ciencia no existen límites.»', author: 'Katherine Johnson · Matemática e Ingeniera de la NASA' }
+    {
+      quote: '«Las cosas difíciles son las que más vale la pena intentar.»',
+      name: 'Margaret Hamilton',
+      role: 'Directora de Software Apolo · NASA'
+    },
+    {
+      quote: '«El trabajo en equipo y la curiosidad convierten lo imposible en realidad.»',
+      name: 'Gene Kranz',
+      role: 'Director de Vuelo Apolo 11 · NASA'
+    },
+    {
+      quote: '«Apunta a las estrellas: con dedicación y ciencia no existen límites.»',
+      name: 'Katherine Johnson',
+      role: 'Matemática e Ingeniera de la NASA'
+    }
   ];
 
   function startLaunchCinematic() {
@@ -587,10 +599,12 @@
     dom.launchShipWrapper.classList.remove('igniting', 'blasting-off');
 
     const quoteEl = document.getElementById('launch-quote-text');
-    const authorEl = document.getElementById('launch-quote-author');
-    if (quoteEl && authorEl) {
+    const nameEl = document.getElementById('launch-quote-name');
+    const roleEl = document.getElementById('launch-quote-role');
+    if (quoteEl && nameEl && roleEl) {
       quoteEl.textContent = NASA_INSPIRATIONAL_QUOTES[0].quote;
-      authorEl.textContent = NASA_INSPIRATIONAL_QUOTES[0].author;
+      nameEl.textContent = NASA_INSPIRATIONAL_QUOTES[0].name;
+      roleEl.textContent = NASA_INSPIRATIONAL_QUOTES[0].role;
     }
 
     dom.launchScreen.classList.add('igniting-pad');
@@ -610,18 +624,18 @@
       playTravelSequence([
         {
           key: 'earth-liftoff',
-          label: `${NASA_INSPIRATIONAL_QUOTES[0].quote} — ${NASA_INSPIRATIONAL_QUOTES[0].author}`,
-          duration: 2000
+          quoteData: NASA_INSPIRATIONAL_QUOTES[0],
+          duration: 2300
         },
         {
           key: 'atmosphere-exit',
-          label: `${NASA_INSPIRATIONAL_QUOTES[1].quote} — ${NASA_INSPIRATIONAL_QUOTES[1].author}`,
-          duration: 2000
+          quoteData: NASA_INSPIRATIONAL_QUOTES[1],
+          duration: 2300
         },
         {
           key: 'moon-arrival',
-          label: `${NASA_INSPIRATIONAL_QUOTES[2].quote} — ${NASA_INSPIRATIONAL_QUOTES[2].author}`,
-          duration: 2000
+          quoteData: NASA_INSPIRATIONAL_QUOTES[2],
+          duration: 2300
         }
       ], () => {
         finishOpeningLaunch();
@@ -663,7 +677,17 @@
       const step = steps[idx];
       dom.travelCinematicStage.innerHTML = MODELS.travelCinematicSvg(step.key);
       if (dom.travelCinematicCaption) {
-        dom.travelCinematicCaption.textContent = step.label || '';
+        if (step.quoteData) {
+          dom.travelCinematicCaption.innerHTML = `
+            <p class="text-base sm:text-xl md:text-2xl font-medium tracking-tight text-white leading-snug drop-shadow-lg text-center">${step.quoteData.quote}</p>
+            <p class="text-sm sm:text-base md:text-lg font-semibold text-cyan-300 pt-0.5 sm:pt-1 text-center drop-shadow">${step.quoteData.name}</p>
+            <p class="text-xs sm:text-sm md:text-base font-normal text-slate-300/90 tracking-wide text-center">${step.quoteData.role}</p>
+          `;
+        } else {
+          dom.travelCinematicCaption.innerHTML = `
+            <p class="text-sm sm:text-base font-medium uppercase tracking-[0.2em] text-slate-200/90 text-center">${step.label || ''}</p>
+          `;
+        }
       }
       if (dom.travelCinematicDots) {
         dom.travelCinematicDots.querySelectorAll('.travel-dot').forEach((dot, dIdx) => {

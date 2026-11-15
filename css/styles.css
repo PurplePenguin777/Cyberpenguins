@@ -356,12 +356,27 @@ a:focus-visible {
   z-index: 5;
   align-self: flex-end;
   width: 100%;
-  padding: 1.5rem 2rem;
+  padding: clamp(1rem, 3vh, 2rem) clamp(0.75rem, 3vw, 2.5rem);
   display: grid;
   grid-template-columns: 40px 1fr 40px;
   align-items: center;
-  gap: 1rem;
-  background: linear-gradient(to top, rgba(4, 7, 18, 0.72) 0%, transparent 100%);
+  gap: 0.75rem;
+  background: linear-gradient(to top, rgba(4, 7, 18, 0.92) 0%, rgba(4, 7, 18, 0.6) 65%, transparent 100%);
+}
+
+@media (max-width: 640px) {
+  .travel-cinematic-ui {
+    grid-template-columns: 1fr auto;
+    padding: 1rem 0.85rem;
+  }
+
+  .travel-cinematic-meta {
+    grid-column: 1;
+  }
+
+  #travel-skip-btn {
+    grid-column: 2;
+  }
 }
 
 .travel-cinematic-meta {

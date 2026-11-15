@@ -75,16 +75,18 @@
       <path d="M 0,625 Q 600,595 1200,625 L 1200,700 L 0,700 Z" fill="#0f182e" />
     </svg>
 
-    <!-- Cartela minimalista con frase motivadora de ingeniería espacial NASA -->
+    <!-- Cartela con frase motivadora en 3 líneas: Frase, Nombre y Cargo -->
     <div id="launch-title-card"
-      class="launch-title-card pointer-events-none relative z-10 text-center flex flex-col items-center justify-center gap-1 px-4 pt-2 max-w-lg w-full mx-auto">
-      <span class="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.22em] text-cyan-300/80 text-center">NASA · Curiosidad y Exploración</span>
-      <p id="launch-quote-text" class="text-xs sm:text-sm md:text-base font-medium text-slate-100 text-center leading-snug drop-shadow-md">
+      class="launch-title-card pointer-events-none relative z-10 text-center flex flex-col items-center justify-center gap-1 sm:gap-1.5 px-4 pt-3 sm:pt-4 max-w-2xl w-full mx-auto">
+      <p id="launch-quote-text" class="text-base sm:text-xl md:text-2xl font-medium tracking-tight text-white leading-snug drop-shadow-lg text-center">
         «Las cosas difíciles son las que más vale la pena intentar.»
       </p>
-      <span id="launch-quote-author" class="text-[10px] sm:text-[11px] text-cyan-200/70 text-center font-normal">
-        Margaret Hamilton · Directora de Software Apolo, NASA
-      </span>
+      <p id="launch-quote-name" class="text-sm sm:text-base md:text-lg font-semibold text-cyan-300 pt-0.5 sm:pt-1 text-center drop-shadow">
+        Margaret Hamilton
+      </p>
+      <p id="launch-quote-role" class="text-xs sm:text-sm md:text-base font-normal text-slate-300/90 tracking-wide text-center">
+        Directora de Software Apolo · NASA
+      </p>
     </div>
 
     <div class="relative z-10 w-full flex flex-col items-center justify-center my-auto scale-90 sm:scale-100 transition-transform">
@@ -171,8 +173,8 @@
     <div class="travel-cinematic-ui">
       <div class="travel-cinematic-meta">
         <div id="travel-cinematic-dots" class="travel-cinematic-dots" aria-hidden="true"></div>
-        <p id="travel-cinematic-caption"
-          class="travel-cinematic-caption text-xs sm:text-sm font-medium tracking-normal text-slate-100/95 max-w-xl text-center leading-relaxed"></p>
+        <div id="travel-cinematic-caption"
+          class="travel-cinematic-caption w-full flex flex-col items-center justify-center gap-1 sm:gap-1.5 text-center max-w-2xl mx-auto px-2"></div>
       </div>
       <button id="travel-skip-btn" type="button" aria-label="Saltar"
         class="squircle-btn w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 text-slate-100 shrink-0">
