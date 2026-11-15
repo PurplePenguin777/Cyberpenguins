@@ -948,11 +948,6 @@
 
   // Diálogo final ramificado desde la cabina de la nave de Cyberpenguin
   const FINAL_BRANCHING_DIALOGUE = {
-    greeting: {
-      speaker: 'ship',
-      text: '¡Bienvenido a bordo, Comandante Cyberpenguin! Todos los sistemas están al 100%. Motores iónicos listos y pasaporte de descubrimientos verificado con honores máximos.',
-      audioUrl: 'audio/ia_nave_bienvenida.mp3'
-    },
     penguinIntro: {
       speaker: 'penguin',
       text: '¡Lo logramos, explorador espacial! ¡Mira nuestro pasaporte! Hemos viajado desde el polvo gris de la Luna, pisamos el óxido rojizo de Marte y flotamos junto a sondas legendarias en el espacio profundo.',
@@ -2118,11 +2113,6 @@ const CHAPTERS_EN = [
 };
 
   const FINAL_BRANCHING_DIALOGUE_EN = {
-  "greeting": {
-    "speaker": "ship",
-    "text": "Welcome aboard, Commander Cyberpenguin! All systems operational at one hundred percent. Ion thrusters primed, and discovery passport verified with supreme honors.",
-    "audioUrl": "audio/en/ia_nave_bienvenida.mp3"
-  },
   "penguinIntro": {
     "speaker": "penguin",
     "text": "We did it, space explorer! Look at our passport! We traveled from the gray dust of the Moon, stepped onto the rusty iron of Mars, and floated alongside legendary robotic probes in deep space.",

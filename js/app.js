@@ -2861,28 +2861,14 @@
       return;
     }
 
-    activeDialogueMachine = { id: 'final-scene', name: shipName };
-    const shipSvg = MODELS.spaceship ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true }) : '';
+    activeDialogueMachine = { id: 'final-scene', name: 'Cyberpenguin' };
     const penguinSvg = MODELS.cyberpenguin ? MODELS.cyberpenguin('right') : '';
 
-    let finalStep = 'greeting';
+    let finalStep = 'penguinIntro';
     let chosenReflection = null;
 
     const renderFinal = () => {
-      if (finalStep === 'greeting') {
-        showSpeechBubbleStep({
-          speaker: 'ship',
-          name: 'Nave de Cyberpenguin',
-          avatarSvg: shipSvg,
-          text: finalTree.greeting.text,
-          audioUrl: finalTree.greeting.audioUrl,
-          anchorPos: shipPos,
-          onNext: () => {
-            finalStep = 'penguinIntro';
-            renderFinal();
-          }
-        });
-      } else if (finalStep === 'penguinIntro') {
+      if (finalStep === 'penguinIntro') {
         showSpeechBubbleStep({
           speaker: 'penguin',
           name: 'Cyberpenguin',
