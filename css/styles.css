@@ -2459,7 +2459,7 @@ a:focus-visible {
   opacity: 0.8;
 }
 
-/* Certificado minimalista */
+/* Certificado minimalista y Diploma de Honor */
 .certificate-frame {
   border-radius: 26px;
   background: linear-gradient(155deg, rgba(27, 36, 72, 0.92) 0%, rgba(12, 17, 38, 0.96) 100%);
@@ -2467,6 +2467,71 @@ a:focus-visible {
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.cadet-intro-card {
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cadet-intro-card.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.96);
+}
+
+#certificate-svg-wrapper svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 68vh;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #certificate-modal,
+  #certificate-modal * {
+    visibility: visible;
+  }
+  #certificate-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #certificate-modal .squircle-panel {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    background: transparent !important;
+  }
+  #certificate-modal .relative.w-full.flex,
+  #certificate-modal .w-full.flex.flex-col.sm\:flex-row,
+  #certificate-modal .w-full.flex.flex-wrap {
+    display: none !important;
+  }
+  #certificate-svg-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+  #certificate-svg-wrapper svg {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+  }
 }
 
 /* ==========================================================================

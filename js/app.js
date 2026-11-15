@@ -14,6 +14,7 @@
 
   const DEFAULT_STATE = {
     launched: false,
+    cadetName: '',
     currentLanguage: 'en', // Predeterminada en inglés si no se detecta español
     currentChapterId: 'moon',
     currentSiteByChapter: {
@@ -236,6 +237,54 @@
     const pauseHome = document.getElementById('pause-home-btn');
     if (pauseHome) pauseHome.textContent = isEn ? '✕ Return to main map' : '✕ Volver al mapa principal';
 
+    // Textos de registro inicial de cadete
+    if (dom.cadetIntroTitle) {
+      dom.cadetIntroTitle.textContent = isEn ? 'Welcome to Cyberpenguins!' : '¡Bienvenido(a) a Cyberpenguins!';
+    }
+    if (dom.cadetIntroSubtitle) {
+      dom.cadetIntroSubtitle.textContent = isEn
+        ? 'What is your name, Space Cadet? Enter your name to prepare your flight log and official NASA diploma.'
+        : '¿Cómo te llamas, Cadete Espacial? Escribe tu nombre para preparar tu bitácora de vuelo y tu diploma oficial de la NASA.';
+    }
+    if (dom.cadetIntroLabel) {
+      dom.cadetIntroLabel.textContent = isEn ? 'Astronaut Name:' : 'Nombre del Astronauta:';
+    }
+    if (dom.cadetFirstNameInput) {
+      dom.cadetFirstNameInput.placeholder = isEn ? 'Enter your name or callsign...' : 'Escribe tu nombre aquí...';
+    }
+    if (dom.cadetStartBtnText) {
+      dom.cadetStartBtnText.textContent = isEn ? 'Start Mission & Liftoff!' : '¡Comenzar Misión y Despegar!';
+    }
+
+    // Textos del modal de Certificado / Diploma de Honor
+    if (dom.certModalTitle) {
+      dom.certModalTitle.textContent = isEn ? 'Honorary Astronautical Diploma' : 'Diploma de Honor Astronáutico';
+    }
+    if (dom.certModalSubtitle) {
+      dom.certModalSubtitle.textContent = isEn
+        ? 'Cyberpenguins Mission & NASA Space Archives'
+        : 'Misión Cyberpenguins & Archivos Espaciales de la NASA';
+    }
+    if (dom.certCadetLabel) {
+      dom.certCadetLabel.textContent = isEn ? 'Astronaut Name on Diploma:' : 'Nombre del Astronauta en el Diploma:';
+    }
+    if (dom.certificateCadetInput) {
+      dom.certificateCadetInput.placeholder = isEn ? 'Your name...' : 'Tu nombre...';
+    }
+    if (dom.printCertText) {
+      dom.printCertText.textContent = isEn ? 'Print' : 'Imprimir';
+    }
+    if (dom.downloadSvgText) {
+      dom.downloadSvgText.textContent = isEn ? 'Download SVG' : 'Descargar SVG';
+    }
+    if (dom.downloadPngText) {
+      dom.downloadPngText.textContent = isEn ? 'Download Diploma (PNG)' : 'Descargar Diploma (PNG)';
+    }
+
+    if (dom.certificateModal && !dom.certificateModal.classList.contains('is-hidden')) {
+      renderCertificateSvgPreview();
+    }
+
     // Re-renderizar elementos de la interfaz según pantalla activa
     renderChapterNav();
     updateHUD();
@@ -302,7 +351,17 @@
       dom.launchScreen.classList.add('hidden-screen', 'is-hidden');
       showHomeScreen();
     } else {
-      startLaunchCinematic();
+      if (dom.cadetIntroCard) {
+        dom.cadetIntroCard.classList.remove('is-hidden');
+        if (dom.cadetFirstNameInput) {
+          dom.cadetFirstNameInput.value = state.cadetName || '';
+          setTimeout(() => {
+            try { dom.cadetFirstNameInput.focus(); } catch (_e) {}
+          }, 400);
+        }
+      } else {
+        startLaunchCinematic();
+      }
     }
   }
 
@@ -314,6 +373,13 @@
     dom.launchShipWrapper = document.getElementById('launch-ship-wrapper');
     dom.launchShipSvg = document.getElementById('launch-ship-svg');
     dom.launchBtn = document.getElementById('launch-btn');
+    dom.cadetIntroCard = document.getElementById('cadet-intro-card');
+    dom.cadetIntroTitle = document.getElementById('cadet-intro-title');
+    dom.cadetIntroSubtitle = document.getElementById('cadet-intro-subtitle');
+    dom.cadetIntroLabel = document.getElementById('cadet-intro-label');
+    dom.cadetFirstNameInput = document.getElementById('cadet-first-name-input');
+    dom.cadetStartBtn = document.getElementById('cadet-start-btn');
+    dom.cadetStartBtnText = document.getElementById('cadet-start-btn-text');
 
     dom.travelCinematic = document.getElementById('travel-cinematic');
     dom.travelCinematicStage = document.getElementById('travel-cinematic-stage');
@@ -414,10 +480,18 @@
     dom.badgesCloseBtn = document.getElementById('badges-close-btn');
 
     dom.certificateModal = document.getElementById('certificate-modal');
-    dom.certificateLevel = document.getElementById('certificate-level');
-    dom.certificatePaw = document.getElementById('certificate-paw');
+    dom.certModalTitle = document.getElementById('cert-modal-title');
+    dom.certModalSubtitle = document.getElementById('cert-modal-subtitle');
+    dom.certCadetLabel = document.getElementById('cert-cadet-label');
+    dom.certificateCadetInput = document.getElementById('certificate-cadet-input');
+    dom.certificateSvgWrapper = document.getElementById('certificate-svg-wrapper');
     dom.downloadCertificateBtn = document.getElementById('download-certificate-btn');
+    dom.downloadSvgCertificateBtn = document.getElementById('download-svg-certificate-btn');
+    dom.printCertificateBtn = document.getElementById('print-certificate-btn');
     dom.certificateCloseBtn = document.getElementById('certificate-close-btn');
+    dom.printCertText = document.getElementById('print-cert-text');
+    dom.downloadSvgText = document.getElementById('download-svg-text');
+    dom.downloadPngText = document.getElementById('download-png-text');
 
     dom.pauseModal = document.getElementById('pause-modal');
     dom.pauseResumeBtn = document.getElementById('pause-resume-btn');
@@ -430,7 +504,42 @@
       dom.orientationBanner.classList.add('dismissed');
     });
 
+    function submitCadetNameAndLaunch() {
+      const inputVal = (dom.cadetFirstNameInput && dom.cadetFirstNameInput.value) ? dom.cadetFirstNameInput.value.trim() : '';
+      const fallbackName = (state.currentLanguage === 'en') ? 'Junior Cosmic Explorer' : 'Joven Explorador(a) Cósmico(a)';
+      state.cadetName = inputVal || state.cadetName || fallbackName;
+      saveState();
+
+      if (dom.cadetIntroCard) {
+        dom.cadetIntroCard.classList.add('is-hidden');
+      }
+      playHarmony('launch');
+      triggerHaptic('jump');
+      startLaunchCinematic();
+    }
+
+    if (dom.cadetStartBtn) {
+      dom.cadetStartBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerHaptic('tap');
+        submitCadetNameAndLaunch();
+      });
+    }
+
+    if (dom.cadetFirstNameInput) {
+      dom.cadetFirstNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitCadetNameAndLaunch();
+        }
+      });
+    }
+
     dom.launchBtn.addEventListener('click', () => {
+      if (dom.cadetIntroCard && !dom.cadetIntroCard.classList.contains('is-hidden')) {
+        submitCadetNameAndLaunch();
+        return;
+      }
       if (isOpeningLaunch) {
         finishOpeningLaunch();
       } else {
@@ -459,8 +568,38 @@
     dom.openPassportBtn.addEventListener('click', openPassportModal);
     dom.openBadgesBtn.addEventListener('click', openBadgesModal);
     dom.openCertificateBtn.addEventListener('click', openCertificateModal);
-    dom.homeDownloadCertificateBtn.addEventListener('click', downloadCertificate);
-    dom.downloadCertificateBtn.addEventListener('click', downloadCertificate);
+
+    if (dom.certificateCadetInput) {
+      dom.certificateCadetInput.addEventListener('input', (e) => {
+        state.cadetName = e.target.value;
+        saveState();
+        renderCertificateSvgPreview();
+      });
+    }
+    if (dom.downloadCertificateBtn) {
+      dom.downloadCertificateBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        downloadCertificate('png');
+      });
+    }
+    if (dom.homeDownloadCertificateBtn) {
+      dom.homeDownloadCertificateBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        downloadCertificate('png');
+      });
+    }
+    if (dom.downloadSvgCertificateBtn) {
+      dom.downloadSvgCertificateBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        downloadCertificate('svg');
+      });
+    }
+    if (dom.printCertificateBtn) {
+      dom.printCertificateBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        printCertificate();
+      });
+    }
     if (dom.resetProgressBtn) {
       dom.resetProgressBtn.addEventListener('click', resetProgress);
     }
@@ -701,6 +840,7 @@
       return {
         ...cloneDefaultState(),
         ...parsed,
+        cadetName: parsed.cadetName || global.localStorage.getItem('cyberpenguins_cadet_name') || '',
         currentLanguage: (isManualChoice && (parsed.currentLanguage === 'es' || parsed.currentLanguage === 'en'))
           ? parsed.currentLanguage
           : resolvedLang,
@@ -727,6 +867,7 @@
     try {
       global.localStorage.setItem(DATA.STORAGE_KEY, JSON.stringify(state));
       global.localStorage.setItem('cyberpenguins_lang', state.currentLanguage || 'en');
+      global.localStorage.setItem('cyberpenguins_cadet_name', state.cadetName || '');
     } catch (_err) {
       // Ignorar si almacenamiento privado bloquea escritura
     }
@@ -829,7 +970,8 @@
       jump: { freqs: [440.0, 587.33, 783.99], gain: 0.036, stepMs: 38, duration: 0.24, wave: 'sine' },
       rcs: { freqs: [880.0, 1174.66], gain: 0.018, stepMs: 28, duration: 0.14, wave: 'triangle' },
       sample: { freqs: [523.25, 659.25, 783.99, 1046.5], gain: 0.05, stepMs: 65, duration: 0.55, wave: 'sine' },
-      arrival: { freqs: [261.63, 392.0, 493.88, 659.25], gain: 0.038, stepMs: 75, duration: 0.85, wave: 'sine' }
+      arrival: { freqs: [261.63, 392.0, 493.88, 659.25], gain: 0.038, stepMs: 75, duration: 0.85, wave: 'sine' },
+      launch: { freqs: [65.41, 82.41, 110.0, 146.83, 220.0, 329.63], gain: 0.05, stepMs: 80, duration: 0.9, wave: 'triangle' }
     };
     const preset = presets[type];
     if (!preset) return;
@@ -943,6 +1085,8 @@
 
     dom.launchScreen.classList.add('igniting-pad');
     dom.launchShipWrapper.classList.add('igniting');
+    playHarmony('launch');
+    triggerHaptic('jump');
 
     const t1 = setTimeout(() => {
       dom.launchShipWrapper.classList.remove('igniting');
@@ -3140,71 +3284,366 @@
 
   function openCertificateModal() {
     if (!areAllChaptersCompleted()) return;
-    const badge = getCurrentBadge();
-    dom.certificateLevel.textContent = badge.name;
-    dom.certificatePaw.innerHTML = MODELS.penguinPawStamp(true, 76);
-    if (dom.downloadCertificateBtn) {
-      dom.downloadCertificateBtn.disabled = false;
+    if (dom.certificateCadetInput) {
+      dom.certificateCadetInput.value = state.cadetName || '';
     }
+    renderCertificateSvgPreview();
     showModal(dom.certificateModal);
   }
 
+  function renderCertificateSvgPreview() {
+    if (!dom.certificateSvgWrapper) return;
+    dom.certificateSvgWrapper.innerHTML = buildCertificateSvg();
+  }
+
   function buildCertificateSvg() {
+    const isEn = (state.currentLanguage === 'en');
     const badge = getCurrentBadge();
-    const rawPaw = MODELS.penguinPawStamp(true, 96);
+    const totalStars = getTotalStars();
+    const cadetName = (state.cadetName && state.cadetName.trim())
+      ? state.cadetName.trim()
+      : (isEn ? 'Junior Cosmic Explorer' : 'Joven Explorador(a) Cósmico(a)');
+
+    const escapedName = cadetName
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+
+    const rawPaw = (MODELS && typeof MODELS.penguinPawStamp === 'function')
+      ? MODELS.penguinPawStamp(true, 68)
+      : '';
     const innerPaw = rawPaw
       .replace(/^[\s\S]*?<svg[^>]*>/i, '')
       .replace(/<\/svg>[\s\S]*$/i, '');
 
+    const today = new Date();
+    const dateFormatted = isEn
+      ? today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const txtAcademy = isEn
+      ? 'SPACE EXPLORATION ACADEMY · NASA ARCHIVES & CYBERPENGUINS'
+      : 'ACADEMIA DE EXPLORACIÓN ESPACIAL · NASA ARCHIVES & CYBERPENGUINS';
+    const txtDiploma = isEn
+      ? 'HONORARY ASTRONAUTICAL DIPLOMA'
+      : 'DIPLOMA DE HONOR ASTRONÁUTICO';
+    const txtConferred = isEn
+      ? 'Conferred with official distinction and highest merit to:'
+      : 'Conferido con distinción oficial y máximo mérito científico a:';
+    const txtBody1 = isEn
+      ? 'For outstanding bravery, scientific curiosity, and astrophysical dedication in completing'
+      : 'Por su destacada valentía, curiosidad científica y dedicación astrofísica al completar';
+    const txtBody2 = isEn
+      ? 'the interplanetary expedition across the Solar System aboard the Cyberpenguins spacecraft,'
+      : 'la gran expedición interplanetaria a través del Sistema Solar en la nave Cyberpenguins,';
+    const txtBody3 = isEn
+      ? 'investigating humanity\'s 6 pioneer space probes and collecting cosmic planetary samples.'
+      : 'investigando las 6 sondas pioneras de la humanidad y recolectando valiosas muestras cósmicas.';
+    const txtMoon = isEn ? 'THE MOON · Surveyor 3 & Apollo 11' : 'LUNA · Surveyor 3 & Apollo 11';
+    const txtMars = isEn ? 'MARS · Viking 1 & Sojourner' : 'MARTE · Viking 1 & Sojourner';
+    const txtDeep = isEn ? 'DEEP SPACE · Pioneer 10 & NEAR' : 'ESPACIO PROFUNDO · Pioneer 10 & NEAR';
+    const txtStars = isEn
+      ? `★ ${totalStars}/15 COSMIC STARS · RANK: ${badge.name.toUpperCase()}`
+      : `★ ${totalStars}/15 ESTRELLAS CÓSMICAS · RANGO: ${badge.name.toUpperCase()}`;
+    const txtSignCommander = isEn ? 'Flight Commander' : 'Comandante de Vuelo';
+    const txtSignCommanderRole = isEn ? 'Chief of Planetary Exploration' : 'Jefe de Expedición Planetaria';
+    const txtSignAI = isEn ? "Ship's AI (Paulina)" : 'IA de la Nave (Paulina)';
+    const txtSignAIRole = isEn ? 'Mission Control & Telemetry' : 'Control de Misión & Telemetría';
+    const txtSeal = isEn ? 'OFFICIAL MISSION ARCHIVE · CYBERPENGUINS' : 'MISIÓN OFICIAL CYBERPENGUINS · NASA';
+    const txtMissionId = isEn ? 'MISSION CODE: NASA-CP-2026-X89' : 'CÓDIGO DE MISIÓN: NASA-CP-2026-X89';
+    const txtDateLabel = isEn ? `DATE: ${dateFormatted}` : `FECHA: ${dateFormatted}`;
+
     return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" width="800" height="560">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700">
   <defs>
     <linearGradient id="certBg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#141c3d" />
-      <stop offset="100%" stop-color="#090d1f" />
+      <stop offset="0%" stop-color="#050817" />
+      <stop offset="45%" stop-color="#0c1638" />
+      <stop offset="100%" stop-color="#040714" />
     </linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="0.6">
+      <stop offset="0%" stop-color="#fef9c3" />
+      <stop offset="25%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="75%" stop-color="#ca8a04" />
+      <stop offset="100%" stop-color="#fef08a" />
+    </linearGradient>
+    <linearGradient id="goldBorderGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="25%" stop-color="#eab308" />
+      <stop offset="50%" stop-color="#fef9c3" />
+      <stop offset="75%" stop-color="#ca8a04" />
+      <stop offset="100%" stop-color="#fef08a" />
+    </linearGradient>
+    <linearGradient id="sealGoldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fffbeb" />
+      <stop offset="35%" stop-color="#fde047" />
+      <stop offset="70%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#78350f" />
+    </linearGradient>
+    <linearGradient id="ribbonGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e11d48" />
+      <stop offset="100%" stop-color="#881337" />
+    </linearGradient>
+    <radialGradient id="nebulaCyan" cx="20%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="rgba(56,189,248,0.12)" />
+      <stop offset="100%" stop-color="rgba(56,189,248,0)" />
+    </radialGradient>
+    <radialGradient id="nebulaGold" cx="80%" cy="75%" r="45%">
+      <stop offset="0%" stop-color="rgba(251,191,36,0.1)" />
+      <stop offset="100%" stop-color="rgba(251,191,36,0)" />
+    </radialGradient>
+    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
   </defs>
-  <rect width="800" height="560" rx="36" fill="url(#certBg)" />
-  <rect x="24" y="24" width="752" height="512" rx="28" fill="none" stroke="#ffbe76" stroke-width="1.5" stroke-opacity="0.45" />
-  <text x="400" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.8" fill="#fde68a">Certificado</text>
-  <text x="400" y="156" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="500" fill="#a5f3fc">${badge.name}</text>
-  <g transform="translate(352, 195)">${innerPaw}</g>
-  <rect x="120" y="340" width="560" height="130" rx="18" fill="rgba(255, 255, 255, 0.035)" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" />
+
+  <!-- Fondo Cósmico Profundo con Nebulosas -->
+  <rect width="1000" height="700" rx="32" fill="url(#certBg)" />
+  <rect width="1000" height="700" rx="32" fill="url(#nebulaCyan)" />
+  <rect width="1000" height="700" rx="32" fill="url(#nebulaGold)" />
+
+  <!-- Constelaciones y Polvo Estelar Geométrico -->
+  <g fill="#ffffff" opacity="0.45">
+    <circle cx="85" cy="85" r="1.5" /><circle cx="160" cy="110" r="1.2" /><circle cx="210" cy="70" r="1.8" />
+    <circle cx="915" cy="85" r="1.5" /><circle cx="840" cy="115" r="1.2" /><circle cx="790" cy="65" r="1.7" />
+    <circle cx="90" cy="610" r="1.3" /><circle cx="140" cy="580" r="1.7" /><circle cx="195" cy="630" r="1.1" />
+    <circle cx="910" cy="610" r="1.4" /><circle cx="860" cy="580" r="1.8" /><circle cx="805" cy="630" r="1.2" />
+    <circle cx="500" cy="65" r="1.4" /><circle cx="340" cy="180" r="1.0" /><circle cx="660" cy="180" r="1.1" />
+  </g>
+  <g stroke="#38bdf8" stroke-width="0.7" opacity="0.25">
+    <line x1="85" y1="85" x2="160" y2="110" /><line x1="160" y1="110" x2="210" y2="70" />
+    <line x1="915" y1="85" x2="840" y2="115" /><line x1="840" y1="115" x2="790" y2="65" />
+    <line x1="90" y1="610" x2="140" y2="580" /><line x1="140" y1="580" x2="195" y2="630" />
+    <line x1="910" y1="610" x2="860" y2="580" /><line x1="860" y1="580" x2="805" y2="630" />
+  </g>
+
+  <!-- Marco de Honor: Doble Filete Metálico Dorado y Acento Cian -->
+  <rect x="22" y="22" width="956" height="656" rx="24" fill="none" stroke="url(#goldBorderGrad)" stroke-width="2.6" filter="url(#goldGlow)" />
+  <rect x="34" y="34" width="932" height="632" rx="18" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.45" stroke-dasharray="12 6" />
+
+  <!-- Esquinas Astronómicas Art-Déco Doradas -->
+  <g stroke="url(#goldBorderGrad)" stroke-width="1.8" fill="none">
+    <path d="M 38 70 L 70 70 L 70 38" /><circle cx="70" cy="70" r="3" fill="#fde047" />
+    <path d="M 962 70 L 930 70 L 930 38" /><circle cx="930" cy="70" r="3" fill="#fde047" />
+    <path d="M 38 630 L 70 630 L 70 662" /><circle cx="70" cy="630" r="3" fill="#fde047" />
+    <path d="M 962 630 L 930 630 L 930 662" /><circle cx="930" cy="630" r="3" fill="#fde047" />
+  </g>
+
+  <!-- Emblema Superior: Alas Cósmicas & Estrella Central -->
+  <g transform="translate(500, 72)" text-anchor="middle">
+    <path d="M -42 0 Q -20 -14 0 -4 Q 20 -14 42 0 Q 20 -6 0 -1 Q -20 -6 -42 0 Z" fill="url(#goldGrad)" opacity="0.9" />
+    <polygon points="0,-12 4,-2 14,0 4,2 0,12 -4,2 -14,0 -4,-2" fill="#ffffff" />
+  </g>
+
+  <!-- Encabezado de la Academia -->
+  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" letter-spacing="3.5" fill="#7ee8fa" opacity="0.92">${txtAcademy}</text>
+
+  <!-- Título Principal del Diploma -->
+  <text x="500" y="152" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="1.2" fill="url(#goldGrad)" filter="url(#goldGlow)">${txtDiploma}</text>
+
+  <!-- Divisor Ornamental Central -->
+  <g transform="translate(500, 172)" stroke="url(#goldBorderGrad)" stroke-width="1.2">
+    <line x1="-160" y1="0" x2="-20" y2="0" />
+    <polygon points="0,-4 4,0 0,4 -4,0" fill="#fde047" stroke="none" />
+    <line x1="20" y1="0" x2="160" y2="0" />
+  </g>
+
+  <!-- Texto de Concesión -->
+  <text x="500" y="206" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="14.5" font-weight="500" fill="#94a3b8">${txtConferred}</text>
+
+  <!-- Nombre del Cadete / Astronauta (Gran Protagonista) -->
+  <text x="500" y="262" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="38" font-weight="800" letter-spacing="0.8" fill="#ffffff" filter="url(#goldGlow)">${escapedName}</text>
+  <path d="M 320 278 Q 500 286 680 278" fill="none" stroke="url(#goldBorderGrad)" stroke-width="2" opacity="0.75" />
+
+  <!-- Mérito Académico y Misiones (Narrativa Educativa NASA) -->
+  <text x="500" y="312" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="400" fill="#cbd5e1" opacity="0.95">${txtBody1}</text>
+  <text x="500" y="332" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="400" fill="#cbd5e1" opacity="0.95">${txtBody2}</text>
+  <text x="500" y="352" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="400" fill="#cbd5e1" opacity="0.95">${txtBody3}</text>
+
+  <!-- Tríptico de Mundos Explorados (Píldoras de Credenciales) -->
+  <g transform="translate(140, 376)">
+    <!-- Luna -->
+    <rect x="0" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
+    <text x="112" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🌕 ${txtMoon}</text>
+    <!-- Marte -->
+    <rect x="247" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
+    <text x="360" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🔴 ${txtMars}</text>
+    <!-- Espacio Profundo -->
+    <rect x="495" y="0" width="225" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
+    <text x="607" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#f8fafc">🌌 ${txtDeep}</text>
+  </g>
+
+  <!-- Píldora de Rango Oficial y Estrellas Obtenidas -->
+  <g transform="translate(260, 428)">
+    <rect x="0" y="0" width="480" height="32" rx="16" fill="rgba(234,179,8,0.12)" stroke="rgba(234,179,8,0.4)" stroke-width="1.2" />
+    <text x="240" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="1.2" fill="#fde047">${txtStars}</text>
+  </g>
+
+  <!-- SELLO DORADO HOLOGRÁFICO CON HUELLA OFICIAL (CENTRO) -->
+  <g transform="translate(500, 555)">
+    <!-- Cintas rojas inferiores del sello -->
+    <path d="M -16 32 L -28 72 L -8 60 L 0 72 L 0 32 Z" fill="url(#ribbonGrad)" opacity="0.95" />
+    <path d="M 16 32 L 28 72 L 8 60 L 0 72 L 0 32 Z" fill="url(#ribbonGrad)" opacity="0.95" />
+    <path d="M -28 72 L -8 60 L 0 72 L 8 60 L 28 72" fill="none" stroke="#fde047" stroke-width="1.5" />
+
+    <!-- Medallón Dorado Dentado -->
+    <circle cx="0" cy="0" r="54" fill="url(#sealGoldGrad)" stroke="#fef08a" stroke-width="2.5" filter="url(#goldGlow)" />
+    <circle cx="0" cy="0" r="47" fill="none" stroke="#78350f" stroke-width="1.2" stroke-dasharray="4 2" />
+    <circle cx="0" cy="0" r="43" fill="#1e1b4b" stroke="#fde047" stroke-width="1.4" />
+
+    <!-- Huella palmeada de Cyberpenguin en el centro del sello -->
+    <g transform="translate(-34, -34)">
+      ${innerPaw}
+    </g>
+  </g>
+  <!-- Texto circular alrededor del sello -->
+  <text x="500" y="632" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="800" letter-spacing="2" fill="#fef08a">${txtSeal}</text>
+
+  <!-- FIRMA IZQUIERDA: COMANDANTE CYBERPENGUIN -->
+  <g transform="translate(180, 525)">
+    <!-- Firma manuscrita estilizada -->
+    <path d="M 20 20 Q 40 -8 55 12 T 85 8 T 115 16 Q 135 4 150 18" fill="none" stroke="#7ee8fa" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M 65 6 Q 72 26 80 4" fill="none" stroke="#7ee8fa" stroke-width="1.8" />
+    <circle cx="152" cy="18" r="2.2" fill="#ffbe76" />
+    <line x1="0" y1="36" x2="190" y2="36" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
+    <text x="95" y="52" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">Cyberpenguin</text>
+    <text x="95" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#94a3b8">${txtSignCommander}</text>
+    <text x="95" y="78" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="400" fill="#64748b">${txtSignCommanderRole}</text>
+  </g>
+
+  <!-- FIRMA DERECHA: IA DE LA NAVE (CONTROL DE MISIÓN) -->
+  <g transform="translate(630, 525)">
+    <!-- Forma de onda osciloscópica / cuántica -->
+    <path d="M 10 20 L 40 20 L 50 2 L 60 38 L 70 8 L 80 30 L 90 20 L 120 20 L 130 10 L 140 28 L 150 20 L 180 20" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    <line x1="0" y1="36" x2="190" y2="36" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
+    <text x="95" y="52" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">${txtSignAI}</text>
+    <text x="95" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#94a3b8">${txtSignAIRole}</text>
+    <text x="95" y="78" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="400" fill="#64748b">NASA Deep Space Network</text>
+  </g>
+
+  <!-- Pie de Página: Código Único de Bitácora y Fecha de Emisión -->
+  <text x="50" y="664" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="1.5" fill="#64748b">${txtMissionId}</text>
+  <text x="950" y="664" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="1.5" fill="#64748b">${txtDateLabel}</text>
 </svg>`;
   }
 
-  function downloadCertificate() {
+  function downloadCertificate(format = 'png') {
     if (!areAllChaptersCompleted()) return null;
     const svgMarkup = buildCertificateSvg();
-    const filename = 'certificado-cyberpenguins.svg';
 
-    if (typeof global.Blob === 'function' && global.URL && typeof global.URL.createObjectURL === 'function') {
+    if (format === 'svg') {
+      const filename = `diploma-cyberpenguins-${Date.now()}.svg`;
       const blob = new global.Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
-      const url = global.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      if (document.body && typeof document.body.appendChild === 'function') {
-        document.body.appendChild(link);
-      }
-      if (typeof link.click === 'function') {
-        link.click();
-      }
-      if (typeof link.remove === 'function') {
-        link.remove();
-      }
-      setTimeout(() => global.URL.revokeObjectURL(url), 1000);
+      triggerBlobDownload(blob, filename);
       return svgMarkup;
     }
 
-    const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgMarkup)}`;
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.setAttribute('download', filename);
-    if (typeof link.click === 'function') {
-      link.click();
+    // Exportar PNG en alta resolución (2000 x 1400 px, 300 DPI nítido)
+    try {
+      const img = new Image();
+      const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
+      const URLObj = global.URL || global.webkitURL || window.URL;
+      const url = URLObj.createObjectURL(svgBlob);
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 2000;
+          canvas.height = 1400;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#050817';
+          ctx.fillRect(0, 0, 2000, 1400);
+          ctx.drawImage(img, 0, 0, 2000, 1400);
+          URLObj.revokeObjectURL(url);
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              triggerBlobDownload(blob, `diploma-cyberpenguins-${Date.now()}.png`);
+            } else {
+              downloadCertificate('svg');
+            }
+          }, 'image/png');
+        } catch (_err) {
+          URLObj.revokeObjectURL(url);
+          downloadCertificate('svg');
+        }
+      };
+      img.onerror = () => {
+        URLObj.revokeObjectURL(url);
+        downloadCertificate('svg');
+      };
+      img.src = url;
+    } catch (_e) {
+      downloadCertificate('svg');
     }
     return svgMarkup;
+  }
+
+  function triggerBlobDownload(blob, filename) {
+    if (global.URL && typeof global.URL.createObjectURL === 'function') {
+      const blobUrl = global.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        link.remove();
+        global.URL.revokeObjectURL(blobUrl);
+      }, 1000);
+    }
+  }
+
+  function printCertificate() {
+    const svgMarkup = buildCertificateSvg();
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      window.print();
+      return;
+    }
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Diploma Cyberpenguins</title>
+        <style>
+          @page { size: landscape; margin: 0; }
+          body {
+            margin: 0;
+            padding: 0;
+            background: #050817;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+          }
+          svg {
+            width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            display: block;
+          }
+        </style>
+      </head>
+      <body>
+        ${svgMarkup}
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              window.close();
+            }, 350);
+          };
+        <\/script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
   }
 
   /* ========================================================================
