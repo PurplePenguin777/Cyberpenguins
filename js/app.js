@@ -1618,45 +1618,100 @@
   function isometricPedestalSvg(chapterId) {
     if (chapterId === 'moon') {
       return `
-        <svg class="mv-pedestal-svg" viewBox="0 0 210 74" width="204" height="72" aria-hidden="true">
-          <!-- Superficie lunar: regolito y cráteres geométricos -->
-          <polygon points="105,8 196,28 105,48 14,28" fill="#cbd5e1" stroke="rgba(148,163,184,0.4)" stroke-width="1" />
-          <polygon points="14,28 105,48 105,62 14,42" fill="#94a3b8" />
-          <polygon points="196,28 105,48 105,62 196,42" fill="#475569" />
-          <polygon points="70,24 86,20 94,26 78,30" fill="#94a3b8" opacity="0.7" />
-          <polygon points="130,34 148,30 156,36 138,40" fill="#64748b" opacity="0.6" />
-          <polygon points="105,14 168,28 105,42 42,28" fill="#e2e8f0" opacity="0.25" />
-          <polygon points="45,26 50,22 54,25 49,29" fill="#f1f5f9" />
-          <polygon points="160,26 166,23 170,27 164,30" fill="#64748b" />
+        <svg class="mv-pedestal-svg" viewBox="0 0 210 76" width="204" height="74" aria-hidden="true">
+          <defs>
+            <linearGradient id="moonCurvedGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e2e8f0" />
+              <stop offset="70%" stop-color="#94a3b8" />
+              <stop offset="100%" stop-color="#64748b" />
+            </linearGradient>
+            <linearGradient id="moonDepthGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#64748b" />
+              <stop offset="100%" stop-color="#1e293b" />
+            </linearGradient>
+          </defs>
+          <!-- Grosor y curvatura de la corteza lunar -->
+          <path d="M 18,34 C 18,52 192,52 192,34 L 192,44 C 192,64 18,64 18,44 Z" fill="url(#moonDepthGrad)" />
+          <!-- Superficie circular y curvada de la Luna -->
+          <ellipse cx="105" cy="34" rx="87" ry="20" fill="url(#moonCurvedGrad)" stroke="rgba(226, 232, 240, 0.45)" stroke-width="1.2" />
+          <!-- Cráteres lunares circulares -->
+          <ellipse cx="72" cy="33" rx="18" ry="7.5" fill="#64748b" />
+          <ellipse cx="73" cy="33.5" rx="14" ry="5.5" fill="#334155" />
+          <ellipse cx="71" cy="32" rx="13" ry="5" fill="#1e293b" opacity="0.6" />
+          <ellipse cx="140" cy="36" rx="13" ry="5.5" fill="#64748b" />
+          <ellipse cx="140" cy="36.5" rx="10" ry="4" fill="#334155" />
+          <ellipse cx="108" cy="24" rx="7" ry="3" fill="#475569" />
+          <!-- Resplandor tenue en el limbo curvo lunar -->
+          <path d="M 22,34 C 55,22 155,22 188,34" fill="none" stroke="#f8fafc" stroke-width="1.2" opacity="0.6" />
         </svg>
       `;
     }
     if (chapterId === 'mars') {
       return `
-        <svg class="mv-pedestal-svg" viewBox="0 0 210 74" width="204" height="72" aria-hidden="true">
-          <!-- Superficie marciana: dunas y roca oxidada -->
-          <polygon points="105,8 196,28 105,48 14,28" fill="#ea8850" stroke="rgba(255,190,118,0.4)" stroke-width="1" />
-          <polygon points="14,28 105,48 105,62 14,42" fill="#c25632" />
-          <polygon points="196,28 105,48 105,62 196,42" fill="#7c2e22" />
-          <polygon points="60,26 82,22 100,28 78,32" fill="#c2410c" opacity="0.65" />
-          <polygon points="120,32 142,26 160,34 138,38" fill="#9a3412" opacity="0.6" />
-          <polygon points="105,14 168,28 105,42 42,28" fill="#fda876" opacity="0.3" />
-          <polygon points="40,25 46,21 52,24 45,28" fill="#fed7aa" />
-          <polygon points="152,24 158,20 164,25 157,28" fill="#7c2d12" />
+        <svg class="mv-pedestal-svg" viewBox="0 0 210 76" width="204" height="74" aria-hidden="true">
+          <defs>
+            <linearGradient id="marsCurvedGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fb923c" />
+              <stop offset="65%" stop-color="#c2410c" />
+              <stop offset="100%" stop-color="#9a3412" />
+            </linearGradient>
+            <linearGradient id="marsDepthGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#9a3412" />
+              <stop offset="100%" stop-color="#431407" />
+            </linearGradient>
+          </defs>
+          <!-- Grosor y curvatura de la corteza marciana -->
+          <path d="M 18,34 C 18,52 192,52 192,34 L 192,44 C 192,64 18,64 18,44 Z" fill="url(#marsDepthGrad)" />
+          <!-- Superficie circular y curvada de Marte -->
+          <ellipse cx="105" cy="34" rx="87" ry="20" fill="url(#marsCurvedGrad)" stroke="rgba(254, 215, 170, 0.45)" stroke-width="1.2" />
+          <!-- Ondulaciones curvas de dunas marcianas -->
+          <path d="M 32,32 C 60,38 90,30 120,35 C 145,39 170,33 182,31" fill="none" stroke="#ea580c" stroke-width="2.2" opacity="0.75" />
+          <path d="M 45,38 C 75,44 110,38 145,42 C 160,43 170,41 176,38" fill="none" stroke="#7c2d12" stroke-width="1.8" opacity="0.65" />
+          <!-- Cráter circular marciano -->
+          <ellipse cx="138" cy="32" rx="14" ry="6" fill="#7c2d12" />
+          <ellipse cx="138" cy="32.5" rx="10.5" ry="4.2" fill="#431407" />
+          <!-- Resplandor en el limbo curvo de Marte -->
+          <path d="M 22,34 C 55,22 155,22 188,34" fill="none" stroke="#ffedd5" stroke-width="1.2" opacity="0.7" />
         </svg>
       `;
     }
     return `
-      <svg class="mv-pedestal-svg" viewBox="0 0 210 74" width="204" height="72" aria-hidden="true">
-        <!-- Superficie de asteroide / espacio profundo -->
-        <polygon points="105,8 196,28 105,48 14,28" fill="#2a3b5c" stroke="rgba(56,189,248,0.45)" stroke-width="1" />
-        <polygon points="14,28 105,48 105,62 14,42" fill="#18233c" />
-        <polygon points="196,28 105,48 105,62 196,42" fill="#0d1424" />
-        <polygon points="64,24 88,18 106,26 82,30" fill="#38bdf8" opacity="0.22" />
-        <polygon points="118,32 146,24 162,32 134,38" fill="#7dd3fc" opacity="0.18" />
-        <polygon points="105,14 168,28 105,42 42,28" fill="#38bdf8" opacity="0.15" />
-        <circle cx="50" cy="27" r="1.5" fill="#7ee8fa" opacity="0.7" />
-        <circle cx="160" cy="25" r="1.8" fill="#bae6fd" opacity="0.8" />
+      <svg class="mv-pedestal-svg" viewBox="0 0 210 76" width="204" height="74" aria-hidden="true">
+        <defs>
+          <linearGradient id="deepCurvedGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1e293b" />
+            <stop offset="60%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#050814" />
+          </linearGradient>
+          <linearGradient id="deepDepthGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#020617" />
+          </linearGradient>
+        </defs>
+        <!-- Estrellas a la lejanía en el vacío cósmico de la Frontera Espacial -->
+        <g fill="#f8fafc">
+          <circle cx="24" cy="14" r="1.1" opacity="0.75" />
+          <circle cx="48" cy="8" r="0.8" opacity="0.6" />
+          <circle cx="78" cy="16" r="1.3" fill="#7ee8fa" opacity="0.85" />
+          <circle cx="105" cy="6" r="0.9" opacity="0.55" />
+          <circle cx="136" cy="12" r="1.2" opacity="0.8" />
+          <circle cx="168" cy="8" r="1" fill="#fed7aa" opacity="0.75" />
+          <circle cx="188" cy="18" r="0.8" opacity="0.65" />
+          <circle cx="16" cy="52" r="0.9" opacity="0.5" />
+          <circle cx="38" cy="64" r="1.1" fill="#7ee8fa" opacity="0.7" />
+          <circle cx="174" cy="62" r="1.2" opacity="0.75" />
+          <circle cx="194" cy="50" r="0.8" fill="#bae6fd" opacity="0.6" />
+        </g>
+        <!-- Base de asteroide 433 Eros en el vacío -->
+        <path d="M 18,34 C 18,52 192,52 192,34 L 192,44 C 192,64 18,64 18,44 Z" fill="url(#deepDepthGrad)" />
+        <!-- Superficie de asteroide con borde de resplandor cósmico -->
+        <ellipse cx="105" cy="34" rx="87" ry="20" fill="url(#deepCurvedGrad)" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.2" />
+        <!-- Facetas de roca del asteroide -->
+        <polygon points="56,32 76,28 92,34 72,38" fill="#334155" opacity="0.7" />
+        <polygon points="118,34 140,29 158,35 136,39" fill="#1e293b" opacity="0.9" />
+        <polygon points="86,34 116,31 126,37 98,40" fill="#38bdf8" opacity="0.18" />
+        <!-- Resplandor tenue en el borde cósmico -->
+        <path d="M 22,34 C 55,22 155,22 188,34" fill="none" stroke="#38bdf8" stroke-width="1.2" opacity="0.65" />
       </svg>
     `;
   }
