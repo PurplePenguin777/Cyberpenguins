@@ -109,7 +109,7 @@
     const rightOuter = [[138, 74], [166, 76], [166, 97], [138, 95]];
 
     return `
-      <svg viewBox="0 0 176 146" width="136" height="114" aria-hidden="true">
+      <svg viewBox="0 0 176 146" width="156" height="128" aria-hidden="true">
         <defs>
           <radialGradient id="${id}-shadow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="rgba(3,6,18,0.62)" />

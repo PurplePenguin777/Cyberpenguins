@@ -99,7 +99,7 @@
     }
 
     return `
-      <svg viewBox="0 0 158 138" width="120" height="105" aria-hidden="true">
+      <svg viewBox="0 0 158 138" width="142" height="124" aria-hidden="true">
         <defs>
           <radialGradient id="${id}-shadow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="rgba(3,6,18,0.58)" />

@@ -22,7 +22,7 @@
     const id = uid('cp');
     const flip = direction === 'left' ? 'transform="translate(110,0) scale(-1,1)"' : '';
     return `
-      <svg viewBox="0 0 110 124" width="84" height="95" aria-hidden="true">
+      <svg viewBox="0 0 110 124" width="56" height="63" aria-hidden="true">
         <defs>
           <radialGradient id="${id}-shadow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="rgba(3,6,18,0.62)" />

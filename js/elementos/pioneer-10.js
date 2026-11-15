@@ -144,7 +144,7 @@
     }
 
     return `
-      <svg viewBox="0 0 176 144" width="136" height="112" aria-hidden="true">
+      <svg viewBox="0 0 176 144" width="156" height="128" aria-hidden="true">
         <!-- Pluma larga del magnetómetro (acortada) -->
         ${truss(58, 58, 14, 32, 2.2, 8)}
         <rect x="6" y="26" width="9" height="8" rx="1.2" fill="#f59e0b" stroke="#78350f" stroke-width="0.9" />

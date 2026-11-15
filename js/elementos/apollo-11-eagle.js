@@ -19,7 +19,7 @@
   function apolloEagle() {
     const id = uid('eagle');
     return `
-      <svg viewBox="0 0 164 148" width="128" height="116" aria-hidden="true">
+      <svg viewBox="0 0 164 148" width="210" height="190" aria-hidden="true">
         <defs>
           <radialGradient id="${id}-shadow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="rgba(3,6,18,0.62)" />

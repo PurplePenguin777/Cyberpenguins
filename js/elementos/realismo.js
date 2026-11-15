@@ -403,7 +403,7 @@
     const hl = lit.length >= 3 ? smoothOpen(lit) : '';
 
     return `
-      <svg viewBox="0 0 84 68" width="66" height="54" aria-hidden="true">
+      <svg viewBox="0 0 84 68" width="44" height="36" aria-hidden="true">
         <defs>
           <radialGradient id="${id}-rg" cx="0.3" cy="0.25" r="0.85">
             <stop offset="0" stop-color="${styles.a}" />
@@ -413,26 +413,22 @@
           <clipPath id="${id}-c"><path d="${d}" /></clipPath>
         </defs>
 
-        <!-- Anillo de escáner (indica que se puede recoger) -->
-        <ellipse class="sample-ground-ring" cx="42" cy="50" rx="28" ry="9.5" fill="none" stroke="${styles.glint}" stroke-width="1.4" stroke-opacity="0.74" />
-
-        <!-- Sombra de contacto y montículo trasero de regolito -->
-        <ellipse cx="46" cy="51" rx="29" ry="6" fill="#000000" opacity="0.4" />
-        <ellipse cx="42" cy="47" rx="29" ry="8" fill="${styles.soilBack}" />
+        <!-- Sombra de contacto geológica y montículo trasero de regolito -->
+        <ellipse cx="46" cy="51" rx="28" ry="6" fill="#000000" opacity="0.45" />
+        <ellipse cx="42" cy="47" rx="28" ry="7.5" fill="${styles.soilBack}" />
 
         <!-- Roca con relieve volumétrico curvo -->
         <path d="${d}" fill="url(#${id}-rg)" stroke="${styles.c}" stroke-width="0.8" />
-        ${hl ? `<path d="${hl}" fill="none" stroke="${styles.a}" stroke-width="1.4" opacity="0.6" stroke-linecap="round" />` : ''}
+        ${hl ? `<path d="${hl}" fill="none" stroke="${styles.a}" stroke-width="1.3" opacity="0.65" stroke-linecap="round" />` : ''}
         <g clip-path="url(#${id}-c)">
-          <path class="sample-glint-vein" d="M ${f(cx - rxv * 0.5)},${f(cy - ryv * 0.2)} Q ${cx},${f(cy - ryv * 0.55)} ${f(cx + rxv * 0.45)},${f(cy + ryv * 0.05)}" fill="none" stroke="${styles.glint}" stroke-width="1.8" stroke-linecap="round" />
-          <path class="sample-glint-vein" d="M ${f(cx - rxv * 0.2)},${f(cy + ryv * 0.1)} L ${f(cx + rxv * 0.3)},${f(cy + ryv * 0.3)}" fill="none" stroke="#ffbe76" stroke-width="1.3" stroke-linecap="round" />
-          <polygon class="sample-glint-vein" points="${f(cx + 6)},${f(cy - 9)} ${f(cx + 10)},${f(cy - 12)} ${f(cx + 12)},${f(cy - 7)}" fill="${styles.glint}" opacity="0.9" />
+          <path d="M ${f(cx - rxv * 0.5)},${f(cy - ryv * 0.2)} Q ${cx},${f(cy - ryv * 0.55)} ${f(cx + rxv * 0.45)},${f(cy + ryv * 0.05)}" fill="none" stroke="${styles.glint}" stroke-width="1.4" stroke-linecap="round" opacity="0.75" />
+          <path d="M ${f(cx - rxv * 0.2)},${f(cy + ryv * 0.1)} L ${f(cx + rxv * 0.3)},${f(cy + ryv * 0.3)}" fill="none" stroke="#ffbe76" stroke-width="1.1" stroke-linecap="round" opacity="0.75" />
         </g>
 
         <!-- Collar de regolito que entierra parcialmente la base -->
-        <path d="M 12,50 Q 28,43 42,47 Q 58,43 72,50 Q 62,60 42,60 Q 22,60 12,50 Z" fill="${styles.soilFront}" stroke="${styles.soilRim}" stroke-width="1" stroke-opacity="0.7" />
-        <ellipse cx="24" cy="53" rx="2.4" ry="1.4" fill="${styles.soilRim}" opacity="0.7" />
-        <ellipse cx="60" cy="52.5" rx="2" ry="1.2" fill="${styles.soilRim}" opacity="0.6" />
+        <path d="M 12,50 Q 28,43 42,47 Q 58,43 72,50 Q 62,60 42,60 Q 22,60 12,50 Z" fill="${styles.soilFront}" stroke="${styles.soilRim}" stroke-width="0.9" stroke-opacity="0.6" />
+        <ellipse cx="24" cy="53" rx="2.4" ry="1.4" fill="${styles.soilRim}" opacity="0.6" />
+        <ellipse cx="60" cy="52.5" rx="2" ry="1.2" fill="${styles.soilRim}" opacity="0.5" />
       </svg>
     `;
   }

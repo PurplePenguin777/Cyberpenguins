@@ -2247,64 +2247,64 @@
 
   const SAMPLE_DETAILS = {
     'sample-moon-1': {
-      title: 'Basalto lunar',
-      site: 'Océano de las Tormentas, La Luna',
-      desc: 'Lava antigua de volcanes lunares que se enfrió hace millones de años formando roca oscura.'
+      title: 'Basalto lunar de olivino',
+      site: 'Misión Apolo 12 · Oceanus Procellarum',
+      desc: 'Roca volcánica oscura rica en hierro y magnesio. Se formó hace 3,200 millones de años cuando inmensos ríos de lava líquida llenaron esta planicie de la Luna.'
     },
     'sample-moon-2': {
-      title: 'Roca de choque',
-      site: 'Cráter Surveyor, La Luna',
-      desc: 'Piedras que se fundieron y quedaron pegadas por el calor cuando un meteorito chocó contra la Luna.'
+      title: 'Brecha de impacto lunar',
+      site: 'Cráter Surveyor · La Luna',
+      desc: 'Fragmentos de distintas rocas que se trituraron y soldaron juntas por el tremendo calor y la presión cuando un asteroide chocó contra la superficie lunar.'
     },
     'sample-moon-3': {
-      title: 'Polvo de cristales',
-      site: 'Suelo lunar, La Luna',
-      desc: 'Granos brillantes triturados por pequeñas piedras del espacio que cayeron durante miles de años.'
+      title: 'Regolito lunar aglutinado',
+      site: 'Llanura de Procellarum · La Luna',
+      desc: 'Suelo fino formado por polvo y pequeños cristales triturados durante miles de millones de años por el bombardeo continuo de micrometeoritos en el vacío.'
     },
     'sample-moon-4': {
-      title: 'Ilmenita con oxígeno',
-      site: 'Mar de la Tranquilidad, La Luna',
-      desc: 'Mineral oscuro que los científicos pueden calentar para obtener oxígeno y respirar en futuras bases.'
+      title: 'Basalto ilmenítico (rico en titanio)',
+      site: 'Misión Apolo 11 · Mare Tranquillitatis',
+      desc: 'Muestra traída por Neil Armstrong. Es muy rica en ilmenita, un mineral de hierro y titanio del que los científicos pueden extraer oxígeno para respirar.'
     },
     'sample-moon-5': {
-      title: 'Roca de la corteza antigua',
-      site: 'Tierras altas, La Luna',
-      desc: 'Un trozo de la primera superficie lunar de hace 4,000 millones de años, más vieja que los dinosaurios.'
+      title: 'Anortosita (Corteza primordial)',
+      site: 'Tierras altas lunares · La Luna',
+      desc: 'Un pedazo de la corteza original de la Luna de hace 4,400 millones de años. Flotó sobre un océano global de magma cuando la Luna recién se había formado.'
     },
     'sample-moon-6': {
-      title: 'Esferita de vidrio',
-      site: 'Zona Apolo 11, La Luna',
-      desc: 'Una bolita de vidrio natural que se formó cuando gotas de lava ardiente salieron disparadas al espacio frío.'
+      title: 'Esférula de vidrio volcánico',
+      site: 'Misión Apolo 11 · Mare Tranquillitatis',
+      desc: 'Diminuta canica de vidrio natural. Nació cuando fuentes de fuego volcánico lanzaron gotas de lava al frío del espacio, congelándose antes de caer.'
     },
     'sample-mars-1': {
-      title: 'Lava con burbujas',
-      site: 'Chryse Planitia, Marte',
-      desc: 'Piedra volcánica con agujeros dejados por gases calientes que escaparon de la lava de Marte.'
+      title: 'Basalto vesicular marciano',
+      site: 'Misión Viking 1 · Chryse Planitia',
+      desc: 'Piedra de lava volcánica llena de agujeros formados por gases calientes. Su tono rojizo proviene del polvo de óxido de hierro que cubre todo el planeta.'
     },
     'sample-mars-2': {
-      title: 'Arándano de hematita',
-      site: 'Llanuras de Chryse, Marte',
-      desc: 'Pequeña esfera mineral que se formó dentro del agua, demostrando que Marte tuvo lagos en el pasado.'
+      title: 'Concreción de hematita («Arándano»)',
+      site: 'Llanuras sedimentarias · Marte',
+      desc: 'Pequeña esfera mineral de óxido de hierro. Solo puede crecer dentro de agua líquida subterránea, demostrando que Marte tuvo agua en su pasado remoto.'
     },
     'sample-mars-3': {
-      title: 'Costra de sal mineral',
-      site: 'Suelo de Viking 1, Marte',
-      desc: 'Capa de sales descubierta por el robot Viking 1 cuando un antiguo lago marciano se evaporó.'
+      title: 'Costra duricrust de sulfato',
+      site: 'Misión Viking 1 · Chryse Planitia',
+      desc: 'Capa endurecida de sales descubierta por el brazo del robot Viking 1. Quedó sobre el suelo cuando lagos marcianos minerales se evaporaron al secarse.'
     },
     'sample-mars-4': {
-      title: 'Roca Barnacle Bill',
-      site: 'Canal de Ares Vallis, Marte',
-      desc: 'La primera roca que tocó el robot Sojourner en 1997 para analizar de qué minerales está hecho Marte.'
+      title: 'Roca andesítica «Barnacle Bill»',
+      site: 'Mars Pathfinder / Sojourner · Ares Vallis',
+      desc: 'La primera roca alienígena analizada por el rover Sojourner en 1997. Su alto contenido de sílice demostró que Marte tuvo volcanes muy evolucionados.'
     },
     'sample-mars-5': {
-      title: 'Bloque pulido Yogi',
-      site: 'Valle de Ares, Marte',
-      desc: 'Una gran roca redondeada y pulida por una fuerte corriente de agua que inundó este valle marciano.'
+      title: 'Megabloque basáltico «Yogi»',
+      site: 'Mars Pathfinder / Sojourner · Ares Vallis',
+      desc: 'Roca volcánica de 1.5 metros de alto arrastrada y pulida por una catástrofe de agua: una inundación gigante que recorrió este valle hace millones de años.'
     },
     'sample-mars-6': {
-      title: 'Suelo duro Scooby Doo',
-      site: 'Campamento Pathfinder, Marte',
-      desc: 'Capa de suelo tan firme y compacta que las ruedas de metal del rover no pudieron rayarla.'
+      title: 'Sedimento cementado «Scooby Doo»',
+      site: 'Mars Pathfinder · Ares Vallis',
+      desc: 'Capa de suelo mineral duro y resistente. Cuando el pequeño rover Sojourner intentó rasparla con sus ruedas de metal, la roca no sufrió ningún daño.'
     }
   };
 

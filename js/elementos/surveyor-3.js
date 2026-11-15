@@ -20,7 +20,7 @@
   function surveyor3() {
     const id = uid('surv');
     return `
-      <svg viewBox="0 0 150 138" width="114" height="105" aria-hidden="true">
+      <svg viewBox="0 0 150 138" width="132" height="122" aria-hidden="true">
         <defs>
           <radialGradient id="${id}-shadow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="rgba(3,6,18,0.58)" />
