@@ -3426,7 +3426,7 @@
       .replace(/'/g, '&apos;');
 
     const rawPaw = (MODELS && typeof MODELS.penguinPawStamp === 'function')
-      ? MODELS.penguinPawStamp(true, 68)
+      ? MODELS.penguinPawStamp(true, 62)
       : '';
     const innerPaw = rawPaw
       .replace(/^[\s\S]*?<svg[^>]*>/i, '')
@@ -3525,13 +3525,16 @@
     <text x="160" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="600" fill="#fde047">${txtStars}</text>
   </g>
 
-  <!-- Sello Oficial con Huella del Pingüino -->
-  <g transform="translate(500, 498)">
-    <circle cx="0" cy="0" r="44" fill="rgba(56,189,248,0.08)" stroke="rgba(56,189,248,0.35)" stroke-width="1.2" />
-    <circle cx="0" cy="0" r="38" fill="rgba(12, 18, 36, 0.4)" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" stroke-dasharray="3 2" />
-    <g transform="translate(-30, -30)">
+  <!-- Firma Auténtica: Huella de Cyberpengüin sobre su línea y nombre -->
+  <g transform="translate(500, 520)">
+    <!-- Patita del pingüino (sin círculo) -->
+    <g transform="translate(-31, -66)">
       ${innerPaw}
     </g>
+    <!-- Línea de firma -->
+    <line x1="-90" y1="0" x2="90" y2="0" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
+    <!-- Nombre Cyberpengüin -->
+    <text x="0" y="22" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="600" letter-spacing="0.5" fill="#f8fafc">Cyberpengüin</text>
   </g>
 
   <!-- Pie de Página: Fecha Centrada y Limpia -->
