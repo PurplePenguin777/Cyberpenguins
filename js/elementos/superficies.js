@@ -142,98 +142,11 @@
 
   /* ---------- Asteroide 433 Eros realista (forma elongada de cacahuate / silla de montar Himeros) ---------- */
 
-  function asteroidErosBody(r = 30, opts = {}) {
-    const { seed = 303, uid = `eros${seed}` } = opts;
-    const sx = r * 1.85;
-    const sy = r * 0.82;
-
-    // Silueta bilobulada auténtica de 433 Eros (forma de cacahuate con depresión central Himeros)
-    const outline = [
-      [-sx * 0.94, -sy * 0.08],
-      [-sx * 0.86, -sy * 0.44],
-      [-sx * 0.65, -sy * 0.74],
-      [-sx * 0.35, -sy * 0.78],
-      [-sx * 0.08, -sy * 0.38], // Depresión Himeros superior
-      [sx * 0.18, -sy * 0.48],
-      [sx * 0.50, -sy * 0.78],
-      [sx * 0.78, -sy * 0.68],
-      [sx * 0.95, -sy * 0.34],
-      [sx * 0.98, sy * 0.14],
-      [sx * 0.86, sy * 0.54],
-      [sx * 0.60, sy * 0.80],
-      [sx * 0.28, sy * 0.68],
-      [sx * 0.02, sy * 0.30], // Depresión Himeros inferior
-      [-sx * 0.28, sy * 0.44],
-      [-sx * 0.58, sy * 0.74],
-      [-sx * 0.82, sy * 0.58],
-      [-sx * 0.96, sy * 0.22]
-    ];
-
-    const dOutline = smoothPolygonPath(outline);
-
-    return `
-      <g id="${uid}">
-        <defs>
-          <clipPath id="clip-${uid}">
-            <path d="${dOutline}" />
-          </clipPath>
-          <!-- Iluminación solar volumétrica global (sol directo desde arriba-izquierda) -->
-          <linearGradient id="erosGlobal-${uid}" x1="0" y1="0" x2="0.6" y2="1">
-            <stop offset="0%" stop-color="#cbd5e1" />
-            <stop offset="38%" stop-color="#64748b" />
-            <stop offset="72%" stop-color="#334155" />
-            <stop offset="100%" stop-color="#090d16" />
-          </linearGradient>
-          <!-- Volumen del lóbulo principal izquierdo -->
-          <radialGradient id="erosLobeA-${uid}" cx="26%" cy="28%" r="48%">
-            <stop offset="0%" stop-color="#f1f5f9" stop-opacity="0.9" />
-            <stop offset="50%" stop-color="#94a3b8" stop-opacity="0.5" />
-            <stop offset="100%" stop-color="#1e293b" stop-opacity="0" />
-          </radialGradient>
-          <!-- Volumen del lóbulo secundario derecho -->
-          <radialGradient id="erosLobeB-${uid}" cx="72%" cy="30%" r="42%">
-            <stop offset="0%" stop-color="#e2e8f0" stop-opacity="0.85" />
-            <stop offset="50%" stop-color="#94a3b8" stop-opacity="0.45" />
-            <stop offset="100%" stop-color="#1e293b" stop-opacity="0" />
-          </radialGradient>
-          <!-- Sombra orográfica profunda en la depresión central de Himeros -->
-          <radialGradient id="erosSaddle-${uid}" cx="48%" cy="56%" r="38%">
-            <stop offset="0%" stop-color="#020617" stop-opacity="0.82" />
-            <stop offset="70%" stop-color="#0f172a" stop-opacity="0.4" />
-            <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
-          </radialGradient>
-        </defs>
-
-        <!-- Base sólida con luz y sombra espacial direccional -->
-        <path d="${dOutline}" fill="url(#erosGlobal-${uid})" />
-
-        <!-- Relieve y volúmenes esféricos naturales de ambos lóbulos -->
-        <g clip-path="url(#clip-${uid})">
-          <circle cx="${n(-sx * 0.48)}" cy="${n(-sy * 0.12)}" r="${n(r * 0.88)}" fill="url(#erosLobeA-${uid})" />
-          <circle cx="${n(sx * 0.48)}" cy="${n(sy * 0.05)}" r="${n(r * 0.72)}" fill="url(#erosLobeB-${uid})" />
-          <ellipse cx="${n(sx * 0.02)}" cy="${n(sy * 0.16)}" rx="${n(r * 0.52)}" ry="${n(r * 0.36)}" fill="url(#erosSaddle-${uid})" />
-
-          <!-- Depósitos planos de polvo de regolito ("ponds") de Himeros -->
-          <ellipse cx="${n(-sx * 0.05)}" cy="${n(sy * 0.08)}" rx="${n(r * 0.22)}" ry="${n(r * 0.11)}" fill="#475569" opacity="0.55" transform="rotate(-10)" />
-          <ellipse cx="${n(sx * 0.38)}" cy="${n(sy * 0.20)}" rx="${n(r * 0.16)}" ry="${n(r * 0.08)}" fill="#384556" opacity="0.5" transform="rotate(6)" />
-
-          <!-- Cráteres orográficos suaves integrados en la roca (sin aros artificiales) -->
-          <g opacity="0.75">
-            <!-- Cráter Psyche: depresión sutil con labio superior iluminado -->
-            <ellipse cx="${n(sx * 0.58)}" cy="${n(-sy * 0.22)}" rx="${n(r * 0.16)}" ry="${n(r * 0.11)}" fill="#1e293b" />
-            <ellipse cx="${n(sx * 0.56)}" cy="${n(-sy * 0.24)}" rx="${n(r * 0.15)}" ry="${n(r * 0.09)}" fill="#0f172a" />
-            <path d="M ${n(sx * 0.46)},${n(-sy * 0.28)} Q ${n(sx * 0.58)},${n(-sy * 0.36)} ${n(sx * 0.70)},${n(-sy * 0.26)}" fill="none" stroke="#f1f5f9" stroke-width="0.75" opacity="0.65" />
-
-            <!-- Microcráteres orgánicos -->
-            <ellipse cx="${n(-sx * 0.42)}" cy="${n(-sy * 0.40)}" rx="${n(r * 0.09)}" ry="${n(r * 0.06)}" fill="#1e293b" opacity="0.7" />
-            <ellipse cx="${n(-sx * 0.65)}" cy="${n(sy * 0.12)}" rx="${n(r * 0.11)}" ry="${n(r * 0.07)}" fill="#1e293b" opacity="0.7" />
-          </g>
-
-          <!-- Borde orográfico iluminado muy suave en la cresta superior -->
-          <path d="${dOutline}" fill="none" stroke="#ffffff" stroke-width="0.75" opacity="0.22" />
-        </g>
-      </g>
-    `;
+  function asteroidErosBody(r, o) {
+    if (typeof M.asteroidErosBody === 'function' && M.asteroidErosBody !== asteroidErosBody) {
+      return M.asteroidErosBody(r, o);
+    }
+    return '';
   }
 
   /* ---------- Planetas con geografía real y curvas fluidas (sin rayos radiales ni bolas blancas) ---------- */
@@ -578,6 +491,7 @@
         <g clip-path="url(#clip-${uid})">
           ${featuresSvg}
           <!-- Terminador nocturno y sombreado esférico tridimensional -->
+          ${M.facetShade ? M.facetShade(r, { seed: seed + 7, strength: kind === 'earth' ? 0.12 : 0.18 }) : ''}
           <circle r="${n(r)}" fill="url(#sphereShade-${uid})" />
         </g>
       </g>
@@ -741,7 +655,8 @@
       { x: 248, y: 112, r: 6, s: 4 },
       { x: 222, y: 40, r: 5, s: 6 }
     ].forEach((a) => {
-      dust += `<g transform="translate(${a.x},${a.y})" opacity="0.65">${asteroidErosBody(a.r, { seed: a.s, uid: `carddust${a.s}` })}</g>`;
+      dust += `<g transform="translate(${a.x},${a.y})" opacity="0.65">${M.asteroidBody(a.r, { seed: a.s, uid: `carddust${a.s}` })}
+        </g>`;
     });
     const mid =
       dust +
@@ -811,7 +726,9 @@
   }
 
   M.lowPolyBody = lowPolyBody;
-  M.asteroidErosBody = asteroidErosBody;
+  if (!M.asteroidErosBody) {
+    M.asteroidErosBody = asteroidErosBody;
+  }
   M.planetBody = planetBody;
   M.groundMesh = groundMesh;
   M.chapterScene = chapterScene;

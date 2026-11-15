@@ -80,7 +80,7 @@
       class="launch-title-card pointer-events-none relative z-10 text-center flex flex-col items-center justify-center gap-1.5 sm:gap-2 px-4 pt-3 sm:pt-4 max-w-2xl w-full mx-auto">
       <p id="launch-quote-text"
         class="text-lg sm:text-2xl md:text-3xl font-semibold tracking-tight text-white leading-snug drop-shadow-xl text-center text-balance">
-        «Las cosas difíciles son las que más vale la pena intentar.»
+        «Las cosas difíciles son las que más vale la pena intentar»
       </p>
       <p id="launch-quote-name"
         class="text-base sm:text-xl font-bold text-cyan-300 pt-0.5 sm:pt-1 text-center drop-shadow-md">
@@ -196,8 +196,10 @@
 
   <!-- Pantalla Inicial: Dioramas Low-Poly y Dock Minimalista -->
   <section id="home-screen" class="home-screen is-hidden" aria-label="Pantalla inicial">
-    <svg id="home-bg-landscape" class="cosmic-panorama-svg is-landscape" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
-    <svg id="home-bg-portrait" class="cosmic-panorama-svg is-portrait" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+    <svg id="home-bg-landscape" class="cosmic-panorama-svg is-landscape" viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+    <svg id="home-bg-portrait" class="cosmic-panorama-svg is-portrait" viewBox="0 0 1080 1920"
+      preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
 
     <div class="home-panel max-w-6xl w-full px-3 sm:px-6 py-4 sm:py-6 flex flex-col gap-6 sm:gap-8">
       <!-- Encabezado Minimalista -->
@@ -342,14 +344,17 @@
       <span class="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">
         ✨ ¡Roca espacial!
       </span>
-      <div id="sample-discovery-crystal" class="sample-discovery-crystal w-20 h-20 flex items-center justify-center py-1">
+      <div id="sample-discovery-crystal"
+        class="sample-discovery-crystal w-20 h-20 flex items-center justify-center py-1">
       </div>
       <div class="flex flex-col items-center gap-0.5">
-        <h3 id="sample-discovery-title" class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug"></h3>
+        <h3 id="sample-discovery-title" class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+        </h3>
         <span id="sample-discovery-site" class="text-[11px] text-cyan-300/80 font-medium"></span>
       </div>
       <p id="sample-discovery-desc"
-        class="text-xs sm:text-[13px] text-slate-200 leading-relaxed bg-white/[0.04] border border-white/[0.06] rounded-xl p-3 w-full"></p>
+        class="text-xs sm:text-[13px] text-slate-200 leading-relaxed bg-white/[0.04] border border-white/[0.06] rounded-xl p-3 w-full">
+      </p>
       <button id="sample-discovery-collect-btn" type="button"
         class="squircle-btn rounded-full w-full py-2.5 px-4 text-xs sm:text-sm font-semibold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-lg shadow-cyan-500/25 active:scale-95">
         🎒 Guardar en la mochila
@@ -475,6 +480,7 @@
   <script defer src="js/elementos/asteroide-eros.js"></script>
   <script defer src="js/elementos/espacio-profundo.js"></script>
   <script defer src="js/elementos/superficies.js"></script>
+  <script defer src="js/elementos/cuerpos.js"></script>
   <script defer src="js/models.js"></script>
   <script defer src="js/tts.js"></script>
   <script defer src="js/fx.js"></script>

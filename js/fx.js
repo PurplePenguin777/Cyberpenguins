@@ -27,6 +27,11 @@
   let camY = 0;
   let lightTarget = { x: 30, y: 72 };
 
+  function erosHorizon(nx) {
+    const dx = (nx * 1000 - 500) / 900;
+    return (900 - 640 * Math.sqrt(Math.max(0, 1 - dx * dx))) / 594;
+  }
+
   function rand(min, max) {
     return min + Math.random() * (max - min);
   }
@@ -109,8 +114,9 @@
     for (let i = 0; i < 62; i += 1) {
       let sx = rand(0.01, 0.99);
       let sy = rand(0.02, 0.96);
-      if (isEros && sx >= 0.50 && sx <= 0.86 && sy >= 0.32 && sy <= 0.72) {
-        sy = sy < 0.52 ? rand(0.03, 0.28) : rand(0.76, 0.96);
+      if (isEros) {
+        const hz = erosHorizon(sx);
+        if (sy > hz - 0.03) sy = rand(0.03, Math.max(0.05, hz - 0.05));
       }
       ambientParticles.push({
         kind: 'deep-star',
@@ -259,7 +265,7 @@
         if (p.kind === 'star' && p.y > 0.25) {
           continue;
         }
-        if (currentSite === 'asteroid-eros' && p.x >= 0.50 && p.x <= 0.86 && p.y >= 0.32 && p.y <= 0.72) {
+        if (currentSite === 'asteroid-eros' && p.y > erosHorizon(p.x)) {
           continue;
         }
 

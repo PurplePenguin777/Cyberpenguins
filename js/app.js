@@ -486,6 +486,7 @@
 
   function enterChapterFromHome(chapterId) {
     const targetId = chapterId || state.currentChapterId || 'moon';
+    if (!isChapterUnlocked(targetId)) return;
     closeAllModals();
     dom.homeScreen.classList.add('is-hidden');
     dom.launchScreen.classList.add('is-hidden');
@@ -528,7 +529,7 @@
         audioCtx = new Ctx();
       }
       if (audioCtx.state === 'suspended' && typeof audioCtx.resume === 'function') {
-        audioCtx.resume().catch(() => {});
+        audioCtx.resume().catch(() => { });
       }
       return audioCtx;
     } catch (_err) {
@@ -625,17 +626,17 @@
 
   const NASA_INSPIRATIONAL_QUOTES = [
     {
-      quote: '«Las cosas difíciles son las que más vale la pena intentar.»',
+      quote: '«Las cosas difíciles son las que más vale la pena intentar»',
       name: 'Margaret Hamilton',
       role: 'Directora de Software Apolo · NASA'
     },
     {
-      quote: '«El trabajo en equipo y la curiosidad convierten lo imposible en realidad.»',
+      quote: '«El trabajo en equipo y la curiosidad convierten lo imposible en realidad»',
       name: 'Gene Kranz',
       role: 'Director de Vuelo Apolo 11 · NASA'
     },
     {
-      quote: '«Apunta a las estrellas: con dedicación y ciencia no existen límites.»',
+      quote: '«Apunta a las estrellas: con dedicación y ciencia no existen límites»',
       name: 'Katherine Johnson',
       role: 'Matemática e Ingeniera de la NASA'
     }
@@ -1248,23 +1249,24 @@
     const shipPos = (activeMachine && activeMachine.shipPos) || chapter.shipPos;
     const isFirstStop = siteIdx === 0 && chapter.machines.length > 1;
     const nextMachine = isFirstStop ? chapter.machines[1] : null;
+    const reqs = checkSiteRequirements(chapter);
     const hatchAriaLabel = isFirstStop && nextMachine
       ? `Escotilla · Viajar a ${nextMachine.name}`
       : 'Escotilla · Quiz y Viaje';
 
-    // 1. Nave de Cyberpenguin (con escotilla abierta para descenso o EVA)
+    // 1. Nave de Cyberpenguin (con escotilla lista cuando se completan las tareas)
     parts.push(`
       <div class="stage-entity ${inSpace ? 'space-float' : ''}" data-sort-y="${shipPos.y}" style="left: ${shipPos.x}%; top: ${shipPos.y}%;">
         <button id="ship-hatch-btn" type="button" class="stage-hotspot" aria-label="${hatchAriaLabel}">
           <div id="stage-ship-svg" class="entity-svg-wrap">
             ${MODELS.spaceship({
-              hatchOpen,
-              launching: false,
-              penguinInHatch: false,
-              inSpaceFlight: inSpace
-            })}
+      hatchOpen: hatchOpen && reqs.canLeave,
+      launching: false,
+      penguinInHatch: false,
+      inSpaceFlight: inSpace
+    })}
           </div>
-          <span class="entity-status-dot ${state.chapterStars[chapter.id] > 0 ? 'done' : ''}" aria-hidden="true"></span>
+          <span class="entity-status-dot ${reqs.canLeave ? 'done' : ''}" aria-hidden="true"></span>
         </button>
       </div>
     `);
@@ -1307,7 +1309,13 @@
     if (hatchBtn) {
       hatchBtn.addEventListener('click', () => {
         const boardingPoint = resolveSurfacePoint(shipPos.x + 9.5, shipPos.y + 4.8, chapter);
-        routeAndMove(boardingPoint.x, boardingPoint.y, checkSurfaceProximity);
+        routeAndMove(boardingPoint.x, boardingPoint.y, () => {
+          checkSurfaceProximity();
+          const r = checkSiteRequirements(chapter);
+          if (!r.canLeave) {
+            showPendingTasksNotice(chapter, r.missing);
+          }
+        });
       });
     }
 
@@ -1606,6 +1614,9 @@
     } else if (type === 'ship-leave') {
       icon = '🚀';
       label = 'Abordar nave y continuar';
+    } else if (type === 'ship-locked') {
+      icon = '🔒';
+      label = 'Misión pendiente';
     }
 
     if (dom.stageActionIcon) dom.stageActionIcon.textContent = icon;
@@ -1623,6 +1634,52 @@
     if (dom.stageActionPrompt) {
       dom.stageActionPrompt.classList.add('is-hidden');
     }
+  }
+
+  function checkSiteRequirements(chapter) {
+    if (!chapter) return { canLeave: true, missing: [] };
+    const { activeMachine } = getActiveSite(chapter);
+    const missing = [];
+
+    // 1. Hablar con la sonda o máquina de la NASA en este sitio
+    if (activeMachine && !state.inspectedMachines.includes(activeMachine.id)) {
+      missing.push(`Hablar con ${activeMachine.name}`);
+    }
+
+    // 2. Recolectar todas las muestras geológicas del sitio
+    if (chapter.hasSurface) {
+      const siteSamples = getSiteSamples(chapter, activeMachine);
+      const pendingSamples = siteSamples.filter((s) => !state.collectedSamples.includes(s.id));
+      if (pendingSamples.length > 0) {
+        missing.push(
+          pendingSamples.length === 1
+            ? 'Recoger la roca pendiente'
+            : `Recoger las ${pendingSamples.length} rocas pendientes`
+        );
+      }
+    }
+
+    return {
+      canLeave: missing.length === 0,
+      missing
+    };
+  }
+
+  function showPendingTasksNotice(chapter, missing) {
+    if (!missing || missing.length === 0) return;
+    const taskText = missing.join(' y ');
+    const speechText = `¡Aún no podemos despegar! Necesitamos ${taskText}. ¡Vamos a completarlo antes de continuar el viaje!`;
+
+    openDialogueModal({
+      id: 'mission-checklist',
+      name: 'Cyberpenguin',
+      dialogue: [
+        {
+          speaker: 'Cyberpenguin',
+          text: speechText
+        }
+      ]
+    });
   }
 
   function checkSurfaceProximity() {
@@ -1679,22 +1736,32 @@
       }
     }
 
-    // 3. Escotilla de la nave espacial
+    // 3. Escotilla de la nave espacial (solo permite despegar si se completaron las tareas)
     const distToShip = getDist(penguinPos, shipPos);
     if (distToShip <= 14.5) {
-      if (isFirstStop) {
-        candidates.push({
-          type: 'ship-travel',
-          target: null,
-          dist: distToShip,
-          onAction: () => travelBetweenSites(chapter.id, 0, 1)
-        });
+      const reqs = checkSiteRequirements(chapter);
+      if (reqs.canLeave) {
+        if (isFirstStop) {
+          candidates.push({
+            type: 'ship-travel',
+            target: null,
+            dist: distToShip,
+            onAction: () => travelBetweenSites(chapter.id, 0, 1)
+          });
+        } else {
+          candidates.push({
+            type: 'ship-leave',
+            target: null,
+            dist: distToShip,
+            onAction: () => closeHatchAndOpenQuiz(chapter)
+          });
+        }
       } else {
         candidates.push({
-          type: 'ship-leave',
-          target: null,
+          type: 'ship-locked',
+          target: { missing: reqs.missing },
           dist: distToShip,
-          onAction: () => closeHatchAndOpenQuiz(chapter)
+          onAction: () => showPendingTasksNotice(chapter, reqs.missing)
         });
       }
     }
@@ -1858,6 +1925,13 @@
     }
   }
 
+  function isChapterUnlocked(chapterId) {
+    const idx = DATA.CHAPTERS.findIndex((c) => c.id === chapterId);
+    if (idx <= 0) return true;
+    const prevChapter = DATA.CHAPTERS[idx - 1];
+    return isChapterCompleted(prevChapter.id);
+  }
+
   function hasChapterProgress(chapterId) {
     const chapter = getChapter(chapterId);
     if (!chapter) return false;
@@ -1873,6 +1947,7 @@
   function renderChapterNav() {
     dom.chapterNav.innerHTML = DATA.CHAPTERS.map((chapter) => {
       const completed = isChapterCompleted(chapter.id);
+      const unlocked = isChapterUnlocked(chapter.id);
       const inProgress = !completed && hasChapterProgress(chapter.id);
       const isCardActive = inProgress && chapter.id === state.currentChapterId;
       const firstMachine = chapter.machines[0];
@@ -1882,9 +1957,8 @@
       const sceneHtml = MODELS.chapterScene(chapter.id, singleMachineSvg);
 
       return `
-        <div class="home-chapter-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
-          isCardActive ? 'is-active' : ''
-        }">
+        <div class="home-chapter-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${isCardActive ? 'is-active' : ''
+        } ${!unlocked ? 'opacity-65' : ''}">
           <div class="w-full flex items-center justify-center">
             <h3 class="text-xs sm:text-sm font-semibold tracking-wide text-slate-200 text-center">${chapter.name}</h3>
           </div>
@@ -1895,13 +1969,16 @@
 
           <div class="flex flex-col items-center gap-3 w-full">
             <button type="button"
-              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 px-4 text-xs sm:text-sm font-medium transition-colors ${
-                isCardActive
-                  ? 'bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm'
-                  : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-200 border border-white/[0.08]'
+              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 px-3 sm:px-4 font-medium transition-colors ${
+                !unlocked
+                  ? 'bg-white/[0.04] text-slate-300/85 border border-white/[0.06] cursor-not-allowed text-[11px] sm:text-xs leading-snug'
+                  : isCardActive
+                    ? 'bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm text-xs sm:text-sm'
+                    : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-200 border border-white/[0.08] text-xs sm:text-sm'
               }"
+              ${!unlocked ? 'disabled' : ''}
               data-enter-chapter="${chapter.id}">
-              ${completed ? 'Explorar de nuevo' : inProgress ? 'Continuar' : 'Explorar'}
+              ${!unlocked ? 'Completa la misión anterior para poder entrar' : completed ? 'Explorar de nuevo' : inProgress ? 'Continuar' : 'Explorar'}
             </button>
           </div>
         </div>
@@ -1947,8 +2024,7 @@
       dom.homeBadgesGrid.innerHTML = DATA.BADGES.map((item) => {
         const unlocked = totalStars >= item.minStars;
         return `
-          <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-0.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center ${
-            unlocked ? '' : 'opacity-40'
+          <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-0.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center ${unlocked ? '' : 'opacity-40'
           }" title="${item.name}">
             <div class="w-6 h-6 flex items-center justify-center [&_svg]:w-6 [&_svg]:h-6">${MODELS.badgeIcon(item.id, unlocked)}</div>
             <span class="text-[9px] font-normal text-slate-300 text-center leading-tight">${item.name}</span>
@@ -2012,6 +2088,7 @@
       state.inspectedMachines.push(machine.id);
       saveState();
       renderStageEntities(getChapter(state.currentChapterId));
+      checkSurfaceProximity();
     }
 
     showModal(dom.dialogueModal);
@@ -2262,7 +2339,13 @@
       const { activeMachine } = getActiveSite(chapter);
       updateLocationPill(chapter, activeMachine);
       renderStageEntities(chapter);
-      playHarmony('sample');
+      const reqs = checkSiteRequirements(chapter);
+      if (reqs.canLeave) {
+        playHarmony('star');
+      } else {
+        playHarmony('sample');
+      }
+      checkSurfaceProximity();
       if (FX && typeof FX.emitBurst === 'function') {
         FX.emitBurst(targetSample.pos, 'sample', chapter.id);
       }
@@ -2378,9 +2461,8 @@
           <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
             ${q.options.map((optText, oIdx) => `
               <button type="button"
-                class="quiz-option-btn px-3.5 py-2.5 flex items-center justify-center text-center gap-2.5 text-sm font-normal text-slate-100 ${
-                  selectedOpt === oIdx ? 'selected' : ''
-                }"
+                class="quiz-option-btn px-3.5 py-2.5 flex items-center justify-center text-center gap-2.5 text-sm font-normal text-slate-100 ${selectedOpt === oIdx ? 'selected' : ''
+        }"
                 data-q-idx="${qIdx}"
                 data-o-idx="${oIdx}">
                 <span class="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-xs font-medium text-amber-200 shrink-0">
@@ -2482,8 +2564,7 @@
     dom.badgesGrid.innerHTML = DATA.BADGES.map((badge) => {
       const unlocked = totalStars >= badge.minStars;
       return `
-        <div class="squircle-card p-3 flex flex-col items-center justify-center gap-1.5 text-center ${
-          unlocked ? 'border-amber-300/45' : 'opacity-55'
+        <div class="squircle-card p-3 flex flex-col items-center justify-center gap-1.5 text-center ${unlocked ? 'border-amber-300/45' : 'opacity-55'
         }">
           <div>${MODELS.badgeIcon(badge.id, unlocked)}</div>
           <span class="text-xs font-medium text-slate-100">${badge.name}</span>

@@ -181,32 +181,11 @@
           </g>
 
           <!-- Luna distante en la esquina superior derecha -->
-          <g transform="translate(810, 92)">
-            <circle cx="0" cy="0" r="18" fill="#94a3b8" />
-            <polygon points="-12,-11 2,-16 14,-6 4,4 -9,1" fill="#e2e8f0" />
-            <polygon points="14,-6 16,6 5,16 4,4" fill="#cbd5e1" />
-            <polygon points="-9,1 4,4 5,16 -11,12 -16,-2" fill="#64748b" />
-          </g>
+          <g transform="translate(810, 92)">${M.planetBody('moon', 18, { uid: 'xmoonl' })}</g>
 
-          <!-- Curvatura de la Tierra con borde atmosférico luminoso -->
-          <g>
-            <path d="M -80,270 Q 240,190 520,560 L -80,560 Z" fill="url(#${id}-rim)" />
-            <path d="M -80,288 Q 230,210 500,560 L -80,560 Z" fill="#1852a4" />
-            <polygon points="-80,288 100,265 160,360 -80,400" fill="#2b7be0" />
-            <polygon points="100,265 260,300 295,410 160,360" fill="#2167c4" />
-            <polygon points="260,300 400,385 410,560 295,410" fill="#1d59ad" />
-            <polygon points="-80,400 160,360 295,410 200,560 -80,560" fill="#154791" />
-            <polygon points="295,410 410,560 500,560 400,385" fill="#113c7d" />
-
-            <polygon points="20,298 135,276 200,332 158,405 45,388" fill="#359c65" />
-            <polygon points="135,276 220,308 200,332" fill="#57cc85" />
-            <polygon points="45,388 158,405 186,480 30,468" fill="#25784d" />
-            <polygon points="270,370 355,398 375,470 300,458" fill="#3ba96e" />
-
-            <!-- Nubes atmosféricas fluidas con curvas suaves -->
-            <path d="M 60,285 Q 120,265 180,282 Q 230,300 200,320 Q 140,305 60,285 Z" fill="#ffffff" opacity="0.75" />
-            <path d="M 170,340 Q 250,325 310,358 Q 340,385 280,380 Q 220,360 170,340 Z" fill="#ffffff" opacity="0.72" />
-            <path d="M -20,330 Q 50,310 110,340 Q 90,370 20,360 Z" fill="#e0f2fe" opacity="0.65" />
+          <g transform="translate(250, 880)">
+            <circle r="566" fill="#7ce8ff" opacity="0.3" />
+            ${M.planetBody('earth', 560, { uid: 'xearthl' })}
           </g>
 
           <g class="travel-ship-cruise" transform="translate(440, 138) rotate(36) scale(0.88)">
@@ -241,33 +220,11 @@
           </g>
 
           <!-- Luna distante en la esquina superior derecha -->
-          <g transform="translate(440, 96)">
-            <circle cx="0" cy="0" r="18" fill="#94a3b8" />
-            <polygon points="-12,-11 2,-16 14,-6 4,4 -9,1" fill="#e2e8f0" />
-            <polygon points="14,-6 16,6 5,16 4,4" fill="#cbd5e1" />
-            <polygon points="-9,1 4,4 5,16 -11,12 -16,-2" fill="#64748b" />
-          </g>
+          <g transform="translate(440, 96)">${M.planetBody('moon', 18, { uid: 'xmoonp' })}</g>
 
-          <!-- Curvatura de la Tierra que llena toda la mitad inferior de 520 a 960 -->
-          <g>
-            <path d="M -30,520 Q 270,430 570,520 L 570,980 L -30,980 Z" fill="url(#${id}-rim-p)" />
-            <path d="M -30,538 Q 270,452 570,538 L 570,980 L -30,980 Z" fill="#1852a4" />
-            <!-- Océano azul cobalto facetado -->
-            <polygon points="-30,538 120,505 190,620 -30,660" fill="#2b7be0" />
-            <polygon points="120,505 270,480 320,610 190,620" fill="#2167c4" />
-            <polygon points="270,480 430,505 390,615 320,610" fill="#1d59ad" />
-            <polygon points="430,505 570,538 570,660 390,615" fill="#1852a4" />
-            <polygon points="-30,660 190,620 320,610 390,615 570,660 570,980 -30,980" fill="#113c7d" />
-
-            <!-- Continente verde -->
-            <polygon points="50,570 150,535 220,580 180,660 70,650" fill="#359c65" />
-            <polygon points="150,535 240,565 220,580" fill="#57cc85" />
-            <polygon points="340,565 440,545 490,610 430,650 350,630" fill="#3ba96e" />
-
-            <!-- Nubes atmosféricas curvadas y fluidas (sin triángulos toscos) -->
-            <path d="M 130,520 Q 185,505 240,522 Q 275,540 230,550 Q 175,536 130,520 Z" fill="#ffffff" opacity="0.75" />
-            <path d="M 250,565 Q 310,550 370,580 Q 360,610 290,598 Q 240,585 250,565 Z" fill="#ffffff" opacity="0.72" />
-            <path d="M 30,590 Q 90,570 145,595 Q 120,625 50,615 Z" fill="#e0f2fe" opacity="0.65" />
+          <g transform="translate(270, 1460)">
+            <circle r="966" fill="#7ce8ff" opacity="0.3" />
+            ${M.planetBody('earth', 960, { uid: 'xearthp' })}
           </g>
 
           <!-- Nave Cyberpenguin orientada en ascenso orbital -->

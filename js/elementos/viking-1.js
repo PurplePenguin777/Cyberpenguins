@@ -1,7 +1,10 @@
 /**
- * Hardware NASA 3/6 (estética low-poly): Viking 1 Lander (Marte).
- * Cuerpo hexagonal ancho low-poly en plata/blanco mate, 3 patas metálicas con platos,
- * cubiertas doradas RTG y gran antena parabólica circular blanca orientada hacia arriba.
+ * Hardware NASA 3/6 (estilo "facetado fiel"): Viking 1 Lander (Marte).
+ * Referencia: cuerpo hexagonal bajo, 3 patas con platos, 2 cámaras sobre postes cortos,
+ * 2 generadores RTG bajo cubiertas metálicas contra el viento, antena de alta ganancia
+ * pequeña (disco de ~0,75 m) sobre un mástil en una esquina, antena UHF de paleta,
+ * pluma meteorológica y brazo recolector con cuchara al frente.
+ * Luz arriba-izquierda: cara superior clara, lado izquierdo medio-claro, lado derecho en sombra.
  */
 (function (global) {
   'use strict';
@@ -16,8 +19,85 @@
   }
   const uid = M.uid;
 
+  const S = M.STYLE || {
+    outline: '#334155',
+    metal: { light: '#f1f5f9', mid: '#cbd5e1', dark: '#64748b' },
+    kapton: { light: '#fde68a', mid: '#f59e0b', dark: '#b45309' }
+  };
+
+  const f = (v) => Number(v).toFixed(1);
+  const poly = (pts) => pts.map((p) => `${f(p[0])},${f(p[1])}`).join(' ');
+
+  // Disco parabólico pequeño: cara en abanico de tres tonos
+  function dish(cx, cy, rx, ry, rotDeg, N) {
+    const rot = (rotDeg * Math.PI) / 180;
+    const rim = (t) => {
+      const x = rx * Math.cos(t);
+      const y = ry * Math.sin(t);
+      return [cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)];
+    };
+    const shell = [];
+    const rimLine = [];
+    for (let i = 0; i < 24; i += 1) {
+      const p = rim((i / 24) * Math.PI * 2);
+      rimLine.push(p);
+      shell.push([p[0] - 2, p[1] + 2]);
+    }
+    let fan = '';
+    for (let i = 0; i < N; i += 1) {
+      const t0 = (i / N) * Math.PI * 2;
+      const t1 = ((i + 1) / N) * Math.PI * 2;
+      const mid = rim((t0 + t1) / 2);
+      const vx = mid[0] - cx;
+      const vy = mid[1] - cy;
+      const len = Math.hypot(vx, vy) || 1;
+      const d = (vx / len) * 0.55 + (vy / len) * 0.83;
+      const tone = d > 0.35 ? '#ffffff' : d > -0.25 ? '#e2e8f0' : d > -0.7 ? '#cbd5e1' : '#94a3b8';
+      const a = rim(t0);
+      const b = rim(t1);
+      fan += `<polygon points="${f(cx)},${f(cy)} ${f(a[0])},${f(a[1])} ${f(b[0])},${f(b[1])}" fill="${tone}" stroke="${tone}" stroke-width="0.5" stroke-linejoin="round" />`;
+    }
+    return `
+      <polygon points="${poly(shell)}" fill="#64748b" stroke="${S.outline}" stroke-width="0.9" stroke-linejoin="round" />
+      ${fan}
+      <polygon points="${poly(rimLine)}" fill="none" stroke="${S.metal.dark}" stroke-width="1.1" stroke-linejoin="round" />
+    `;
+  }
+
+  // Cubierta contra el viento de un RTG: cilindro con costillas
+  function rtgCover(x, y) {
+    let ribs = '';
+    for (let i = 1; i < 5; i += 1) {
+      ribs += `<line x1="${x + i * 3.2}" y1="${y + 0.8}" x2="${x + i * 3.2}" y2="${y + 9.2}" />`;
+    }
+    return `
+      <rect x="${x}" y="${y}" width="16" height="10" rx="3" fill="${S.metal.mid}" stroke="${S.outline}" stroke-width="0.9" />
+      <rect x="${x}" y="${y}" width="16" height="3.2" rx="1.6" fill="${S.metal.light}" opacity="0.8" />
+      <g stroke="${S.metal.dark}" stroke-width="0.8">${ribs}</g>
+    `;
+  }
+
   function viking1() {
     const id = uid('vik');
+
+    // Cuerpo: hexágono achatado, cara superior y 3 caras laterales visibles
+    const cx = 79;
+    const cy = 70;
+    const rx = 38;
+    const ry = 11;
+    const depth = 16;
+    const top = [0, 60, 120, 180, 240, 300].map((deg) => {
+      const a = (deg * Math.PI) / 180;
+      return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)];
+    });
+    const bot = top.map((p) => [p[0], p[1] + depth]);
+    const hatch = top.map((p) => [cx + (p[0] - cx) * 0.6, cy - 1 + (p[1] - cy) * 0.6]);
+    const sideTones = ['#94a3b8', '#cbd5e1', '#e2e8f0'];
+    let sides = '';
+    for (let i = 0; i < 3; i += 1) {
+      sides += `<polygon points="${poly([top[i], top[i + 1], bot[i + 1], bot[i]])}" fill="${sideTones[i]}" stroke="${S.outline}" stroke-width="1" stroke-linejoin="round" />`;
+    }
+
     return `
       <svg viewBox="0 0 158 138" width="120" height="105" aria-hidden="true">
         <defs>
@@ -25,69 +105,54 @@
             <stop offset="0%" stop-color="rgba(3,6,18,0.58)" />
             <stop offset="100%" stop-color="rgba(3,6,18,0)" />
           </radialGradient>
-          <radialGradient id="${id}-dish" cx="40%" cy="38%" r="65%">
-            <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="70%" stop-color="#e2e8f0" />
-            <stop offset="100%" stop-color="#94a3b8" />
-          </radialGradient>
         </defs>
 
-        <ellipse cx="79" cy="123" rx="52" ry="12" fill="url(#${id}-shadow)" />
+        <ellipse cx="79" cy="123" rx="58" ry="11" fill="url(#${id}-shadow)" />
 
-        <!-- 3 Patas metálicas con platos -->
-        <g>
-          <line x1="50" y1="85" x2="29" y2="118" stroke="#e2e8f0" stroke-width="4.2" stroke-linecap="round" />
-          <line x1="58" y1="78" x2="40" y2="112" stroke="#64748b" stroke-width="2" />
-          <ellipse cx="29" cy="119" rx="11" ry="4" fill="#f1f5f9" stroke="#64748b" stroke-width="1" />
-
-          <line x1="108" y1="85" x2="129" y2="118" stroke="#94a3b8" stroke-width="4.2" stroke-linecap="round" />
-          <line x1="100" y1="78" x2="118" y2="112" stroke="#475569" stroke-width="2" />
-          <ellipse cx="129" cy="119" rx="11" ry="4" fill="#cbd5e1" stroke="#475569" stroke-width="1" />
-
-          <line x1="79" y1="90" x2="79" y2="125" stroke="#cbd5e1" stroke-width="4.2" stroke-linecap="round" />
-          <ellipse cx="79" cy="126" rx="11" ry="4" fill="#e2e8f0" stroke="#475569" stroke-width="1" />
+        <!-- 3 patas con puntal y plato -->
+        <g stroke-linecap="round">
+          <line x1="56" y1="80" x2="38" y2="106" stroke="${S.metal.dark}" stroke-width="2" />
+          <line x1="48" y1="84" x2="26" y2="116" stroke="${S.metal.light}" stroke-width="4.2" />
+          <line x1="102" y1="80" x2="120" y2="106" stroke="${S.metal.dark}" stroke-width="2" />
+          <line x1="110" y1="84" x2="132" y2="116" stroke="${S.metal.mid}" stroke-width="4.2" />
+          <line x1="79" y1="92" x2="79" y2="123" stroke="${S.metal.light}" stroke-width="4.2" />
         </g>
+        <ellipse cx="26" cy="117" rx="11" ry="4" fill="${S.metal.light}" stroke="${S.metal.dark}" stroke-width="1" />
+        <ellipse cx="132" cy="117" rx="11" ry="4" fill="${S.metal.mid}" stroke="${S.metal.dark}" stroke-width="1" />
+        <ellipse cx="79" cy="124" rx="11" ry="4" fill="${S.metal.light}" stroke="${S.metal.dark}" stroke-width="1" />
 
-        <!-- Cuerpo hexagonal ancho facetado en blanco/plata (Diapositiva 4) -->
-        <polygon points="34,68 79,53 124,68 118,89 79,97 40,89" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" stroke-linejoin="round" />
-        <polygon points="34,68 79,53 79,97 40,89" fill="#f8fafc" />
-        <polygon points="79,53 124,68 118,89 79,97" fill="#94a3b8" />
-        <polygon points="48,70 79,60 110,70 107,87 79,93 51,87" fill="#e2e8f0" stroke="#64748b" stroke-width="0.9" />
+        <!-- Pluma meteorológica a la izquierda -->
+        <line x1="42" y1="66" x2="20" y2="46" stroke="${S.metal.light}" stroke-width="2" stroke-linecap="round" />
+        <circle cx="19" cy="45" r="2.4" fill="#38bdf8" stroke="${S.outline}" stroke-width="0.7" />
 
-        <!-- Bahía técnica frontal oscura y cubiertas RTG -->
-        <rect x="65" y="72" width="28" height="16" rx="1.5" fill="#1e293b" stroke="#94a3b8" stroke-width="0.9" />
-        <rect x="69" y="75" width="11" height="6" fill="#f8fafc" />
-        <rect x="71" y="76.5" width="7" height="1.5" fill="#2563eb" />
-        <circle cx="86" cy="79" r="2.2" fill="#38bdf8" />
+        <!-- Cuerpo hexagonal -->
+        ${sides}
+        <polygon points="${poly(top)}" fill="${S.metal.light}" stroke="${S.outline}" stroke-width="1" stroke-linejoin="round" />
+        <polygon points="${poly(hatch)}" fill="#94a3b8" stroke="${S.metal.dark}" stroke-width="0.9" stroke-linejoin="round" />
 
-        <polygon points="33,66 47,63 48,80 35,82" fill="#f59e0b" stroke="#78350f" stroke-width="0.9" />
-        <polygon points="111,63 125,66 123,82 110,80" fill="#d97706" stroke="#78350f" stroke-width="0.9" />
+        <!-- Cubiertas de RTG a ambos lados de la cubierta superior -->
+        ${rtgCover(38, 62)}
+        ${rtgCover(104, 62)}
 
-        <!-- 2 Cámaras estereoscópicas cilíndricas -->
-        <g>
-          <rect x="55" y="45" width="6.5" height="18" rx="1.5" fill="#f1f5f9" stroke="#475569" stroke-width="0.9" />
-          <rect x="54.5" y="46" width="7.5" height="4" rx="1" fill="#1e293b" />
-          <circle cx="58.2" cy="48" r="1.2" fill="#38bdf8" />
+        <!-- Antena UHF de paleta y mástil -->
+        <line x1="60" y1="62" x2="57" y2="44" stroke="${S.metal.dark}" stroke-width="1.8" stroke-linecap="round" />
+        <polygon points="51,37 62,39 61,47 50,45" fill="${S.metal.light}" stroke="${S.outline}" stroke-width="0.9" stroke-linejoin="round" />
 
-          <rect x="96.5" y="45" width="6.5" height="18" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="0.9" />
-          <rect x="96" y="46" width="7.5" height="4" rx="1" fill="#1e293b" />
-          <circle cx="99.8" cy="48" r="1.2" fill="#38bdf8" />
-        </g>
+        <!-- 2 cámaras sobre postes cortos -->
+        <rect x="65" y="50" width="6" height="14" rx="1.4" fill="${S.metal.mid}" stroke="${S.outline}" stroke-width="0.9" />
+        <rect x="64.5" y="48" width="7" height="5" rx="1.2" fill="#1e293b" />
+        <circle cx="68" cy="50.5" r="1.2" fill="#38bdf8" />
+        <rect x="85" y="50" width="6" height="14" rx="1.4" fill="${S.metal.light}" stroke="${S.outline}" stroke-width="0.9" />
+        <rect x="84.5" y="48" width="7" height="5" rx="1.2" fill="#1e293b" />
+        <circle cx="88" cy="50.5" r="1.2" fill="#38bdf8" />
 
-        <!-- Gran antena parabólica circular blanca frontal (Diapositiva 4) -->
-        <rect x="76.5" y="42" width="5" height="19" fill="#94a3b8" />
-        <circle cx="79" cy="28" r="20.5" fill="url(#${id}-dish)" stroke="#64748b" stroke-width="1.3" />
-        <circle cx="79" cy="28" r="15.5" fill="none" stroke="rgba(100,116,139,0.28)" stroke-width="1" />
-        <line x1="65" y1="28" x2="79" y2="21" stroke="#475569" stroke-width="1.3" />
-        <line x1="93" y1="28" x2="79" y2="21" stroke="#475569" stroke-width="1.3" />
-        <line x1="79" y1="42" x2="79" y2="21" stroke="#334155" stroke-width="1.5" />
-        <circle cx="79" cy="21" r="2.8" fill="#1e293b" stroke="#f8fafc" stroke-width="0.9" />
+        <!-- Antena de alta ganancia pequeña sobre mástil -->
+        <line x1="100" y1="62" x2="110" y2="42" stroke="${S.metal.dark}" stroke-width="2" stroke-linecap="round" />
+        ${dish(113, 33, 10, 12, 25, 10)}
 
-        <!-- Brazo meteorológico y colector -->
-        <line x1="42" y1="66" x2="23" y2="49" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" />
-        <circle cx="22" cy="48" r="2.3" fill="#38bdf8" />
-        <path d="M 113,75 L 142,87 L 140,92 L 111,80 Z" fill="#cbd5e1" stroke="#475569" stroke-width="0.9" />
-        <path d="M 139,86 L 149,89 L 146,95 L 136,91 Z" fill="#f05432" />
+        <!-- Brazo recolector con cuchara al frente-derecha -->
+        <line x1="96" y1="84" x2="134" y2="97" stroke="${S.metal.light}" stroke-width="2.4" stroke-linecap="round" />
+        <polygon points="132,94 142,97 140,103 130,100" fill="${S.metal.mid}" stroke="${S.outline}" stroke-width="0.9" stroke-linejoin="round" />
       </svg>
     `;
   }

@@ -1,8 +1,11 @@
 /**
- * Hardware NASA 4/6 (precisión científica + low-poly): Mars Pathfinder Sojourner Rover (Marte).
- * 6 ruedas de aluminio con tacos metálicos y suspensión rocker-bogie, Warm Electronics Box (WEB)
- * aislada con Kapton dorado, panel solar plano GaAs en el techo (sin mástil alto),
- * cámaras estéreo y láseres integrados en el frente del chasis, APXS desplegado y antena UHF trasera.
+ * Hardware NASA 4/6 (estilo "facetado fiel"): Mars Pathfinder Sojourner Rover (Marte).
+ * Referencia: ~65 cm de largo, 48 cm de ancho, ~30 cm de alto; 6 ruedas de 13 cm con tacos,
+ * suspensión rocker-bogie, panel solar plano de GaAs cubriendo toda la parte superior,
+ * cámaras estéreo y 5 proyectores láser en el FRENTE, espectrómetro APXS en la parte TRASERA
+ * y antena UHF trasera.
+ * Frente del rover hacia la derecha. Luz arriba-izquierda: cara superior clara,
+ * cara lateral media, cara frontal en sombra.
  */
 (function (global) {
   'use strict';
@@ -17,33 +20,57 @@
   }
   const uid = M.uid;
 
-  function wheelSvg(cx, cy, isFront = true) {
-    const tireFill = isFront ? '#475569' : '#334155';
-    const rimFill = isFront ? '#94a3b8' : '#64748b';
-    const hubFill = isFront ? '#cbd5e1' : '#94a3b8';
-    const stroke = isFront ? '#cbd5e1' : '#64748b';
+  const S = M.STYLE || {
+    outline: '#334155',
+    metal: { light: '#f1f5f9', mid: '#cbd5e1', dark: '#64748b' },
+    solar: { light: '#3b82f6', mid: '#1d4ed8', dark: '#172554' }
+  };
+
+  const f = (v) => Number(v).toFixed(1);
+
+  function wheel(cx, cy, far) {
+    const rx = 9;
+    const ry = 10.5;
+    const tire = far ? '#334155' : '#475569';
+    const rim = far ? '#64748b' : '#94a3b8';
+    const hub = far ? '#94a3b8' : '#e2e8f0';
+    let cleats = '';
+    for (let i = 0; i < 10; i += 1) {
+      const a = (i / 10) * Math.PI * 2;
+      const c = Math.cos(a);
+      const s = Math.sin(a);
+      cleats += `<line x1="${f(cx + c * rx * 0.86)}" y1="${f(cy + s * ry * 0.86)}" x2="${f(cx + c * (rx + 1.6))}" y2="${f(cy + s * (ry + 1.6))}" />`;
+    }
     return `
       <g>
-        <ellipse cx="${cx}" cy="${cy}" rx="9.5" ry="10.5" fill="${tireFill}" stroke="${stroke}" stroke-width="1.3" />
-        <!-- Tacos metálicos (cleats) para tracción sobre regolito marciano -->
-        <g stroke="#e2e8f0" stroke-width="1.4" stroke-linecap="round">
-          <line x1="${cx}" y1="${cy - 11.2}" x2="${cx}" y2="${cy - 8.4}" />
-          <line x1="${cx}" y1="${cy + 8.4}" x2="${cx}" y2="${cy + 11.2}" />
-          <line x1="${cx - 10.2}" y1="${cy}" x2="${cx - 7.6}" y2="${cy}" />
-          <line x1="${cx + 7.6}" y1="${cy}" x2="${cx + 10.2}" y2="${cy}" />
-          <line x1="${cx - 7.2}" y1="${cy - 7.6}" x2="${cx - 5.2}" y2="${cy - 5.6}" />
-          <line x1="${cx + 5.2}" y1="${cy - 5.6}" x2="${cx + 7.2}" y2="${cy - 7.6}" />
-          <line x1="${cx - 7.2}" y1="${cy + 7.6}" x2="${cx - 5.2}" y2="${cy + 5.6}" />
-          <line x1="${cx + 5.2}" y1="${cy + 5.6}" x2="${cx + 7.2}" y2="${cy + 7.6}" />
-        </g>
-        <ellipse cx="${cx}" cy="${cy}" rx="5" ry="5.5" fill="${rimFill}" stroke="#334155" stroke-width="0.9" />
-        <circle cx="${cx}" cy="${cy}" r="2.1" fill="${hubFill}" />
+        <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${tire}" stroke="${S.outline}" stroke-width="1" />
+        <g stroke="#e2e8f0" stroke-width="1.3" stroke-linecap="round">${cleats}</g>
+        <ellipse cx="${cx}" cy="${cy}" rx="${rx * 0.55}" ry="${ry * 0.55}" fill="${rim}" stroke="${S.outline}" stroke-width="0.8" />
+        <circle cx="${cx}" cy="${cy}" r="2.2" fill="${hub}" />
       </g>
     `;
   }
 
   function sojourner() {
     const id = uid('soj');
+
+    // Panel solar: cuadrícula de celdas sobre la cara superior
+    let grid = '';
+    for (let i = 1; i < 6; i += 1) {
+      const t = i / 6;
+      grid += `<line x1="${f(40 + 68 * t)}" y1="60.5" x2="${f(53 + 69 * t)}" y2="54.5" />`;
+    }
+    for (let j = 1; j < 3; j += 1) {
+      const v = j / 3;
+      grid += `<line x1="${f(40 + 13 * v)}" y1="${f(60.5 - 6 * v)}" x2="${f(108 + 14 * v)}" y2="${f(60.5 - 6 * v)}" />`;
+    }
+
+    // 5 proyectores láser en la cara frontal
+    let lasers = '';
+    [0.12, 0.32, 0.52, 0.72, 0.92].forEach((t) => {
+      lasers += `<circle cx="${f(114 + 16 * t)}" cy="${f(72 - 9 * t)}" r="1.15" fill="#ef4444" />`;
+    });
+
     return `
       <svg viewBox="0 0 152 118" width="118" height="92" aria-hidden="true">
         <defs>
@@ -51,78 +78,62 @@
             <stop offset="0%" stop-color="rgba(3,6,18,0.58)" />
             <stop offset="100%" stop-color="rgba(3,6,18,0)" />
           </radialGradient>
-          <linearGradient id="${id}-kapton" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#fbbf24" />
-            <stop offset="52%" stop-color="#f59e0b" />
-            <stop offset="100%" stop-color="#d97706" />
-          </linearGradient>
-          <linearGradient id="${id}-solar" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#2563eb" />
-            <stop offset="65%" stop-color="#1e3a8a" />
-            <stop offset="100%" stop-color="#0f172a" />
-          </linearGradient>
         </defs>
 
-        <ellipse cx="76" cy="103" rx="52" ry="12" fill="url(#${id}-shadow)" />
+        <ellipse cx="76" cy="103" rx="58" ry="11" fill="url(#${id}-shadow)" />
 
-        <!-- 3 Ruedas del lado lejano -->
-        <g>
-          ${wheelSvg(44, 83, false)}
-          ${wheelSvg(74, 86, false)}
-          ${wheelSvg(106, 82, false)}
+        <!-- Lado lejano: ruedas y brazos en tono oscuro -->
+        <g stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <polyline points="128,83 78,65" />
+          <polyline points="52,83 78,65 90,83" />
+        </g>
+        ${wheel(52, 83, true)}
+        ${wheel(90, 83, true)}
+        ${wheel(128, 83, true)}
+
+        <!-- Antena látigo UHF trasera -->
+        <line x1="50" y1="55" x2="43" y2="22" stroke="${S.metal.light}" stroke-width="1.5" stroke-linecap="round" />
+        <circle cx="43" cy="21.5" r="2" fill="#f59e0b" stroke="#78350f" stroke-width="0.7" />
+
+        <!-- Cuerpo (Warm Electronics Box): cara superior clara, lateral media, frontal en sombra -->
+        <polygon points="34,62 114,62 130,53 50,53" fill="${S.metal.light}" stroke="${S.outline}" stroke-width="1" stroke-linejoin="round" />
+        <polygon points="34,62 114,62 114,81 34,81" fill="${S.metal.mid}" stroke="${S.outline}" stroke-width="1" stroke-linejoin="round" />
+        <polygon points="114,62 130,53 130,72 114,81" fill="#94a3b8" stroke="${S.outline}" stroke-width="1" stroke-linejoin="round" />
+        <polygon points="34,62 114,62 114,66 34,66" fill="${S.metal.light}" opacity="0.7" />
+        <g stroke="${S.metal.dark}" stroke-width="0.8" opacity="0.8">
+          <line x1="56" y1="66" x2="56" y2="81" />
+          <line x1="78" y1="66" x2="78" y2="81" />
+          <line x1="98" y1="66" x2="98" y2="81" />
         </g>
 
-        <!-- Antena látigo UHF trasera (sin mástil de cámaras) -->
-        <line x1="39" y1="53" x2="35" y2="23" stroke="#e2e8f0" stroke-width="1.6" stroke-linecap="round" />
-        <circle cx="35" cy="22" r="2.2" fill="#f59e0b" stroke="#78350f" stroke-width="0.7" />
+        <!-- Panel solar plano de arseniuro de galio sobre toda la cara superior -->
+        <polygon points="40,60.5 108,60.5 122,54.5 53,54.5" fill="${S.solar.mid}" stroke="#93c5fd" stroke-width="1" stroke-linejoin="round" />
+        <g stroke="#60a5fa" stroke-width="0.7" opacity="0.85">${grid}</g>
 
-        <!-- Chasis Warm Electronics Box (WEB) con Kapton dorado y bastidor de aluminio -->
-        <polygon points="35,54 94,48 117,59 115,78 80,84 33,76" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" stroke-linejoin="round" />
-        <!-- Cara lateral revestida de Kapton dorado dentro de marco de aluminio -->
-        <polygon points="34,56 82,61 80,83 33,76" fill="#e2e8f0" />
-        <polygon points="38,59 77,63 76,79 37,73" fill="url(#${id}-kapton)" stroke="#92400e" stroke-width="0.9" />
-        <line x1="51" y1="60" x2="50" y2="75" stroke="#fde68a" stroke-width="0.7" opacity="0.75" />
-        <line x1="64" y1="62" x2="63" y2="77" stroke="#b45309" stroke-width="0.7" opacity="0.75" />
+        <!-- FRENTE: cámaras estéreo y láseres -->
+        <circle cx="118.8" cy="59.3" r="2.3" fill="#0f172a" stroke="${S.metal.light}" stroke-width="0.8" />
+        <circle cx="118.8" cy="59.3" r="1" fill="#38bdf8" />
+        <circle cx="125.2" cy="55.7" r="2.3" fill="#0f172a" stroke="${S.metal.light}" stroke-width="0.8" />
+        <circle cx="125.2" cy="55.7" r="1" fill="#38bdf8" />
+        ${lasers}
 
-        <!-- Cara frontal del chasis con cámaras estéreo y proyectores láser integrados (sin mástil superior) -->
-        <polygon points="82,61 117,59 115,78 80,83" fill="#94a3b8" />
-        <rect x="85" y="62" width="27" height="12" rx="1.5" fill="#e2e8f0" stroke="#475569" stroke-width="0.8" />
-        <!-- Cámara estéreo izquierda + derecha -->
-        <circle cx="91" cy="67.5" r="2.6" fill="#0f172a" stroke="#475569" stroke-width="0.8" />
-        <circle cx="91" cy="67.5" r="1.2" fill="#38bdf8" />
-        <circle cx="105.5" cy="66.5" r="2.6" fill="#0f172a" stroke="#475569" stroke-width="0.8" />
-        <circle cx="105.5" cy="66.5" r="1.2" fill="#38bdf8" />
-        <!-- Proyector central de franjas láser -->
-        <rect x="96.5" y="66" width="4" height="2.4" rx="0.6" fill="#ef4444" />
+        <!-- TRASERA: APXS desplegado hacia el suelo detrás del rover -->
+        <rect x="24" y="64" width="10" height="10" rx="1.5" fill="#475569" stroke="${S.outline}" stroke-width="0.9" />
+        <line x1="27" y1="74" x2="19" y2="90" stroke="${S.metal.light}" stroke-width="2.2" stroke-linecap="round" />
+        <polygon points="12,90 25,90 26,99 11,99" fill="#d97706" stroke="#78350f" stroke-width="0.9" stroke-linejoin="round" />
+        <ellipse cx="18.5" cy="99" rx="6.5" ry="1.8" fill="${S.metal.light}" stroke="${S.outline}" stroke-width="0.7" />
 
-        <!-- Espectrómetro de Rayos X y Partículas Alfa (APXS) desplegado al frente -->
-        <g>
-          <line x1="112" y1="73" x2="132" y2="81" stroke="#cbd5e1" stroke-width="2.4" stroke-linecap="round" />
-          <polygon points="129,77 137,80 135,88 127,85" fill="#d97706" stroke="#78350f" stroke-width="0.9" />
-          <circle cx="135" cy="85" r="2.2" fill="#e2e8f0" stroke="#475569" stroke-width="0.8" />
+        <!-- Suspensión rocker-bogie del lado cercano -->
+        <g stroke="${S.metal.light}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <polyline points="112,92 62,74" />
+          <polyline points="36,92 62,74 74,92" />
         </g>
+        <circle cx="62" cy="74" r="2.8" fill="${S.metal.dark}" stroke="${S.metal.light}" stroke-width="1" />
 
-        <!-- Techo plano con panel solar de arseniuro de galio (GaAs) ajustado sobre la WEB -->
-        <polygon points="34,52 79,41 114,50 69,61" fill="url(#${id}-solar)" stroke="#93c5fd" stroke-width="1.3" stroke-linejoin="round" />
-        <g stroke="#60a5fa" stroke-width="0.8" opacity="0.85">
-          <line x1="45" y1="49" x2="80" y2="58" />
-          <line x1="56" y1="46.5" x2="91" y2="55.5" />
-          <line x1="67" y1="44" x2="102" y2="53" />
-          <line x1="51" y1="56.5" x2="96" y2="45.5" />
-        </g>
-
-        <!-- Suspensión articulada rocker-bogie -->
-        <g stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          <polyline points="47,91 64,74 82,82" />
-          <polyline points="64,74 92,71 113,86" />
-        </g>
-
-        <!-- 3 Ruedas delanteras de aluminio con tacos metálicos -->
-        <g>
-          ${wheelSvg(47, 91, true)}
-          ${wheelSvg(82, 95, true)}
-          ${wheelSvg(113, 87, true)}
-        </g>
+        <!-- 3 ruedas cercanas con tacos metálicos -->
+        ${wheel(36, 92, false)}
+        ${wheel(74, 92, false)}
+        ${wheel(112, 92, false)}
       </svg>
     `;
   }

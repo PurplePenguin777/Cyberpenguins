@@ -17,15 +17,7 @@
   };
 
   function facetedPhobos(cx, cy, scale) {
-    return `
-      <g transform="translate(${cx}, ${cy}) scale(${scale})">
-        <polygon points="-18,-6 -8,-15 8,-14 19,-4 15,10 -2,14 -15,8" fill="#8b6f63" />
-        <polygon points="-8,-15 8,-14 4,0 -11,-3" fill="#c2a799" />
-        <polygon points="8,-14 19,-4 15,10 4,0" fill="#a08375" />
-        <polygon points="-15,8 4,0 -2,14" fill="#6b5248" />
-        <polygon points="-3,-6 3,-7 5,-2 -1,0" fill="#5e473e" />
-      </g>
-    `;
+    return `<g transform="translate(${cx}, ${cy})">${M.phobosBody(19 * scale, { uid: M.uid('phobos') })}</g>`;
   }
 
   function stageBackdropMarte(siteId) {
