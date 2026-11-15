@@ -137,7 +137,12 @@
     if (FX && typeof FX.pause === 'function') {
       FX.pause();
     }
-    startLaunchCinematic();
+    if (state.launched) {
+      dom.launchScreen.classList.add('hidden-screen', 'is-hidden');
+      showHomeScreen();
+    } else {
+      startLaunchCinematic();
+    }
   }
 
   function cacheDom() {
@@ -1632,11 +1637,8 @@
         <div class="home-chapter-card p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
           isActive ? 'is-active' : ''
         }">
-          <div class="w-full flex items-center justify-between gap-2">
-            <span class="text-[10.5px] font-medium uppercase tracking-[0.22em] text-slate-400">${chapter.name}</span>
-            <span class="text-[11px] font-medium tabular-nums ${
-              completed ? 'text-emerald-300' : 'text-amber-200/90'
-            }">★ ${stars}/5</span>
+          <div class="w-full flex items-center justify-center">
+            <span class="text-[11px] font-medium uppercase tracking-[0.22em] text-slate-400 text-center">${chapter.name}</span>
           </div>
 
           <div class="home-chapter-emblem relative flex flex-col items-center justify-end w-full pt-2">
@@ -1714,11 +1716,15 @@
       certPreview.classList.toggle('is-unlocked', allCompleted);
       certPreview.innerHTML = `
         <div class="flex items-center justify-center">${MODELS.penguinPawStamp(allCompleted, 26)}</div>
-        <span class="text-xs font-medium text-center ${allCompleted ? 'text-amber-200' : 'text-slate-300'}">${badge.name}</span>
       `;
     }
+    const certActions = document.getElementById('home-certificate-actions');
     if (dom.homeCertificateStatus) {
-      dom.homeCertificateStatus.textContent = '';
+      dom.homeCertificateStatus.textContent = allCompleted ? '' : 'Disponible al completar todos los capítulos';
+      dom.homeCertificateStatus.classList.toggle('hidden', allCompleted);
+    }
+    if (certActions) {
+      certActions.classList.toggle('hidden', !allCompleted);
     }
     if (dom.openCertificateBtn) {
       dom.openCertificateBtn.disabled = !allCompleted;

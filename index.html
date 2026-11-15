@@ -291,8 +291,8 @@
 
     <div class="home-panel max-w-6xl w-full px-3 sm:px-6 py-4 sm:py-6 flex flex-col gap-6 sm:gap-8">
       <!-- Encabezado Minimalista -->
-      <header class="flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3.5">
+      <header class="relative flex items-center justify-center py-2">
+        <div class="flex items-center justify-center gap-3">
           <div class="w-10 h-10 rounded-2xl bg-white/[0.045] backdrop-blur-xl border border-white/[0.12] flex items-center justify-center shrink-0">
             <svg viewBox="0 0 36 36" width="22" height="22" aria-hidden="true">
               <polygon points="18,4 30,14 18,22 6,14" fill="#e2e8f0" />
@@ -300,16 +300,13 @@
               <polygon points="30,14 18,22 18,32" fill="#0284c7" opacity="0.9" />
             </svg>
           </div>
-          <h1 class="text-2xl sm:text-[32px] font-semibold tracking-[-0.035em] text-white">Cyberpenguins</h1>
+          <h1 class="text-2xl sm:text-[32px] font-semibold tracking-[-0.035em] text-white text-center">Cyberpenguins</h1>
         </div>
-        <div class="flex items-center gap-2.5">
-          <button id="home-start-btn" type="button"
-            class="squircle-btn rounded-full inline-flex items-center justify-center text-center px-6 py-2.5 text-sm font-medium bg-white text-slate-950 hover:bg-cyan-50 shadow-[0_8px_28px_rgba(255,255,255,0.14)]">
-            Explorar
-          </button>
-          <button id="reset-progress-btn" type="button" title="Reiniciar" aria-label="Reiniciar"
-            class="squircle-btn rounded-full w-10 h-10 inline-flex items-center justify-center text-center bg-white/[0.05] hover:bg-rose-400/20 border border-white/[0.1] text-slate-300">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9"
+        <div class="absolute right-0 flex items-center gap-2">
+          <button id="home-start-btn" type="button" aria-hidden="true" tabindex="-1" class="hidden">Explorar</button>
+          <button id="reset-progress-btn" type="button" title="Reiniciar progreso" aria-label="Reiniciar progreso"
+            class="squircle-btn rounded-full w-9 h-9 inline-flex items-center justify-center text-center bg-white/[0.04] hover:bg-rose-400/20 border border-white/[0.08] text-slate-400 hover:text-white transition-colors">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
               <path d="M3 3v5h5" />
@@ -326,10 +323,9 @@
       <!-- Dock Inferior Compacto (Pasaporte, Rango y Certificado) -->
       <footer class="home-dock grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4">
         <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
-          <div class="w-full flex items-center justify-between gap-2">
-            <span class="text-xs font-medium tracking-tight text-slate-200">Pasaporte</span>
-            <span id="hud-passport-count"
-              class="squircle-pill inline-flex items-center justify-center text-center px-2 py-0.5 text-[11px] font-medium bg-white/[0.07] text-amber-200 border border-white/10">0/3</span>
+          <div class="w-full flex items-center justify-center relative">
+            <span class="text-xs font-medium tracking-tight text-slate-200 text-center">Pasaporte</span>
+            <span id="hud-passport-count" class="hidden">0/3</span>
           </div>
           <div id="home-passport-slots" class="w-full grid grid-cols-3 gap-1.5"></div>
           <button id="open-passport-btn" type="button"
@@ -339,10 +335,9 @@
         </section>
 
         <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
-          <div class="w-full flex items-center justify-between gap-2">
-            <span id="hud-badge-name" class="text-xs font-medium tracking-tight text-cyan-200">Aprendiz</span>
-            <span id="home-total-stars"
-              class="squircle-pill inline-flex items-center justify-center text-center px-2 py-0.5 text-[11px] font-medium bg-white/[0.07] text-amber-200 border border-white/10">★ 0/15</span>
+          <div class="w-full flex items-center justify-center relative">
+            <span id="hud-badge-name" class="text-xs font-medium tracking-tight text-cyan-200 text-center">Insignias</span>
+            <span id="home-total-stars" class="hidden">★ 0/15</span>
           </div>
           <div id="home-badges-grid" class="w-full grid grid-cols-5 gap-1"></div>
           <button id="open-badges-btn" type="button"
@@ -352,15 +347,14 @@
         </section>
 
         <section class="home-dock-segment px-3 py-2 flex flex-col justify-between gap-2.5 text-center">
-          <div class="w-full flex items-center justify-between gap-2">
-            <span class="text-xs font-medium tracking-tight text-slate-200">Certificado</span>
-            <span id="home-chapters-completed-count"
-              class="squircle-pill inline-flex items-center justify-center text-center px-2 py-0.5 text-[11px] font-medium bg-white/[0.07] text-cyan-200 border border-white/10">0/3</span>
+          <div class="w-full flex items-center justify-center relative">
+            <span class="text-xs font-medium tracking-tight text-slate-200 text-center">Certificado</span>
+            <span id="home-chapters-completed-count" class="hidden">0/3</span>
           </div>
           <div id="home-certificate-preview"
             class="certificate-card-preview w-full min-h-[54px] rounded-2xl bg-white/[0.03] border border-white/[0.07] px-3 py-2 flex items-center justify-center gap-2.5 text-center"></div>
-          <p id="home-certificate-status" class="text-xs font-normal text-slate-400 text-center empty:hidden"></p>
-          <div class="w-full flex items-center justify-center gap-2">
+          <p id="home-certificate-status" class="text-xs font-normal text-slate-400 text-center py-1">Disponible al completar todos los capítulos</p>
+          <div id="home-certificate-actions" class="w-full flex items-center justify-center gap-2 hidden">
             <button id="open-certificate-btn" type="button" disabled
               class="squircle-btn rounded-full flex-1 inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.14] text-slate-200">
               Ver
@@ -446,19 +440,14 @@
 
   <!-- Modal 2: Escotilla de Nave & 3 Espacios de Quiz (2 preguntas x 4 opciones en blanco) -->
   <div id="quiz-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Quiz">
-    <div class="squircle-panel max-w-2xl w-full p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto text-center">
-      <div class="flex items-center justify-between gap-2">
+    <div class="squircle-panel max-w-2xl w-full p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto text-center relative">
+      <div class="relative w-full flex items-center justify-center">
         <h2 class="text-lg font-semibold tracking-tight text-white text-center">Quiz</h2>
-        <div class="flex items-center justify-center gap-2">
-          <span id="quiz-stars-badge"
-            class="squircle-pill inline-flex items-center justify-center text-center px-3 py-1 text-xs font-medium bg-amber-300/10 text-amber-200 border border-amber-300/25">
-            ★ 0/5
-          </span>
-          <button id="quiz-close-btn" type="button"
-            class="squircle-btn inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.08] hover:bg-white/[0.15] text-slate-200">
-            Cerrar
-          </button>
-        </div>
+        <span id="quiz-stars-badge" class="hidden">★ 0/5</span>
+        <button id="quiz-close-btn" type="button" aria-label="Cerrar"
+          class="absolute right-0 w-8 h-8 rounded-full flex items-center justify-center text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors text-xl font-bold">
+          ✕
+        </button>
       </div>
 
       <!-- Selector de los 3 espacios de quiz -->
@@ -482,12 +471,12 @@
 
   <!-- Modal 3: Pasaporte de Explorador (Sellos de patitas de pingüino) -->
   <div id="passport-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Pasaporte">
-    <div class="squircle-panel max-w-lg w-full p-6 flex flex-col gap-4 text-center">
-      <div class="flex items-center justify-between gap-2">
+    <div class="squircle-panel max-w-lg w-full p-6 flex flex-col gap-4 text-center relative">
+      <div class="relative w-full flex items-center justify-center">
         <h2 class="text-lg font-semibold tracking-tight text-white text-center">Pasaporte</h2>
-        <button id="passport-close-btn" type="button"
-          class="squircle-btn inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.08] hover:bg-white/[0.15] text-slate-200">
-          Cerrar
+        <button id="passport-close-btn" type="button" aria-label="Cerrar"
+          class="absolute right-0 w-8 h-8 rounded-full flex items-center justify-center text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors text-xl font-bold">
+          ✕
         </button>
       </div>
       <div id="passport-slots" class="grid grid-cols-3 gap-3"></div>
@@ -496,16 +485,13 @@
 
   <!-- Modal 4: Estructura de Insignias -->
   <div id="badges-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Insignias">
-    <div class="squircle-panel max-w-xl w-full p-6 flex flex-col gap-4 text-center">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center justify-center gap-3">
-          <h2 class="text-lg font-semibold tracking-tight text-white text-center">Insignias</h2>
-          <span id="badges-total-stars"
-            class="squircle-pill inline-flex items-center justify-center text-center px-3 py-0.5 text-xs font-medium bg-amber-300/10 text-amber-200 border border-amber-300/20">★ 0/15</span>
-        </div>
-        <button id="badges-close-btn" type="button"
-          class="squircle-btn inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.08] hover:bg-white/[0.15] text-slate-200">
-          Cerrar
+    <div class="squircle-panel max-w-xl w-full p-6 flex flex-col gap-4 text-center relative">
+      <div class="relative w-full flex items-center justify-center">
+        <h2 class="text-lg font-semibold tracking-tight text-white text-center">Insignias</h2>
+        <span id="badges-total-stars" class="hidden">★ 0/15</span>
+        <button id="badges-close-btn" type="button" aria-label="Cerrar"
+          class="absolute right-0 w-8 h-8 rounded-full flex items-center justify-center text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors text-xl font-bold">
+          ✕
         </button>
       </div>
       <div id="badges-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
@@ -514,15 +500,12 @@
 
   <!-- Modal 5: Certificado Minimalista (solo Certificado, Nivel y Huella del pingüino) -->
   <div id="certificate-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Certificado">
-    <div class="squircle-panel max-w-md w-full p-6 flex flex-col gap-4 text-center">
-      <div class="flex items-center justify-between gap-2">
-        <button id="download-certificate-btn" type="button" disabled
-          class="squircle-btn inline-flex items-center justify-center text-center px-3.5 py-1.5 text-xs font-medium bg-amber-300 hover:bg-amber-200 text-slate-950">
-          Descargar
-        </button>
-        <button id="certificate-close-btn" type="button"
-          class="squircle-btn inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.08] hover:bg-white/[0.15] text-slate-200">
-          Cerrar
+    <div class="squircle-panel max-w-md w-full p-6 flex flex-col gap-4 text-center relative">
+      <div class="relative w-full flex items-center justify-center">
+        <h2 class="text-lg font-semibold tracking-tight text-white text-center">Certificado</h2>
+        <button id="certificate-close-btn" type="button" aria-label="Cerrar"
+          class="absolute right-0 w-8 h-8 rounded-full flex items-center justify-center text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors text-xl font-bold">
+          ✕
         </button>
       </div>
       <div class="certificate-frame p-8 flex flex-col items-center justify-center gap-5 min-h-[290px] text-center">
@@ -531,6 +514,10 @@
         <div id="certificate-paw" class="py-1 flex items-center justify-center"></div>
         <!-- Área en blanco para el diseño futuro del texto -->
         <div class="blank-template-slot w-full h-16 flex items-center justify-center text-center"></div>
+        <button id="download-certificate-btn" type="button" disabled
+          class="squircle-btn rounded-full inline-flex items-center justify-center text-center px-4 py-2 text-xs font-medium bg-amber-300 hover:bg-amber-200 text-slate-950">
+          Descargar certificado
+        </button>
       </div>
     </div>
   </div>
