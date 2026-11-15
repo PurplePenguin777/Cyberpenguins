@@ -1603,22 +1603,47 @@
   }
 
   function isometricPedestalSvg(chapterId) {
-    const palettes = {
-      moon: { top: '#cbd5e1', left: '#94a3b8', right: '#475569', stepTop: '#e2e8f0', rim: 'rgba(126, 232, 250, 0.36)' },
-      mars: { top: '#ea8850', left: '#c25632', right: '#7c2e22', stepTop: '#fda876', rim: 'rgba(255, 190, 118, 0.36)' },
-      'deep-space': { top: '#38bdf8', left: '#1d4ed8', right: '#1e1b4b', stepTop: '#7dd3fc', rim: 'rgba(126, 232, 250, 0.42)' }
-    };
-    const p = palettes[chapterId] || palettes.moon;
+    if (chapterId === 'moon') {
+      return `
+        <svg class="mv-pedestal-svg" viewBox="0 0 210 74" width="204" height="72" aria-hidden="true">
+          <!-- Superficie lunar: regolito y cráteres geométricos -->
+          <polygon points="105,8 196,28 105,48 14,28" fill="#cbd5e1" stroke="rgba(148,163,184,0.4)" stroke-width="1" />
+          <polygon points="14,28 105,48 105,62 14,42" fill="#94a3b8" />
+          <polygon points="196,28 105,48 105,62 196,42" fill="#475569" />
+          <polygon points="70,24 86,20 94,26 78,30" fill="#94a3b8" opacity="0.7" />
+          <polygon points="130,34 148,30 156,36 138,40" fill="#64748b" opacity="0.6" />
+          <polygon points="105,14 168,28 105,42 42,28" fill="#e2e8f0" opacity="0.25" />
+          <polygon points="45,26 50,22 54,25 49,29" fill="#f1f5f9" />
+          <polygon points="160,26 166,23 170,27 164,30" fill="#64748b" />
+        </svg>
+      `;
+    }
+    if (chapterId === 'mars') {
+      return `
+        <svg class="mv-pedestal-svg" viewBox="0 0 210 74" width="204" height="72" aria-hidden="true">
+          <!-- Superficie marciana: dunas y roca oxidada -->
+          <polygon points="105,8 196,28 105,48 14,28" fill="#ea8850" stroke="rgba(255,190,118,0.4)" stroke-width="1" />
+          <polygon points="14,28 105,48 105,62 14,42" fill="#c25632" />
+          <polygon points="196,28 105,48 105,62 196,42" fill="#7c2e22" />
+          <polygon points="60,26 82,22 100,28 78,32" fill="#c2410c" opacity="0.65" />
+          <polygon points="120,32 142,26 160,34 138,38" fill="#9a3412" opacity="0.6" />
+          <polygon points="105,14 168,28 105,42 42,28" fill="#fda876" opacity="0.3" />
+          <polygon points="40,25 46,21 52,24 45,28" fill="#fed7aa" />
+          <polygon points="152,24 158,20 164,25 157,28" fill="#7c2d12" />
+        </svg>
+      `;
+    }
     return `
-      <svg class="mv-pedestal-svg" viewBox="0 0 210 68" width="204" height="66" aria-hidden="true">
-        <!-- Base arquitectónica isométrica -->
-        <polygon points="105,6 196,26 105,46 14,26" fill="${p.top}" stroke="${p.rim}" stroke-width="1" />
-        <polygon points="14,26 105,46 105,58 14,38" fill="${p.left}" />
-        <polygon points="196,26 105,46 105,58 196,38" fill="${p.right}" />
-        <!-- Escalón inferior desplazado para profundidad geométrica -->
-        <polygon points="105,58 164,45 164,53 105,66" fill="${p.right}" opacity="0.88" />
-        <polygon points="105,58 46,45 46,53 105,66" fill="${p.left}" opacity="0.88" />
-        <polygon points="105,12 172,26 105,40 38,26" fill="${p.stepTop}" opacity="0.28" />
+      <svg class="mv-pedestal-svg" viewBox="0 0 210 74" width="204" height="72" aria-hidden="true">
+        <!-- Superficie de asteroide / espacio profundo -->
+        <polygon points="105,8 196,28 105,48 14,28" fill="#2a3b5c" stroke="rgba(56,189,248,0.45)" stroke-width="1" />
+        <polygon points="14,28 105,48 105,62 14,42" fill="#18233c" />
+        <polygon points="196,28 105,48 105,62 196,42" fill="#0d1424" />
+        <polygon points="64,24 88,18 106,26 82,30" fill="#38bdf8" opacity="0.22" />
+        <polygon points="118,32 146,24 162,32 134,38" fill="#7dd3fc" opacity="0.18" />
+        <polygon points="105,14 168,28 105,42 42,28" fill="#38bdf8" opacity="0.15" />
+        <circle cx="50" cy="27" r="1.5" fill="#7ee8fa" opacity="0.7" />
+        <circle cx="160" cy="25" r="1.8" fill="#bae6fd" opacity="0.8" />
       </svg>
     `;
   }
@@ -1626,12 +1651,16 @@
   function renderChapterNav() {
     dom.chapterNav.innerHTML = DATA.CHAPTERS.map((chapter) => {
       const isActive = chapter.id === state.currentChapterId;
-      const stars = state.chapterStars[chapter.id] || 0;
       const completed = isChapterCompleted(chapter.id);
-      const machinesPreviewSvg = chapter.machines.map((m) => {
-        const svg = typeof MODELS[m.modelKey] === 'function' ? MODELS[m.modelKey]() : '';
-        return `<div class="w-16 h-16 flex items-center justify-center drop-shadow-[0_10px_14px_rgba(2,6,23,0.65)] [&_svg]:w-full [&_svg]:h-full" title="${m.name}">${svg}</div>`;
-      }).join('');
+      const firstMachine = chapter.machines[0];
+      const singleMachineSvg = firstMachine && typeof MODELS[firstMachine.modelKey] === 'function'
+        ? MODELS[firstMachine.modelKey]()
+        : '';
+      const machinePreview = `
+        <div class="w-20 h-20 flex items-center justify-center drop-shadow-[0_12px_18px_rgba(2,6,23,0.7)] [&_svg]:w-full [&_svg]:h-full">
+          ${singleMachineSvg}
+        </div>
+      `;
 
       return `
         <div class="home-chapter-card p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
@@ -1642,16 +1671,13 @@
           </div>
 
           <div class="home-chapter-emblem relative flex flex-col items-center justify-end w-full pt-2">
-            <div class="relative z-10 flex items-end justify-center gap-5 -mb-5">${machinesPreviewSvg}</div>
+            <div class="relative z-10 flex items-end justify-center -mb-5">${machinePreview}</div>
             ${isometricPedestalSvg(chapter.id)}
           </div>
 
           <div class="flex flex-col items-center gap-3 w-full">
-            <h2 class="text-[15px] sm:text-base font-medium tracking-[-0.02em] text-white/95 text-center leading-snug">
-              ${chapter.machines.map((m) => m.name).join(' · ')}
-            </h2>
             <button type="button"
-              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2 text-xs sm:text-sm font-medium ${
+              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 text-xs sm:text-sm font-medium ${
                 isActive
                   ? 'bg-white text-slate-950 hover:bg-cyan-50'
                   : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-100'
