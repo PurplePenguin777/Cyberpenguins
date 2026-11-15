@@ -16,27 +16,20 @@
   };
 
   function facetedEarthGroup(cx, cy, r) {
+    if (typeof M.planetBody === 'function') {
+      const uid = 'learth_' + Math.round(cx) + '_' + Math.round(cy);
+      return `<g transform="translate(${cx}, ${cy})">${M.planetBody('earth', r, { uid })}</g>`;
+    }
     const scale = r / 50;
     return `
       <g transform="translate(${cx}, ${cy}) scale(${scale.toFixed(3)})">
-        <!-- Halo atmosférico sutil -->
-        <circle cx="0" cy="0" r="56" fill="#38bdf8" opacity="0.16" />
-        <circle cx="0" cy="0" r="50" fill="#184e9e" />
-        <!-- Facetas oceánicas low-poly -->
-        <polygon points="-44,-22 -14,-48 18,-46 4,-12 -28,-6" fill="#2c7be5" />
-        <polygon points="18,-46 46,-20 44,12 4,-12" fill="#246bc7" />
-        <polygon points="-48,-4 -28,-6 4,-12 -8,28 -44,20" fill="#2262b8" />
-        <polygon points="4,-12 44,12 24,44 -8,28" fill="#184e9e" />
-        <polygon points="-44,20 -8,28 24,44 -14,48 -36,36" fill="#123d7e" />
-        <!-- Continentes verdes facetados estilo diapositivas 1 y 7 -->
-        <polygon points="-32,-26 -6,-40 12,-24 0,-8 -24,-10" fill="#3da66d" />
-        <polygon points="-6,-40 16,-36 12,-24" fill="#63d48f" />
-        <polygon points="16,-14 38,-6 34,18 14,16 8,-2" fill="#359360" />
-        <polygon points="-24,10 -2,12 -10,34 -30,28" fill="#2c8052" />
-        <!-- Bandas angulares de nubes y sombra nocturna -->
-        <polygon points="-26,-16 8,-22 14,-15 -20,-9" fill="#ffffff" opacity="0.68" />
-        <polygon points="-14,4 22,12 16,18 -18,10" fill="#e0f2fe" opacity="0.52" />
-        <path d="M 10,-49 A 50,50 0 0,1 10,49 A 34,50 0 0,0 10,-49 Z" fill="#06122b" opacity="0.46" />
+        <circle cx="0" cy="0" r="54" fill="#38bdf8" opacity="0.32" />
+        <circle cx="0" cy="0" r="50" fill="#1d4ed8" />
+        <path d="M -12,-38 C -4,-44 8,-42 16,-34 C 22,-24 18,-12 8,-8 C -2,-4 -14,-14 -18,-26 Z" fill="#2d8a56" />
+        <path d="M 6,-4 C 18,-6 28,-14 36,-10 C 44,-2 38,18 26,24 C 14,28 6,14 4,4 Z" fill="#2d8a56" />
+        <path d="M -26,8 C -14,10 -8,22 -14,36 C -20,44 -32,38 -36,24 C -38,14 -32,8 -26,8 Z" fill="#2d8a56" />
+        <path d="M -28,-18 Q -4,-28 14,-16 Q 32,-8 24,12 Q 8,4 -16,-2 Z" fill="#ffffff" opacity="0.65" />
+        <path d="M 10,-49 A 50,50 0 0,1 10,49 A 34,50 0 0,0 10,-49 Z" fill="#020617" opacity="0.65" />
       </g>
     `;
   }
@@ -78,62 +71,66 @@
           <!-- La Tierra low-poly flotando en el cielo lunar -->
           ${facetedEarthGroup(366, 98, 48)}
 
-          <!-- Cordillera trasera low-poly en el horizonte lunar -->
+          <!-- Cordillera lejana en el horizonte lunar (Montes Secchi / Apeninos) -->
           <g>
-            <polygon points="-10,278 120,214 250,268" fill="#334155" />
-            <polygon points="120,214 250,268 156,280" fill="#475569" />
-            <polygon points="210,272 390,218 540,266" fill="#2b374d" />
-            <polygon points="390,218 540,266 432,276" fill="#475569" />
-            <polygon points="500,268 688,208 860,268" fill="#334155" />
-            <polygon points="688,208 860,268 742,278" fill="#52627a" />
-            <polygon points="810,268 945,224 1015,274" fill="#2b374d" />
+            <path d="M -10,278 Q 80,240 180,248 Q 280,256 380,232 Q 480,210 580,242 Q 680,230 780,215 Q 890,240 1015,268 L 1015,290 L -10,290 Z" fill="#243044" />
+            <path d="M -10,282 Q 120,246 250,264 Q 390,238 520,258 Q 660,228 810,256 Q 920,244 1015,274 L 1015,292 L -10,292 Z" fill="#334155" />
           </g>
 
-          <!-- Planicie lunar principal compuesta por grandes facetas low-poly -->
-          <polygon points="-10,276 260,256 540,254 810,260 1010,276 1010,598 -10,598" fill="#cbd5e1" />
-          <polygon points="-10,276 260,256 320,348 -10,362" fill="#dfe7f0" />
-          <polygon points="260,256 540,254 610,344 320,348" fill="#e6edf5" />
-          <polygon points="540,254 810,260 880,350 610,344" fill="#d3dde9" />
-          <polygon points="810,260 1010,276 1010,366 880,350" fill="#bac6d6" />
+          <!-- Vasta y plana llanura basáltica del Mar de la Tranquilidad (Apollo 11) -->
+          <path d="M -10,274 Q 500,264 1015,274 L 1015,598 L -10,598 Z" fill="#cbd5e1" />
+          <polygon points="-10,274 260,260 320,348 -10,362" fill="#d9e2ec" />
+          <polygon points="260,260 560,258 630,346 320,348" fill="#e2ebf5" />
+          <polygon points="560,258 820,262 890,350 630,346" fill="#d5e0ec" />
+          <polygon points="820,262 1015,274 1015,366 890,350" fill="#c3cfde" />
 
-          <!-- Área central iluminada para los elementos del juego -->
-          <polygon points="-10,362 320,348 250,486 -10,492" fill="#c3cfde" />
-          <polygon points="320,348 610,344 680,478 250,486" fill="#d9e2ec" />
-          <polygon points="610,344 880,350 1010,366 1010,494 680,478" fill="#c0ccd9" />
-          <polygon points="-10,492 250,486 480,598 -10,598" fill="#aebccb" />
-          <polygon points="250,486 680,478 760,598 480,598" fill="#b9c6d6" />
-          <polygon points="680,478 1010,494 1010,598 760,598" fill="#a2b0c2" />
+          <!-- Área central de regolito fino ilmenítico para módulo Eagle y Cyberpenguin -->
+          <polygon points="-10,362 320,348 250,486 -10,492" fill="#c5d2e0" />
+          <polygon points="320,348 630,346 690,478 250,486" fill="#dde6f0" />
+          <polygon points="630,346 890,350 1015,366 1015,494 690,478" fill="#cbd7e5" />
+          <polygon points="-10,492 250,486 480,598 -10,598" fill="#b0bece" />
+          <polygon points="250,486 690,478 760,598 480,598" fill="#bcc9d8" />
+          <polygon points="690,478 1015,494 1015,598 760,598" fill="#a6b5c6" />
 
-          <!-- Cráter facetado grande (Mare Tranquillitatis, zona derecha superior del plano) -->
+          <!-- Cráter de impacto con relieve realista (Cráter Little West cercano a Apollo 11) -->
           <g transform="translate(768, 336)">
-            <polygon points="-92,-12 -46,-36 32,-38 92,-12 72,20 0,34 -74,20" fill="#94a3b8" />
-            <polygon points="-76,-8 -36,-28 28,-30 76,-8 58,14 0,24 -60,14" fill="#64748b" />
-            <polygon points="-58,-4 -24,-18 22,-20 56,-4 20,12 -32,10" fill="#475569" />
-            <polygon points="-92,-12 -46,-36 32,-38 28,-30 -36,-28 -76,-8" fill="#e2e8f0" />
+            <!-- Borde iluminado superior -->
+            <ellipse cx="0" cy="0" rx="86" ry="26" fill="#94a3b8" />
+            <!-- Interior del cráter en sombra de luz solar rasante -->
+            <ellipse cx="-4" cy="4" rx="72" ry="20" fill="#475569" />
+            <ellipse cx="-8" cy="6" rx="54" ry="14" fill="#1e293b" />
+            <!-- Borde iluminado noreste -->
+            <path d="M -86,0 C -50,-24 50,-24 86,0 C 70,-18 -30,-18 -86,0 Z" fill="#f1f5f9" opacity="0.85" />
           </g>
 
-          <!-- Cráter medio izquierdo -->
+          <!-- Cráter secundario izquierdo con sombra orográfica -->
           <g transform="translate(178, 496)">
-            <polygon points="-58,-6 -24,-22 28,-22 60,-4 44,18 -4,24 -48,16" fill="#94a3b8" />
-            <polygon points="-44,-4 -18,-16 24,-16 46,-2 32,12 -2,16 -36,10" fill="#64748b" />
-            <polygon points="-58,-6 -24,-22 28,-22 24,-16 -18,-16 -44,-4" fill="#cbd5e1" />
+            <ellipse cx="0" cy="0" rx="54" ry="18" fill="#94a3b8" />
+            <ellipse cx="-3" cy="3" rx="44" ry="14" fill="#475569" />
+            <ellipse cx="-6" cy="4" rx="30" ry="9" fill="#1e293b" />
+            <path d="M -54,0 C -30,-16 30,-16 54,0 C 40,-12 -20,-12 -54,0 Z" fill="#e2e8f0" opacity="0.8" />
           </g>
 
-          <!-- Cráter pequeño superior centro-izquierda -->
+          <!-- Pequeño cráter de impacto superior -->
           <g transform="translate(362, 294)">
-            <polygon points="-34,-4 -14,-13 18,-13 36,-3 26,10 -2,14 -28,9" fill="#94a3b8" />
-            <polygon points="-24,-2 -10,-9 14,-9 26,-1 18,7 -2,9 -20,6" fill="#64748b" />
+            <ellipse cx="0" cy="0" rx="32" ry="11" fill="#8898ac" />
+            <ellipse cx="-2" cy="2" rx="24" ry="8" fill="#334155" />
+            <path d="M -32,0 C -18,-10 18,-10 32,0 C 22,-7 -12,-7 -32,0 Z" fill="#e2e8f0" opacity="0.75" />
           </g>
 
-          <!-- Bloques de roca angular low-poly en los márgenes -->
+          <!-- Bloques rocosos de eyección de anortosita e ilmenita -->
           <g>
-            <polygon points="104,312 128,288 154,296 164,316 122,320" fill="#94a3b8" />
-            <polygon points="128,288 154,296 142,318 122,320" fill="#cbd5e1" />
-            <polygon points="154,296 164,316 142,318" fill="#64748b" />
+            <polygon points="104,312 126,288 152,295 162,316 122,320" fill="#8595a8" />
+            <polygon points="126,288 152,295 140,317 122,320" fill="#e2e8f0" />
+            <polygon points="152,295 162,316 140,317" fill="#475569" />
 
-            <polygon points="222,542 252,516 286,522 296,548 238,554" fill="#7c8b9e" />
-            <polygon points="252,516 286,522 270,548 238,554" fill="#aebccb" />
-            <polygon points="286,522 296,548 270,548" fill="#526278" />
+            <polygon points="222,542 250,516 284,522 294,548 238,554" fill="#718296" />
+            <polygon points="250,516 284,522 268,548 238,554" fill="#cbd5e1" />
+            <polygon points="284,522 294,548 268,548" fill="#334155" />
+
+            <polygon points="864,440 886,420 910,426 918,446 876,450" fill="#7c8d9e" />
+            <polygon points="886,420 910,426 898,446 876,450" fill="#d9e2ec" />
+            <polygon points="910,426 918,446 898,446" fill="#3b4859" />
           </g>
         </svg>
       `;
@@ -170,22 +167,16 @@
         <!-- Tierra low-poly en posición alta derecha -->
         ${facetedEarthGroup(742, 92, 44)}
 
-        <!-- Cordillera basáltica elevada de Oceanus Procellarum -->
+        <!-- Cordillera basáltica lejana de Oceanus Procellarum (Montes Riphaeus) -->
         <g>
-          <polygon points="-10,278 96,204 206,274" fill="#2c3a52" />
-          <polygon points="96,204 206,274 128,282" fill="#465672" />
-          <polygon points="172,272 318,186 446,266" fill="#253247" />
-          <polygon points="318,186 446,266 346,274" fill="#4c5e7c" />
-          <polygon points="418,268 594,210 742,268" fill="#2f3e57" />
-          <polygon points="594,210 742,268 634,274" fill="#526583" />
-          <polygon points="710,270 868,196 1015,274" fill="#263349" />
-          <polygon points="868,196 1015,274 904,280" fill="#485a77" />
+          <path d="M -10,278 Q 90,208 210,270 Q 330,192 450,264 Q 600,212 740,268 Q 870,202 1015,274 L 1015,290 L -10,290 Z" fill="#202c3e" />
+          <path d="M -10,280 Q 96,218 206,274 Q 318,206 446,266 Q 594,222 742,268 Q 868,214 1015,274 L 1015,292 L -10,292 Z" fill="#324259" />
         </g>
 
-        <!-- Planicie de basalto gris-azulado low-poly -->
-        <polygon points="-10,274 280,256 620,254 880,262 1010,276 1010,598 -10,598" fill="#b4c2d4" />
-        <polygon points="-10,274 280,256 220,362 -10,352" fill="#c6d2e1" />
-        <polygon points="280,256 620,254 550,356 220,362" fill="#d2dceb" />
+        <!-- Cuenca y pendiente interior suave del cráter Surveyor en Oceanus Procellarum -->
+        <path d="M -10,274 Q 500,260 1015,276 L 1015,598 L -10,598 Z" fill="#b4c2d4" />
+        <polygon points="-10,274 280,256 220,362 -10,352" fill="#c4d1e2" />
+        <polygon points="280,256 620,254 550,356 220,362" fill="#cfdcee" />
         <polygon points="620,254 880,262 840,358 550,356" fill="#bfccd9" />
         <polygon points="880,262 1010,276 1010,364 840,358" fill="#a4b3c7" />
 
@@ -197,28 +188,31 @@
         <polygon points="310,492 640,486 730,598 430,598" fill="#a8b7ca" />
         <polygon points="640,486 1010,494 1010,598 730,598" fill="#8f9fb4" />
 
-        <!-- Cráteres facetados en Oceanus Procellarum -->
+        <!-- Cráter Surveyor (200 m de diámetro) con pendiente suave de regolito -->
         <g transform="translate(226, 332)">
-          <polygon points="-74,-8 -34,-28 26,-28 74,-6 54,18 -4,26 -58,16" fill="#8192a8" />
-          <polygon points="-58,-4 -24,-20 20,-20 58,-2 40,12 -2,18 -44,10" fill="#52627a" />
-          <polygon points="-74,-8 -34,-28 26,-28 20,-20 -24,-20 -58,-4" fill="#d4dfec" />
+          <ellipse cx="0" cy="0" rx="76" ry="24" fill="#78899f" />
+          <ellipse cx="-4" cy="3" rx="62" ry="18" fill="#46556c" />
+          <ellipse cx="-8" cy="5" rx="42" ry="12" fill="#1e293b" />
+          <path d="M -76,0 C -45,-20 45,-20 76,0 C 58,-14 -28,-14 -76,0 Z" fill="#dce6f2" opacity="0.8" />
         </g>
 
+        <!-- Cráter secundario de impacto sureste -->
         <g transform="translate(804, 488)">
-          <polygon points="-64,-8 -26,-24 30,-22 66,-4 46,18 -6,24 -52,14" fill="#7c8da4" />
-          <polygon points="-48,-4 -18,-16 24,-15 50,-2 34,12 -4,15 -38,8" fill="#4b5a72" />
-          <polygon points="-64,-8 -26,-24 30,-22 24,-15 -18,-16 -48,-4" fill="#c6d3e2" />
+          <ellipse cx="0" cy="0" rx="64" ry="20" fill="#708298" />
+          <ellipse cx="-3" cy="3" rx="50" ry="15" fill="#3d4c62" />
+          <ellipse cx="-6" cy="4" rx="32" ry="9" fill="#1e293b" />
+          <path d="M -64,0 C -36,-16 36,-16 64,0 C 46,-11 -20,-11 -64,0 Z" fill="#cbd7e6" opacity="0.75" />
         </g>
 
-        <!-- Promontorios basálticos angulares -->
+        <!-- Bloques rocosos basálticos de Oceanus Procellarum -->
         <g>
-          <polygon points="64,458 98,426 138,434 150,464 82,468" fill="#64748b" />
+          <polygon points="64,458 98,426 138,434 150,464 82,468" fill="#58677c" />
           <polygon points="98,426 138,434 118,462 82,468" fill="#94a3b8" />
-          <polygon points="138,434 150,464 118,462" fill="#475569" />
+          <polygon points="138,434 150,464 118,462" fill="#3c4959" />
 
-          <polygon points="866,306 898,278 934,284 946,312 886,316" fill="#64748b" />
+          <polygon points="866,306 898,278 934,284 946,312 886,316" fill="#58677c" />
           <polygon points="898,278 934,284 916,312 886,316" fill="#94a3b8" />
-          <polygon points="934,284 946,312 916,312" fill="#475569" />
+          <polygon points="934,284 946,312 916,312" fill="#3c4959" />
         </g>
       </svg>
     `;

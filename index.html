@@ -78,21 +78,26 @@
     <!-- Cartela con frase motivadora en 3 líneas: Frase, Nombre y Cargo -->
     <div id="launch-title-card"
       class="launch-title-card pointer-events-none relative z-10 text-center flex flex-col items-center justify-center gap-1.5 sm:gap-2 px-4 pt-3 sm:pt-4 max-w-2xl w-full mx-auto">
-      <p id="launch-quote-text" class="text-lg sm:text-2xl md:text-3xl font-semibold tracking-tight text-white leading-snug drop-shadow-xl text-center text-balance">
+      <p id="launch-quote-text"
+        class="text-lg sm:text-2xl md:text-3xl font-semibold tracking-tight text-white leading-snug drop-shadow-xl text-center text-balance">
         «Las cosas difíciles son las que más vale la pena intentar.»
       </p>
-      <p id="launch-quote-name" class="text-base sm:text-xl font-bold text-cyan-300 pt-0.5 sm:pt-1 text-center drop-shadow-md">
+      <p id="launch-quote-name"
+        class="text-base sm:text-xl font-bold text-cyan-300 pt-0.5 sm:pt-1 text-center drop-shadow-md">
         Margaret Hamilton
       </p>
-      <p id="launch-quote-role" class="text-xs sm:text-sm md:text-base font-medium text-slate-300/90 tracking-wide text-center">
+      <p id="launch-quote-role"
+        class="text-xs sm:text-sm md:text-base font-medium text-slate-300/90 tracking-wide text-center">
         Directora de Software Apolo · NASA
       </p>
     </div>
 
-    <div class="relative z-10 w-full flex flex-col items-center justify-center my-auto scale-90 sm:scale-100 transition-transform">
+    <div
+      class="relative z-10 w-full flex flex-col items-center justify-center my-auto scale-90 sm:scale-100 transition-transform">
       <div class="relative flex items-end justify-center">
         <!-- Torre umbilical con brazos retráctiles -->
-        <svg viewBox="0 0 110 230" width="92" height="200" aria-hidden="true" class="-mr-8 sm:-mr-12 mb-5 sm:mb-7 opacity-95 w-16 sm:w-[92px] h-auto">
+        <svg viewBox="0 0 110 230" width="92" height="200" aria-hidden="true"
+          class="-mr-8 sm:-mr-12 mb-5 sm:mb-7 opacity-95 w-16 sm:w-[92px] h-auto">
           <defs>
             <linearGradient id="towerGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stop-color="#5d6ea3" />
@@ -136,7 +141,8 @@
       </div>
 
       <!-- Plataforma técnica con trinchera de llamas -->
-      <svg viewBox="0 0 360 76" width="320" height="68" aria-hidden="true" class="-mt-5 sm:-mt-7 max-w-[85vw] sm:max-w-xs h-auto">
+      <svg viewBox="0 0 360 76" width="320" height="68" aria-hidden="true"
+        class="-mt-5 sm:-mt-7 max-w-[85vw] sm:max-w-xs h-auto">
         <defs>
           <linearGradient id="padSurface" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#455587" />
@@ -182,14 +188,14 @@
       <div class="travel-cinematic-meta">
         <div id="travel-cinematic-dots" class="travel-cinematic-dots" aria-hidden="true"></div>
         <div id="travel-cinematic-caption"
-          class="travel-cinematic-caption w-full flex flex-col items-center justify-center gap-1 sm:gap-2 text-center max-w-2xl mx-auto px-4"></div>
+          class="travel-cinematic-caption w-full flex flex-col items-center justify-center gap-1 sm:gap-2 text-center max-w-2xl mx-auto px-4">
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Pantalla Inicial: Dioramas Low-Poly y Dock Minimalista -->
   <section id="home-screen" class="home-screen is-hidden" aria-label="Pantalla inicial">
-    <!-- Fondo cósmico: una versión para pantallas horizontales y otra para verticales (se generan en js/elementos/superficies.js) -->
     <svg id="home-bg-landscape" class="cosmic-panorama-svg is-landscape" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
     <svg id="home-bg-portrait" class="cosmic-panorama-svg is-portrait" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
 
@@ -197,7 +203,8 @@
       <!-- Encabezado Minimalista -->
       <header class="relative flex items-center justify-center py-2">
         <div class="flex items-center justify-center">
-          <h1 class="text-2xl sm:text-[32px] font-semibold tracking-[-0.035em] text-white text-center">Cyberpenguins</h1>
+          <h1 class="text-2xl sm:text-[32px] font-semibold tracking-[-0.035em] text-white text-center">Cyberpenguins
+          </h1>
         </div>
         <div class="absolute right-0 flex items-center gap-2">
           <button id="home-start-btn" type="button" aria-hidden="true" tabindex="-1" class="hidden">Explorar</button>
@@ -221,7 +228,7 @@
       <footer class="home-dock grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4">
         <section class="home-dock-segment px-3 py-3 flex flex-col justify-center gap-3 text-center">
           <div class="w-full flex items-center justify-center relative">
-            <span class="text-xs font-medium tracking-tight text-slate-200 text-center">Pasaporte</span>
+            <span class="text-xs font-medium tracking-tight text-slate-300 text-center">Pasaporte</span>
             <span id="hud-passport-count" class="hidden">0/3</span>
           </div>
           <div id="home-passport-slots" class="w-full grid grid-cols-3 gap-1.5"></div>
@@ -230,7 +237,8 @@
 
         <section class="home-dock-segment px-3 py-3 flex flex-col justify-center gap-3 text-center">
           <div class="w-full flex items-center justify-center relative">
-            <span id="hud-badge-name" class="text-xs font-medium tracking-tight text-cyan-200 text-center">Insignias</span>
+            <span class="text-xs font-medium tracking-tight text-slate-300 text-center">Insignias</span>
+            <span id="hud-badge-name" class="hidden">Aprendiz</span>
             <span id="home-total-stars" class="hidden">★ 0/15</span>
           </div>
           <div id="home-badges-grid" class="w-full grid grid-cols-5 gap-1"></div>
@@ -239,12 +247,14 @@
 
         <section class="home-dock-segment px-3 py-3 flex flex-col justify-center gap-3 text-center">
           <div class="w-full flex items-center justify-center relative">
-            <span class="text-xs font-medium tracking-tight text-slate-200 text-center">Certificado</span>
+            <span class="text-xs font-medium tracking-tight text-slate-300 text-center">Certificado</span>
             <span id="home-chapters-completed-count" class="hidden">0/3</span>
           </div>
           <div id="home-certificate-preview"
-            class="certificate-card-preview w-full min-h-[54px] rounded-2xl bg-white/[0.03] border border-white/[0.07] px-3 py-2 flex items-center justify-center gap-2.5 text-center"></div>
-          <p id="home-certificate-status" class="text-xs font-normal text-slate-400 text-center py-1">Disponible al completar todos los capítulos</p>
+            class="certificate-card-preview w-full min-h-[54px] rounded-xl bg-white/[0.03] border border-white/[0.06] px-3 py-2 flex items-center justify-center gap-2.5 text-center">
+          </div>
+          <p id="home-certificate-status" class="text-xs font-normal text-slate-400 text-center py-1">Disponible al
+            completar todos los capítulos</p>
           <div id="home-certificate-actions" class="w-full flex items-center justify-center gap-2 hidden">
             <button id="open-certificate-btn" type="button" disabled
               class="squircle-btn rounded-full flex-1 inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.14] text-slate-200">
@@ -267,7 +277,8 @@
       <div id="iso-board" class="iso-board" role="application" aria-label="Escenario espacial" tabindex="0">
         <div id="stage-backdrop-layer" class="iso-backdrop"></div>
         <canvas id="stage-fx-canvas" class="stage-fx-canvas" aria-hidden="true"></canvas>
-        <svg id="eva-tether-layer" class="eva-tether-layer is-hidden" viewBox="0 0 1000 594" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <svg id="eva-tether-layer" class="eva-tether-layer is-hidden" viewBox="0 0 1000 594" preserveAspectRatio="none"
+          aria-hidden="true"></svg>
         <div id="stage-entities-layer"></div>
         <div id="stage-lighting-overlay" class="stage-lighting-overlay" aria-hidden="true"></div>
 
@@ -311,9 +322,40 @@
         <div id="penguin-actor" class="penguin-actor">
           <div id="penguin-sprite" class="penguin-sprite"></div>
         </div>
+
+        <!-- Prompt flotante de interacción contextual -->
+        <div id="stage-action-prompt" class="stage-action-prompt is-hidden" aria-live="polite">
+          <button id="stage-action-btn" type="button" class="stage-action-btn squircle-btn">
+            <span id="stage-action-icon" class="stage-action-icon">💬</span>
+            <span id="stage-action-label" class="stage-action-label">Hablar</span>
+          </button>
+        </div>
       </div>
     </section>
   </main>
+
+  <!-- Modal Minimalista de Descubrimiento de Roca -->
+  <div id="sample-discovery-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true"
+    aria-labelledby="sample-discovery-title">
+    <div
+      class="sample-discovery-card squircle-panel max-w-[320px] w-full p-5 sm:p-6 flex flex-col items-center text-center gap-3 relative">
+      <span class="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">
+        ✨ ¡Roca espacial!
+      </span>
+      <div id="sample-discovery-crystal" class="sample-discovery-crystal w-20 h-20 flex items-center justify-center py-1">
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <h3 id="sample-discovery-title" class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug"></h3>
+        <span id="sample-discovery-site" class="text-[11px] text-cyan-300/80 font-medium"></span>
+      </div>
+      <p id="sample-discovery-desc"
+        class="text-xs sm:text-[13px] text-slate-200 leading-relaxed bg-white/[0.04] border border-white/[0.06] rounded-xl p-3 w-full"></p>
+      <button id="sample-discovery-collect-btn" type="button"
+        class="squircle-btn rounded-full w-full py-2.5 px-4 text-xs sm:text-sm font-semibold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-lg shadow-cyan-500/25 active:scale-95">
+        🎒 Guardar en la mochila
+      </button>
+    </div>
+  </div>
 
   <!-- Diálogo Inferior Flotante Centrado -->
   <div id="dialogue-modal" class="dialogue-bottom-bar is-hidden" role="dialog" aria-modal="false"
@@ -322,16 +364,21 @@
       <div id="dialogue-machine-preview"
         class="squircle-card w-11 h-11 flex items-center justify-center p-1.5 shrink-0"></div>
       <div class="flex-1 min-w-0 flex flex-col items-center justify-center text-center gap-1">
-        <span id="dialogue-machine-name" class="dialogue-speaker-tag dialogue-speaker-penguin text-center">Cyberpenguin</span>
-        <div id="dialogue-blank-slot" class="blank-template-slot dialogue-line-slot w-full justify-center text-center"></div>
-        <div id="dialogue-topics-container" class="dialogue-topics-container w-full flex flex-wrap items-center justify-center gap-2 pt-1 empty:hidden"></div>
+        <span id="dialogue-machine-name"
+          class="dialogue-speaker-tag dialogue-speaker-penguin text-center">Cyberpenguin</span>
+        <div id="dialogue-blank-slot" class="blank-template-slot dialogue-line-slot w-full justify-center text-center">
+        </div>
+        <div id="dialogue-topics-container"
+          class="dialogue-topics-container w-full flex flex-wrap items-center justify-center gap-2 pt-1 empty:hidden">
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Modal 2: Escotilla de Nave & 3 Espacios de Quiz (2 preguntas x 4 opciones en blanco) -->
   <div id="quiz-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Quiz">
-    <div class="squircle-panel max-w-2xl w-full p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto text-center relative">
+    <div
+      class="squircle-panel max-w-2xl w-full p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto text-center relative">
       <div class="relative w-full flex items-center justify-center">
         <h2 class="text-lg font-semibold tracking-tight text-white text-center">Quiz</h2>
         <span id="quiz-stars-badge" class="hidden">★ 0/5</span>

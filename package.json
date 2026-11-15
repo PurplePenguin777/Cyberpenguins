@@ -2,13 +2,15 @@
   "name": "cyberpenguins-nasa-explorer",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Aventura espacial interactiva de Cyberpenguin por misiones reales de la NASA.",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "devDependencies": {
+  "dependencies": {
     "vite": "^6.0.0"
   }
 }

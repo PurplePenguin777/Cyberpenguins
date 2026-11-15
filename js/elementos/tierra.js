@@ -72,9 +72,10 @@
             <polygon points="452,352 460,352 462,390 448,390" fill="#94a3b8" />
           </g>
 
-          <!-- Nubes de escape en la plataforma -->
+          <!-- Nubes de vapor y despegue con curvas suaves en la plataforma -->
           <g opacity="0.88">
-            <polygon points="385,400 480,370 575,400 540,425 420,425" fill="#e2e8f0" opacity="0.85" />
+            <path d="M 360,410 Q 420,365 480,368 Q 540,370 600,410 Q 560,432 480,430 Q 400,432 360,410 Z" fill="#e2e8f0" opacity="0.85" />
+            <path d="M 400,420 Q 450,380 480,382 Q 510,380 560,420 Q 520,436 480,434 Q 440,436 400,420 Z" fill="#ffffff" opacity="0.9" />
           </g>
 
           <g class="travel-ship-liftoff" transform="translate(410, 102) scale(0.92)">
@@ -135,8 +136,9 @@
             <polygon points="250,662 290,662 295,670 245,670" fill="#cbd5e1" />
             <polygon points="250,630 258,630 260,662 248,662" fill="#94a3b8" />
 
-            <!-- Nubes de vapor y deflexión -->
-            <polygon points="190,680 270,650 350,680 320,710 220,710" fill="#e2e8f0" opacity="0.85" />
+            <!-- Nubes de vapor de despegue con curvas suaves -->
+            <path d="M 180,684 Q 220,642 270,644 Q 320,642 360,684 Q 330,715 270,712 Q 210,715 180,684 Z" fill="#e2e8f0" opacity="0.85" />
+            <path d="M 210,690 Q 240,655 270,656 Q 300,655 330,690 Q 300,716 270,714 Q 240,716 210,690 Z" fill="#ffffff" opacity="0.9" />
           </g>
 
           <!-- Cohete Cyberpenguin en ascenso vertical -->
@@ -200,6 +202,11 @@
             <polygon points="135,276 220,308 200,332" fill="#57cc85" />
             <polygon points="45,388 158,405 186,480 30,468" fill="#25784d" />
             <polygon points="270,370 355,398 375,470 300,458" fill="#3ba96e" />
+
+            <!-- Nubes atmosféricas fluidas con curvas suaves -->
+            <path d="M 60,285 Q 120,265 180,282 Q 230,300 200,320 Q 140,305 60,285 Z" fill="#ffffff" opacity="0.75" />
+            <path d="M 170,340 Q 250,325 310,358 Q 340,385 280,380 Q 220,360 170,340 Z" fill="#ffffff" opacity="0.72" />
+            <path d="M -20,330 Q 50,310 110,340 Q 90,370 20,360 Z" fill="#e0f2fe" opacity="0.65" />
           </g>
 
           <g class="travel-ship-cruise" transform="translate(440, 138) rotate(36) scale(0.88)">
@@ -257,9 +264,10 @@
             <polygon points="150,535 240,565 220,580" fill="#57cc85" />
             <polygon points="340,565 440,545 490,610 430,650 350,630" fill="#3ba96e" />
 
-            <!-- Nubes blancas angulares -->
-            <polygon points="160,515 230,530 220,545 150,530" fill="#ffffff" opacity="0.75" />
-            <polygon points="270,570 340,600 320,610 260,585" fill="#e0f2fe" opacity="0.7" />
+            <!-- Nubes atmosféricas curvadas y fluidas (sin triángulos toscos) -->
+            <path d="M 130,520 Q 185,505 240,522 Q 275,540 230,550 Q 175,536 130,520 Z" fill="#ffffff" opacity="0.75" />
+            <path d="M 250,565 Q 310,550 370,580 Q 360,610 290,598 Q 240,585 250,565 Z" fill="#ffffff" opacity="0.72" />
+            <path d="M 30,590 Q 90,570 145,595 Q 120,625 50,615 Z" fill="#e0f2fe" opacity="0.65" />
           </g>
 
           <!-- Nave Cyberpenguin orientada en ascenso orbital -->

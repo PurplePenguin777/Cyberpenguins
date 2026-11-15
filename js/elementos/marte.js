@@ -65,27 +65,34 @@
             <circle cx="0" cy="0" r="2.0" fill="#fed7aa" />
           </g>
 
-          <!-- Cadenas montañosas lejanas y Twin Peaks de Ares Vallis low-poly -->
+          <!-- Cadenas montañosas lejanas y los célebres Twin Peaks de Ares Vallis (Sojourner / Pathfinder) -->
           <g>
-            <!-- Meseta lejana izquierda -->
-            <polygon points="-10,276 110,218 220,224 316,272" fill="#6b2920" />
-            <polygon points="110,218 220,224 196,274 92,276" fill="#9a412d" />
-            <!-- Twin Peaks clásicos en el cuadrante derecho -->
-            <polygon points="480,274 584,186 648,192 718,266" fill="#7c2e22" />
-            <polygon points="584,186 648,192 628,270 554,272" fill="#ba5335" />
-            <polygon points="690,268 784,174 854,182 968,272" fill="#742b20" />
-            <polygon points="784,174 854,182 826,272 746,270" fill="#c95e3c" />
-            <polygon points="854,182 968,272 1015,274 1015,254 934,232" fill="#61231b" />
+            <!-- Meseta erosionada en el horizonte izquierdo -->
+            <path d="M -10,276 Q 80,242 160,246 Q 240,250 320,270 L 320,286 L -10,286 Z" fill="#581f18" />
+            <polygon points="-10,276 110,242 220,246 316,272" fill="#752a20" />
+            <polygon points="110,242 220,246 196,274 92,276" fill="#a44530" />
+
+            <!-- North Peak y South Peak (Twin Peaks reales esculpidos por la gran inundación) -->
+            <!-- North Peak (pico izquierdo más bajo y redondeado) -->
+            <path d="M 460,274 Q 520,224 570,192 Q 620,220 670,268 L 670,284 L 460,284 Z" fill="#68241b" />
+            <polygon points="460,274 540,202 595,206 660,268" fill="#843124" />
+            <polygon points="540,202 595,206 580,270 520,272" fill="#c45838" />
+
+            <!-- South Peak (pico derecho más alto y cónico) -->
+            <path d="M 670,268 Q 740,208 790,172 Q 850,210 930,272 L 930,284 L 670,284 Z" fill="#5d2017" />
+            <polygon points="670,268 765,178 825,186 925,272" fill="#7e2e21" />
+            <polygon points="765,178 825,186 805,272 735,270" fill="#d26440" />
+            <polygon points="825,186 925,272 1015,274 1015,256 905,236" fill="#66251c" />
           </g>
 
-          <!-- Llanura aluvial marciana compuesta por polígonos low-poly terracota/ocre -->
-          <polygon points="-10,272 280,256 610,254 880,260 1010,274 1010,598 -10,598" fill="#c25632" />
+          <!-- Llanura aluvial de Ares Vallis rica en regolito y arena eólica -->
+          <path d="M -10,272 Q 500,256 1010,274 L 1010,598 L -10,598 Z" fill="#c25632" />
           <polygon points="-10,272 280,256 218,358 -10,348" fill="#d96b3d" />
           <polygon points="280,256 610,254 574,354 218,358" fill="#e57c47" />
           <polygon points="610,254 880,260 854,358 574,354" fill="#d16238" />
           <polygon points="880,260 1010,274 1010,362 854,358" fill="#b64d2c" />
 
-          <!-- Zona media iluminada para cyberpingüino, nave y Sojourner -->
+          <!-- Zona media para Cyberpenguin, nave y rover Sojourner -->
           <polygon points="-10,348 218,358 310,492 -10,498" fill="#cb5e36" />
           <polygon points="218,358 574,354 662,486 310,492" fill="#dc7041" />
           <polygon points="574,354 854,358 1010,362 1010,496 662,486" fill="#c15430" />
@@ -95,24 +102,31 @@
           <polygon points="310,492 662,486 756,598 438,598" fill="#b74e2d" />
           <polygon points="662,486 1010,496 1010,598 756,598" fill="#9a3a20" />
 
-          <!-- Cuencas de impacto someras -->
+          <!-- Cuenca de impacto con regolito y sombra orográfica -->
           <g transform="translate(806, 336)">
-            <polygon points="-70,-6 -28,-22 30,-20 72,-4 52,16 -4,20 -56,12" fill="#a64225" />
-            <polygon points="-50,-2 -18,-13 22,-12 52,-1 34,10 -4,12 -38,6" fill="#7c2d17" />
+            <ellipse cx="0" cy="0" rx="64" ry="18" fill="#923a1f" />
+            <ellipse cx="-4" cy="3" rx="50" ry="13" fill="#652312" />
+            <path d="M -64,0 C -36,-14 36,-14 64,0 C 46,-10 -20,-10 -64,0 Z" fill="#eb8a52" opacity="0.8" />
           </g>
 
-          <!-- Rocas angulares low-poly estilo diapositiva 4 -->
+          <!-- Rocas basálticas redondeadas e imbricadas de la inundación de Ares Vallis ("Barnacle Bill" y "Yogi") -->
           <g>
-            <polygon points="82,312 114,282 148,290 158,316 98,320" fill="#8f361d" />
-            <polygon points="114,282 148,290 132,318 98,320" fill="#df7141" />
-            <polygon points="148,290 158,316 132,318" fill="#6b2613" />
+            <!-- Roca tipo Barnacle Bill (izquierda) -->
+            <polygon points="82,312 112,282 144,288 156,314 98,320" fill="#782d17" />
+            <polygon points="112,282 144,288 130,316 98,320" fill="#e57644" />
+            <polygon points="144,288 156,314 130,316" fill="#581e0f" />
 
-            <polygon points="736,522 770,486 808,494 824,524 752,530" fill="#8f361d" />
-            <polygon points="770,486 808,494 790,524 752,530" fill="#d96b3d" />
-            <polygon points="808,494 824,524 790,524" fill="#652312" />
+            <!-- Roca tipo Yogi (gran canto rodado derecho en primer plano) -->
+            <polygon points="726,522 764,484 812,492 830,524 748,530" fill="#7c2e18" />
+            <polygon points="764,484 812,492 792,524 748,530" fill="#de7041" />
+            <polygon points="812,492 830,524 792,524" fill="#541b0e" />
 
-            <polygon points="132,536 164,512 198,520 206,544 148,548" fill="#87331b" />
-            <polygon points="164,512 198,520 182,544 148,548" fill="#cf6137" />
+            <!-- Rocas secundarias dispersas de la llanura de inundación -->
+            <polygon points="132,536 162,512 196,520 204,544 148,548" fill="#7c2e18" />
+            <polygon points="162,512 196,520 180,544 148,548" fill="#d96b3d" />
+
+            <polygon points="410,470 432,452 454,458 460,476 420,480" fill="#752c17" />
+            <polygon points="432,452 454,458 444,476 420,480" fill="#df7646" />
           </g>
         </svg>
       `;
@@ -145,18 +159,16 @@
         <!-- Fobos solitario sobre Chryse Planitia (escala aparente realista) -->
         ${facetedPhobos(236, 94, 0.48)}
 
-        <!-- Escarpes amesetados ocre/óxido en el horizonte -->
+        <!-- Escarpes y mesetas amesetadas en el horizonte dorado de Chryse Planitia -->
         <g>
-          <polygon points="-10,276 154,224 310,272" fill="#7c351e" />
-          <polygon points="154,224 310,272 212,276" fill="#b45630" />
-          <polygon points="270,272 444,234 612,270" fill="#702f1b" />
-          <polygon points="444,234 612,270 492,274" fill="#a84e2a" />
-          <polygon points="578,270 760,214 912,232 1015,274" fill="#7d361f" />
-          <polygon points="760,214 912,232 874,274 714,272" fill="#c46235" />
+          <path d="M -10,276 Q 140,210 300,268 Q 450,220 600,266 Q 750,202 910,228 Q 960,234 1015,274 L 1015,288 L -10,288 Z" fill="#692815" />
+          <polygon points="-10,276 154,224 310,272 212,276" fill="#aa4a25" />
+          <polygon points="270,272 444,234 612,270 492,274" fill="#9c401e" />
+          <polygon points="578,270 760,214 912,232 874,274 714,272" fill="#ba562a" />
         </g>
 
-        <!-- Planicie dorada-óxido de Chryse Planitia (facetas low-poly) -->
-        <polygon points="-10,272 260,258 580,254 840,260 1010,274 1010,598 -10,598" fill="#d16c3c" />
+        <!-- Planicie dorada-óxido de Chryse Planitia (sitio de Viking 1) -->
+        <path d="M -10,272 Q 500,256 1010,274 L 1010,598 L -10,598 Z" fill="#d16c3c" />
         <polygon points="-10,272 260,258 290,356 -10,352" fill="#df7d48" />
         <polygon points="260,258 580,254 608,354 290,356" fill="#eb8d53" />
         <polygon points="580,254 840,260 886,356 608,354" fill="#dc7743" />
@@ -170,18 +182,26 @@
         <polygon points="244,488 670,486 764,598 456,598" fill="#c2592f" />
         <polygon points="670,486 1010,494 1010,598 764,598" fill="#a34321" />
 
-        <!-- Cráter somero izquierdo -->
+        <!-- Cráter somero y deriva eólica -->
         <g transform="translate(178, 344)">
-          <polygon points="-66,-6 -24,-22 30,-20 68,-4 46,18 -6,22 -52,14" fill="#b54f2a" />
-          <polygon points="-46,-3 -16,-14 22,-13 48,-1 30,11 -4,14 -34,8" fill="#843318" />
+          <ellipse cx="0" cy="0" rx="58" ry="18" fill="#a44222" />
+          <ellipse cx="-4" cy="3" rx="42" ry="12" fill="#752a14" />
+          <path d="M -58,0 C -30,-12 30,-12 58,0 C 42,-8 -18,-8 -58,0 Z" fill="#eb8d53" opacity="0.8" />
         </g>
 
-        <!-- Rocas basálticas en bordes -->
+        <!-- Bloques basálticos y roca "Big Joe" emblemática de Viking 1 -->
         <g>
-          <polygon points="844,298 878,270 914,276 928,302 862,306" fill="#8f361d" />
-          <polygon points="878,270 914,276 896,304 862,306" fill="#df7a47" />
-          <polygon points="240,540 272,512 312,518 324,548 256,552" fill="#843318" />
-          <polygon points="272,512 312,518 294,548 256,552" fill="#d36b3b" />
+          <!-- Gran roca "Big Joe" semienterrada en las arenas de Chryse -->
+          <polygon points="830,302 866,268 912,274 932,306 854,312" fill="#782914" />
+          <polygon points="866,268 912,274 892,308 854,312" fill="#e57e49" />
+          <polygon points="912,274 932,306 892,308" fill="#521a0c" />
+
+          <!-- Rocas basálticas dispersas -->
+          <polygon points="240,540 270,512 310,518 322,548 256,552" fill="#752914" />
+          <polygon points="270,512 310,518 292,548 256,552" fill="#d97241" />
+
+          <polygon points="680,510 706,488 734,494 742,518 696,522" fill="#752914" />
+          <polygon points="706,488 734,494 722,518 696,522" fill="#e07b46" />
         </g>
       </svg>
     `;

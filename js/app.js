@@ -116,6 +116,8 @@
   let activeDialogueTurn = 0;
   let activeDialogueToken = 0;
   let activeQuizChapterId = state.currentChapterId;
+  let activeInteractable = null;
+  let pendingSampleToCollect = null;
 
   const dom = {};
 
@@ -205,6 +207,19 @@
     dom.dialogueBlankSlot = document.getElementById('dialogue-blank-slot');
     dom.dialogueTopicsContainer = document.getElementById('dialogue-topics-container');
 
+    dom.stageActionPrompt = document.getElementById('stage-action-prompt');
+    dom.stageActionBtn = document.getElementById('stage-action-btn');
+    dom.stageActionIcon = document.getElementById('stage-action-icon');
+    dom.stageActionLabel = document.getElementById('stage-action-label');
+
+    dom.sampleDiscoveryModal = document.getElementById('sample-discovery-modal');
+    dom.sampleDiscoveryCrystal = document.getElementById('sample-discovery-crystal');
+    dom.sampleDiscoveryTitle = document.getElementById('sample-discovery-title');
+    dom.sampleDiscoveryType = document.getElementById('sample-discovery-type');
+    dom.sampleDiscoverySite = document.getElementById('sample-discovery-site');
+    dom.sampleDiscoveryDesc = document.getElementById('sample-discovery-desc');
+    dom.sampleDiscoveryCollectBtn = document.getElementById('sample-discovery-collect-btn');
+
     dom.quizModal = document.getElementById('quiz-modal');
     dom.quizStarsBadge = document.getElementById('quiz-stars-badge');
     dom.quizChapterTabs = document.getElementById('quiz-chapter-tabs');
@@ -255,6 +270,28 @@
     dom.homeDownloadCertificateBtn.addEventListener('click', downloadCertificate);
     dom.downloadCertificateBtn.addEventListener('click', downloadCertificate);
     dom.resetProgressBtn.addEventListener('click', resetProgress);
+
+    if (dom.stageActionBtn) {
+      dom.stageActionBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (activeInteractable && typeof activeInteractable.onAction === 'function') {
+          const action = activeInteractable.onAction;
+          hideStageActionPrompt();
+          action();
+        }
+      });
+    }
+
+    if (dom.sampleDiscoveryCollectBtn) {
+      dom.sampleDiscoveryCollectBtn.addEventListener('click', () => {
+        if (pendingSampleToCollect) {
+          const { chapter, sampleObj } = pendingSampleToCollect;
+          pendingSampleToCollect = null;
+          hideModal(dom.sampleDiscoveryModal);
+          collectSample(chapter, sampleObj);
+        }
+      });
+    }
     renderHomeBackground();
     bindChapterParallax();
 
@@ -278,8 +315,10 @@
       { el: dom.quizModal, onClose: closeQuizModal },
       { el: dom.passportModal, onClose: () => hideModal(dom.passportModal) },
       { el: dom.badgesModal, onClose: () => hideModal(dom.badgesModal) },
-      { el: dom.certificateModal, onClose: () => hideModal(dom.certificateModal) }
+      { el: dom.certificateModal, onClose: () => hideModal(dom.certificateModal) },
+      { el: dom.sampleDiscoveryModal, onClose: () => hideModal(dom.sampleDiscoveryModal) }
     ].forEach(({ el, onClose }) => {
+      if (!el) return;
       el.addEventListener('click', (event) => {
         if (event.target === el) onClose();
       });
@@ -340,6 +379,14 @@
       if (event.code === 'Space' || event.key === ' ') {
         event.preventDefault();
         triggerGravityJump();
+        return;
+      }
+
+      if ((event.key === 'e' || event.key === 'E' || event.key === 'Enter') && activeInteractable && typeof activeInteractable.onAction === 'function') {
+        event.preventDefault();
+        const action = activeInteractable.onAction;
+        hideStageActionPrompt();
+        action();
         return;
       }
 
@@ -752,6 +799,7 @@
     if (!fromMachine || !toMachine) return;
 
     closeDialogueModal();
+    hideStageActionPrompt();
     clearWalkTimers();
     dom.penguinActor.classList.remove('walking');
     if (FX && typeof FX.pause === 'function') {
@@ -903,6 +951,7 @@
     proximityMachineId = null;
     isJumping = false;
     closeDialogueModal();
+    hideStageActionPrompt();
     saveState();
 
     updateLocationPill(chapter, activeMachine);
@@ -1257,16 +1306,8 @@
     const hatchBtn = document.getElementById('ship-hatch-btn');
     if (hatchBtn) {
       hatchBtn.addEventListener('click', () => {
-        const triggerHatchAction = () => {
-          if (isFirstStop) {
-            travelBetweenSites(chapter.id, 0, 1);
-          } else {
-            closeHatchAndOpenQuiz(chapter);
-          }
-        };
-
         const boardingPoint = resolveSurfacePoint(shipPos.x + 9.5, shipPos.y + 4.8, chapter);
-        routeAndMove(boardingPoint.x, boardingPoint.y, triggerHatchAction);
+        routeAndMove(boardingPoint.x, boardingPoint.y, checkSurfaceProximity);
       });
     }
 
@@ -1289,7 +1330,7 @@
         if (!sampleObj) return;
         const sampleTarget = resolveSurfacePoint(sampleObj.pos.x, sampleObj.pos.y, chapter);
         routeAndMove(sampleTarget.x, sampleTarget.y, () => {
-          collectSample(chapter, sampleObj);
+          openSampleDiscoveryModal(chapter, sampleObj);
         });
       });
     });
@@ -1539,6 +1580,7 @@
         spawnDustPuff(penguinPos.x, penguinPos.y);
       }
       isJumping = false;
+      checkSurfaceProximity();
     }, profile.jumpDurationMs);
   }
 
@@ -1546,47 +1588,123 @@
     return Math.hypot(a.x - b.x, a.y - b.y);
   }
 
+  function showStageActionPrompt(type, target, onAction) {
+    if (!dom.stageActionPrompt || !dom.stageActionBtn) return;
+    activeInteractable = { type, target, onAction };
+
+    let icon = '💬';
+    let label = 'Interactuar';
+    if (type === 'sample') {
+      icon = '🎒';
+      label = 'Guardar en la mochila';
+    } else if (type === 'machine') {
+      icon = '💬';
+      label = `Hablar con ${target.name || 'sonda'}`;
+    } else if (type === 'ship-travel') {
+      icon = '🚀';
+      label = 'Siguiente parada de la misión';
+    } else if (type === 'ship-leave') {
+      icon = '🚀';
+      label = 'Abordar nave y continuar';
+    }
+
+    if (dom.stageActionIcon) dom.stageActionIcon.textContent = icon;
+    if (dom.stageActionLabel) dom.stageActionLabel.textContent = label;
+
+    const px = Math.max(10, Math.min(90, penguinPos.x));
+    const py = Math.max(18, Math.min(84, penguinPos.y - 13));
+    dom.stageActionPrompt.style.left = `${px}%`;
+    dom.stageActionPrompt.style.top = `${py}%`;
+    dom.stageActionPrompt.classList.remove('is-hidden');
+  }
+
+  function hideStageActionPrompt() {
+    activeInteractable = null;
+    if (dom.stageActionPrompt) {
+      dom.stageActionPrompt.classList.add('is-hidden');
+    }
+  }
+
   function checkSurfaceProximity() {
     const chapter = getChapter(state.currentChapterId);
     if (!chapter) return;
-    if (dom.gameScreen.classList.contains('is-hidden') || isBlockingModalOpen()) return;
+    if (dom.gameScreen.classList.contains('is-hidden') || isBlockingModalOpen()) {
+      hideStageActionPrompt();
+      return;
+    }
 
     const { siteIdx, activeMachine } = getActiveSite(chapter);
     const shipPos = (activeMachine && activeMachine.shipPos) || chapter.shipPos;
     const isFirstStop = siteIdx === 0 && chapter.machines.length > 1;
 
-    const distToShip = getDist(penguinPos, shipPos);
-    if (distToShip > 16.5) {
-      leftShipArea = true;
-    } else if (leftShipArea && distToShip <= 12.2) {
-      leftShipArea = false;
-      if (isFirstStop) {
-        travelBetweenSites(chapter.id, 0, 1);
-      } else {
-        closeHatchAndOpenQuiz(chapter);
+    // Si nos alejamos de la máquina activa mientras habla, cerrar diálogo
+    if (activeMachine) {
+      const distToMachine = getDist(penguinPos, activeMachine.pos);
+      if (distToMachine > 18.5 && activeDialogueMachine && activeDialogueMachine.id === activeMachine.id) {
+        closeDialogueModal();
       }
-      return;
     }
 
+    // Evaluar interactuables dentro de rango
+    const candidates = [];
+
+    // 1. Muestras geológicas no recogidas (prioridad de exploración)
     if (chapter.hasSurface) {
-      getSiteSamples(chapter, activeMachine).forEach((sampleObj) => {
-        if (!state.collectedSamples.includes(sampleObj.id) && getDist(penguinPos, sampleObj.pos) <= 10.5) {
-          collectSample(chapter, sampleObj);
+      const siteSamples = getSiteSamples(chapter, activeMachine);
+      siteSamples.forEach((sampleObj) => {
+        if (!state.collectedSamples.includes(sampleObj.id)) {
+          const dist = getDist(penguinPos, sampleObj.pos);
+          if (dist <= 13.5) {
+            candidates.push({
+              type: 'sample',
+              target: sampleObj,
+              dist,
+              onAction: () => openSampleDiscoveryModal(chapter, sampleObj)
+            });
+          }
         }
       });
     }
 
+    // 2. Máquina o sonda histórica
     if (activeMachine) {
-      const distToMachine = getDist(penguinPos, activeMachine.pos);
-      if (distToMachine > 16.5) {
-        proximityMachineId = null;
-        if (activeDialogueMachine && activeDialogueMachine.id === activeMachine.id) {
-          closeDialogueModal();
-        }
-      } else if (distToMachine <= 12.5 && proximityMachineId !== activeMachine.id) {
-        proximityMachineId = activeMachine.id;
-        openDialogueModal(activeMachine);
+      const dist = getDist(penguinPos, activeMachine.pos);
+      if (dist <= 15.5) {
+        candidates.push({
+          type: 'machine',
+          target: activeMachine,
+          dist,
+          onAction: () => openDialogueModal(activeMachine)
+        });
       }
+    }
+
+    // 3. Escotilla de la nave espacial
+    const distToShip = getDist(penguinPos, shipPos);
+    if (distToShip <= 14.5) {
+      if (isFirstStop) {
+        candidates.push({
+          type: 'ship-travel',
+          target: null,
+          dist: distToShip,
+          onAction: () => travelBetweenSites(chapter.id, 0, 1)
+        });
+      } else {
+        candidates.push({
+          type: 'ship-leave',
+          target: null,
+          dist: distToShip,
+          onAction: () => closeHatchAndOpenQuiz(chapter)
+        });
+      }
+    }
+
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => a.dist - b.dist);
+      const nearest = candidates[0];
+      showStageActionPrompt(nearest.type, nearest.target, nearest.onAction);
+    } else {
+      hideStageActionPrompt();
     }
   }
 
@@ -1764,11 +1882,11 @@
       const sceneHtml = MODELS.chapterScene(chapter.id, singleMachineSvg);
 
       return `
-        <div class="home-chapter-card p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
+        <div class="home-chapter-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${
           isCardActive ? 'is-active' : ''
         }">
           <div class="w-full flex items-center justify-center">
-            <span class="text-[11px] font-medium uppercase tracking-[0.22em] text-slate-400 text-center">${chapter.name}</span>
+            <h3 class="text-xs sm:text-sm font-semibold tracking-wide text-slate-200 text-center">${chapter.name}</h3>
           </div>
 
           <div class="home-chapter-emblem relative w-full">
@@ -1777,10 +1895,10 @@
 
           <div class="flex flex-col items-center gap-3 w-full">
             <button type="button"
-              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 text-xs sm:text-sm font-medium ${
+              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 px-4 text-xs sm:text-sm font-medium transition-colors ${
                 isCardActive
-                  ? 'bg-white text-slate-950 hover:bg-cyan-50'
-                  : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-100'
+                  ? 'bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm'
+                  : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-200 border border-white/[0.08]'
               }"
               data-enter-chapter="${chapter.id}">
               ${completed ? 'Explorar de nuevo' : inProgress ? 'Continuar' : 'Explorar'}
@@ -2039,6 +2157,100 @@
   /* ========================================================================
      Muestras & Pasaporte de Explorador (Patitas de Pingüino)
      ======================================================================== */
+
+  const SAMPLE_DETAILS = {
+    'sample-moon-1': {
+      title: 'Basalto lunar',
+      site: 'Océano de las Tormentas · La Luna',
+      desc: '¡Lava enfriada de volcanes lunares! Hace miles de millones de años, en la Luna había volcanes que expulsaban ríos de fuego.'
+    },
+    'sample-moon-2': {
+      title: 'Roca de impacto',
+      site: 'Cráter Surveyor · La Luna',
+      desc: '¡Un meteorito chocó con fuerza brutal contra la Luna! El calor fundió las rocas y las pegó como piezas de un rompecabezas.'
+    },
+    'sample-moon-3': {
+      title: 'Polvo de cristales',
+      site: 'Suelo lunar · La Luna',
+      desc: 'Diminutos cristales brillantes que forman el suelo de la Luna. Se trituraron durante eones por piedritas del espacio.'
+    },
+    'sample-moon-4': {
+      title: 'Mineral con oxígeno',
+      site: 'Mar de la Tranquilidad · La Luna',
+      desc: '¡Un mineral oscuro muy valioso! Los astronautas lo descubrieron y los científicos pueden sacar oxígeno de él para respirar.'
+    },
+    'sample-moon-5': {
+      title: 'Roca del Génesis',
+      site: 'Tierras altas · La Luna',
+      desc: 'Un pedacito de la corteza original de la Luna. Es más vieja que los dinosaurios y casi cualquier roca de la Tierra: ¡4,000 millones de años!'
+    },
+    'sample-moon-6': {
+      title: 'Perla de cristal',
+      site: 'Zona Apolo 11 · La Luna',
+      desc: 'Una pequeña canica de cristal brillante. Se formó en el frío del espacio cuando una fuente de lava volcánica explotó al cielo.'
+    },
+    'sample-mars-1': {
+      title: 'Piedra con burbujas',
+      site: 'Chryse Planitia · Marte',
+      desc: 'Lava marciana con agujeritos. Cuando el volcán la expulsó, los gases calientes formaron burbujas como en una esponja.'
+    },
+    'sample-mars-2': {
+      title: 'Arándano de Marte',
+      site: 'Llanuras de Chryse · Marte',
+      desc: '¡Una bolita mineral redonda! Los científicos las llaman «arándanos» y demuestran que antes había agua líquida corriendo en Marte.'
+    },
+    'sample-mars-3': {
+      title: 'Costra de sal marciana',
+      site: 'Suelo de Viking 1 · Marte',
+      desc: 'La pala del robot Viking 1 rascó el suelo y encontró esta sal dorada. Quedó aquí cuando un lago marciano se secó bajo el Sol.'
+    },
+    'sample-mars-4': {
+      title: 'Roca Barnacle Bill',
+      site: 'Canal de Ares Vallis · Marte',
+      desc: 'La primera roca que tocó el rover Sojourner en 1997. ¡El pequeño robot la olió con su rayo láser para descubrir sus secretos!'
+    },
+    'sample-mars-5': {
+      title: 'Roca gigante Yogi',
+      site: 'Valle de Ares · Marte',
+      desc: 'Una roca enorme con forma de oso. Un río gigante y veloz en el Marte antiguo la arrastró y la pulió como piedra de río.'
+    },
+    'sample-mars-6': {
+      title: 'Roca Scooby Doo',
+      site: 'Campamento Pathfinder · Marte',
+      desc: 'Una roca tan dura y resistente que cuando el rover intentó rasparla con sus ruedas metálicas, ¡no le hizo ni una sola marca!'
+    }
+  };
+
+  function openSampleDiscoveryModal(chapter, sampleObj) {
+    if (!chapter || !sampleObj) return;
+    pendingSampleToCollect = { chapter, sampleObj };
+    const details = SAMPLE_DETAILS[sampleObj.id] || {
+      title: sampleObj.label || 'Roca espacial',
+      site: chapter.name,
+      desc: '¡Un fascinante tesoro cósmico! Guárdalo en tu mochila para completar las misiones de tu pasaporte de Cyberpenguin.'
+    };
+
+    if (dom.sampleDiscoveryTitle) {
+      dom.sampleDiscoveryTitle.textContent = details.title || sampleObj.label || 'Roca espacial';
+    }
+    if (dom.sampleDiscoverySite) {
+      dom.sampleDiscoverySite.textContent = details.site || chapter.name;
+    }
+    if (dom.sampleDiscoveryDesc) {
+      dom.sampleDiscoveryDesc.textContent = details.desc;
+    }
+    if (dom.sampleDiscoveryType) {
+      dom.sampleDiscoveryType.textContent = details.type || '';
+    }
+    if (dom.sampleDiscoveryCrystal) {
+      const variant = typeof sampleObj.variant === 'number' ? sampleObj.variant : 0;
+      dom.sampleDiscoveryCrystal.innerHTML = MODELS.sampleCrystal(chapter.id, variant);
+    }
+
+    hideStageActionPrompt();
+    showModal(dom.sampleDiscoveryModal);
+    playHarmony('dialogue');
+  }
 
   function collectSample(chapter, sampleObj) {
     const targetSample = sampleObj || (chapter && chapter.sample);
@@ -2370,8 +2582,9 @@
       dom.quizModal,
       dom.passportModal,
       dom.badgesModal,
-      dom.certificateModal
-    ].some((m) => !m.classList.contains('is-hidden'));
+      dom.certificateModal,
+      dom.sampleDiscoveryModal
+    ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
   function isBlockingModalOpen() {
@@ -2379,8 +2592,9 @@
       dom.quizModal,
       dom.passportModal,
       dom.badgesModal,
-      dom.certificateModal
-    ].some((m) => !m.classList.contains('is-hidden'));
+      dom.certificateModal,
+      dom.sampleDiscoveryModal
+    ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
   function closeAllModals() {
@@ -2389,5 +2603,7 @@
     hideModal(dom.passportModal);
     hideModal(dom.badgesModal);
     hideModal(dom.certificateModal);
+    if (dom.sampleDiscoveryModal) hideModal(dom.sampleDiscoveryModal);
+    hideStageActionPrompt();
   }
 })(typeof window !== 'undefined' ? window : globalThis);
