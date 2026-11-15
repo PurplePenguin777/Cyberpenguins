@@ -1,9 +1,9 @@
 /* ==========================================================================
-   Cyberpenguins - Estética Minimalista Apple & Arquitectura Monument Valley
+   Cyberpenguins - Estética Minimalista Espacial & Arquitectura Low-Poly
    ========================================================================== */
 
 :root {
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   --bg-space: #060914;
   --bg-space-deep: #04060e;
   --surface-glass: rgba(16, 22, 44, 0.68);
@@ -17,7 +17,7 @@
   --accent-cool: #7ee8fa;
   --accent-mint: #a8e6cf;
   --accent-lavender: #c3b1e1;
-  --spring-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-smooth: cubic-bezier(0.16, 1, 0.3, 1);
   --spring-mv: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -47,7 +47,7 @@ body {
 }
 
 /* ==========================================================================
-   Superficies Translúcidas Apple (visionOS / iOS) & Squircles G2
+   Superficies Translúcidas & Squircles G2
    ========================================================================== */
 
 .squircle-panel {
@@ -71,7 +71,7 @@ body {
   box-shadow:
     0 14px 36px rgba(3, 6, 18, 0.36),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: transform 0.35s var(--spring-apple), border-color 0.28s ease, background-color 0.28s ease, box-shadow 0.35s ease;
+  transition: transform 0.35s var(--spring-smooth), border-color 0.28s ease, background-color 0.28s ease, box-shadow 0.35s ease;
 }
 
 .squircle-btn {
@@ -81,10 +81,10 @@ body {
   text-align: center;
   border-radius: 16px / 14px;
   transition:
-    transform 0.28s var(--spring-apple),
+    transform 0.28s var(--spring-smooth),
     background-color 0.22s ease,
     border-color 0.22s ease,
-    box-shadow 0.28s var(--spring-apple),
+    box-shadow 0.28s var(--spring-smooth),
     opacity 0.2s ease;
   cursor: pointer;
 }
@@ -179,7 +179,7 @@ a:focus-visible {
   align-items: center;
   justify-content: space-between;
   padding: 2.25rem 1.5rem 2.5rem;
-  transition: opacity 0.8s var(--spring-apple), transform 0.8s var(--spring-apple), filter 0.8s ease;
+  transition: opacity 0.8s var(--spring-smooth), transform 0.8s var(--spring-smooth), filter 0.8s ease;
   overflow: hidden;
 }
 
@@ -200,7 +200,7 @@ a:focus-visible {
 }
 
 .launch-title-card {
-  transition: opacity 0.7s var(--spring-apple), transform 0.7s var(--spring-apple), filter 0.7s ease;
+  transition: opacity 0.7s var(--spring-smooth), transform 0.7s var(--spring-smooth), filter 0.7s ease;
 }
 
 .launch-screen.igniting-pad .launch-title-card {
@@ -313,7 +313,7 @@ a:focus-visible {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  animation: screenFadeIn 0.45s var(--spring-apple) both;
+  animation: screenFadeIn 0.45s var(--spring-smooth) both;
 }
 
 .travel-cinematic-stage {
@@ -326,7 +326,7 @@ a:focus-visible {
 .cine-crossfade {
   width: 100%;
   height: 100%;
-  animation: cineCrossfade 0.55s var(--spring-apple) both;
+  animation: cineCrossfade 0.55s var(--spring-smooth) both;
 }
 
 .cine-camera-drift {
@@ -385,7 +385,7 @@ a:focus-visible {
   height: 6px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.25);
-  transition: width 0.35s var(--spring-apple), background-color 0.35s ease;
+  transition: width 0.35s var(--spring-smooth), background-color 0.35s ease;
 }
 
 .travel-dot.is-active {
@@ -469,7 +469,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   Pantalla Inicial (Minimalismo Apple + Low-Poly Monument Valley)
+   Pantalla Inicial (Diseño Minimalista + Low-Poly Isométrico)
    ========================================================================== */
 
 .home-screen {
@@ -482,7 +482,7 @@ a:focus-visible {
   padding: 1.25rem;
   overflow: hidden;
   overflow-y: auto;
-  animation: screenFadeIn 0.55s var(--spring-apple) both;
+  animation: screenFadeIn 0.55s var(--spring-smooth) both;
 }
 
 .home-screen .cosmic-panorama-svg {
@@ -497,7 +497,7 @@ a:focus-visible {
   background: transparent;
   border: none;
   box-shadow: none;
-  animation: panelRiseIn 0.55s var(--spring-apple) both;
+  animation: panelRiseIn 0.55s var(--spring-smooth) both;
 }
 
 .home-chapter-card {
@@ -545,7 +545,7 @@ a:focus-visible {
   transform: translateY(-2px) scale(1.03);
 }
 
-.home-apple-dock {
+.home-dock {
   border-radius: 24px;
   background: rgba(12, 18, 36, 0.48);
   backdrop-filter: blur(28px) saturate(165%);
@@ -631,7 +631,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   Cartela Cinematográfica de Capítulo estilo Monument Valley
+   Cartela Cinematográfica de Capítulo
    ========================================================================== */
 
 .chapter-title-card {
@@ -651,9 +651,9 @@ a:focus-visible {
   transform: translateY(8px) scale(0.985);
   filter: blur(6px);
   transition:
-    opacity 0.65s var(--spring-apple),
-    transform 0.65s var(--spring-apple),
-    filter 0.65s var(--spring-apple);
+    opacity 0.65s var(--spring-smooth),
+    transform 0.65s var(--spring-smooth),
+    filter 0.65s var(--spring-smooth);
 }
 
 .chapter-title-card.is-visible {
@@ -711,7 +711,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   Maqueta Isométrica Navegable & Arquitectura Monument Valley
+   Maqueta Isométrica Navegable & Arquitectura Low-Poly
    ========================================================================== */
 
 .game-shell {
@@ -724,7 +724,7 @@ a:focus-visible {
   flex-direction: column;
   padding: 0;
   background: #04060e;
-  animation: screenFadeIn 0.55s var(--spring-apple) both;
+  animation: screenFadeIn 0.55s var(--spring-smooth) both;
 }
 
 .stage-viewport {
@@ -837,7 +837,7 @@ a:focus-visible {
 }
 
 .entity-svg-wrap {
-  transition: transform 0.32s var(--spring-apple);
+  transition: transform 0.32s var(--spring-smooth);
   filter: drop-shadow(0 12px 22px rgba(4, 7, 22, 0.6));
 }
 
@@ -1004,7 +1004,7 @@ a:focus-visible {
 }
 
 .penguin-actor.descending {
-  animation: penguinDescend 0.75s var(--spring-apple);
+  animation: penguinDescend 0.75s var(--spring-smooth);
 }
 
 @keyframes penguinHop {
@@ -1152,7 +1152,7 @@ a:focus-visible {
   }
 }
 
-/* Doble anillo concéntrico estilo Monument Valley al tocar el sendero */
+/* Doble anillo concéntrico al tocar el sendero */
 .walk-ripple {
   position: absolute;
   width: 24px;
@@ -1163,7 +1163,7 @@ a:focus-visible {
   opacity: 0.92;
   pointer-events: none;
   z-index: 15;
-  animation: rippleOut 0.65s var(--spring-apple) forwards;
+  animation: rippleOut 0.65s var(--spring-smooth) forwards;
 }
 
 .walk-ripple::after {
@@ -1172,7 +1172,7 @@ a:focus-visible {
   inset: -4px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.55);
-  animation: rippleOutInner 0.65s var(--spring-apple) forwards;
+  animation: rippleOutInner 0.65s var(--spring-smooth) forwards;
 }
 
 @keyframes rippleOut {
@@ -1190,7 +1190,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   Modales y Cápsula Flotante de Diálogo (Apple TV+ / Monument Valley)
+   Modales y Cápsula Flotante de Diálogo
    ========================================================================== */
 
 .modal-overlay {
@@ -1208,7 +1208,7 @@ a:focus-visible {
 }
 
 .modal-overlay:not(.is-hidden) > .squircle-panel {
-  animation: panelRiseIn 0.38s var(--spring-apple) both;
+  animation: panelRiseIn 0.38s var(--spring-smooth) both;
 }
 
 .modal-overlay.is-hidden,
@@ -1251,7 +1251,7 @@ a:focus-visible {
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  animation: dialogueSlideUp 0.38s var(--spring-apple) both;
+  animation: dialogueSlideUp 0.38s var(--spring-smooth) both;
 }
 
 @keyframes dialogueSlideUp {
@@ -1385,7 +1385,7 @@ a:focus-visible {
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.035);
   min-height: 46px;
-  transition: border-color 0.22s ease, background-color 0.22s ease, transform 0.2s var(--spring-apple);
+  transition: border-color 0.22s ease, background-color 0.22s ease, transform 0.2s var(--spring-smooth);
   cursor: pointer;
 }
 

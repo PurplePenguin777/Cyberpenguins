@@ -1,5 +1,5 @@
 /**
- * Hardware NASA 5/6 rediseñado con estética Canva (Diapositiva 4): Pioneer 10 (Espacio Profundo).
+ * Hardware NASA 5/6 (estética low-poly): Pioneer 10 (Espacio Profundo).
  * Compartimento hexagonal dorado-ámbar detrás de una gran antena parabólica circular blanca
  * con trípode alimentador frontal y brazos largos metálicos de magnetómetro y RTG.
  */

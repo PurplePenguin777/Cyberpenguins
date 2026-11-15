@@ -1,5 +1,5 @@
 /**
- * Hardware NASA 3/6 rediseñado con estética Canva (Diapositiva 4): Viking 1 Lander (Marte).
+ * Hardware NASA 3/6 (estética low-poly): Viking 1 Lander (Marte).
  * Cuerpo hexagonal ancho low-poly en plata/blanco mate, 3 patas metálicas con platos,
  * cubiertas doradas RTG y gran antena parabólica circular blanca orientada hacia arriba.
  */

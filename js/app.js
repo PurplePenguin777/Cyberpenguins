@@ -1597,7 +1597,7 @@
     return isChapterCompleted(chapter.id) || chapter.machines.some((m) => state.inspectedMachines.includes(m.id));
   }
 
-  function monumentPedestalSvg(chapterId) {
+  function isometricPedestalSvg(chapterId) {
     const palettes = {
       moon: { top: '#cbd5e1', left: '#94a3b8', right: '#475569', stepTop: '#e2e8f0', rim: 'rgba(126, 232, 250, 0.36)' },
       mars: { top: '#ea8850', left: '#c25632', right: '#7c2e22', stepTop: '#fda876', rim: 'rgba(255, 190, 118, 0.36)' },
@@ -1606,7 +1606,7 @@
     const p = palettes[chapterId] || palettes.moon;
     return `
       <svg class="mv-pedestal-svg" viewBox="0 0 210 68" width="204" height="66" aria-hidden="true">
-        <!-- Base arquitectónica isométrica estilo Monument Valley -->
+        <!-- Base arquitectónica isométrica -->
         <polygon points="105,6 196,26 105,46 14,26" fill="${p.top}" stroke="${p.rim}" stroke-width="1" />
         <polygon points="14,26 105,46 105,58 14,38" fill="${p.left}" />
         <polygon points="196,26 105,46 105,58 196,38" fill="${p.right}" />
@@ -1641,7 +1641,7 @@
 
           <div class="home-chapter-emblem relative flex flex-col items-center justify-end w-full pt-2">
             <div class="relative z-10 flex items-end justify-center gap-5 -mb-5">${machinesPreviewSvg}</div>
-            ${monumentPedestalSvg(chapter.id)}
+            ${isometricPedestalSvg(chapter.id)}
           </div>
 
           <div class="flex flex-col items-center gap-3 w-full">
@@ -2178,8 +2178,8 @@
   </defs>
   <rect width="800" height="560" rx="36" fill="url(#certBg)" />
   <rect x="24" y="24" width="752" height="512" rx="28" fill="none" stroke="#ffbe76" stroke-width="1.5" stroke-opacity="0.45" />
-  <text x="400" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', system-ui, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.8" fill="#fde68a">Certificado</text>
-  <text x="400" y="156" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="500" fill="#a5f3fc">${badge.name}</text>
+  <text x="400" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.8" fill="#fde68a">Certificado</text>
+  <text x="400" y="156" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="500" fill="#a5f3fc">${badge.name}</text>
   <g transform="translate(352, 195)">${innerPaw}</g>
   <rect x="120" y="340" width="560" height="130" rx="18" fill="rgba(255, 255, 255, 0.035)" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" />
 </svg>`;

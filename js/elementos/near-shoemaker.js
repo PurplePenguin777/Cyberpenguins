@@ -1,5 +1,5 @@
 /**
- * Hardware NASA 6/6 rediseñado con estética Canva (Diapositiva 4): NEAR Shoemaker (433 Eros).
+ * Hardware NASA 6/6 (estética low-poly): NEAR Shoemaker (433 Eros).
  * Bus prismático octogonal blanco/plata facetado con módulo frontal dorado y lente oscuro,
  * antena superior y 2 grandes alas rectangulares azules de paneles solares con rejilla.
  */

@@ -2,7 +2,7 @@
   "name": "cyberpenguins-nasa-explorer",
   "version": "1.0.0",
   "private": true,
-  "description": "Aventura espacial interactiva de Cyberpenguin por misiones reales de la NASA, lista para GoDaddy y Vercel.",
+  "description": "Aventura espacial interactiva de Cyberpenguin por misiones reales de la NASA.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

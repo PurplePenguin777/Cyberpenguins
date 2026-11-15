@@ -1,5 +1,5 @@
 /**
- * Elemento visual rediseñado con la estética Canva ("Abandonados pero no olvidados"):
+ * Elemento visual (estética low-poly):
  * - Cyberpenguin low-poly con casco blanco de auriculares laterales, cuello y mochila azul cobalto,
  *   rostro en máscara blanca, ojos grandes expresivos, pico naranja y botas naranjas.
  * - Cuerda umbilical EVA luminosa.
@@ -106,7 +106,7 @@
           <polygon points="33,50 77,50 79,57 55,61 31,57" fill="url(#${id}-cobalt)" stroke="#1e3a8a" stroke-width="1.1" stroke-linejoin="round" />
           <polygon points="35,51 64,51 55,55 34,54" fill="#60a5fa" opacity="0.55" />
 
-          <!-- Auriculares laterales rectangulares del casco (estilo Canva) -->
+          <!-- Auriculares laterales rectangulares del casco -->
           <g>
             <rect x="24" y="25" width="9" height="16" rx="3" fill="#e2e8f0" stroke="#64748b" stroke-width="1" />
             <rect x="26" y="29" width="2.2" height="8" rx="1" fill="#2563eb" />
@@ -127,7 +127,7 @@
           <!-- Cabeza azul marino oscuro del pingüino dentro del casco -->
           <path d="M 38,32 C 38,20 45,16 55,16 C 65,16 72,20 72,32 C 72,41 65,45 55,45 C 45,45 38,41 38,32 Z" fill="#172b59" />
 
-          <!-- Máscara facial blanca en forma de corazón (estilo Canva) -->
+          <!-- Máscara facial blanca en forma de corazón -->
           <path d="M 40,32 C 40,24 46,21 52,24 C 54,25.5 55,27 56,27 C 57,27 58,25.5 60,24 C 66,21 71,25 71,32 C 71,40 64,44 55,44 C 46,44 40,40 40,32 Z" fill="#f8fafc" />
           <path d="M 41,37 Q 55,45 70,37 Q 63,44 55,44 Q 47,44 41,37 Z" fill="#e2e8f0" />
 

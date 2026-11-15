@@ -1,5 +1,5 @@
 /* =========================================================
-   Elemento: La Tierra (estética low-poly Canva)
+   Elemento: La Tierra (estética low-poly)
    Fases de despegue terrestre y salida atmosférica hacia el cosmos.
    ========================================================= */
 (function initElementoTierra() {

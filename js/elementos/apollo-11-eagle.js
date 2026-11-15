@@ -1,5 +1,5 @@
 /**
- * Hardware NASA 2/6 rediseñado con estética Canva (Diapositiva 4): Apollo 11 Eagle (La Luna).
+ * Hardware NASA 2/6 (estética low-poly): Apollo 11 Eagle (La Luna).
  * Etapa de descenso octogonal dorado-ámbar Kapton facetado con 4 patas y escalera,
  * coronada por una etapa de ascenso geométrica facetada en blanco/plata con ventanas hundidas.
  */

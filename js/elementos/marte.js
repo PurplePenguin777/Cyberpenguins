@@ -1,5 +1,5 @@
 /* =========================================================
-   Elemento: Marte (estética low-poly Canva)
+   Elemento: Marte (estética low-poly)
    Escenarios de Ares Vallis y Chryse Planitia, fases orbitales,
    rocas marcianas y emblema holográfico naranja.
    ========================================================= */

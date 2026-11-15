@@ -1,5 +1,5 @@
 /* =========================================================
-   Elemento: La Luna (estética low-poly Canva)
+   Elemento: La Luna (estética low-poly)
    Escenarios de alunizaje, fases orbitales, rocas lunares y emblema holográfico.
    ========================================================= */
 (function initElementoLuna() {

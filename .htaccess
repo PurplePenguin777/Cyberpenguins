@@ -1,4 +1,4 @@
-# Configuración Apache/cPanel optimizada para GoDaddy (Cyberpenguins)
+# Configuración de servidor web optimizada (Cyberpenguins)
 Options -Indexes
 DirectoryIndex index.html
 
