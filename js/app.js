@@ -269,9 +269,7 @@
       dom.certModalTitle.textContent = isEn ? 'Honorary astronautical diploma' : 'Diploma de honor astronáutico';
     }
     if (dom.certModalSubtitle) {
-      dom.certModalSubtitle.textContent = isEn
-        ? 'Cyberpenguin: The Explorers We Must Never Forget · Space archives'
-        : 'Cyberpenguin: The Explorers We Must Never Forget · Archivos espaciales';
+      dom.certModalSubtitle.textContent = 'Cyberpenguin: The Explorers We Must Never Forget';
     }
     if (dom.certCadetLabel) {
       dom.certCadetLabel.textContent = isEn ? 'Astronaut name on diploma:' : 'Nombre del astronauta en el diploma:';
@@ -3439,25 +3437,19 @@
       ? today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
       : today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    const txtOverline = isEn
-      ? 'Cyberpenguin: The Explorers We Must Never Forget · Space archives'
-      : 'Cyberpenguin: The Explorers We Must Never Forget · Archivos espaciales';
+    const txtOverline = 'Cyberpenguin: The Explorers We Must Never Forget';
     const txtDiploma = isEn
       ? 'Honorary astronautical diploma'
       : 'Diploma de honor astronáutico';
     const txtConferred = isEn
-      ? 'Conferred with merit to:'
-      : 'Conferido con mérito a:';
+      ? 'Awarded to:'
+      : 'Otorgado a:';
     const txtBody = isEn
       ? 'For successfully completing the cosmic expedition and exploring the 6 pioneer space probes.'
       : 'Por completar con éxito la expedición cósmica y explorar las 6 sondas espaciales pioneras.';
     const txtStars = isEn
       ? `★ ${totalStars}/15 cosmic stars · Rank: ${badge.name}`
       : `★ ${totalStars}/15 estrellas cósmicas · Rango: ${badge.name}`;
-    const txtSignCommander = isEn ? 'Flight commander' : 'Comandante de vuelo';
-    const txtSignAI = isEn ? "Ship's AI (Paulina)" : 'IA de la nave (Paulina)';
-    const txtSignAIRole = isEn ? 'Mission control' : 'Control de misión';
-    const txtMissionId = isEn ? 'Mission code: CP-2026-X89' : 'Código de misión: CP-2026-X89';
     const txtDateLabel = isEn ? `Date: ${dateFormatted}` : `Fecha: ${dateFormatted}`;
 
     let certBackdrop = '';
@@ -3510,56 +3502,40 @@
   <circle cx="56" cy="644" r="2.5" fill="#38bdf8" opacity="0.75" />
   <circle cx="944" cy="644" r="2.5" fill="#38bdf8" opacity="0.75" />
 
-  <!-- Cabecera Discreta -->
+  <!-- Cabecera Oficial del Juego -->
   <circle cx="500" cy="80" r="3.5" fill="#38bdf8" />
-  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="500" letter-spacing="1.2" fill="#7ee8fa">${txtOverline}</text>
+  <text x="500" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="1.2" fill="#7ee8fa">${txtOverline}</text>
 
   <!-- Título del Diploma -->
-  <text x="500" y="160" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="700" letter-spacing="0.4" fill="#ffffff">${txtDiploma}</text>
-  <line x1="430" y1="182" x2="570" y2="182" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+  <text x="500" y="162" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="700" letter-spacing="0.4" fill="#ffffff">${txtDiploma}</text>
+  <line x1="430" y1="184" x2="570" y2="184" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
 
   <!-- Concesión -->
-  <text x="500" y="222" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13.5" font-weight="400" fill="#94a3b8">${txtConferred}</text>
+  <text x="500" y="232" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="400" fill="#94a3b8">${txtConferred}</text>
 
   <!-- Nombre del Cadete -->
-  <text x="500" y="278" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="36" font-weight="800" fill="#ffffff">${escapedName}</text>
+  <text x="500" y="292" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="38" font-weight="800" fill="#ffffff">${escapedName}</text>
 
   <!-- Mérito Educativo -->
-  <text x="500" y="324" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="400" fill="#cbd5e1">${txtBody}</text>
+  <text x="500" y="344" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="400" fill="#cbd5e1">${txtBody}</text>
 
   <!-- Píldora de Rango y Estrellas -->
-  <g transform="translate(340, 356)">
+  <g transform="translate(340, 380)">
     <rect x="0" y="0" width="320" height="34" rx="17" fill="rgba(12, 18, 36, 0.65)" stroke="rgba(255,255,255,0.14)" stroke-width="1" />
     <text x="160" y="21.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="600" fill="#fde047">${txtStars}</text>
   </g>
 
-  <!-- Sello Central Oficial con Huella del Pingüino -->
-  <g transform="translate(500, 464)">
-    <circle cx="0" cy="0" r="42" fill="rgba(56,189,248,0.08)" stroke="rgba(56,189,248,0.35)" stroke-width="1.2" />
-    <circle cx="0" cy="0" r="36" fill="rgba(12, 18, 36, 0.4)" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" stroke-dasharray="3 2" />
-    <g transform="translate(-28, -28)">
+  <!-- Sello Oficial con Huella del Pingüino -->
+  <g transform="translate(500, 498)">
+    <circle cx="0" cy="0" r="44" fill="rgba(56,189,248,0.08)" stroke="rgba(56,189,248,0.35)" stroke-width="1.2" />
+    <circle cx="0" cy="0" r="38" fill="rgba(12, 18, 36, 0.4)" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" stroke-dasharray="3 2" />
+    <g transform="translate(-30, -30)">
       ${innerPaw}
     </g>
   </g>
 
-  <!-- Firmas Minimalistas -->
-  <!-- Izquierda: Cyberpenguin -->
-  <g transform="translate(260, 560)">
-    <line x1="-80" y1="0" x2="80" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
-    <text x="0" y="20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="600" fill="#f8fafc">Cyberpenguin</text>
-    <text x="0" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="400" fill="#94a3b8">${txtSignCommander}</text>
-  </g>
-
-  <!-- Derecha: IA de la Nave -->
-  <g transform="translate(740, 560)">
-    <line x1="-80" y1="0" x2="80" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
-    <text x="0" y="20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="600" fill="#f8fafc">${txtSignAI}</text>
-    <text x="0" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="400" fill="#94a3b8">${txtSignAIRole}</text>
-  </g>
-
-  <!-- Pie de Página -->
-  <text x="50" y="650" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#64748b">${txtMissionId}</text>
-  <text x="950" y="650" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="500" fill="#64748b">${txtDateLabel}</text>
+  <!-- Pie de Página: Fecha Centrada y Limpia -->
+  <text x="500" y="626" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="500" fill="#94a3b8">${txtDateLabel}</text>
 </svg>`;
   }
 
