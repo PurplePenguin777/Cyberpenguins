@@ -608,9 +608,21 @@
       dom.launchScreen.classList.add('hidden-screen', 'is-hidden');
 
       playTravelSequence([
-        { key: 'earth-liftoff', label: NASA_INSPIRATIONAL_QUOTES[0].quote, duration: 1750 },
-        { key: 'atmosphere-exit', label: NASA_INSPIRATIONAL_QUOTES[1].quote, duration: 1750 },
-        { key: 'moon-arrival', label: NASA_INSPIRATIONAL_QUOTES[2].quote, duration: 1750 }
+        {
+          key: 'earth-liftoff',
+          label: `${NASA_INSPIRATIONAL_QUOTES[0].quote} — ${NASA_INSPIRATIONAL_QUOTES[0].author}`,
+          duration: 2000
+        },
+        {
+          key: 'atmosphere-exit',
+          label: `${NASA_INSPIRATIONAL_QUOTES[1].quote} — ${NASA_INSPIRATIONAL_QUOTES[1].author}`,
+          duration: 2000
+        },
+        {
+          key: 'moon-arrival',
+          label: `${NASA_INSPIRATIONAL_QUOTES[2].quote} — ${NASA_INSPIRATIONAL_QUOTES[2].author}`,
+          duration: 2000
+        }
       ], () => {
         finishOpeningLaunch();
       });
