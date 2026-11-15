@@ -55,7 +55,8 @@
       jitter = 0.18,
       craters = 0,
       cap = null,
-      tint = null
+      tint = null,
+      litNoise = 0.14
     } = opts;
     const rand = rng(seed);
     const pts = [[0, 0]];
@@ -97,7 +98,7 @@
       const nx = cx / stretchX / r;
       const ny = cy / r;
       const z = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
-      const lit = Math.max(0, Math.min(1, (nx * L[0] + ny * L[1] + z * L[2]) / ll + (rand() - 0.5) * 0.14));
+      const lit = Math.max(0, Math.min(1, (nx * L[0] + ny * L[1] + z * L[2]) / ll + (rand() - 0.5) * litNoise));
       let color = lit < 0.5 ? mix(dark, mid, lit / 0.5) : mix(mid, light, (lit - 0.5) / 0.5);
       if (tint && lit > 0.3 && rand() < tint.prob) color = mix(color, tint.color, 0.72);
       if (cap && ny < -0.6) color = mix(color, cap, 0.8);
@@ -118,6 +119,90 @@
       out += `<polygon points="${pathPts.trim()}" fill="${dark}" opacity="0.5" />`;
     }
     return `<g>${out}</g>`;
+  }
+
+  /* ---------- Planetas reconocibles: pocas facetas suaves + rasgos reales encima ---------- */
+
+  const PLANET_FEATURES = {
+    moon: {
+      base: { dark: '#3b4658', mid: '#9aa7ba', light: '#f1f5f9' },
+      patches: [
+        { fill: '#475569', op: 0.34, pts: [[-0.5, -0.45], [-0.15, -0.62], [0.05, -0.42], [-0.05, -0.1], [-0.35, 0.0], [-0.56, -0.2]] },
+        { fill: '#475569', op: 0.3, pts: [[0.1, 0.0], [0.45, -0.15], [0.62, 0.15], [0.36, 0.36], [0.1, 0.26]] }
+      ],
+      craters: [[-0.35, -0.3, 0.15], [0.25, -0.52, 0.1], [0.42, 0.08, 0.17], [-0.15, 0.38, 0.13], [-0.58, 0.16, 0.09], [0.04, -0.04, 0.07], [0.1, 0.64, 0.1], [-0.72, -0.1, 0.06]],
+      craterDark: '#334155',
+      craterRim: '#f1f5f9'
+    },
+    mars: {
+      base: { dark: '#5c1d0c', mid: '#c2410c', light: '#fdba74' },
+      patches: [
+        { fill: '#7c2d12', op: 0.5, pts: [[-0.62, 0.0], [-0.2, -0.12], [0.02, 0.15], [-0.25, 0.46], [-0.55, 0.36]] },
+        { fill: '#9a3412', op: 0.45, pts: [[0.2, -0.22], [0.56, -0.1], [0.62, 0.22], [0.3, 0.27]] },
+        { fill: '#431407', op: 0.5, pts: [[-0.46, 0.06], [0.3, 0.13], [0.32, 0.18], [-0.46, 0.11]] },
+        { fill: '#fff7ed', op: 0.92, pts: [[-0.36, -0.97], [0.36, -0.97], [0.3, -0.74], [0.1, -0.67], [-0.12, -0.71], [-0.3, -0.75]] },
+        { fill: '#ffedd5', op: 0.7, pts: [[-0.22, 0.95], [0.22, 0.95], [0.14, 0.8], [-0.14, 0.8]] }
+      ],
+      craters: [[0.45, 0.45, 0.09], [-0.2, 0.6, 0.07], [0.55, -0.4, 0.06]],
+      craterDark: '#431407',
+      craterRim: '#fed7aa'
+    },
+    earth: {
+      base: { dark: '#0a1740', mid: '#1d56c9', light: '#5fa8f5' },
+      patches: [
+        { fill: '#3da66d', op: 0.95, pts: [[-0.64, -0.55], [-0.26, -0.64], [-0.1, -0.4], [-0.22, -0.15], [-0.4, 0.0], [-0.5, -0.2], [-0.72, -0.3]] },
+        { fill: '#359360', op: 0.95, pts: [[-0.32, 0.06], [-0.12, 0.13], [-0.1, 0.46], [-0.25, 0.72], [-0.36, 0.36]] },
+        { fill: '#3da66d', op: 0.95, pts: [[0.1, -0.86], [0.7, -0.7], [0.92, -0.36], [0.62, -0.2], [0.36, -0.46], [0.1, -0.52]] },
+        { fill: '#4fb87d', op: 0.95, pts: [[0.15, -0.4], [0.5, -0.3], [0.62, 0.0], [0.46, 0.36], [0.3, 0.52], [0.2, 0.16], [0.1, -0.1]] },
+        { fill: '#ffffff', op: 0.5, pts: [[-0.72, -0.2], [-0.3, -0.3], [0.1, -0.22], [-0.3, -0.12]] },
+        { fill: '#ffffff', op: 0.45, pts: [[0.2, 0.3], [0.7, 0.2], [0.82, 0.32], [0.4, 0.42]] },
+        { fill: '#ffffff', op: 0.45, pts: [[-0.62, 0.52], [-0.2, 0.46], [0.0, 0.58], [-0.4, 0.64]] },
+        { fill: '#f1f5f9', op: 0.85, pts: [[-0.3, -0.98], [0.3, -0.98], [0.22, -0.82], [-0.22, -0.82]] }
+      ],
+      craters: [],
+      craterDark: '#0a1740',
+      craterRim: '#5fa8f5'
+    }
+  };
+
+  function planetBody(kind, r, opts = {}) {
+    const f = PLANET_FEATURES[kind];
+    const { rings = 4, seg = 16, seed = 1, uid = `${kind}${seed}` } = opts;
+    const sc = (pts) => pts.map((q) => `${n(q[0] * r)},${n(q[1] * r)}`).join(' ');
+    let overlay = '';
+    f.patches.forEach((pt) => {
+      overlay += `<polygon points="${sc(pt.pts)}" fill="${pt.fill}" opacity="${pt.op}" />`;
+    });
+    f.craters.forEach((c, ci) => {
+      const cr = c[2] * r;
+      let ring = '';
+      let inner = '';
+      for (let i = 0; i < 10; i += 1) {
+        const a = (i / 10) * Math.PI * 2;
+        const wob = 1 + (((i * 7 + ci * 3) % 5) - 2) * 0.04;
+        ring += `${n(c[0] * r + Math.cos(a) * cr * wob)},${n(c[1] * r + Math.sin(a) * cr * wob)} `;
+        inner += `${n(c[0] * r + cr * 0.12 + Math.cos(a) * cr * 0.72 * wob)},${n(c[1] * r + cr * 0.12 + Math.sin(a) * cr * 0.72 * wob)} `;
+      }
+      overlay += `<polygon points="${ring.trim()}" fill="${f.craterRim}" opacity="0.55" />`;
+      overlay += `<polygon points="${inner.trim()}" fill="${f.craterDark}" opacity="0.6" />`;
+    });
+    const body = lowPolyBody({
+      r,
+      rings,
+      seg,
+      seed,
+      dark: f.base.dark,
+      mid: f.base.mid,
+      light: f.base.light,
+      jitter: 0.04,
+      litNoise: 0.04
+    });
+    return (
+      `<g><defs>` +
+      `<clipPath id="clip-${uid}"><circle r="${n(r * 0.985)}" /></clipPath>` +
+      `<radialGradient id="shade-${uid}" cx="0.33" cy="0.3" r="0.85"><stop offset="0.45" stop-color="#020617" stop-opacity="0" /><stop offset="1" stop-color="#020617" stop-opacity="0.55" /></radialGradient>` +
+      `</defs>${body}<g clip-path="url(#clip-${uid})">${overlay}<circle r="${n(r)}" fill="url(#shade-${uid})" /></g></g>`
+    );
   }
 
   /* ---------- Malla triangulada de terreno ---------- */
@@ -246,7 +331,7 @@
     const far =
       stars(cfg.seed, 34, 78, 300, cfg.starColors) +
       (chapterId === 'moon'
-        ? `<g transform="translate(246,34)">${lowPolyBody({ r: 12, rings: 3, seg: 9, seed: 5, dark: '#0b1b4d', mid: '#1d4ed8', light: '#60a5fa', tint: { color: '#3da66d', prob: 0.3 } })}</g>`
+        ? `<g transform="translate(246,34)">${planetBody('earth', 12, { rings: 3, seg: 12, seed: 5, uid: 'cardearth' })}</g>`
         : `<g transform="translate(40,38)">${lowPolyBody({ r: 7, rings: 2, seg: 7, seed: 9, dark: '#3f3f46', mid: '#78716c', light: '#d6d3d1', jitter: 0.4 })}</g>`) +
       ridge({ y0: 96, amp: 14, seed: cfg.seed + 1, color: cfg.ridgeFar, steps: 20 });
     const mid = ridge({ y0: 104, amp: 10, seed: cfg.seed + 2, color: cfg.ridgeMid, steps: 18 });
@@ -282,16 +367,13 @@
     const mid =
       dust +
       `<g transform="translate(262,26)"><polygon points="0,-9 2.4,-2.4 9,0 2.4,2.4 0,9 -2.4,2.4 -9,0 -2.4,-2.4" fill="#fb923c" opacity="0.5" /><polygon points="0,-4.5 1.3,-1.3 4.5,0 1.3,1.3 0,4.5 -1.3,1.3 -4.5,0 -1.3,-1.3" fill="#fef08a" /></g>`;
-    const path =
-      '<path d="M -20,142 Q 150,92 320,126" fill="none" stroke="#7ee8fa" stroke-opacity="0.28" stroke-width="0.9" stroke-linecap="round" />' +
-      '<circle cx="72" cy="119" r="1.6" fill="#7ee8fa" opacity="0.75" />' +
-      '<circle cx="248" cy="115" r="1.3" fill="#bae6fd" opacity="0.6" />';
+    const near = stars(77, 14, 150, 300, ['#ffffff', '#e0f2fe']).replace(/r="([0-9.]+)"/g, (m, v) => `r="${n(Number(v) * 1.5)}"`);
 
     return `
       <div class="chapter-scene" data-scene="deep-space" style="background:linear-gradient(180deg, #020412 0%, #060b1f 100%)" aria-hidden="true">
         <svg class="scene-layer scene-far" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${far}</svg>
         <svg class="scene-layer scene-mid" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${mid}</svg>
-        <svg class="scene-layer scene-ground" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${path}</svg>
+        <svg class="scene-layer scene-ground" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${near}</svg>
         <div class="scene-glow"></div>
         <div class="scene-machine"><div class="scene-machine-inner">${machineSvg}</div></div>
       </div>
@@ -313,18 +395,18 @@
     const H = land ? 1080 : 1920;
     const k = land ? 'l' : 'p';
     const pos = land
-      ? { moon: [215, 200, 96], earth: [40, 1270, 440], eros: [1525, 240], ald: [1690, 185], mars: [1745, 790, 138] }
-      : { moon: [200, 300, 120], earth: [60, 2070, 500], eros: [800, 380], ald: [930, 260], mars: [900, 1180, 150] };
+      ? { moon: [215, 200, 96], earth: [150, 1085, 310], eros: [1525, 240], ald: [1690, 185], mars: [1745, 790, 138] }
+      : { moon: [200, 300, 120], earth: [90, 2040, 420], eros: [800, 380], ald: [930, 260], mars: [900, 1180, 150] };
 
-    const moon = `<g transform="translate(${pos.moon[0]},${pos.moon[1]})" opacity="0.88">${lowPolyBody({ r: pos.moon[2], rings: 5, seg: 14, seed: 101, dark: '#334155', mid: '#94a3b8', light: '#f1f5f9', craters: 4 })}</g>`;
+    const moon = `<g transform="translate(${pos.moon[0]},${pos.moon[1]})" opacity="0.88">${planetBody('moon', pos.moon[2], { rings: 5, seg: 18, seed: 101, uid: 'bgmoon' + k })}</g>`;
     const earth =
       `<g transform="translate(${pos.earth[0]},${pos.earth[1]})">` +
       `<circle r="${pos.earth[2] + 10}" fill="none" stroke="url(#bgAtmoRim-${k})" stroke-width="7" />` +
-      lowPolyBody({ r: pos.earth[2], rings: 7, seg: 26, seed: 202, dark: '#0a1740', mid: '#1d4ed8', light: '#60a5fa', jitter: 0.1, tint: { color: '#3da66d', prob: 0.07 } }) +
+      planetBody('earth', pos.earth[2], { rings: 6, seg: 28, seed: 202, uid: 'bgearth' + k }) +
       '</g>';
     const eros = `<g transform="translate(${pos.eros[0]},${pos.eros[1]}) rotate(-14)" opacity="0.85">${lowPolyBody({ r: 30, rings: 3, seg: 10, seed: 303, dark: '#1e293b', mid: '#64748b', light: '#cbd5e1', stretchX: 1.8, jitter: 0.4 })}</g>`;
     const aldebaran = `<g transform="translate(${pos.ald[0]},${pos.ald[1]})"><polygon points="0,-24 6,-6 24,0 6,6 0,24 -6,6 -24,0 -6,-6" fill="#fb923c" opacity="0.55" /><polygon points="0,-13 3.5,-3.5 13,0 3.5,3.5 0,13 -3.5,3.5 -13,0 -3.5,-3.5" fill="#fef08a" /><polygon points="0,-5 5,0 0,5 -5,0" fill="#ffffff" /></g>`;
-    const mars = `<g transform="translate(${pos.mars[0]},${pos.mars[1]})" opacity="0.88">${lowPolyBody({ r: pos.mars[2], rings: 5, seg: 16, seed: 404, dark: '#431407', mid: '#c2410c', light: '#fdba74', cap: '#fff7ed', craters: 5 })}</g>`;
+    const mars = `<g transform="translate(${pos.mars[0]},${pos.mars[1]})" opacity="0.88">${planetBody('mars', pos.mars[2], { rings: 5, seg: 20, seed: 404, uid: 'bgmars' + k })}</g>`;
 
     const facets =
       `<g opacity="0.2">${groundMesh({ x0: 0, y0: 0, w: W * 0.34, h: H * 0.34, cols: 8, rows: 6, seed: 11, dark: '#0b1226', light: '#1e293b', jitter: 0.5, noise: 0.9 })}</g>` +
@@ -356,6 +438,7 @@
   }
 
   M.lowPolyBody = lowPolyBody;
+  M.planetBody = planetBody;
   M.groundMesh = groundMesh;
   M.chapterScene = chapterScene;
   M.homeBackdrop = homeBackdrop;
