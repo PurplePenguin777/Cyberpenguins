@@ -14,6 +14,7 @@
 
   const DEFAULT_STATE = {
     launched: false,
+    currentLanguage: 'es',
     currentChapterId: 'moon',
     currentSiteByChapter: {
       moon: 0,
@@ -140,6 +141,119 @@
 
   document.addEventListener('DOMContentLoaded', init);
 
+
+  /* ========================================================================
+     Soporte Bilingüe e Internacionalización (ES / EN)
+     ======================================================================== */
+
+  function toggleLanguage() {
+    const nextLang = (state.currentLanguage === 'en') ? 'es' : 'en';
+    setLanguage(nextLang);
+  }
+
+  function setLanguage(lang) {
+    state.currentLanguage = lang;
+    saveState();
+    updateLanguageUI();
+  }
+
+  function updateLanguageUI() {
+    const isEn = (state.currentLanguage === 'en');
+
+    // Actualizar botones de idioma (en Home y en Stage)
+    if (dom.langBtnText) {
+      dom.langBtnText.textContent = isEn ? 'ES' : 'EN';
+    }
+    if (dom.langToggleBtn) {
+      dom.langToggleBtn.title = isEn ? 'Cambiar a Español' : 'Switch to English';
+      dom.langToggleBtn.setAttribute('aria-label', isEn ? 'Cambiar a Español' : 'Switch to English');
+    }
+    if (dom.stageLangBtnText) {
+      dom.stageLangBtnText.textContent = isEn ? 'ES' : 'EN';
+    }
+    if (dom.stageLangToggleBtn) {
+      dom.stageLangToggleBtn.title = isEn ? 'Cambiar a Español' : 'Switch to English';
+      dom.stageLangToggleBtn.setAttribute('aria-label', isEn ? 'Cambiar a Español' : 'Switch to English');
+    }
+
+    // Actualizar títulos del dock inferior en pantalla principal
+    const segments = document.querySelectorAll('.home-dock-segment');
+    if (segments.length >= 3) {
+      const pTitle = segments[0].querySelector('span.font-medium');
+      if (pTitle) pTitle.textContent = isEn ? 'Passport' : 'Pasaporte';
+      const bTitle = segments[1].querySelector('span.font-medium');
+      if (bTitle) bTitle.textContent = isEn ? 'Badges' : 'Insignias';
+      const cTitle = segments[2].querySelector('span.font-medium');
+      if (cTitle) cTitle.textContent = isEn ? 'Certificate' : 'Certificado';
+    }
+
+    const certStatusEl = document.getElementById('home-certificate-status');
+    if (certStatusEl) {
+      const allDone = areAllChaptersCompleted();
+      certStatusEl.textContent = allDone
+        ? (isEn ? 'Completed! Certificate ready' : '¡Completado! Certificado listo')
+        : (isEn ? 'Available upon completing all chapters' : 'Disponible al completar todos los capítulos');
+    }
+
+    const certViewBtn = document.getElementById('open-certificate-btn');
+    if (certViewBtn) certViewBtn.textContent = isEn ? 'View' : 'Ver';
+
+    const certDownloadBtn = document.getElementById('home-download-certificate-btn');
+    if (certDownloadBtn) certDownloadBtn.textContent = isEn ? 'Download' : 'Descargar';
+
+    const quizValidateBtn = document.getElementById('quiz-validate-btn');
+    if (quizValidateBtn) quizValidateBtn.textContent = isEn ? 'Validate' : 'Validar';
+
+    const quizTravelBtn = document.getElementById('quiz-travel-btn');
+    if (quizTravelBtn) quizTravelBtn.textContent = isEn ? 'Travel' : 'Viajar';
+
+    const pauseTitle = dom.pauseModal ? dom.pauseModal.querySelector('h2') : null;
+    if (pauseTitle) pauseTitle.textContent = isEn ? 'Mission Paused' : 'Misión en Pausa';
+    const pauseSub = dom.pauseModal ? dom.pauseModal.querySelector('p') : null;
+    if (pauseSub) pauseSub.textContent = isEn ? 'Exploration temporarily on hold.' : 'Exploración detenida temporalmente.';
+    const pauseResume = document.getElementById('pause-resume-btn');
+    if (pauseResume) pauseResume.textContent = isEn ? '▶ Resume mission' : '▶ Continuar misión';
+    const pauseSound = document.getElementById('pause-sound-btn');
+    if (pauseSound) pauseSound.textContent = isEn ? '🔊 Toggle sound' : '🔊 Alternar sonido';
+    const pauseHome = document.getElementById('pause-home-btn');
+    if (pauseHome) pauseHome.textContent = isEn ? '✕ Return to main map' : '✕ Volver al mapa principal';
+
+    // Re-renderizar elementos de la interfaz según pantalla activa
+    renderChapterNav();
+    updateHUD();
+
+    if (dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden')) {
+      const chapter = getChapter(state.currentChapterId);
+      const { activeMachine } = getActiveSite(chapter);
+      updateLocationPill(chapter, activeMachine);
+      renderStageEntities(chapter);
+
+      // Si hay un globo de diálogo abierto, actualizar al nuevo idioma
+      if (activeBranchState && activeBranchState.machine) {
+        const currentMachineId = activeBranchState.machine.id;
+        if (currentMachineId === 'final-scene') {
+          openFinalDialogueModal();
+        } else {
+          const freshMachine = chapter.machines.find((m) => m.id === currentMachineId) || activeBranchState.machine;
+          activeBranchState.machine = freshMachine;
+          if (activeBranchState.choice1 && freshMachine.branchingDialogue && freshMachine.branchingDialogue.decision1) {
+            const freshC1 = freshMachine.branchingDialogue.decision1.choices.find((c) => c.id === activeBranchState.choice1.id);
+            if (freshC1) activeBranchState.choice1 = freshC1;
+          }
+          if (activeBranchState.choice2 && freshMachine.branchingDialogue && freshMachine.branchingDialogue.decision2) {
+            const freshC2 = freshMachine.branchingDialogue.decision2.choices.find((c) => c.id === activeBranchState.choice2.id);
+            if (freshC2) activeBranchState.choice2 = freshC2;
+          }
+          renderBranchStep();
+        }
+      }
+    }
+
+    if (dom.quizModal && !dom.quizModal.classList.contains('is-hidden')) {
+      renderQuizModal();
+    }
+  }
+
   function init() {
     if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && window.location && window.location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
@@ -219,6 +333,10 @@
     dom.stageLocationPill = document.getElementById('stage-location-pill');
     dom.soundToggleBtn = document.getElementById('sound-toggle-btn');
     dom.pauseBtn = document.getElementById('pause-btn');
+    dom.langToggleBtn = document.getElementById('lang-toggle-btn');
+    dom.langBtnText = document.getElementById('lang-btn-text');
+    dom.stageLangToggleBtn = document.getElementById('stage-lang-toggle-btn');
+    dom.stageLangBtnText = document.getElementById('stage-lang-btn-text');
     dom.chapterTitleCard = document.getElementById('chapter-title-card');
     dom.chapterCardNumeral = document.getElementById('chapter-card-numeral');
     dom.chapterCardTitle = document.getElementById('chapter-card-title');
@@ -508,11 +626,20 @@
 
   function loadState() {
     try {
+      let savedLang = 'es';
+      try {
+        savedLang = global.localStorage.getItem('cyberpenguins_lang') || 'es';
+      } catch (_e) {}
       const raw = global.localStorage.getItem(DATA.STORAGE_KEY);
-      if (!raw) return cloneDefaultState();
+      if (!raw) {
+        const def = cloneDefaultState();
+        def.currentLanguage = savedLang;
+        return def;
+      }
       const parsed = JSON.parse(raw);
       return {
         ...cloneDefaultState(),
+        currentLanguage: parsed.currentLanguage || savedLang || 'es',
         ...parsed,
         currentSiteByChapter: {
           ...DEFAULT_STATE.currentSiteByChapter,
@@ -534,6 +661,7 @@
   function saveState() {
     try {
       global.localStorage.setItem(DATA.STORAGE_KEY, JSON.stringify(state));
+      global.localStorage.setItem('cyberpenguins_lang', state.currentLanguage || 'es');
     } catch (_err) {
       // Ignorar si almacenamiento privado bloquea escritura
     }
@@ -948,8 +1076,13 @@
      Escenario Espacial & Movimiento de Cyberpenguin
      ======================================================================== */
 
+  function getChaptersList() {
+    return DATA.getChapters ? DATA.getChapters(state.currentLanguage) : DATA.CHAPTERS;
+  }
+
   function getChapter(chapterId) {
-    return DATA.CHAPTERS.find((c) => c.id === chapterId) || DATA.CHAPTERS[0];
+    const list = getChaptersList();
+    return list.find((c) => c.id === chapterId) || list[0];
   }
 
   function getActiveSite(chapter) {
@@ -1671,8 +1804,9 @@
     }
 
     // Globo de pensamiento ambiental sobre Cyberpenguin al saltar en gravedad especial
-    if (DATA.AMBIENT_THOUGHTS && DATA.AMBIENT_THOUGHTS[chapter.id]) {
-      const thoughts = DATA.AMBIENT_THOUGHTS[chapter.id];
+    const allThoughts = DATA.getAmbientThoughts ? DATA.getAmbientThoughts(state.currentLanguage) : DATA.AMBIENT_THOUGHTS;
+    if (allThoughts && allThoughts[chapter.id]) {
+      const thoughts = allThoughts[chapter.id];
       const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
       showPenguinThought(thought);
     }
@@ -1702,17 +1836,18 @@
     if (!dom.stageActionPrompt || !dom.stageActionBtn) return;
     activeInteractable = { type, target, onAction };
 
-    let label = 'Interactuar';
+    const isEn = (state.currentLanguage === 'en');
+    let label = isEn ? 'Interact' : 'Interactuar';
     if (type === 'sample') {
-      label = 'Guardar en la mochila';
+      label = isEn ? 'Store in backpack' : 'Guardar en la mochila';
     } else if (type === 'machine') {
-      label = `Hablar con ${target.name || 'sonda'}`;
+      label = isEn ? `Talk to ${target.name || 'spacecraft'}` : `Hablar con ${target.name || 'sonda'}`;
     } else if (type === 'ship-travel') {
-      label = 'Siguiente parada';
+      label = isEn ? 'Next stop' : 'Siguiente parada';
     } else if (type === 'ship-leave') {
-      label = 'Entrar a la nave';
+      label = isEn ? 'Board spaceship' : 'Entrar a la nave';
     } else if (type === 'ship-locked') {
-      label = 'Completa la misión anterior para poder entrar';
+      label = isEn ? 'Complete previous mission to enter' : 'Completa la misión anterior para poder entrar';
     }
 
     if (dom.stageActionIcon) dom.stageActionIcon.textContent = '';
@@ -1942,8 +2077,9 @@
 
   function getCurrentBadge() {
     const total = getTotalStars();
-    let current = DATA.BADGES[0];
-    DATA.BADGES.forEach((badge) => {
+    const badges = DATA.getBadges ? DATA.getBadges(state.currentLanguage) : DATA.BADGES;
+    let current = badges[0];
+    badges.forEach((badge) => {
       if (total >= badge.minStars) current = badge;
     });
     return current;
@@ -1984,7 +2120,8 @@
   }
 
   function renderChapterNav() {
-    dom.chapterNav.innerHTML = DATA.CHAPTERS.map((chapter) => {
+    const isEn = (state.currentLanguage === 'en');
+    dom.chapterNav.innerHTML = getChaptersList().map((chapter) => {
       const completed = isChapterCompleted(chapter.id);
       const unlocked = isChapterUnlocked(chapter.id);
       const inProgress = !completed && hasChapterProgress(chapter.id);
@@ -1994,6 +2131,14 @@
         ? MODELS[firstMachine.modelKey]()
         : '';
       const sceneHtml = MODELS.chapterScene(chapter.id, singleMachineSvg);
+
+      const btnLabel = !unlocked
+        ? (isEn ? 'Complete previous mission to unlock' : 'Completa la misión anterior para poder entrar')
+        : completed
+        ? (isEn ? 'Explore again' : 'Explorar de nuevo')
+        : inProgress
+        ? (isEn ? 'Continue' : 'Continuar')
+        : (isEn ? 'Explore' : 'Explorar');
 
       return `
         <div class="home-chapter-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${isCardActive ? 'is-active' : ''
@@ -2017,7 +2162,7 @@
               }"
               ${!unlocked ? 'disabled' : ''}
               data-enter-chapter="${chapter.id}">
-              ${!unlocked ? 'Completa la misión anterior para poder entrar' : completed ? 'Explorar de nuevo' : inProgress ? 'Continuar' : 'Explorar'}
+              ${btnLabel}
             </button>
           </div>
         </div>
@@ -2034,21 +2179,23 @@
   function updateHUD() {
     const totalStars = getTotalStars();
     const badge = getCurrentBadge();
-    const completedCount = DATA.CHAPTERS.filter((ch) => isChapterCompleted(ch.id)).length;
+    const chaptersList = getChaptersList();
+    const badgesList = DATA.getBadges ? DATA.getBadges(state.currentLanguage) : DATA.BADGES;
+    const completedCount = chaptersList.filter((ch) => isChapterCompleted(ch.id)).length;
     const allCompleted = areAllChaptersCompleted();
 
-    const passportCount = DATA.CHAPTERS.filter(hasChapterPassportStamp).length;
-    dom.hudPassportCount.textContent = `${passportCount}/${DATA.CHAPTERS.length}`;
+    const passportCount = chaptersList.filter(hasChapterPassportStamp).length;
+    dom.hudPassportCount.textContent = `${passportCount}/${chaptersList.length}`;
     dom.hudBadgeName.textContent = badge.name;
 
     if (dom.homeTotalStars) {
       dom.homeTotalStars.textContent = `★ ${totalStars}/15`;
     }
     if (dom.homeChaptersCompletedCount) {
-      dom.homeChaptersCompletedCount.textContent = `${completedCount}/${DATA.CHAPTERS.length}`;
+      dom.homeChaptersCompletedCount.textContent = `${completedCount}/${chaptersList.length}`;
     }
     if (dom.homePassportSlots) {
-      dom.homePassportSlots.innerHTML = DATA.CHAPTERS.map((chapter) => {
+      dom.homePassportSlots.innerHTML = chaptersList.map((chapter) => {
         const stamped = hasChapterPassportStamp(chapter);
         return `
           <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-1.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center">
@@ -2059,7 +2206,7 @@
       }).join('');
     }
     if (dom.homeBadgesGrid) {
-      dom.homeBadgesGrid.innerHTML = DATA.BADGES.map((item) => {
+      dom.homeBadgesGrid.innerHTML = badgesList.map((item) => {
         const unlocked = totalStars >= item.minStars;
         return `
           <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-0.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center ${unlocked ? '' : 'opacity-40'
@@ -2155,11 +2302,21 @@
     else if (isShip) dom.stageSpeechBubble.classList.add('speaker-is-ship');
     else dom.stageSpeechBubble.classList.add('speaker-is-machine');
 
+    const isEnglish = (state.currentLanguage === 'en');
+    const voiceBadge = isEnglish
+      ? '<span class="voice-status-badge">(voice currently being created)</span>'
+      : '';
+
     if (dom.speechBubbleAvatar) {
       dom.speechBubbleAvatar.innerHTML = avatarSvg || '';
     }
     if (dom.speechBubbleName) {
-      dom.speechBubbleName.textContent = name || (isPenguin ? 'Cyberpenguin' : isShip ? 'Nave de Cyberpenguin' : 'Máquina');
+      const defaultName = isPenguin
+        ? 'Cyberpenguin'
+        : isShip
+        ? (isEnglish ? "Cyberpenguin's Ship" : 'Nave de Cyberpenguin')
+        : (isEnglish ? 'Spacecraft' : 'Máquina');
+      dom.speechBubbleName.innerHTML = (name || defaultName) + (name || isPenguin || isShip ? voiceBadge : '');
     }
     if (dom.speechBubbleText) {
       const cleanText = (text || '').trim();
@@ -2198,6 +2355,7 @@
 
     // Botón de continuar cuando no hay opciones múltiples
     if (dom.speechBubbleActionRow && dom.speechBubbleNextBtn) {
+      dom.speechBubbleNextBtn.textContent = (state.currentLanguage === 'en') ? 'Continue ▶' : 'Continuar ▶';
       if (Array.isArray(choices) && choices.length > 0) {
         dom.speechBubbleActionRow.style.display = 'none';
       } else {
@@ -2221,6 +2379,7 @@
         audioUrl: audioUrl || '',
         pitch,
         rate,
+        lang: (state.currentLanguage === 'en') ? 'en-US' : 'es-ES',
         onEnd: () => {
           // En diálogos con botón siguiente, el usuario pulsa para avanzar
         },
@@ -2443,18 +2602,21 @@
   function openFinalDialogueModal() {
     const chapter = getChapter(state.currentChapterId);
     const shipPos = (chapter && chapter.shipPos) || { x: 22, y: 58 };
-    const finalTree = DATA.FINAL_BRANCHING_DIALOGUE;
+    const isEn = (state.currentLanguage === 'en');
+    const finalTree = DATA.getFinalDialogue ? DATA.getFinalDialogue(state.currentLanguage) : DATA.FINAL_BRANCHING_DIALOGUE;
+    const fallbackList = (state.currentLanguage === 'en' && DATA.FINAL_DIALOGUE_EN) ? DATA.FINAL_DIALOGUE_EN : (DATA.FINAL_DIALOGUE || []);
+    const shipName = isEn ? "Cyberpenguin's Ship" : 'Nave de Cyberpenguin';
 
     if (!finalTree) {
       fallbackLinearDialogue({
         id: 'final-scene',
-        name: 'Nave de Cyberpenguin',
-        dialogue: DATA.FINAL_DIALOGUE || []
+        name: shipName,
+        dialogue: fallbackList
       });
       return;
     }
 
-    activeDialogueMachine = { id: 'final-scene', name: 'Nave de Cyberpenguin' };
+    activeDialogueMachine = { id: 'final-scene', name: shipName };
     const shipSvg = MODELS.spaceship ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true }) : '';
     const penguinSvg = MODELS.cyberpenguin ? MODELS.cyberpenguin('right') : '';
 
@@ -2739,7 +2901,8 @@
   }
 
   function renderQuizModal() {
-    const quiz = DATA.QUIZZES[activeQuizChapterId] || DATA.QUIZZES.moon;
+    const allQuizzes = DATA.getQuizzes ? DATA.getQuizzes(state.currentLanguage) : DATA.QUIZZES;
+    const quiz = allQuizzes[activeQuizChapterId] || allQuizzes.moon;
     const chapter = getChapter(quiz.chapterId);
     const stars = state.chapterStars[quiz.chapterId] || 0;
     const savedAnswers = state.quizAnswers[quiz.chapterId] || [null, null];
@@ -2826,7 +2989,8 @@
   }
 
   function validateActiveQuiz() {
-    const quiz = DATA.QUIZZES[activeQuizChapterId];
+    const allQuizzes = DATA.getQuizzes ? DATA.getQuizzes(state.currentLanguage) : DATA.QUIZZES;
+    const quiz = allQuizzes[activeQuizChapterId] || allQuizzes.moon;
     const answers = state.quizAnswers[activeQuizChapterId] || [null, null];
     let scoreCount = 0;
 
@@ -2900,8 +3064,9 @@
   function openBadgesModal() {
     const totalStars = getTotalStars();
     dom.badgesTotalStars.textContent = `★ ${totalStars}/15`;
+    const badgesList = DATA.getBadges ? DATA.getBadges(state.currentLanguage) : DATA.BADGES;
 
-    dom.badgesGrid.innerHTML = DATA.BADGES.map((badge) => {
+    dom.badgesGrid.innerHTML = badgesList.map((badge) => {
       const unlocked = totalStars >= badge.minStars;
       return `
         <div class="squircle-card p-3 flex flex-col items-center justify-center gap-1.5 text-center ${unlocked ? 'border-amber-300/45' : 'opacity-55'

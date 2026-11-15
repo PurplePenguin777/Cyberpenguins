@@ -2,6 +2,7 @@
  * Módulo de reproducción de diálogos para Cyberpenguins.
  * - Usa Web Speech API (speechSynthesis) para prototipo con texto.
  * - Si el dispositivo define `audioUrl`, reproduce directamente ese archivo de audio.
+ * - Si `audioUrl` falla o aún no está disponible (ej. audios en producción), recurre fluidamente a Web Speech API con el idioma activo (es-ES / en-US).
  */
 (function (global) {
   'use strict';
@@ -19,11 +20,45 @@
     }
   }
 
-  function speak({ text, audioUrl, pitch, rate, onStart, onEnd, onEmpty }) {
+  function speak({ text, audioUrl, pitch, rate, lang, onStart, onEnd, onEmpty }) {
     stop();
 
     const cleanAudioUrl = (audioUrl || '').trim();
     const cleanText = (text || '').trim();
+    const targetLang = lang || 'es-ES';
+
+    const playWebSpeech = () => {
+      if (!cleanText) {
+        if (onEmpty) onEmpty();
+        return false;
+      }
+
+      if (typeof global.speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') {
+        if (onEmpty) {
+          onEmpty();
+        } else if (onEnd) {
+          setTimeout(onEnd, 1400);
+        }
+        return false;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = targetLang;
+      utterance.rate = typeof rate === 'number' ? rate : 0.96;
+      utterance.pitch = typeof pitch === 'number' ? pitch : 1.05;
+      utterance.onstart = () => {
+        if (onStart) onStart();
+      };
+      utterance.onend = () => {
+        if (onEnd) onEnd();
+      };
+      utterance.onerror = () => {
+        if (onEnd) onEnd();
+      };
+
+      global.speechSynthesis.speak(utterance);
+      return true;
+    };
 
     if (cleanAudioUrl) {
       currentAudio = new Audio(cleanAudioUrl);
@@ -36,44 +71,17 @@
       };
       currentAudio.onerror = () => {
         currentAudio = null;
-        if (onEnd) onEnd();
+        // Si el archivo de audio no existe (ej. voces en producción), respaldo a síntesis vocal
+        playWebSpeech();
       };
       currentAudio.play().catch(() => {
-        if (onEnd) onEnd();
+        currentAudio = null;
+        playWebSpeech();
       });
       return true;
     }
 
-    if (!cleanText) {
-      if (onEmpty) onEmpty();
-      return false;
-    }
-
-    if (typeof global.speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') {
-      if (onEmpty) {
-        onEmpty();
-      } else if (onEnd) {
-        setTimeout(onEnd, 1400);
-      }
-      return false;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'es-ES';
-    utterance.rate = typeof rate === 'number' ? rate : 0.96;
-    utterance.pitch = typeof pitch === 'number' ? pitch : 1.05;
-    utterance.onstart = () => {
-      if (onStart) onStart();
-    };
-    utterance.onend = () => {
-      if (onEnd) onEnd();
-    };
-    utterance.onerror = () => {
-      if (onEnd) onEnd();
-    };
-
-    global.speechSynthesis.speak(utterance);
-    return true;
+    return playWebSpeech();
   }
 
   global.CYBERPENGUINS_TTS = {

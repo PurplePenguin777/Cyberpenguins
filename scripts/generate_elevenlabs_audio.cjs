@@ -23,7 +23,8 @@ const VOICE_MAP = {
   'Sojourner Rover': 'iV6xDQ4wcM3ZcXDx30GB',       // Betty – Quirky, Cartoonish & Warm
   'Pioneer 10': 'c338PHkXJ2cW8fdMPhzP',            // Hanna – Warm, Deep, Inspiring
   'NEAR Shoemaker': 'MXbNlTMQcU6GZQlRkXHB',        // Jorge
-  'IA de la Nave': 'A9OFofjAh6JEy1MNk5Mz'          // Paulina – Cálida y Comercial
+  'IA de la Nave': 'A9OFofjAh6JEy1MNk5Mz',         // Paulina – Cálida y Comercial
+  "Ship's AI": 'A9OFofjAh6JEy1MNk5Mz'             // Paulina – Cálida y Comercial
 };
 
 // Ajustes de voz recomendados por personaje para máxima expresividad
@@ -36,14 +37,19 @@ const SETTINGS_MAP = {
   'Sojourner Rover': { stability: 0.35, similarity_boost: 0.75, style: 0.55 },
   'Pioneer 10': { stability: 0.68, similarity_boost: 0.82, style: 0.20 },
   'NEAR Shoemaker': { stability: 0.45, similarity_boost: 0.75, style: 0.40 },
-  'IA de la Nave': { stability: 0.60, similarity_boost: 0.80, style: 0.20 }
+  'IA de la Nave': { stability: 0.60, similarity_boost: 0.80, style: 0.20 },
+  "Ship's AI": { stability: 0.60, similarity_boost: 0.80, style: 0.20 }
 };
 
-const SCRIPT_PATH = path.join(__dirname, '..', 'ELEVENLABS_GUION_VOCES.md');
+const isEnglish = process.argv.includes('--lang=en') || process.argv.includes('-en');
+const SCRIPT_PATH = path.join(__dirname, '..', isEnglish ? 'ELEVENLABS_GUION_VOCES_EN.md' : 'ELEVENLABS_GUION_VOCES.md');
 const AUDIO_DIR = path.join(__dirname, '..', 'audio');
 
 if (!fs.existsSync(AUDIO_DIR)) {
   fs.mkdirSync(AUDIO_DIR, { recursive: true });
+}
+if (isEnglish && !fs.existsSync(path.join(AUDIO_DIR, 'en'))) {
+  fs.mkdirSync(path.join(AUDIO_DIR, 'en'), { recursive: true });
 }
 
 function parseScript() {
@@ -55,8 +61,8 @@ function parseScript() {
     const filename = blocks[i].trim();
     const body = blocks[i + 1];
 
-    // Extraer personaje
-    const charMatch = body.match(/\*\*Personaje:\*\*\s*([^\n]+)/);
+    // Extraer personaje (soporta español e inglés)
+    const charMatch = body.match(/\*\*(?:Personaje|Character):\*\*\s*([^\n]+)/);
     let character = charMatch ? charMatch[1].trim() : '';
     // Limpiar notas como (⭐ Secreto ...)
     character = character.replace(/\s*\(.*?\)/, '').trim();
