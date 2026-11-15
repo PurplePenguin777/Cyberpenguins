@@ -293,7 +293,6 @@
       });
     }
     renderHomeBackground();
-    bindChapterParallax();
 
     dom.quizCloseBtn.addEventListener('click', closeQuizModal);
     dom.quizValidateBtn.addEventListener('click', validateActiveQuiz);
@@ -1846,85 +1845,6 @@
     if (dom.homeBgPortrait) dom.homeBgPortrait.innerHTML = MODELS.homeBackdrop('portrait');
   }
 
-  /* Profundidad en las tarjetas: al deslizar (pantalla vertical o táctil) o al pasar el mouse (horizontal) */
-
-  function isScrollParallaxMode() {
-    if (typeof global.matchMedia !== 'function') return false;
-    return (
-      global.matchMedia('(orientation: portrait)').matches ||
-      !global.matchMedia('(hover: hover) and (pointer: fine)').matches
-    );
-  }
-
-  function setSceneParallax(card, sx, sy) {
-    const scene = card && card.querySelector ? card.querySelector('.chapter-scene') : null;
-    if (!scene) return;
-    scene.style.setProperty('--sx', sx.toFixed(3));
-    scene.style.setProperty('--sy', sy.toFixed(3));
-  }
-
-  function clampUnit(v) {
-    return Math.max(-1, Math.min(1, v));
-  }
-
-  function updateScrollParallax() {
-    if (!dom.chapterNav || !dom.chapterNav.querySelectorAll) return;
-    const cards = dom.chapterNav.querySelectorAll('.home-chapter-card') || [];
-    const scrollMode = isScrollParallaxMode();
-    const vh = global.innerHeight || 800;
-    cards.forEach((card) => {
-      if (!scrollMode) {
-        setSceneParallax(card, 0, 0);
-        return;
-      }
-      const r = card.getBoundingClientRect();
-      const p = clampUnit((r.top + r.height / 2 - vh / 2) / (vh / 2));
-      setSceneParallax(card, p * 0.9, p);
-    });
-  }
-
-  function bindChapterParallax() {
-    if (!dom.chapterNav || typeof dom.chapterNav.addEventListener !== 'function') return;
-    let ticking = false;
-    const requestScrollUpdate = () => {
-      if (ticking) return;
-      ticking = true;
-      const run = () => {
-        ticking = false;
-        updateScrollParallax();
-      };
-      if (typeof global.requestAnimationFrame === 'function') global.requestAnimationFrame(run);
-      else run();
-    };
-
-    dom.chapterNav.addEventListener('pointermove', (e) => {
-      if (isScrollParallaxMode()) return;
-      const card = e.target && e.target.closest ? e.target.closest('.home-chapter-card') : null;
-      if (!card) return;
-      const r = card.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      const sx = clampUnit(((e.clientX - r.left) / r.width - 0.5) * 2);
-      const sy = clampUnit(((e.clientY - r.top) / r.height - 0.5) * 2);
-      setSceneParallax(card, sx, sy);
-    });
-
-    dom.chapterNav.addEventListener('pointerout', (e) => {
-      if (isScrollParallaxMode()) return;
-      const card = e.target && e.target.closest ? e.target.closest('.home-chapter-card') : null;
-      if (!card) return;
-      if (e.relatedTarget && card.contains && card.contains(e.relatedTarget)) return;
-      setSceneParallax(card, 0, 0);
-    });
-
-    if (dom.homeScreen && typeof dom.homeScreen.addEventListener === 'function') {
-      dom.homeScreen.addEventListener('scroll', requestScrollUpdate, { passive: true });
-    }
-    if (typeof global.addEventListener === 'function') {
-      global.addEventListener('resize', requestScrollUpdate);
-      global.addEventListener('orientationchange', requestScrollUpdate);
-    }
-  }
-
   function isChapterUnlocked(chapterId) {
     const idx = DATA.CHAPTERS.findIndex((c) => c.id === chapterId);
     if (idx <= 0) return true;
@@ -1990,7 +1910,6 @@
         enterChapterFromHome(btn.dataset.enterChapter);
       });
     });
-    updateScrollParallax();
   }
 
   function updateHUD() {
