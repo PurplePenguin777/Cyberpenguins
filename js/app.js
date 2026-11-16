@@ -1739,7 +1739,11 @@
     // 1. Nave de Cyberpenguin (con escotilla lista cuando se completan las tareas)
     parts.push(`
       <div class="stage-entity ${inSpace ? 'space-float' : ''}" data-sort-y="${shipPos.y}" style="left: ${shipPos.x}%; top: ${shipPos.y}%;">
-        <button id="ship-hatch-btn" type="button" class="stage-hotspot" aria-label="${hatchAriaLabel}">
+        <button id="ship-hatch-btn" type="button" class="stage-hotspot ship-hotspot" aria-label="${hatchAriaLabel}">
+          <div class="sample-beacon ship-beacon ${reqs.canLeave ? 'ready' : ''}" aria-hidden="true">
+            <span class="sample-beacon-star">✦</span>
+            <span class="sample-beacon-ring"></span>
+          </div>
           <div id="stage-ship-svg" class="entity-svg-wrap">
             ${MODELS.spaceship({
       hatchOpen: hatchOpen && reqs.canLeave,
@@ -1761,6 +1765,12 @@
       parts.push(`
         <div class="stage-entity ${floatClass}" data-sort-y="${activeMachine.pos.y}" style="left: ${activeMachine.pos.x}%; top: ${activeMachine.pos.y}%;">
           <button type="button" class="stage-hotspot machine-hotspot" data-machine-id="${activeMachine.id}" aria-label="${activeMachine.name}">
+            ${!inspected ? `
+              <div class="sample-beacon machine-beacon" aria-hidden="true">
+                <span class="sample-beacon-star">✦</span>
+                <span class="sample-beacon-ring"></span>
+              </div>
+            ` : ''}
             <div class="entity-svg-wrap">${modelSvg}</div>
             <span class="entity-status-dot ${inspected ? 'done' : ''}" aria-hidden="true"></span>
           </button>

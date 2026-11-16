@@ -1245,44 +1245,70 @@ a:focus-visible {
   display: none;
 }
 
-/* Indicador permanente flotante sobre rocas con muestras recolectables */
+/* Indicador permanente flotante sobre interactuables (rocas, nave, sondas) */
 .sample-beacon {
   position: absolute;
-  top: -18px;
+  top: -26px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: 10;
+  z-index: 20;
   animation: sampleBeaconBob 2.2s ease-in-out infinite alternate;
 }
 
 .sample-beacon-star {
-  font-size: 0.92rem;
+  font-size: 1.55rem;
   color: #38bdf8;
-  filter: drop-shadow(0 0 6px #38bdf8);
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.95));
   line-height: 1;
 }
 
 .sample-beacon-ring {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  border: 2px solid rgba(56, 189, 248, 0.55);
   animation: sampleBeaconPulse 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.ship-beacon {
+  top: -18px;
+}
+
+.ship-beacon.ready .sample-beacon-star {
+  color: #34d399;
+  filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.95));
+}
+
+.ship-beacon.ready .sample-beacon-ring {
+  border-color: rgba(52, 211, 153, 0.65);
+}
+
+.machine-beacon {
+  top: -22px;
+}
+
+.machine-beacon .sample-beacon-star {
+  color: #facc15;
+  filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.95));
+}
+
+.machine-beacon .sample-beacon-ring {
+  border-color: rgba(250, 204, 21, 0.55);
 }
 
 @keyframes sampleBeaconBob {
   0% { transform: translateX(-50%) translateY(0); }
-  100% { transform: translateX(-50%) translateY(-5px); }
+  100% { transform: translateX(-50%) translateY(-7px); }
 }
 
 @keyframes sampleBeaconPulse {
-  0% { transform: scale(0.6); opacity: 0.9; }
-  100% { transform: scale(1.6); opacity: 0; }
+  0% { transform: scale(0.65); opacity: 0.95; }
+  100% { transform: scale(1.75); opacity: 0; }
 }
 
 .sample-hotspot .entity-svg-wrap {
