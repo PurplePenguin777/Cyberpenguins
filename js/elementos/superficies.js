@@ -591,7 +591,7 @@
     return out;
   }
 
-  /* ---------- Escenas de las tarjetas (La Luna, Marte, Frontera Espacial) ---------- */
+  /* ---------- Escenas de las tarjetas (La Luna, Marte, Espacio profundo) ---------- */
 
   const SCENES = {
     moon: {

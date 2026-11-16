@@ -872,7 +872,7 @@ a:focus-visible {
   transform: translateX(-50%);
 }
 
-/* Frontera Espacial: sin superficie, la máquina flota en gravedad cero */
+/* Espacio profundo: sin superficie, la máquina flota en gravedad cero */
 .chapter-scene[data-scene="deep-space"] .scene-machine {
   bottom: 28%;
   transform: translateX(-50%);
