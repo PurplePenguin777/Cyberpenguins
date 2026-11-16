@@ -239,6 +239,26 @@
     const quizContinueBtn = document.getElementById('quiz-continue-btn');
     if (quizContinueBtn) quizContinueBtn.textContent = isEn ? 'Continue journey ▶' : 'Continuar viaje ▶';
 
+    // Opciones del menú inicial: Cómo se juega y Acerca del proyecto
+    if (dom.homeHowToPlayLabel) {
+      dom.homeHowToPlayLabel.textContent = isEn ? 'How to play' : 'Cómo se juega';
+    }
+    if (dom.homeHowToPlayBtn) {
+      dom.homeHowToPlayBtn.setAttribute('aria-label', isEn ? 'How to play' : 'Cómo se juega');
+    }
+    if (dom.homeAboutLabel) {
+      dom.homeAboutLabel.textContent = isEn ? 'About project' : 'Acerca del proyecto';
+    }
+    if (dom.homeAboutBtn) {
+      dom.homeAboutBtn.setAttribute('aria-label', isEn ? 'About project' : 'Acerca del proyecto');
+    }
+    if (dom.howToPlayModal && !dom.howToPlayModal.classList.contains('is-hidden')) {
+      renderHowToPlayModal();
+    }
+    if (dom.aboutProjectModal && !dom.aboutProjectModal.classList.contains('is-hidden')) {
+      renderAboutProjectModal();
+    }
+
     // Textos de registro inicial de cadete (minimalista en sentence case)
     if (dom.cadetIntroTitle) {
       dom.cadetIntroTitle.textContent = isEn ? 'Welcome to Cyberpenguin' : 'Bienvenido a Cyberpenguin';
@@ -531,6 +551,25 @@
     dom.printCertText = document.getElementById('print-cert-text');
     dom.downloadSvgText = document.getElementById('download-svg-text');
     dom.downloadPngText = document.getElementById('download-png-text');
+
+    // Navegación informativa en el menú inicial
+    dom.homeHowToPlayBtn = document.getElementById('home-how-to-play-btn');
+    dom.homeHowToPlayLabel = document.getElementById('home-how-to-play-label');
+    dom.homeAboutBtn = document.getElementById('home-about-btn');
+    dom.homeAboutLabel = document.getElementById('home-about-label');
+
+    // Modales informativos: Cómo se juega y Acerca del proyecto
+    dom.howToPlayModal = document.getElementById('how-to-play-modal');
+    dom.howToPlayTitle = document.getElementById('how-to-play-title');
+    dom.howToPlaySubtitle = document.getElementById('how-to-play-subtitle');
+    dom.howToPlayContent = document.getElementById('how-to-play-content');
+    dom.howToPlayCloseBtn = document.getElementById('how-to-play-close-btn');
+
+    dom.aboutProjectModal = document.getElementById('about-project-modal');
+    dom.aboutProjectTitle = document.getElementById('about-project-title');
+    dom.aboutProjectSubtitle = document.getElementById('about-project-subtitle');
+    dom.aboutProjectContent = document.getElementById('about-project-content');
+    dom.aboutProjectCloseBtn = document.getElementById('about-project-close-btn');
   }
 
   function bindEvents() {
@@ -616,6 +655,42 @@
     dom.openPassportBtn.addEventListener('click', openPassportModal);
     dom.openBadgesBtn.addEventListener('click', openBadgesModal);
     dom.openCertificateBtn.addEventListener('click', openCertificateModal);
+
+    // Modales informativos: Cómo se juega y Acerca del proyecto
+    if (dom.homeHowToPlayBtn) {
+      dom.homeHowToPlayBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        openHowToPlayModal();
+      });
+    }
+    if (dom.homeAboutBtn) {
+      dom.homeAboutBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        openAboutProjectModal();
+      });
+    }
+    if (dom.howToPlayCloseBtn) {
+      dom.howToPlayCloseBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        closeHowToPlayModal();
+      });
+    }
+    if (dom.howToPlayModal) {
+      dom.howToPlayModal.addEventListener('click', (e) => {
+        if (e.target === dom.howToPlayModal) closeHowToPlayModal();
+      });
+    }
+    if (dom.aboutProjectCloseBtn) {
+      dom.aboutProjectCloseBtn.addEventListener('click', () => {
+        triggerHaptic('tap');
+        closeAboutProjectModal();
+      });
+    }
+    if (dom.aboutProjectModal) {
+      dom.aboutProjectModal.addEventListener('click', (e) => {
+        if (e.target === dom.aboutProjectModal) closeAboutProjectModal();
+      });
+    }
 
     const homeCertCard = document.getElementById('home-certificate-preview');
     if (homeCertCard) {
@@ -2544,26 +2619,32 @@
 
       return `
         <div class="home-chapter-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${isCardActive ? 'is-active' : ''
-        } ${!unlocked ? 'opacity-65' : ''}">
+        } ${!unlocked ? 'is-locked' : ''}">
           <div class="w-full flex items-center justify-center">
             <h3 class="text-xs sm:text-sm font-semibold tracking-wide text-slate-200 text-center">${chapter.name}</h3>
           </div>
 
-          <div class="home-chapter-emblem relative w-full">
+          <div class="home-chapter-emblem relative w-full ${!unlocked ? 'opacity-55' : ''}">
             ${sceneHtml}
           </div>
 
           <div class="flex flex-col items-center gap-3 w-full">
             <button type="button"
               class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 px-3 sm:px-4 font-medium transition-colors ${!unlocked
-          ? 'bg-white/[0.04] text-slate-300/85 border border-white/[0.06] cursor-not-allowed text-[11px] sm:text-xs leading-snug'
+          ? 'home-chapter-btn-locked'
           : isCardActive
             ? 'bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm text-xs sm:text-sm'
             : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-200 border border-white/[0.08] text-xs sm:text-sm'
         }"
               ${!unlocked ? 'disabled' : ''}
               data-enter-chapter="${chapter.id}">
-              ${btnLabel}
+              ${!unlocked ? `
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 opacity-90 inline-block flex-shrink-0" aria-hidden="true">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              ` : ''}
+              <span>${btnLabel}</span>
             </button>
           </div>
         </div>
@@ -3810,6 +3891,172 @@
   }
 
   /* ========================================================================
+     Modales Informativos: Cómo se juega y Acerca del proyecto
+     ======================================================================== */
+
+  function renderHowToPlayModal() {
+    if (!dom.howToPlayContent) return;
+    const isEn = (state.currentLanguage === 'en');
+    if (dom.howToPlayTitle) {
+      dom.howToPlayTitle.textContent = isEn ? 'How to play' : 'Cómo se juega';
+    }
+    if (dom.howToPlaySubtitle) {
+      dom.howToPlaySubtitle.textContent = isEn ? 'Interactive exploration and space physics' : 'Exploración interactiva y física espacial';
+    }
+    if (dom.howToPlayCloseBtn) {
+      dom.howToPlayCloseBtn.textContent = isEn ? 'Got it' : 'Entendido';
+    }
+
+    const items = isEn ? [
+      {
+        icon: '🐾',
+        title: 'Walk and move',
+        desc: 'Click or tap anywhere on the terrain to send Cyberpenguin walking. Obstacle avoidance is calculated automatically.'
+      },
+      {
+        icon: '🦘',
+        title: 'Gravity jumps',
+        desc: 'Press the floating Jump button, hit Spacebar, swipe up or double-tap. Jump physics, height, and hang time accurately reflect each celestial world.'
+      },
+      {
+        icon: '🛰️',
+        title: 'Talk to historical spacecraft',
+        desc: 'Approach robotic explorers like Surveyor 3, Apollo 11 Eagle or Viking 1 to discover authentic mission history and voice interactions.'
+      },
+      {
+        icon: '💎',
+        title: 'Geological rock samples',
+        desc: 'Discover and collect real geological extraterrestrial rocks on the ground to store them in your astronaut backpack.'
+      },
+      {
+        icon: '🚀',
+        title: 'Quiz and takeoff',
+        desc: 'Return to your landing ship to complete the mission quiz, earn stars in your passport, and set course for your next cosmic destination.'
+      }
+    ] : [
+      {
+        icon: '🐾',
+        title: 'Caminar y explorar',
+        desc: 'Toca o haz clic en cualquier lugar del terreno para mover a Cyberpenguin. El cálculo de rutas esquivará obstáculos automáticamente.'
+      },
+      {
+        icon: '🦘',
+        title: 'Saltos con gravedad auténtica',
+        desc: 'Usa el botón flotante Saltar, la barra espaciadora, desliza hacia arriba o haz doble toque. La altura y flotabilidad reflejan la física real de cada mundo (Luna, Marte, Asteroide Eros, Espacio profundo).'
+      },
+      {
+        icon: '🛰️',
+        title: 'Hablar con sondas históricas',
+        desc: 'Acércate a los robots exploradores como Surveyor 3, Apolo 11 Eagle o Viking 1 para conocer su historia y datos verificados de sus misiones.'
+      },
+      {
+        icon: '💎',
+        title: 'Muestras geológicas',
+        desc: 'Encuentra y recoge fragmentos de rocas extraterrestres auténticas en el suelo para guardarlas en tu mochila de exploración.'
+      },
+      {
+        icon: '🚀',
+        title: 'Cuestionario y despegue',
+        desc: 'Vuelve a la nave para responder el cuestionario interactivo, ganar estrellas en tu pasaporte y viajar al siguiente destino cósmico.'
+      }
+    ];
+
+    dom.howToPlayContent.innerHTML = items.map((it) => `
+      <div class="info-item-card">
+        <div class="flex items-center justify-center gap-1.5">
+          <span class="text-sm" aria-hidden="true">${it.icon}</span>
+          <span class="info-item-title">${it.title}</span>
+        </div>
+        <p class="info-item-desc">${it.desc}</p>
+      </div>
+    `).join('');
+  }
+
+  function openHowToPlayModal() {
+    renderHowToPlayModal();
+    if (dom.howToPlayModal) {
+      dom.howToPlayModal.classList.remove('is-hidden');
+    }
+  }
+
+  function closeHowToPlayModal() {
+    if (dom.howToPlayModal) {
+      dom.howToPlayModal.classList.add('is-hidden');
+    }
+  }
+
+  function renderAboutProjectModal() {
+    if (!dom.aboutProjectContent) return;
+    const isEn = (state.currentLanguage === 'en');
+    if (dom.aboutProjectTitle) {
+      dom.aboutProjectTitle.textContent = isEn ? 'About project' : 'Acerca del proyecto';
+    }
+    if (dom.aboutProjectSubtitle) {
+      dom.aboutProjectSubtitle.textContent = 'Cyberpenguin: The Explorers We Must Never Forget';
+    }
+    if (dom.aboutProjectCloseBtn) {
+      dom.aboutProjectCloseBtn.textContent = isEn ? 'Close' : 'Cerrar';
+    }
+
+    const items = isEn ? [
+      {
+        icon: '🌌',
+        title: 'Tribute to robotic explorers',
+        desc: 'Cyberpenguin is an educational science tribute celebrating the historic probes, landers, and orbiters that pioneered space exploration and must never be forgotten.'
+      },
+      {
+        icon: '🔬',
+        title: 'Scientific and physical realism',
+        desc: 'Every chapter incorporates authentic planetary gravity profiles, proportional astronomical distances, and validated historical mission records from NASA and planetary science.'
+      },
+      {
+        icon: '✨',
+        title: 'Modern and accessible experience',
+        desc: 'Built with native web standards as an installable PWA, featuring interactive natural voice synthesis (TTS), spatial binaural audio, fluid touch controls, and a printable honorary astronaut diploma.'
+      }
+    ] : [
+      {
+        icon: '🌌',
+        title: 'Homenaje a los pioneros espaciales',
+        desc: 'Cyberpenguin es un proyecto educativo de divulgación científica creado para rendir tributo a las sondas, robots y módulos espaciales que abrieron el camino al cosmos y que nunca debemos olvidar.'
+      },
+      {
+        icon: '🔬',
+        title: 'Realismo físico y científico',
+        desc: 'Cada capítulo cuenta con perfiles gravitatorios exactos, distancias proporcionales reales y registros históricos validados con datos de misiones de la NASA y la ciencia planetaria.'
+      },
+      {
+        icon: '✨',
+        title: 'Experiencia moderna y accesible',
+        desc: 'Desarrollado con estándares web nativos en arquitectura PWA instalable, con síntesis de voz natural (TTS), audio espacial binaural, controles táctiles y diploma de honor astronáutico descargable.'
+      }
+    ];
+
+    dom.aboutProjectContent.innerHTML = items.map((it) => `
+      <div class="info-item-card">
+        <div class="flex items-center justify-center gap-1.5">
+          <span class="text-sm" aria-hidden="true">${it.icon}</span>
+          <span class="info-item-title">${it.title}</span>
+        </div>
+        <p class="info-item-desc">${it.desc}</p>
+      </div>
+    `).join('');
+  }
+
+  function openAboutProjectModal() {
+    renderAboutProjectModal();
+    if (dom.aboutProjectModal) {
+      dom.aboutProjectModal.classList.remove('is-hidden');
+    }
+  }
+
+  function closeAboutProjectModal() {
+    if (dom.aboutProjectModal) {
+      dom.aboutProjectModal.classList.add('is-hidden');
+    }
+  }
+
+  /* ========================================================================
      Utilidades de Modales
      ======================================================================== */
 
@@ -3831,7 +4078,9 @@
       dom.passportModal,
       dom.badgesModal,
       dom.certificateModal,
-      dom.sampleDiscoveryModal
+      dom.sampleDiscoveryModal,
+      dom.howToPlayModal,
+      dom.aboutProjectModal
     ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
@@ -3844,7 +4093,9 @@
       dom.passportModal,
       dom.badgesModal,
       dom.certificateModal,
-      dom.sampleDiscoveryModal
+      dom.sampleDiscoveryModal,
+      dom.howToPlayModal,
+      dom.aboutProjectModal
     ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
@@ -3855,6 +4106,8 @@
     hideModal(dom.badgesModal);
     hideModal(dom.certificateModal);
     if (dom.sampleDiscoveryModal) hideModal(dom.sampleDiscoveryModal);
+    if (dom.howToPlayModal) closeHowToPlayModal();
+    if (dom.aboutProjectModal) closeAboutProjectModal();
     hideStageActionPrompt();
   }
 })(typeof window !== 'undefined' ? window : globalThis);

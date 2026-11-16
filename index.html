@@ -38,7 +38,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link rel="stylesheet" href="css/styles.css?v=20261115n" />
+  <link rel="stylesheet" href="css/styles.css?v=20261116a" />
 </head>
 <body class="font-sans antialiased">
   <div class="starfield" aria-hidden="true"></div>
@@ -213,26 +213,51 @@
 
     <div class="home-panel max-w-6xl w-full px-3 sm:px-6 py-4 sm:py-6 flex flex-col gap-6 sm:gap-8">
       <!-- Encabezado Principal -->
-      <header class="relative flex items-center justify-center py-2">
-        <div class="flex flex-col items-center justify-center text-center px-4">
-          <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white text-center leading-tight">
-            Cyberpenguin
-          </h1>
-          <p class="text-[10px] sm:text-xs md:text-sm font-semibold tracking-wide text-cyan-300 text-center mt-0.5">
-            The Explorers We Must Never Forget
-          </p>
-        </div>
-        <div class="absolute right-0 flex items-center gap-2">
-          <button id="home-start-btn" type="button" aria-hidden="true" tabindex="-1" class="hidden">Explorar</button>
-          <div id="home-lang-selector" class="lang-selector-group" role="group" aria-label="Selector de idioma / Language selector">
-            <button id="home-lang-es" type="button" class="lang-selector-btn is-active" data-lang="es" aria-pressed="true" title="Idioma actual: Español">
-              <span class="lang-opt-long">Español</span>
-              <span class="lang-opt-short">ES</span>
+      <header class="home-header relative py-2">
+        <div class="home-header-grid w-full flex flex-col md:grid md:grid-cols-3 items-center justify-between gap-3">
+          <!-- Opciones: Cómo se juega y Acerca del proyecto -->
+          <div class="home-nav-group flex items-center justify-center md:justify-start gap-2 order-2 md:order-1">
+            <button id="home-how-to-play-btn" type="button" class="home-nav-pill squircle-btn" aria-label="Cómo se juega">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <span id="home-how-to-play-label">Cómo se juega</span>
             </button>
-            <button id="home-lang-en" type="button" class="lang-selector-btn" data-lang="en" aria-pressed="false" title="Switch to English">
-              <span class="lang-opt-long">English</span>
-              <span class="lang-opt-short">EN</span>
+            <button id="home-about-btn" type="button" class="home-nav-pill squircle-btn" aria-label="Acerca del proyecto">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <span id="home-about-label">Acerca del proyecto</span>
             </button>
+          </div>
+
+          <!-- Título Central -->
+          <div class="flex flex-col items-center justify-center text-center px-2 order-1 md:order-2">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white text-center leading-tight">
+              Cyberpenguin
+            </h1>
+            <p class="text-[10px] sm:text-xs md:text-sm font-semibold tracking-wide text-cyan-300 text-center mt-0.5">
+              The Explorers We Must Never Forget
+            </p>
+          </div>
+
+          <!-- Selector de Idioma -->
+          <div class="flex items-center justify-center md:justify-end gap-2 order-3">
+            <button id="home-start-btn" type="button" aria-hidden="true" tabindex="-1" class="hidden">Explorar</button>
+            <div id="home-lang-selector" class="lang-selector-group" role="group" aria-label="Selector de idioma / Language selector">
+              <button id="home-lang-es" type="button" class="lang-selector-btn is-active" data-lang="es" aria-pressed="true" title="Idioma actual: Español">
+                <span class="lang-opt-long">Español</span>
+                <span class="lang-opt-short">ES</span>
+              </button>
+              <button id="home-lang-en" type="button" class="lang-selector-btn" data-lang="en" aria-pressed="false" title="Switch to English">
+                <span class="lang-opt-long">English</span>
+                <span class="lang-opt-short">EN</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -574,28 +599,84 @@
     </div>
   </div>
 
+  <!-- Modal: Cómo se juega (Minimalista Liquid Glass Centrado) -->
+  <div id="how-to-play-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="how-to-play-title">
+    <div class="info-modal-card squircle-panel max-w-[460px] w-full p-6 sm:p-7 flex flex-col items-center text-center gap-4 relative">
+      <div class="info-modal-badge w-10 h-10 rounded-full flex items-center justify-center text-cyan-300 bg-cyan-400/10 border border-cyan-400/20">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+
+      <div class="flex flex-col items-center text-center gap-1 w-full">
+        <h2 id="how-to-play-title" class="text-base sm:text-lg font-bold text-white tracking-tight text-center">
+          Cómo se juega
+        </h2>
+        <p id="how-to-play-subtitle" class="text-xs text-slate-300 text-center">
+          Exploración interactiva y física espacial
+        </p>
+      </div>
+
+      <div id="how-to-play-content" class="info-modal-body flex flex-col gap-2.5 w-full text-center"></div>
+
+      <button id="how-to-play-close-btn" type="button" class="squircle-btn rounded-full w-full py-2.5 px-4 font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all mt-1">
+        Entendido
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: Acerca del proyecto (Minimalista Liquid Glass Centrado) -->
+  <div id="about-project-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="about-project-title">
+    <div class="info-modal-card squircle-panel max-w-[460px] w-full p-6 sm:p-7 flex flex-col items-center text-center gap-4 relative">
+      <div class="info-modal-badge w-10 h-10 rounded-full flex items-center justify-center text-amber-300 bg-amber-400/10 border border-amber-400/20">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+      </div>
+
+      <div class="flex flex-col items-center text-center gap-1 w-full">
+        <h2 id="about-project-title" class="text-base sm:text-lg font-bold text-white tracking-tight text-center">
+          Acerca del proyecto
+        </h2>
+        <p id="about-project-subtitle" class="text-xs text-slate-300 text-center">
+          Cyberpenguin: The Explorers We Must Never Forget
+        </p>
+      </div>
+
+      <div id="about-project-content" class="info-modal-body flex flex-col gap-2.5 w-full text-center"></div>
+
+      <button id="about-project-close-btn" type="button" class="squircle-btn rounded-full w-full py-2.5 px-4 font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all mt-1">
+        Cerrar
+      </button>
+    </div>
+  </div>
 
 
-  <script defer src="js/data.js?v=20261115n"></script>
-  <script defer src="js/elementos/pinguino.js?v=20261115n"></script>
-  <script defer src="js/elementos/nave-pinguino.js?v=20261115n"></script>
-  <script defer src="js/elementos/surveyor-3.js?v=20261115n"></script>
-  <script defer src="js/elementos/apollo-11-eagle.js?v=20261115n"></script>
-  <script defer src="js/elementos/viking-1.js?v=20261115n"></script>
-  <script defer src="js/elementos/sojourner.js?v=20261115n"></script>
-  <script defer src="js/elementos/pioneer-10.js?v=20261115n"></script>
-  <script defer src="js/elementos/near-shoemaker.js?v=20261115n"></script>
-  <script defer src="js/elementos/tierra.js?v=20261115n"></script>
-  <script defer src="js/elementos/luna.js?v=20261115n"></script>
-  <script defer src="js/elementos/marte.js?v=20261115n"></script>
-  <script defer src="js/elementos/asteroide-eros.js?v=20261115n"></script>
-  <script defer src="js/elementos/espacio-profundo.js?v=20261115n"></script>
-  <script defer src="js/elementos/superficies.js?v=20261115n"></script>
-  <script defer src="js/elementos/cuerpos.js?v=20261115n"></script>
-  <script defer src="js/models.js?v=20261115n"></script>
-  <script defer src="js/elementos/realismo.js?v=20261115n"></script>
-  <script defer src="js/tts.js?v=20261115n"></script>
-  <script defer src="js/fx.js?v=20261115n"></script>
-  <script defer src="js/app.js?v=20261115n"></script>
+
+  <script defer src="js/data.js?v=20261116a"></script>
+  <script defer src="js/elementos/pinguino.js?v=20261116a"></script>
+  <script defer src="js/elementos/nave-pinguino.js?v=20261116a"></script>
+  <script defer src="js/elementos/surveyor-3.js?v=20261116a"></script>
+  <script defer src="js/elementos/apollo-11-eagle.js?v=20261116a"></script>
+  <script defer src="js/elementos/viking-1.js?v=20261116a"></script>
+  <script defer src="js/elementos/sojourner.js?v=20261116a"></script>
+  <script defer src="js/elementos/pioneer-10.js?v=20261116a"></script>
+  <script defer src="js/elementos/near-shoemaker.js?v=20261116a"></script>
+  <script defer src="js/elementos/tierra.js?v=20261116a"></script>
+  <script defer src="js/elementos/luna.js?v=20261116a"></script>
+  <script defer src="js/elementos/marte.js?v=20261116a"></script>
+  <script defer src="js/elementos/asteroide-eros.js?v=20261116a"></script>
+  <script defer src="js/elementos/espacio-profundo.js?v=20261116a"></script>
+  <script defer src="js/elementos/superficies.js?v=20261116a"></script>
+  <script defer src="js/elementos/cuerpos.js?v=20261116a"></script>
+  <script defer src="js/models.js?v=20261116a"></script>
+  <script defer src="js/elementos/realismo.js?v=20261116a"></script>
+  <script defer src="js/tts.js?v=20261116a"></script>
+  <script defer src="js/fx.js?v=20261116a"></script>
+  <script defer src="js/app.js?v=20261116a"></script>
 </body>
 </html>
