@@ -353,23 +353,11 @@
     if (FX && typeof FX.pause === 'function') {
       FX.pause();
     }
-    if (state.launched || (state.cadetName && state.cadetName.trim())) {
-      state.launched = true;
-      saveState();
+    if (state.launched) {
       dom.launchScreen.classList.add('hidden-screen', 'is-hidden');
       showHomeScreen();
     } else {
-      if (dom.cadetIntroCard) {
-        dom.cadetIntroCard.classList.remove('is-hidden');
-        if (dom.cadetFirstNameInput) {
-          dom.cadetFirstNameInput.value = state.cadetName || '';
-          setTimeout(() => {
-            try { dom.cadetFirstNameInput.focus(); } catch (_e) {}
-          }, 400);
-        }
-      } else {
-        startLaunchCinematic();
-      }
+      startLaunchCinematic();
     }
   }
 
