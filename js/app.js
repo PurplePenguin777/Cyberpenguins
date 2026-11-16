@@ -3293,16 +3293,16 @@
     const isEn = (state.currentLanguage === 'en');
     const savedAnswers = state.quizAnswers[quiz.chapterId] || [null, null];
 
-    // Contenedor minimalista: solo preguntas numeradas y sus opciones
+    // Contenedor minimalista: solo preguntas numeradas y sus opciones centradas
     const letters = ['A', 'B', 'C', 'D'];
     dom.quizQuestionsContainer.innerHTML = quiz.questions.map((q, qIdx) => {
       const selectedOpt = savedAnswers[qIdx];
       return `
-        <div class="quiz-question-card flex flex-col gap-2 p-3 sm:p-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
-          <p class="text-xs sm:text-sm font-semibold text-slate-100 text-center leading-snug">
-            <span class="text-cyan-300 mr-1">${qIdx + 1}.</span>${q.question || ''}
+        <div class="quiz-question-card flex flex-col items-center justify-center text-center gap-2.5 p-3 sm:p-3.5 rounded-2xl">
+          <p class="quiz-question-text text-xs sm:text-sm font-semibold text-slate-100 text-center">
+            <span class="text-cyan-300 mr-1.5 font-bold">${qIdx + 1}.</span>${q.question || ''}
           </p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
+          <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
             ${q.options.map((optText, oIdx) => {
               const isSelected = (selectedOpt === oIdx);
               let optionClass = isSelected ? 'selected' : '';
@@ -3312,13 +3312,13 @@
               }
               return `
                 <button type="button"
-                  class="quiz-option-btn px-2.5 py-1.5 sm:py-2 flex items-center gap-2 text-xs font-normal text-slate-200 transition-all ${optionClass}"
+                  class="quiz-option-btn px-2.5 py-2 flex items-center justify-center text-center gap-2 text-xs font-normal text-slate-200 transition-all ${optionClass}"
                   data-q-idx="${qIdx}"
                   data-o-idx="${oIdx}">
                   <span class="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-[10px] font-bold text-amber-200 shrink-0">
                     ${letters[oIdx]}
                   </span>
-                  <span class="text-left flex-1 leading-snug empty:hidden">${optText || ''}</span>
+                  <span class="quiz-option-text text-center leading-snug empty:hidden">${optText || ''}</span>
                 </button>
               `;
             }).join('')}
