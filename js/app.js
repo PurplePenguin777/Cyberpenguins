@@ -320,6 +320,14 @@
         showStageActionPrompt(activeInteractable.type, activeInteractable.target, activeInteractable.onAction);
       }
 
+      // Actualizar botón flotante de salto
+      if (dom.stageJumpLabel) {
+        dom.stageJumpLabel.textContent = isEn ? 'Jump' : 'Saltar';
+      }
+      if (dom.stageJumpBtn) {
+        dom.stageJumpBtn.setAttribute('aria-label', isEn ? 'Jump according to gravity' : 'Saltar según la gravedad');
+      }
+
       // Si hay un globo de diálogo abierto, actualizar al nuevo idioma
       if (activeBranchState && activeBranchState.machine) {
         const currentMachineId = activeBranchState.machine.id;
@@ -480,6 +488,8 @@
     dom.stageActionBtn = document.getElementById('stage-action-btn');
     dom.stageActionIcon = document.getElementById('stage-action-icon');
     dom.stageActionLabel = document.getElementById('stage-action-label');
+    dom.stageJumpBtn = document.getElementById('stage-jump-btn');
+    dom.stageJumpLabel = document.getElementById('stage-jump-label');
 
     dom.sampleDiscoveryModal = document.getElementById('sample-discovery-modal');
     dom.sampleDiscoveryCrystal = document.getElementById('sample-discovery-crystal');
@@ -746,23 +756,93 @@
       }
     });
 
-    // Clic directo sobre Cyberpenguin para saltar según la gravedad del entorno
-    if (dom.penguinActor) {
-      dom.penguinActor.addEventListener('click', (event) => {
+    // Botón flotante Liquid Glass de salto (especialmente táctil / móviles)
+    if (dom.stageJumpBtn) {
+      const handleJumpButton = (event) => {
+        event.preventDefault();
         event.stopPropagation();
+        suppressBoardClickUntil = Date.now() + 450;
         triggerGravityJump();
+      };
+      dom.stageJumpBtn.addEventListener('click', handleJumpButton);
+      dom.stageJumpBtn.addEventListener('touchend', handleJumpButton);
+    }
+
+    // Clic / toque directo sobre Cyberpenguin para saltar según la gravedad del entorno
+    if (dom.penguinActor) {
+      const handlePenguinJump = (event) => {
+        event.stopPropagation();
+        suppressBoardClickUntil = Date.now() + 450;
+        triggerGravityJump();
+      };
+      dom.penguinActor.addEventListener('click', handlePenguinJump);
+      dom.penguinActor.addEventListener('touchend', (event) => {
+        event.preventDefault();
+        handlePenguinJump(event);
       });
     }
 
-    // Clic en el escenario para caminar sobre la superficie o flotar en caminata EVA
+    // Gestos táctiles en móviles y pantallas táctiles (Swipe hacia arriba para saltar, doble tap)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+    let lastTapTime = 0;
+    let suppressBoardClickUntil = 0;
+
+    dom.isoBoard.addEventListener('touchstart', (event) => {
+      if (event.touches && event.touches.length === 1) {
+        const touch = event.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+      }
+    }, { passive: true });
+
+    dom.isoBoard.addEventListener('touchend', (event) => {
+      if (event.changedTouches && event.changedTouches.length === 1) {
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+        const elapsed = Date.now() - touchStartTime;
+        const dist = Math.hypot(deltaX, deltaY);
+
+        // Gesto 1: Swipe vertical hacia arriba para saltar según la gravedad
+        if (deltaY < -35 && Math.abs(deltaY) > Math.abs(deltaX) * 1.15 && elapsed < 380) {
+          suppressBoardClickUntil = Date.now() + 500;
+          triggerGravityJump();
+          return;
+        }
+
+        // Gesto 2: Doble toque rápido para saltar
+        const now = Date.now();
+        if (dist < 20 && (now - lastTapTime) < 300) {
+          suppressBoardClickUntil = Date.now() + 500;
+          lastTapTime = 0;
+          triggerGravityJump();
+          return;
+        }
+        lastTapTime = now;
+      }
+    }, { passive: true });
+
+    // Clic / toque en el escenario para caminar sobre la superficie o flotar en caminata EVA
     dom.isoBoard.addEventListener('click', (event) => {
+      if (Date.now() < suppressBoardClickUntil) {
+        return;
+      }
       if (
         event.target.closest('.stage-hotspot') ||
         event.target.closest('#penguin-actor') ||
+        event.target.closest('#stage-jump-btn') ||
         event.target.closest('.back-home-btn') ||
         event.target.closest('.sound-control-group') ||
-        event.target.closest('.stage-lang-selector')
+        event.target.closest('.stage-lang-selector') ||
+        event.target.closest('#stage-speech-bubble') ||
+        event.target.closest('#stage-action-prompt')
       ) {
+        return;
+      }
+      if (isJumping) {
         return;
       }
       const rect = dom.isoBoard.getBoundingClientRect();
@@ -770,6 +850,7 @@
       const pctY = ((event.clientY - rect.top) / rect.height) * 100;
       const chapter = getChapter(state.currentChapterId);
       const safeTarget = resolveSurfacePoint(pctX, pctY, chapter, penguinPos);
+      triggerHaptic('tap');
       spawnRipple(safeTarget.x, safeTarget.y);
       routeAndMove(safeTarget.x, safeTarget.y, checkSurfaceProximity);
     });
@@ -1947,6 +2028,7 @@
   }
 
   function routeAndMove(targetX, targetY, onArrive) {
+    if (isJumping) return;
     const chapter = getChapter(state.currentChapterId);
     const route = buildAvoidanceRoute(penguinPos, { x: targetX, y: targetY }, chapter);
 
@@ -2001,6 +2083,7 @@
   }
 
   function moveTo(targetX, targetY, onArrive, durationOverrideMs) {
+    if (isJumping) return;
     const chapter = getChapter(state.currentChapterId);
     const profile = getGravityProfile(chapter.id);
     const durationMs = durationOverrideMs || profile.stepDurationMs;
@@ -2037,6 +2120,7 @@
   }
 
   function stepPenguin(dir) {
+    if (isJumping) return;
     const chapter = getChapter(state.currentChapterId);
     const stepSize = chapter.hasSurface ? 6 : 7;
     const deltas = {
@@ -2057,6 +2141,7 @@
     const chapter = getChapter(state.currentChapterId);
     if (!chapter || dom.gameScreen.classList.contains('is-hidden') || isBlockingModalOpen()) return;
     if (isJumping || !dom.penguinActor) return;
+    clearWalkTimers();
     triggerHaptic('jump');
 
     const { activeMachine } = getActiveSite(chapter);

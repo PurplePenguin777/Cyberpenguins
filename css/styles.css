@@ -931,10 +931,12 @@ a:focus-visible {
     padding: 0 0.65rem 0 0.35rem;
     gap: 0.35rem;
   }
+
   .sound-toggle-btn {
     width: 28px !important;
     height: 28px !important;
   }
+
   .sound-slider-wrap {
     width: 52px;
   }
@@ -1006,11 +1008,13 @@ a:focus-visible {
   .lang-opt-long {
     display: none;
   }
+
   .lang-opt-short {
     display: inline;
     font-weight: 700;
     font-size: 0.72rem;
   }
+
   .lang-selector-btn {
     padding: 0 0.55rem;
     height: 28px;
@@ -1036,6 +1040,7 @@ a:focus-visible {
     height: 38px;
     padding: 3px;
   }
+
   .stage-lang-selector .lang-selector-btn {
     height: 28px;
     padding: 0 0.45rem;
@@ -1087,6 +1092,17 @@ a:focus-visible {
   white-space: nowrap;
   pointer-events: none;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+@media (max-width: 640px) {
+  .stage-location-pill {
+    top: 4.15rem;
+    font-size: 0.65rem;
+    padding: 0.35rem 0.85rem;
+    max-width: calc(100vw - 2.5rem);
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 }
 
 /* ==========================================================================
@@ -1208,6 +1224,10 @@ a:focus-visible {
   background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.03) 0%, rgba(5, 8, 20, 0.55) 100%);
   box-shadow: none;
   cursor: default;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .iso-board:focus-visible {
@@ -1289,6 +1309,19 @@ a:focus-visible {
   align-items: center;
   cursor: pointer;
   color: inherit;
+  touch-action: manipulation;
+  position: relative;
+}
+
+.sample-hotspot::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  right: -16px;
+  bottom: -16px;
+  border-radius: 50%;
+  pointer-events: auto;
 }
 
 .stage-hotspot:hover .entity-svg-wrap {
@@ -1392,13 +1425,25 @@ a:focus-visible {
 }
 
 @keyframes sampleBeaconBob {
-  0% { transform: translateX(-50%) translateY(0); }
-  100% { transform: translateX(-50%) translateY(-7px); }
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  100% {
+    transform: translateX(-50%) translateY(-7px);
+  }
 }
 
 @keyframes sampleBeaconPulse {
-  0% { transform: scale(0.65); opacity: 0.95; }
-  100% { transform: scale(1.75); opacity: 0; }
+  0% {
+    transform: scale(0.65);
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
 }
 
 .sample-hotspot .entity-svg-wrap {
@@ -1452,10 +1497,23 @@ a:focus-visible {
   z-index: 72;
   pointer-events: auto;
   cursor: pointer;
+  touch-action: manipulation;
   transition:
     left 0.44s cubic-bezier(0.25, 0.8, 0.3, 1),
     top 0.44s cubic-bezier(0.25, 0.8, 0.3, 1),
     opacity 0.3s ease;
+}
+
+.penguin-actor::before {
+  content: '';
+  position: absolute;
+  top: -18px;
+  left: -18px;
+  right: -18px;
+  bottom: -18px;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .penguin-actor.gravity-moon {
@@ -1612,18 +1670,45 @@ a:focus-visible {
 }
 
 @keyframes cpJumpShadowMars {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  38% { transform: scale(0.82); opacity: 0.45; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  38% {
+    transform: scale(0.82);
+    opacity: 0.45;
+  }
 }
 
 @keyframes cpJumpShadowMoon {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  48% { transform: scale(0.5); opacity: 0.18; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  48% {
+    transform: scale(0.5);
+    opacity: 0.18;
+  }
 }
 
 @keyframes cpJumpShadowEros {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  52% { transform: scale(0.2); opacity: 0.04; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  52% {
+    transform: scale(0.2);
+    opacity: 0.04;
+  }
 }
 
 .penguin-actor.descending-moon .penguin-sprite {
@@ -1647,9 +1732,11 @@ a:focus-visible {
   0% {
     transform: translateY(0px) rotate(-5deg);
   }
+
   50% {
     transform: translateY(-5px) rotate(0deg);
   }
+
   100% {
     transform: translateY(0px) rotate(5deg);
   }
@@ -1660,9 +1747,11 @@ a:focus-visible {
   0% {
     transform: rotate(-18deg) translateY(-2px);
   }
+
   50% {
     transform: rotate(0deg) translateY(0px);
   }
+
   100% {
     transform: rotate(18deg) translateY(2px);
   }
@@ -1672,9 +1761,11 @@ a:focus-visible {
   0% {
     transform: rotate(18deg) translateY(2px);
   }
+
   50% {
     transform: rotate(0deg) translateY(0px);
   }
+
   100% {
     transform: rotate(-18deg) translateY(-2px);
   }
@@ -1685,6 +1776,7 @@ a:focus-visible {
   0% {
     transform: rotate(-14deg);
   }
+
   100% {
     transform: rotate(16deg);
   }
@@ -1694,6 +1786,7 @@ a:focus-visible {
   0% {
     transform: rotate(14deg);
   }
+
   100% {
     transform: rotate(-14deg);
   }
@@ -1704,10 +1797,12 @@ a:focus-visible {
     transform: scaleX(0.88) scaleY(0.9);
     opacity: 0.55;
   }
+
   50% {
     transform: scaleX(1.1) scaleY(1.05);
     opacity: 0.75;
   }
+
   100% {
     transform: scaleX(0.88) scaleY(0.9);
     opacity: 0.55;
@@ -1719,9 +1814,11 @@ a:focus-visible {
   0% {
     transform: translateY(0px) rotate(-3.5deg);
   }
+
   40% {
     transform: translateY(-13px) rotate(1deg);
   }
+
   100% {
     transform: translateY(1px) rotate(3.5deg);
   }
@@ -1731,9 +1828,11 @@ a:focus-visible {
   0% {
     transform: rotate(-24deg) translateY(-4px);
   }
+
   50% {
     transform: rotate(2deg) translateY(-8px);
   }
+
   100% {
     transform: rotate(20deg) translateY(0px);
   }
@@ -1743,9 +1842,11 @@ a:focus-visible {
   0% {
     transform: rotate(20deg) translateY(0px);
   }
+
   50% {
     transform: rotate(-4deg) translateY(-8px);
   }
+
   100% {
     transform: rotate(-24deg) translateY(-4px);
   }
@@ -1755,6 +1856,7 @@ a:focus-visible {
   0% {
     transform: rotate(-18deg);
   }
+
   100% {
     transform: rotate(22deg);
   }
@@ -1764,6 +1866,7 @@ a:focus-visible {
   0% {
     transform: rotate(18deg);
   }
+
   100% {
     transform: rotate(-18deg);
   }
@@ -1774,10 +1877,12 @@ a:focus-visible {
     transform: scale(0.95);
     opacity: 0.65;
   }
+
   45% {
     transform: scale(0.7);
     opacity: 0.32;
   }
+
   100% {
     transform: scale(1.06);
     opacity: 0.75;
@@ -2142,6 +2247,66 @@ a:focus-visible {
   border-color: rgba(255, 255, 255, 0.28);
 }
 
+/* Botón flotante Liquid Glass de salto (Especial para móviles y pantallas táctiles) */
+.stage-jump-btn {
+  position: absolute;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  right: calc(1.5rem + env(safe-area-inset-right, 0px));
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.15rem;
+  min-height: 42px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stage-jump-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.stage-jump-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.32);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.stage-jump-btn:hover svg {
+  transform: translateY(-2px);
+}
+
+.stage-jump-btn:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+@media (max-width: 640px) {
+  .stage-jump-btn {
+    bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+    right: calc(1rem + env(safe-area-inset-right, 0px));
+    padding: 0.55rem 0.95rem;
+    font-size: 0.8rem;
+    min-height: 38px;
+  }
+}
+
 /* Tarjeta minimalista de muestra de roca (Liquid Glass Centrado) */
 .sample-discovery-card {
   border-radius: 26px !important;
@@ -2452,6 +2617,7 @@ a:focus-visible {
     opacity: 0;
     transform: translate(-50%, -85%) scale(0.85);
   }
+
   100% {
     opacity: 1;
     transform: translate(-50%, -100%) scale(1);
@@ -2467,6 +2633,7 @@ a:focus-visible {
     opacity: 0;
     transform: translate(-50%, 0px) scale(0.85);
   }
+
   100% {
     opacity: 1;
     transform: translate(-50%, 16px) scale(1);
@@ -2698,6 +2865,7 @@ a:focus-visible {
     opacity: 0;
     transform: translate(-50%, -75%) scale(0.75);
   }
+
   100% {
     opacity: 1;
     transform: translate(-50%, -100%) scale(1);
@@ -2829,10 +2997,12 @@ a:focus-visible {
   body * {
     visibility: hidden;
   }
+
   #certificate-modal,
   #certificate-modal * {
     visibility: visible;
   }
+
   #certificate-modal {
     position: absolute;
     left: 0;
@@ -2846,6 +3016,7 @@ a:focus-visible {
     padding: 0 !important;
     margin: 0 !important;
   }
+
   #certificate-modal .squircle-panel {
     border: none !important;
     box-shadow: none !important;
@@ -2853,11 +3024,13 @@ a:focus-visible {
     max-width: 100% !important;
     background: transparent !important;
   }
+
   #certificate-modal .relative.w-full.flex,
   #certificate-modal .w-full.flex.flex-col.sm\:flex-row,
   #certificate-modal .w-full.flex.flex-wrap {
     display: none !important;
   }
+
   #certificate-svg-wrapper {
     border: none !important;
     box-shadow: none !important;
@@ -2865,6 +3038,7 @@ a:focus-visible {
     width: 100vw !important;
     height: 100vh !important;
   }
+
   #certificate-svg-wrapper svg {
     width: 100vw !important;
     height: 100vh !important;
