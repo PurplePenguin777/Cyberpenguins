@@ -3020,62 +3020,62 @@
   const SAMPLE_DETAILS = {
     'sample-moon-1': {
       title: 'Basalto lunar de olivino',
-      site: 'Misión Apolo 12 · Oceanus Procellarum',
+      site: 'Encontrado en: Oceanus Procellarum (en la Luna)',
       desc: 'Roca volcánica oscura rica en hierro y magnesio. Se formó hace 3,200 millones de años cuando inmensos ríos de lava líquida llenaron esta planicie de la Luna.'
     },
     'sample-moon-2': {
       title: 'Brecha de impacto lunar',
-      site: 'Cráter Surveyor · La Luna',
+      site: 'Encontrado en: cráter Surveyor (en la Luna)',
       desc: 'Fragmentos de distintas rocas que se trituraron y soldaron juntas por el tremendo calor y la presión cuando un asteroide chocó contra la superficie lunar.'
     },
     'sample-moon-3': {
       title: 'Regolito lunar aglutinado',
-      site: 'Llanura de Procellarum · La Luna',
+      site: 'Encontrado en: llanura de Procellarum (en la Luna)',
       desc: 'Suelo fino formado por polvo y pequeños cristales triturados durante miles de millones de años por el bombardeo continuo de micrometeoritos en el vacío.'
     },
     'sample-moon-4': {
       title: 'Basalto ilmenítico (rico en titanio)',
-      site: 'Misión Apolo 11 · Mare Tranquillitatis',
+      site: 'Encontrado en: Mare Tranquillitatis (en la Luna)',
       desc: 'Muestra traída por Neil Armstrong. Es muy rica en ilmenita, un mineral de hierro y titanio del que los científicos pueden extraer oxígeno para respirar.'
     },
     'sample-moon-5': {
       title: 'Anortosita (corteza primordial)',
-      site: 'Tierras altas lunares · La Luna',
+      site: 'Encontrado en: tierras altas lunares (en la Luna)',
       desc: 'Un pedazo de la corteza original de la Luna de hace 4,400 millones de años. Flotó sobre un océano global de magma cuando la Luna recién se había formado.'
     },
     'sample-moon-6': {
       title: 'Esférula de vidrio volcánico',
-      site: 'Misión Apolo 11 · Mare Tranquillitatis',
+      site: 'Encontrado en: Mare Tranquillitatis (en la Luna)',
       desc: 'Diminuta canica de vidrio natural. Nació cuando fuentes de fuego volcánico lanzaron gotas de lava al frío del espacio, congelándose antes de caer.'
     },
     'sample-mars-1': {
       title: 'Basalto vesicular marciano',
-      site: 'Misión Viking 1 · Chryse Planitia',
+      site: 'Encontrado en: llanura de Chryse Planitia (en Marte)',
       desc: 'Piedra de lava volcánica llena de agujeros formados por gases calientes. Su tono rojizo proviene del polvo de óxido de hierro que cubre todo el planeta.'
     },
     'sample-mars-2': {
       title: 'Concreción de hematita («arándano»)',
-      site: 'Llanuras sedimentarias · Marte',
+      site: 'Encontrado en: llanuras sedimentarias (en Marte)',
       desc: 'Pequeña esfera mineral de óxido de hierro. Solo puede crecer dentro de agua líquida subterránea, demostrando que Marte tuvo agua en su pasado remoto.'
     },
     'sample-mars-3': {
       title: 'Costra duricrust de sulfato',
-      site: 'Misión Viking 1 · Chryse Planitia',
+      site: 'Encontrado en: llanura de Chryse Planitia (en Marte)',
       desc: 'Capa endurecida de sales descubierta por el brazo del robot Viking 1. Quedó sobre el suelo cuando lagos marcianos minerales se evaporaron al secarse.'
     },
     'sample-mars-4': {
       title: 'Roca andesítica «Barnacle Bill»',
-      site: 'Mars Pathfinder / Sojourner · Ares Vallis',
+      site: 'Encontrado en: valle de Ares Vallis (en Marte)',
       desc: 'La primera roca alienígena analizada por el rover Sojourner en 1997. Su alto contenido de sílice demostró que Marte tuvo volcanes muy evolucionados.'
     },
     'sample-mars-5': {
       title: 'Megabloque basáltico «Yogi»',
-      site: 'Mars Pathfinder / Sojourner · Ares Vallis',
+      site: 'Encontrado en: valle de Ares Vallis (en Marte)',
       desc: 'Roca volcánica de 1.5 metros de alto arrastrada y pulida por una catástrofe de agua: una inundación gigante que recorrió este valle hace millones de años.'
     },
     'sample-mars-6': {
       title: 'Sedimento cementado «Scooby Doo»',
-      site: 'Mars Pathfinder · Ares Vallis',
+      site: 'Encontrado en: valle de Ares Vallis (en Marte)',
       desc: 'Capa de suelo mineral duro y resistente. Cuando el pequeño rover Sojourner intentó rasparla con sus ruedas de metal, la roca no sufrió ningún daño.'
     }
   };
@@ -3083,62 +3083,62 @@
   const SAMPLE_DETAILS_EN = {
     'sample-moon-1': {
       title: 'Olivine lunar basalt',
-      site: 'Apollo 12 mission · Oceanus Procellarum',
+      site: 'Found in: Oceanus Procellarum (on the Moon)',
       desc: 'Dark volcanic rock rich in iron and magnesium. Formed 3.2 billion years ago when massive rivers of liquid lava flooded this lunar plain.'
     },
     'sample-moon-2': {
       title: 'Lunar impact breccia',
-      site: 'Surveyor Crater · The Moon',
+      site: 'Found in: Surveyor Crater (on the Moon)',
       desc: 'Fragments of varied rocks pulverized and fused together by immense heat and pressure when an asteroid struck the lunar surface.'
     },
     'sample-moon-3': {
       title: 'Agglutinate lunar regolith',
-      site: 'Procellarum Plains · The Moon',
+      site: 'Found in: Procellarum plains (on the Moon)',
       desc: 'Fine soil composed of pulverized dust and tiny crystals created over billions of years by micrometeorite impacts in the vacuum of space.'
     },
     'sample-moon-4': {
       title: 'Ilmenite basalt (titanium-rich)',
-      site: 'Apollo 11 mission · Mare Tranquillitatis',
+      site: 'Found in: Mare Tranquillitatis (on the Moon)',
       desc: 'Sample retrieved by Neil Armstrong. Abundant in ilmenite, an iron-titanium mineral from which future explorers can extract breathable oxygen.'
     },
     'sample-moon-5': {
       title: 'Anorthosite (primordial crust)',
-      site: 'Lunar highlands · The Moon',
+      site: 'Found in: lunar highlands (on the Moon)',
       desc: 'A piece of the Moon\'s original crust dating back 4.4 billion years. It floated atop a global magma ocean when the Moon was newly formed.'
     },
     'sample-moon-6': {
       title: 'Volcanic glass spherule',
-      site: 'Apollo 11 mission · Mare Tranquillitatis',
+      site: 'Found in: Mare Tranquillitatis (on the Moon)',
       desc: 'Tiny natural glass bead. Created when ancient lunar fire fountains sprayed molten droplets into the freeze of space, chilling before hitting the ground.'
     },
     'sample-mars-1': {
       title: 'Martian vesicular basalt',
-      site: 'Viking 1 mission · Chryse Planitia',
+      site: 'Found in: Chryse Planitia plains (on Mars)',
       desc: 'Volcanic lava rock dotted with gas bubbles. Its rusty tone comes from iron oxide dust covering the entire planet.'
     },
     'sample-mars-2': {
       title: 'Hematite concretion («blueberry»)',
-      site: 'Sedimentary plains · Mars',
+      site: 'Found in: sedimentary plains (on Mars)',
       desc: 'Small spherical iron oxide mineral. Only forms in the presence of liquid groundwater, proving that Mars was once a watery world.'
     },
     'sample-mars-3': {
       title: 'Duricrust sulfate crust',
-      site: 'Viking 1 mission · Chryse Planitia',
+      site: 'Found in: Chryse Planitia plains (on Mars)',
       desc: 'Hardened salt crust uncovered by Viking 1\'s robotic arm. Left behind as ancient mineral-rich Martian lakes evaporated.'
     },
     'sample-mars-4': {
       title: 'Andesite rock «Barnacle Bill»',
-      site: 'Mars Pathfinder / Sojourner · Ares Vallis',
+      site: 'Found in: Ares Vallis (on Mars)',
       desc: 'The very first extraterrestrial rock analyzed by Sojourner in 1997. High silica content revealed complex volcanic evolution on Mars.'
     },
     'sample-mars-5': {
       title: 'Basaltic megaboulder «Yogi»',
-      site: 'Mars Pathfinder / Sojourner · Ares Vallis',
+      site: 'Found in: Ares Vallis (on Mars)',
       desc: 'A 1.5-meter-high volcanic boulder smoothed and dragged by a catastrophic ancient flood that surged through Ares Vallis millions of years ago.'
     },
     'sample-mars-6': {
       title: 'Cemented sediment «Scooby Doo»',
-      site: 'Mars Pathfinder · Ares Vallis',
+      site: 'Found in: Ares Vallis (on Mars)',
       desc: 'Tough, hard mineral crust. When Sojourner attempted to scrape it with its metal wheels, the rock stood firm without a scratch.'
     }
   };
@@ -3148,9 +3148,12 @@
     pendingSampleToCollect = { chapter, sampleObj };
     const isEn = (state.currentLanguage === 'en');
     const detailsMap = isEn ? SAMPLE_DETAILS_EN : SAMPLE_DETAILS;
+    const fallbackSite = isEn
+      ? `Found in: ${chapter.name}`
+      : `Encontrado en: ${chapter.name}`;
     const details = detailsMap[sampleObj.id] || {
       title: sampleObj.label || (isEn ? 'Space rock' : 'Roca espacial'),
-      site: chapter.name,
+      site: fallbackSite,
       desc: isEn
         ? 'A rock fragment gathered on the surface to keep and analyze in your passport.'
         : 'Un fragmento de roca recogido en la superficie para guardar y analizar en tu pasaporte.'
@@ -3160,7 +3163,7 @@
       dom.sampleDiscoveryTitle.textContent = details.title || sampleObj.label || (isEn ? 'Space rock' : 'Roca espacial');
     }
     if (dom.sampleDiscoverySite) {
-      dom.sampleDiscoverySite.textContent = details.site || chapter.name;
+      dom.sampleDiscoverySite.textContent = details.site || fallbackSite;
     }
     if (dom.sampleDiscoveryDesc) {
       dom.sampleDiscoveryDesc.textContent = details.desc;
