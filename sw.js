@@ -3,7 +3,7 @@
    Permite instalar la aplicación y jugar sin conexión a internet.
    ========================================================= */
 
-const CACHE_NAME = 'cyberpenguins-v5';
+const CACHE_NAME = 'cyberpenguins-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -80,14 +80,14 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html')))
+        .catch(() => caches.match(event.request, { ignoreSearch: true }).then((res) => res || caches.match('./index.html', { ignoreSearch: true })))
     );
     return;
   }
 
   // Cache First para recursos estáticos pesados
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
       if (cachedResponse) return cachedResponse;
       return fetch(event.request)
         .then((networkResponse) => {
@@ -98,7 +98,7 @@ self.addEventListener('fetch', (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
           return networkResponse;
         })
-        .catch(() => caches.match('./index.html'));
+        .catch(() => caches.match('./index.html', { ignoreSearch: true }));
     })
   );
 });
