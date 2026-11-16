@@ -329,11 +329,14 @@
 
   function init() {
     if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && window.location && window.location.protocol.startsWith('http')) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
+      const registerSW = () => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          if (reg && typeof reg.update === 'function') reg.update();
+        }).catch(() => {});
+      };
+      window.addEventListener('load', registerSW);
       if (document.readyState === 'complete') {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        registerSW();
       }
     }
 
