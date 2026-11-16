@@ -1305,20 +1305,7 @@ a:focus-visible {
 }
 
 .entity-status-dot {
-  margin-top: 4px;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--accent-warm);
-  border: 1.5px solid rgba(255, 255, 255, 0.68);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-  pointer-events: none;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.entity-status-dot.done {
-  background: var(--accent-mint);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+  display: none !important;
 }
 
 .entity-dot {

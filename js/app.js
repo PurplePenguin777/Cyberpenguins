@@ -1767,7 +1767,6 @@
       inSpaceFlight: inSpace
     })}
           </div>
-          <span class="entity-status-dot ${reqs.canLeave ? 'done' : ''}" aria-hidden="true"></span>
         </button>
       </div>
     `);
@@ -1787,7 +1786,6 @@
               </div>
             ` : ''}
             <div class="entity-svg-wrap">${modelSvg}</div>
-            <span class="entity-status-dot ${inspected ? 'done' : ''}" aria-hidden="true"></span>
           </button>
         </div>
       `);
