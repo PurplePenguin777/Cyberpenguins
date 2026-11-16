@@ -122,6 +122,7 @@
   let pendingSampleToCollect = null;
   let activeBranchState = null;
   let thoughtBubbleTimer = null;
+  let activeAmbientThought = null;
   let lastRenderedDir = null;
 
   const dom = {};
@@ -162,6 +163,9 @@
       try {
         global.localStorage.setItem('cyberpenguins_lang_manual', 'true');
       } catch (_e) {}
+    }
+    if (TTS && typeof TTS.stop === 'function') {
+      TTS.stop();
     }
     saveState();
     updateLanguageUI();
@@ -300,6 +304,23 @@
       const { activeMachine } = getActiveSite(chapter);
       updateLocationPill(chapter, activeMachine);
       renderStageEntities(chapter);
+
+      if (dom.speechBubbleNextBtn) {
+        dom.speechBubbleNextBtn.textContent = isEn ? 'Continue ▶' : 'Continuar ▶';
+      }
+
+      // Actualizar globo de pensamiento si está activo
+      if (dom.stageThoughtBubble && !dom.stageThoughtBubble.classList.contains('is-hidden') && activeAmbientThought) {
+        const allThoughts = DATA.getAmbientThoughts ? DATA.getAmbientThoughts(state.currentLanguage) : DATA.AMBIENT_THOUGHTS;
+        if (allThoughts && allThoughts[activeAmbientThought.chapterId] && allThoughts[activeAmbientThought.chapterId][activeAmbientThought.index]) {
+          dom.thoughtBubbleText.textContent = allThoughts[activeAmbientThought.chapterId][activeAmbientThought.index];
+        }
+      }
+
+      // Actualizar prompt de interacción contextual ("Guardar en la mochila" / "Store in backpack")
+      if (activeInteractable && dom.stageActionPrompt && !dom.stageActionPrompt.classList.contains('is-hidden')) {
+        showStageActionPrompt(activeInteractable.type, activeInteractable.target, activeInteractable.onAction);
+      }
 
       // Si hay un globo de diálogo abierto, actualizar al nuevo idioma
       if (activeBranchState && activeBranchState.machine) {
@@ -1755,8 +1776,11 @@
       parts.push(`
         <div class="stage-entity" data-sort-y="${sampleObj.pos.y}" style="left: ${sampleObj.pos.x}%; top: ${sampleObj.pos.y}%;">
           <button ${btnIdAttr}type="button" class="stage-hotspot sample-hotspot" data-sample-id="${sampleObj.id}" aria-label="${sampleObj.label}">
+            <div class="sample-beacon" aria-hidden="true">
+              <span class="sample-beacon-star">✦</span>
+              <span class="sample-beacon-ring"></span>
+            </div>
             <div class="entity-svg-wrap">${MODELS.sampleCrystal(chapter.id, sampleObj.variant || 0)}</div>
-            <span class="entity-status-dot" aria-hidden="true"></span>
           </button>
         </div>
       `);
@@ -2047,8 +2071,9 @@
     const allThoughts = DATA.getAmbientThoughts ? DATA.getAmbientThoughts(state.currentLanguage) : DATA.AMBIENT_THOUGHTS;
     if (allThoughts && allThoughts[chapter.id]) {
       const thoughts = allThoughts[chapter.id];
-      const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
-      showPenguinThought(thought);
+      const randomIndex = Math.floor(Math.random() * thoughts.length);
+      activeAmbientThought = { chapterId: chapter.id, index: randomIndex };
+      showPenguinThought(thoughts[randomIndex]);
     }
 
     if (!chapter.hasSurface) {
@@ -2101,7 +2126,7 @@
     if (type === 'sample' && target && target.pos) {
       objX = target.pos.x;
       objY = target.pos.y;
-      offsetY = -8;
+      offsetY = -2.5; // Directamente encima de la roca (cerca de la roca, no sobre el pingüino)
     } else if (type === 'machine' && target && target.pos) {
       objX = target.pos.x;
       objY = target.pos.y;
@@ -2119,6 +2144,7 @@
     const py = Math.max(10, Math.min(88, objY + offsetY));
     dom.stageActionPrompt.style.left = `${px}%`;
     dom.stageActionPrompt.style.top = `${py}%`;
+    dom.stageActionPrompt.classList.toggle('prompt-for-sample', type === 'sample');
     dom.stageActionPrompt.classList.remove('is-hidden');
   }
 
@@ -2530,7 +2556,8 @@
       if (dom.stageThoughtBubble) {
         dom.stageThoughtBubble.classList.add('is-hidden');
       }
-    }, 4200);
+      activeAmbientThought = null;
+    }, 4500);
   }
 
   function showSpeechBubbleStep({ speaker, name, avatarSvg, text, audioUrl, anchorPos, choices, onNext, onChoice }) {

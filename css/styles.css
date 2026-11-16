@@ -1247,9 +1247,53 @@ a:focus-visible {
   background: var(--accent-mint);
 }
 
-/* Rocas científicas semienterradas con resaltado geológico natural (sin luces ni estrellas) */
+/* Rocas científicas semienterradas con resaltado geológico e indicador permanente */
+.sample-hotspot {
+  position: relative;
+}
+
 .sample-hotspot .entity-status-dot {
   display: none;
+}
+
+/* Indicador permanente flotante sobre rocas con muestras recolectables */
+.sample-beacon {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+  animation: sampleBeaconBob 2.2s ease-in-out infinite alternate;
+}
+
+.sample-beacon-star {
+  font-size: 0.92rem;
+  color: #38bdf8;
+  filter: drop-shadow(0 0 6px #38bdf8);
+  line-height: 1;
+}
+
+.sample-beacon-ring {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  animation: sampleBeaconPulse 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+@keyframes sampleBeaconBob {
+  0% { transform: translateX(-50%) translateY(0); }
+  100% { transform: translateX(-50%) translateY(-5px); }
+}
+
+@keyframes sampleBeaconPulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 
 .sample-hotspot .entity-svg-wrap {
@@ -1932,7 +1976,7 @@ a:focus-visible {
   z-index: 85;
   pointer-events: auto;
   transform: translate(-50%, -100%);
-  margin-top: -14px;
+  margin-top: -6px;
   transition: opacity 0.22s ease, transform 0.25s var(--spring-smooth);
 }
 
@@ -1943,6 +1987,7 @@ a:focus-visible {
 }
 
 .stage-action-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1961,6 +2006,29 @@ a:focus-visible {
   white-space: nowrap;
   cursor: pointer;
   transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Flecha indicadora apuntando directamente al interactuable (roca, nave o máquina) */
+.stage-action-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(15, 23, 42, 0.94);
+}
+
+.stage-action-prompt.prompt-for-sample .stage-action-btn {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 14px rgba(56, 189, 248, 0.2);
+}
+
+.stage-action-prompt.prompt-for-sample .stage-action-btn::after {
+  border-top-color: rgba(15, 23, 42, 0.94);
 }
 
 .stage-action-btn:hover {
@@ -2414,7 +2482,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   Globo de Pensamiento Flotante de Cyberpenguin (💭 Ambient Thoughts)
+   Globo de Pensamiento Flotante de Cyberpenguin (Estilo Cómic / Nube Flotante)
    ========================================================================== */
 
 .stage-thought-bubble {
@@ -2422,80 +2490,114 @@ a:focus-visible {
   z-index: 115;
   pointer-events: none;
   transform: translate(-50%, -100%);
-  margin-top: -12px;
-  animation: thoughtBubbleFadeIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-  transition: left 0.3s ease, top 0.3s ease;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55));
+  margin-top: -16px;
+  animation: thoughtBubblePopIn 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  transition: left 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), top 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  filter: drop-shadow(0 14px 28px rgba(4, 8, 24, 0.65));
 }
 
-@keyframes thoughtBubbleFadeIn {
-  from {
+@keyframes thoughtBubblePopIn {
+  0% {
     opacity: 0;
-    transform: translate(-50%, -75%) scale(0.8);
+    transform: translate(-50%, -75%) scale(0.75);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translate(-50%, -100%) scale(1);
   }
 }
 
 .thought-bubble-content {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-radius: 20px;
-  background: rgba(15, 23, 42, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 2px dashed rgba(56, 189, 248, 0.45);
-  padding: 0.55rem 0.95rem;
-  max-width: 290px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  position: relative;
+  background: radial-gradient(circle at 40% 25%, rgba(22, 34, 64, 0.96), rgba(10, 16, 32, 0.97));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(56, 189, 248, 0.7);
+  border-radius: 28px;
+  padding: 0.85rem 1.2rem;
+  max-width: min(88vw, 320px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 18px rgba(56, 189, 248, 0.18),
+    0 12px 30px rgba(0, 0, 0, 0.55);
 }
 
-.thought-bubble-icon {
-  font-size: 1.15rem;
-  flex-shrink: 0;
-  animation: thoughtIconBob 2s ease-in-out infinite alternate;
+/* Ondulaciones y lóbulos de nube de cómic */
+.thought-bubble-content::before {
+  content: '';
+  position: absolute;
+  top: -13px;
+  left: 20%;
+  width: 46px;
+  height: 24px;
+  border-radius: 50% 50% 0 0;
+  background: rgba(18, 28, 54, 0.97);
+  border-top: 2px solid rgba(56, 189, 248, 0.7);
+  border-left: 1.5px solid rgba(56, 189, 248, 0.45);
+  border-right: 1.5px solid rgba(56, 189, 248, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 1;
 }
 
-@keyframes thoughtIconBob {
-  from { transform: translateY(0); }
-  to { transform: translateY(-3px); }
+.thought-bubble-content::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  right: 22%;
+  width: 36px;
+  height: 18px;
+  border-radius: 50% 50% 0 0;
+  background: rgba(18, 28, 54, 0.97);
+  border-top: 2px solid rgba(56, 189, 248, 0.7);
+  border-left: 1.5px solid rgba(56, 189, 248, 0.45);
+  border-right: 1.5px solid rgba(56, 189, 248, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 1;
 }
 
 .thought-bubble-text {
-  font-size: 0.82rem;
-  line-height: 1.4;
-  color: #e2e8f0;
+  position: relative;
+  z-index: 2;
+  font-size: 0.88rem;
+  line-height: 1.48;
+  color: #f8fafc;
   font-weight: 500;
   text-align: left;
+  letter-spacing: 0.01em;
 }
 
+/* Cola de burbujas redondeadas de pensamiento descendente hacia la cabeza del personaje */
 .thought-bubble-trail {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 3px;
-  gap: 2px;
+  gap: 3px;
 }
 
 .thought-bubble-trail .trail-dot {
   display: block;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1.5px dashed rgba(56, 189, 248, 0.45);
+  background: rgba(14, 22, 44, 0.96);
+  border: 1.5px solid rgba(56, 189, 248, 0.7);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), 0 0 8px rgba(56, 189, 248, 0.2);
 }
 
 .thought-bubble-trail .dot-1 {
-  width: 9px;
-  height: 9px;
+  width: 13px;
+  height: 13px;
 }
 
 .thought-bubble-trail .dot-2 {
-  width: 6px;
-  height: 6px;
-  opacity: 0.8;
+  width: 8px;
+  height: 8px;
+  opacity: 0.88;
+}
+
+.thought-bubble-trail .dot-3 {
+  width: 5px;
+  height: 5px;
+  opacity: 0.75;
 }
 
 /* Certificado minimalista y Diploma de Honor */
