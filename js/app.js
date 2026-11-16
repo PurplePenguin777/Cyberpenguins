@@ -3909,64 +3909,51 @@
 
     const items = isEn ? [
       {
-        icon: '🐾',
         title: 'Walk and move',
-        desc: 'Click or tap anywhere on the terrain to send Cyberpenguin walking. Obstacle avoidance is calculated automatically.'
+        desc: 'Click or tap anywhere on the terrain.<br>Cyberpenguin avoids obstacles automatically.'
       },
       {
-        icon: '🦘',
         title: 'Gravity jumps',
-        desc: 'Press the floating Jump button, hit Spacebar, swipe up or double-tap. Jump physics, height, and hang time accurately reflect each celestial world.'
+        desc: 'Use the jump button, spacebar, swipe up or double-tap.<br>Height and hang time match the real physics of each world.'
       },
       {
-        icon: '🛰️',
         title: 'Talk to historical spacecraft',
-        desc: 'Approach robotic explorers like Surveyor 3, Apollo 11 Eagle or Viking 1 to discover authentic mission history and voice interactions.'
+        desc: 'Approach robotic explorers like Surveyor 3 or Viking 1<br>to discover authentic mission history and data.'
       },
       {
-        icon: '💎',
         title: 'Geological rock samples',
-        desc: 'Discover and collect real geological extraterrestrial rocks on the ground to store them in your astronaut backpack.'
+        desc: 'Find and collect authentic extraterrestrial rock samples<br>to store them in your astronaut backpack.'
       },
       {
-        icon: '🚀',
         title: 'Quiz and takeoff',
-        desc: 'Return to your landing ship to complete the mission quiz, earn stars in your passport, and set course for your next cosmic destination.'
+        desc: 'Return to the ship to answer the mission quiz,<br>earn stars and travel to the next cosmic destination.'
       }
     ] : [
       {
-        icon: '🐾',
         title: 'Caminar y explorar',
-        desc: 'Toca o haz clic en cualquier lugar del terreno para mover a Cyberpenguin. El cálculo de rutas esquivará obstáculos automáticamente.'
+        desc: 'Toca o haz clic en cualquier lugar del terreno.<br>Cyberpenguin esquivará los obstáculos automáticamente.'
       },
       {
-        icon: '🦘',
         title: 'Saltos con gravedad auténtica',
-        desc: 'Usa el botón flotante Saltar, la barra espaciadora, desliza hacia arriba o haz doble toque. La altura y flotabilidad reflejan la física real de cada mundo (Luna, Marte, Asteroide Eros, Espacio profundo).'
+        desc: 'Usa el botón saltar, espacio, desliza hacia arriba o doble toque.<br>La altura y flotabilidad reflejan la física real de cada mundo.'
       },
       {
-        icon: '🛰️',
         title: 'Hablar con sondas históricas',
-        desc: 'Acércate a los robots exploradores como Surveyor 3, Apolo 11 Eagle o Viking 1 para conocer su historia y datos verificados de sus misiones.'
+        desc: 'Acércate a los robots exploradores como Surveyor 3 o Viking 1<br>para conocer su historia y datos verificados de sus misiones.'
       },
       {
-        icon: '💎',
         title: 'Muestras geológicas',
-        desc: 'Encuentra y recoge fragmentos de rocas extraterrestres auténticas en el suelo para guardarlas en tu mochila de exploración.'
+        desc: 'Encuentra y recoge fragmentos de rocas extraterrestres auténticas<br>para guardarlas en tu mochila de exploración.'
       },
       {
-        icon: '🚀',
         title: 'Cuestionario y despegue',
-        desc: 'Vuelve a la nave para responder el cuestionario interactivo, ganar estrellas en tu pasaporte y viajar al siguiente destino cósmico.'
+        desc: 'Vuelve a la nave para responder el cuestionario estelar,<br>ganar estrellas y viajar al siguiente destino cósmico.'
       }
     ];
 
     dom.howToPlayContent.innerHTML = items.map((it) => `
       <div class="info-item-card">
-        <div class="flex items-center justify-center gap-1.5">
-          <span class="text-sm" aria-hidden="true">${it.icon}</span>
-          <span class="info-item-title">${it.title}</span>
-        </div>
+        <span class="info-item-title">${it.title}</span>
         <p class="info-item-desc">${it.desc}</p>
       </div>
     `).join('');
@@ -3998,49 +3985,15 @@
       dom.aboutProjectCloseBtn.textContent = isEn ? 'Close' : 'Cerrar';
     }
 
-    const items = isEn ? [
-      {
-        icon: '🌌',
-        title: 'Tribute to robotic explorers',
-        desc: 'Cyberpenguin is an educational science tribute celebrating the historic probes, landers, and orbiters that pioneered space exploration and must never be forgotten.'
-      },
-      {
-        icon: '🔬',
-        title: 'Scientific and physical realism',
-        desc: 'Every chapter incorporates authentic planetary gravity profiles, proportional astronomical distances, and validated historical mission records from NASA and planetary science.'
-      },
-      {
-        icon: '✨',
-        title: 'Modern and accessible experience',
-        desc: 'Built with native web standards as an installable PWA, featuring interactive natural voice synthesis (TTS), spatial binaural audio, fluid touch controls, and a printable honorary astronaut diploma.'
-      }
-    ] : [
-      {
-        icon: '🌌',
-        title: 'Homenaje a los pioneros espaciales',
-        desc: 'Cyberpenguin es un proyecto educativo de divulgación científica creado para rendir tributo a las sondas, robots y módulos espaciales que abrieron el camino al cosmos y que nunca debemos olvidar.'
-      },
-      {
-        icon: '🔬',
-        title: 'Realismo físico y científico',
-        desc: 'Cada capítulo cuenta con perfiles gravitatorios exactos, distancias proporcionales reales y registros históricos validados con datos de misiones de la NASA y la ciencia planetaria.'
-      },
-      {
-        icon: '✨',
-        title: 'Experiencia moderna y accesible',
-        desc: 'Desarrollado con estándares web nativos en arquitectura PWA instalable, con síntesis de voz natural (TTS), audio espacial binaural, controles táctiles y diploma de honor astronáutico descargable.'
-      }
-    ];
+    const message = isEn
+      ? 'Created with love by team Cyberpenguins<br>for the NASA Space Apps Challenge 2026'
+      : 'Creado con cariño por el team Cyberpenguins<br>para el NASA Space Apps Challenge 2026';
 
-    dom.aboutProjectContent.innerHTML = items.map((it) => `
-      <div class="info-item-card">
-        <div class="flex items-center justify-center gap-1.5">
-          <span class="text-sm" aria-hidden="true">${it.icon}</span>
-          <span class="info-item-title">${it.title}</span>
-        </div>
-        <p class="info-item-desc">${it.desc}</p>
+    dom.aboutProjectContent.innerHTML = `
+      <div class="info-about-card">
+        <p class="info-about-text">${message}</p>
       </div>
-    `).join('');
+    `;
   }
 
   function openAboutProjectModal() {
