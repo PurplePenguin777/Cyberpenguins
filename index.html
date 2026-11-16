@@ -38,7 +38,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link rel="stylesheet" href="css/styles.css?v=20261115g" />
+  <link rel="stylesheet" href="css/styles.css?v=20261115h" />
 </head>
 <body class="font-sans antialiased">
   <div class="starfield" aria-hidden="true"></div>
@@ -325,25 +325,21 @@
           </button>
         </div>
 
-        <!-- Botón de pausa rápida -->
-        <button id="pause-btn" type="button" aria-label="Menú de pausa" class="pause-btn squircle-btn">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="9" y1="5" x2="9" y2="19" />
-            <line x1="15" y1="5" x2="15" y2="19" />
-          </svg>
-        </button>
-
-        <!-- Control minimalista de paisaje sonoro ambiental -->
-        <button id="sound-toggle-btn" type="button" aria-label="Alternar sonido ambiental" aria-pressed="true"
-          class="sound-toggle-btn squircle-btn">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <path class="sound-wave-1" d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-            <path class="sound-wave-2" d="M18.7 5.3a9.5 9.5 0 0 1 0 13.4" />
-          </svg>
-        </button>
+        <!-- Control minimalista liquid glass de volumen -->
+        <div id="sound-control-group" class="sound-control-group" role="group" aria-label="Control de sonido">
+          <button id="sound-toggle-btn" type="button" aria-label="Silenciar sonido" class="sound-toggle-btn">
+            <svg id="sound-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path class="sound-wave-1" d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+              <path class="sound-wave-2" d="M18.7 5.3a9.5 9.5 0 0 1 0 13.4" />
+            </svg>
+          </button>
+          <div class="sound-slider-wrap">
+            <input id="sound-volume-slider" type="range" min="0" max="100" value="80"
+              class="sound-volume-slider" aria-label="Volumen general" />
+          </div>
+        </div>
 
         <!-- Cartela cinematográfica de capítulo -->
         <div id="chapter-title-card" class="chapter-title-card is-hidden" aria-hidden="true">
@@ -564,50 +560,28 @@
     </div>
   </div>
 
-  <!-- Modal 6: Menú de Pausa -->
-  <div id="pause-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Menú de pausa">
-    <div class="squircle-panel max-w-sm w-full p-6 flex flex-col gap-4 text-center relative">
-      <div class="relative w-full flex items-center justify-center">
-        <h2 class="text-xl font-bold tracking-tight text-white text-center">Misión en pausa</h2>
-      </div>
-      <p class="text-xs text-slate-300">Exploración detenida temporalmente.</p>
-      <div class="flex flex-col gap-2.5 mt-2">
-        <button id="pause-resume-btn" type="button"
-          class="squircle-btn w-full py-2.5 px-4 text-sm font-semibold bg-cyan-400 hover:bg-cyan-300 text-slate-950 flex items-center justify-center gap-2">
-          ▶ Continuar misión
-        </button>
-        <button id="pause-sound-btn" type="button"
-          class="squircle-btn w-full py-2 px-4 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center gap-2">
-          🔊 Alternar sonido
-        </button>
-        <button id="pause-home-btn" type="button"
-          class="squircle-btn w-full py-2 px-4 text-xs font-medium bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 flex items-center justify-center gap-2">
-          ✕ Volver al mapa principal
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <script defer src="js/data.js?v=20261115g"></script>
-  <script defer src="js/elementos/pinguino.js?v=20261115g"></script>
-  <script defer src="js/elementos/nave-pinguino.js?v=20261115g"></script>
-  <script defer src="js/elementos/surveyor-3.js?v=20261115g"></script>
-  <script defer src="js/elementos/apollo-11-eagle.js?v=20261115g"></script>
-  <script defer src="js/elementos/viking-1.js?v=20261115g"></script>
-  <script defer src="js/elementos/sojourner.js?v=20261115g"></script>
-  <script defer src="js/elementos/pioneer-10.js?v=20261115g"></script>
-  <script defer src="js/elementos/near-shoemaker.js?v=20261115g"></script>
-  <script defer src="js/elementos/tierra.js?v=20261115g"></script>
-  <script defer src="js/elementos/luna.js?v=20261115g"></script>
-  <script defer src="js/elementos/marte.js?v=20261115g"></script>
-  <script defer src="js/elementos/asteroide-eros.js?v=20261115g"></script>
-  <script defer src="js/elementos/espacio-profundo.js?v=20261115g"></script>
-  <script defer src="js/elementos/superficies.js?v=20261115g"></script>
-  <script defer src="js/elementos/cuerpos.js?v=20261115g"></script>
-  <script defer src="js/models.js?v=20261115g"></script>
-  <script defer src="js/elementos/realismo.js?v=20261115g"></script>
-  <script defer src="js/tts.js?v=20261115g"></script>
-  <script defer src="js/fx.js?v=20261115g"></script>
-  <script defer src="js/app.js?v=20261115g"></script>
+
+  <script defer src="js/data.js?v=20261115h"></script>
+  <script defer src="js/elementos/pinguino.js?v=20261115h"></script>
+  <script defer src="js/elementos/nave-pinguino.js?v=20261115h"></script>
+  <script defer src="js/elementos/surveyor-3.js?v=20261115h"></script>
+  <script defer src="js/elementos/apollo-11-eagle.js?v=20261115h"></script>
+  <script defer src="js/elementos/viking-1.js?v=20261115h"></script>
+  <script defer src="js/elementos/sojourner.js?v=20261115h"></script>
+  <script defer src="js/elementos/pioneer-10.js?v=20261115h"></script>
+  <script defer src="js/elementos/near-shoemaker.js?v=20261115h"></script>
+  <script defer src="js/elementos/tierra.js?v=20261115h"></script>
+  <script defer src="js/elementos/luna.js?v=20261115h"></script>
+  <script defer src="js/elementos/marte.js?v=20261115h"></script>
+  <script defer src="js/elementos/asteroide-eros.js?v=20261115h"></script>
+  <script defer src="js/elementos/espacio-profundo.js?v=20261115h"></script>
+  <script defer src="js/elementos/superficies.js?v=20261115h"></script>
+  <script defer src="js/elementos/cuerpos.js?v=20261115h"></script>
+  <script defer src="js/models.js?v=20261115h"></script>
+  <script defer src="js/elementos/realismo.js?v=20261115h"></script>
+  <script defer src="js/tts.js?v=20261115h"></script>
+  <script defer src="js/fx.js?v=20261115h"></script>
+  <script defer src="js/app.js?v=20261115h"></script>
 </body>
 </html>

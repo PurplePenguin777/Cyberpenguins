@@ -8,6 +8,7 @@
   'use strict';
 
   let currentAudio = null;
+  let currentVolume = 0.8;
 
   function stop() {
     if (currentAudio) {
@@ -17,6 +18,13 @@
     }
     if (typeof global.speechSynthesis !== 'undefined') {
       global.speechSynthesis.cancel();
+    }
+  }
+
+  function setVolume(val) {
+    currentVolume = Math.max(0, Math.min(1, typeof val === 'number' ? val : 0.8));
+    if (currentAudio) {
+      currentAudio.volume = currentVolume;
     }
   }
 
@@ -46,6 +54,7 @@
       utterance.lang = targetLang;
       utterance.rate = typeof rate === 'number' ? rate : 0.96;
       utterance.pitch = typeof pitch === 'number' ? pitch : 1.05;
+      utterance.volume = currentVolume;
       utterance.onstart = () => {
         if (onStart) onStart();
       };
@@ -62,6 +71,7 @@
 
     if (cleanAudioUrl) {
       currentAudio = new Audio(cleanAudioUrl);
+      currentAudio.volume = currentVolume;
       currentAudio.onplay = () => {
         if (onStart) onStart();
       };
@@ -86,6 +96,7 @@
 
   global.CYBERPENGUINS_TTS = {
     speak,
-    stop
+    stop,
+    setVolume
   };
 })(typeof window !== 'undefined' ? window : globalThis);

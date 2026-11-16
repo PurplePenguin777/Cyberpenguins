@@ -57,6 +57,8 @@
   let proximityMachineId = null;
   let isJumping = false;
   let soundEnabled = true;
+  let soundVolume = 0.8;
+  let previousVolume = 0.8;
   let audioCtx = null;
 
   // Datos gravitacionales reales por cuerpo celeste
@@ -230,17 +232,6 @@
     const quizTravelBtn = document.getElementById('quiz-travel-btn');
     if (quizTravelBtn) quizTravelBtn.textContent = isEn ? 'Travel' : 'Viajar';
 
-    const pauseTitle = dom.pauseModal ? dom.pauseModal.querySelector('h2') : null;
-    if (pauseTitle) pauseTitle.textContent = isEn ? 'Mission paused' : 'Misión en pausa';
-    const pauseSub = dom.pauseModal ? dom.pauseModal.querySelector('p') : null;
-    if (pauseSub) pauseSub.textContent = isEn ? 'Exploration temporarily on hold.' : 'Exploración detenida temporalmente.';
-    const pauseResume = document.getElementById('pause-resume-btn');
-    if (pauseResume) pauseResume.textContent = isEn ? '▶ Resume mission' : '▶ Continuar misión';
-    const pauseSound = document.getElementById('pause-sound-btn');
-    if (pauseSound) pauseSound.textContent = isEn ? '🔊 Toggle sound' : '🔊 Alternar sonido';
-    const pauseHome = document.getElementById('pause-home-btn');
-    if (pauseHome) pauseHome.textContent = isEn ? '✕ Return to main map' : '✕ Volver al mapa principal';
-
     // Textos de registro inicial de cadete (minimalista en sentence case)
     if (dom.cadetIntroTitle) {
       dom.cadetIntroTitle.textContent = isEn ? 'Welcome to Cyberpenguin' : 'Bienvenido a Cyberpenguin';
@@ -378,6 +369,7 @@
     updateHUD();
     loadChapterScene(state.currentChapterId, false);
     updateLanguageUI();
+    updateSoundUI();
     if (FX && typeof FX.pause === 'function') {
       FX.pause();
     }
@@ -443,8 +435,9 @@
     dom.stageEntitiesLayer = document.getElementById('stage-entities-layer');
     dom.stageLightingOverlay = document.getElementById('stage-lighting-overlay');
     dom.stageLocationPill = document.getElementById('stage-location-pill');
+    dom.soundControlGroup = document.getElementById('sound-control-group');
     dom.soundToggleBtn = document.getElementById('sound-toggle-btn');
-    dom.pauseBtn = document.getElementById('pause-btn');
+    dom.soundVolumeSlider = document.getElementById('sound-volume-slider');
     dom.homeLangSelector = document.getElementById('home-lang-selector');
     dom.stageLangSelector = document.getElementById('stage-lang-selector');
     dom.chapterTitleCard = document.getElementById('chapter-title-card');
@@ -519,11 +512,6 @@
     dom.printCertText = document.getElementById('print-cert-text');
     dom.downloadSvgText = document.getElementById('download-svg-text');
     dom.downloadPngText = document.getElementById('download-png-text');
-
-    dom.pauseModal = document.getElementById('pause-modal');
-    dom.pauseResumeBtn = document.getElementById('pause-resume-btn');
-    dom.pauseSoundBtn = document.getElementById('pause-sound-btn');
-    dom.pauseHomeBtn = document.getElementById('pause-home-btn');
   }
 
   function bindEvents() {
@@ -699,32 +687,10 @@
       });
     }
 
-    if (dom.pauseBtn) {
-      dom.pauseBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        togglePauseModal();
-      });
-    }
-
-    if (dom.pauseResumeBtn) {
-      dom.pauseResumeBtn.addEventListener('click', () => {
-        triggerHaptic('tap');
-        closePauseModal();
-      });
-    }
-
-    if (dom.pauseSoundBtn) {
-      dom.pauseSoundBtn.addEventListener('click', () => {
-        triggerHaptic('tap');
-        toggleSound();
-      });
-    }
-
-    if (dom.pauseHomeBtn) {
-      dom.pauseHomeBtn.addEventListener('click', () => {
-        triggerHaptic('tap');
-        closePauseModal();
-        showHomeScreen();
+    if (dom.soundVolumeSlider) {
+      dom.soundVolumeSlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value) / 100;
+        setSoundVolume(val);
       });
     }
 
@@ -734,8 +700,7 @@
       { el: dom.passportModal, onClose: () => hideModal(dom.passportModal) },
       { el: dom.badgesModal, onClose: () => hideModal(dom.badgesModal) },
       { el: dom.certificateModal, onClose: () => hideModal(dom.certificateModal) },
-      { el: dom.sampleDiscoveryModal, onClose: () => hideModal(dom.sampleDiscoveryModal) },
-      { el: dom.pauseModal, onClose: closePauseModal }
+      { el: dom.sampleDiscoveryModal, onClose: () => hideModal(dom.sampleDiscoveryModal) }
     ].forEach(({ el, onClose }) => {
       if (!el) return;
       el.addEventListener('click', (event) => {
@@ -773,8 +738,8 @@
         event.target.closest('.stage-hotspot') ||
         event.target.closest('#penguin-actor') ||
         event.target.closest('.back-home-btn') ||
-        event.target.closest('.pause-btn') ||
-        event.target.closest('.sound-toggle-btn')
+        event.target.closest('.sound-control-group') ||
+        event.target.closest('.stage-lang-selector')
       ) {
         return;
       }
@@ -787,13 +752,13 @@
       routeAndMove(safeTarget.x, safeTarget.y, checkSurfaceProximity);
     });
 
-    // Teclado (Flechas / WASD para mover, Espacio para saltar, Escape para pausar o cerrar modales)
+    // Teclado (Flechas / WASD para mover, Espacio para saltar, Escape para volver o cerrar modales)
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
         if (isBlockingModalOpen()) {
           closeAllModals();
         } else if (!dom.gameScreen.classList.contains('is-hidden')) {
-          togglePauseModal();
+          showHomeScreen();
         }
         return;
       }
@@ -951,6 +916,7 @@
     if (FX && typeof FX.pause === 'function') {
       FX.pause();
     }
+    saveState();
     dom.gameScreen.classList.add('is-hidden');
     dom.launchScreen.classList.add('is-hidden');
     dom.homeScreen.classList.remove('is-hidden');
@@ -1012,7 +978,7 @@
   }
 
   function playHarmony(type) {
-    if (!soundEnabled) return;
+    if (!soundEnabled || soundVolume <= 0) return;
     const ctx = getAudioContext();
     if (!ctx) return;
 
@@ -1031,6 +997,7 @@
 
     try {
       const now = ctx.currentTime;
+      const targetGain = Math.max(0.0001, preset.gain * (soundVolume / 0.8));
       preset.freqs.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gainNode = ctx.createGain();
@@ -1041,7 +1008,7 @@
         osc.frequency.setValueAtTime(freq, start);
 
         gainNode.gain.setValueAtTime(0.0001, start);
-        gainNode.gain.exponentialRampToValueAtTime(preset.gain, start + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(targetGain, start + 0.02);
         gainNode.gain.exponentialRampToValueAtTime(0.0001, stop);
 
         osc.connect(gainNode);
@@ -1054,13 +1021,57 @@
     }
   }
 
-  function toggleSound() {
-    soundEnabled = !soundEnabled;
-    if (dom.soundToggleBtn) {
-      dom.soundToggleBtn.classList.toggle('is-muted', !soundEnabled);
-      dom.soundToggleBtn.setAttribute('aria-pressed', String(soundEnabled));
+  function updateSoundUI() {
+    if (!dom.soundToggleBtn) return;
+    const isMuted = !soundEnabled || soundVolume <= 0;
+    dom.soundToggleBtn.classList.toggle('is-muted', isMuted);
+    dom.soundToggleBtn.setAttribute('aria-pressed', String(!isMuted));
+    dom.soundToggleBtn.setAttribute('aria-label', isMuted ? 'Activar sonido' : 'Silenciar sonido');
+
+    if (dom.soundVolumeSlider) {
+      dom.soundVolumeSlider.value = String(Math.round(soundVolume * 100));
+      const pct = Math.round(soundVolume * 100);
+      dom.soundVolumeSlider.style.background = `linear-gradient(to right, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.7) ${pct}%, rgba(255, 255, 255, 0.18) ${pct}%, rgba(255, 255, 255, 0.18) 100%)`;
     }
-    if (soundEnabled) {
+
+    const svg = document.getElementById('sound-icon-svg');
+    if (svg) {
+      if (isMuted) {
+        svg.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <line x1="22" y1="9" x2="16" y2="15" />
+          <line x1="16" y1="9" x2="22" y2="15" />
+        `;
+      } else if (soundVolume < 0.5) {
+        svg.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <path class="sound-wave-1" d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+        `;
+      } else {
+        svg.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <path class="sound-wave-1" d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          <path class="sound-wave-2" d="M18.7 5.3a9.5 9.5 0 0 1 0 13.4" />
+        `;
+      }
+    }
+  }
+
+  function setSoundVolume(val) {
+    soundVolume = Math.max(0, Math.min(1, typeof val === 'number' ? val : 0.8));
+    soundEnabled = soundVolume > 0;
+    if (typeof CYBERPENGUINS_TTS !== 'undefined' && typeof CYBERPENGUINS_TTS.setVolume === 'function') {
+      CYBERPENGUINS_TTS.setVolume(soundVolume);
+    }
+    updateSoundUI();
+  }
+
+  function toggleSound() {
+    if (soundVolume > 0) {
+      previousVolume = soundVolume;
+      setSoundVolume(0);
+    } else {
+      setSoundVolume(previousVolume > 0 ? previousVolume : 0.8);
       playHarmony('step');
     }
   }
@@ -3699,38 +3710,6 @@
     el.classList.add('is-hidden');
   }
 
-  function isPauseModalOpen() {
-    return Boolean(dom.pauseModal && !dom.pauseModal.classList.contains('is-hidden'));
-  }
-
-  function openPauseModal() {
-    if (!dom.pauseModal) return;
-    triggerHaptic('tap');
-    if (FX && typeof FX.pause === 'function') {
-      FX.pause();
-    }
-    TTS.stop();
-    showModal(dom.pauseModal);
-  }
-
-  function closePauseModal() {
-    if (!dom.pauseModal) return;
-    hideModal(dom.pauseModal);
-    if (dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden')) {
-      if (FX && typeof FX.resume === 'function') {
-        FX.resume();
-      }
-    }
-  }
-
-  function togglePauseModal() {
-    if (isPauseModalOpen()) {
-      closePauseModal();
-    } else {
-      openPauseModal();
-    }
-  }
-
   function isAnyModalOpen() {
     if (dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden')) {
       return true;
@@ -3741,8 +3720,7 @@
       dom.passportModal,
       dom.badgesModal,
       dom.certificateModal,
-      dom.sampleDiscoveryModal,
-      dom.pauseModal
+      dom.sampleDiscoveryModal
     ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
@@ -3755,13 +3733,11 @@
       dom.passportModal,
       dom.badgesModal,
       dom.certificateModal,
-      dom.sampleDiscoveryModal,
-      dom.pauseModal
+      dom.sampleDiscoveryModal
     ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
   function closeAllModals() {
-    closePauseModal();
     closeDialogueModal();
     closeQuizModal();
     hideModal(dom.passportModal);
