@@ -346,6 +346,10 @@
     if (dom.quizModal && !dom.quizModal.classList.contains('is-hidden')) {
       renderQuizModal();
     }
+
+    if (dom.sampleDiscoveryModal && !dom.sampleDiscoveryModal.classList.contains('is-hidden') && pendingSampleToCollect) {
+      openSampleDiscoveryModal(pendingSampleToCollect.chapter, pendingSampleToCollect.sampleObj);
+    }
   }
 
   function init() {
