@@ -807,6 +807,32 @@ a:focus-visible {
   text-align: center;
 }
 
+/* Distribución en computadoras / pantallas amplias para caber sin scroll */
+@media (min-width: 768px) {
+  .how-to-play-card {
+    max-width: 680px !important;
+  }
+
+  .how-to-play-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.55rem !important;
+    overflow-y: visible !important;
+    max-height: none !important;
+  }
+
+  .how-to-play-grid .info-item-card:last-child {
+    grid-column: span 2;
+    max-width: 380px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .info-item-card {
+    padding: 0.55rem 0.8rem;
+  }
+}
+
 /* Fondo cósmico: versión horizontal o vertical según la orientación */
 .home-screen .cosmic-panorama-svg.is-portrait {
   display: none;
