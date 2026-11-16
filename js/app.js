@@ -59,17 +59,17 @@
   let soundEnabled = true;
   let audioCtx = null;
 
-  // Datos gravitacionales reales de la NASA por cuerpo celeste
+  // Datos gravitacionales reales por cuerpo celeste
   const GRAVITY_PROFILES = {
     moon: {
       label: '1.62 m/s² (0.165 g)',
       gravityClass: 'gravity-moon',
       jumpClass: 'jumping-moon',
       descendClass: 'descending-moon',
-      descendDurationMs: 920,
-      stepDurationMs: 600,
-      jumpDurationMs: 1120,
-      jumpAdvanceDist: 8.5,
+      descendDurationMs: 980,
+      stepDurationMs: 640,
+      jumpDurationMs: 1320,
+      jumpAdvanceDist: 9.5,
       dustOnJump: true,
       isEva: false
     },
@@ -78,10 +78,10 @@
       gravityClass: 'gravity-mars',
       jumpClass: 'jumping-mars',
       descendClass: 'descending-mars',
-      descendDurationMs: 520,
-      stepDurationMs: 410,
-      jumpDurationMs: 520,
-      jumpAdvanceDist: 3.8,
+      descendDurationMs: 460,
+      stepDurationMs: 380,
+      jumpDurationMs: 460,
+      jumpAdvanceDist: 3.5,
       dustOnJump: true,
       isEva: false
     },
@@ -90,10 +90,10 @@
       gravityClass: 'gravity-eros',
       jumpClass: 'jumping-eros',
       descendClass: 'descending-eva',
-      descendDurationMs: 1080,
-      stepDurationMs: 800,
-      jumpDurationMs: 1480,
-      jumpAdvanceDist: 10.5,
+      descendDurationMs: 1400,
+      stepDurationMs: 950,
+      jumpDurationMs: 2500,
+      jumpAdvanceDist: 14.0,
       dustOnJump: false,
       isEva: true
     },
@@ -102,10 +102,10 @@
       gravityClass: 'gravity-deep',
       jumpClass: 'jumping-deep',
       descendClass: 'descending-eva',
-      descendDurationMs: 1080,
-      stepDurationMs: 740,
-      jumpDurationMs: 1320,
-      jumpAdvanceDist: 9.5,
+      descendDurationMs: 1400,
+      stepDurationMs: 850,
+      jumpDurationMs: 2100,
+      jumpAdvanceDist: 12.0,
       dustOnJump: false,
       isEva: true
     }
@@ -994,6 +994,8 @@
     const presets = {
       step: { freqs: [523.25, 659.25], gain: 0.025, stepMs: 35, duration: 0.16, wave: 'sine' },
       jump: { freqs: [440.0, 587.33, 783.99], gain: 0.036, stepMs: 38, duration: 0.24, wave: 'sine' },
+      jumpMars: { freqs: [329.63, 440.0, 523.25], gain: 0.038, stepMs: 28, duration: 0.18, wave: 'sine' },
+      jumpMoon: { freqs: [523.25, 659.25, 880.0, 1046.5], gain: 0.034, stepMs: 52, duration: 0.36, wave: 'sine' },
       rcs: { freqs: [880.0, 1174.66], gain: 0.018, stepMs: 28, duration: 0.14, wave: 'triangle' },
       sample: { freqs: [523.25, 659.25, 783.99, 1046.5], gain: 0.05, stepMs: 65, duration: 0.55, wave: 'sine' },
       arrival: { freqs: [261.63, 392.0, 493.88, 659.25], gain: 0.038, stepMs: 75, duration: 0.85, wave: 'sine' },
@@ -1597,7 +1599,7 @@
       const t = Math.min(1, Math.max(0, elapsed / evaAnimDuration));
       const { activeMachine } = getActiveSite(chapter);
       const siteId = activeMachine ? activeMachine.siteId : '';
-      const jumpArcPct = (siteId === 'asteroid-eros' ? 9.5 : 5.8) * Math.sin(t * Math.PI);
+      const jumpArcPct = (siteId === 'asteroid-eros' ? 16.5 : (chapter.id === 'moon' ? 8.5 : 3.5)) * Math.sin(t * Math.PI);
       computedTarget = {
         x: computedTarget.x,
         y: computedTarget.y - jumpArcPct
@@ -2033,9 +2035,12 @@
     if (profile.dustOnJump) {
       spawnDustPuff(penguinPos.x, penguinPos.y);
     }
-    playHarmony(chapter.hasSurface ? 'jump' : 'rcs');
+    const jumpSound = (siteId === 'asteroid-eros' || !chapter.hasSurface)
+      ? 'rcs'
+      : (chapter.id === 'mars' ? 'jumpMars' : 'jumpMoon');
+    playHarmony(jumpSound);
     if (FX && typeof FX.emitBurst === 'function') {
-      FX.emitBurst(penguinPos, chapter.hasSurface ? 'jump' : 'rcs', chapter.id, siteId);
+      FX.emitBurst(penguinPos, (siteId === 'asteroid-eros' || !chapter.hasSurface) ? 'rcs' : 'jump', chapter.id, siteId);
     }
 
     // Globo de pensamiento ambiental sobre Cyberpenguin al saltar en gravedad especial

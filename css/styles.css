@@ -1432,22 +1432,49 @@ a:focus-visible {
 
 .penguin-actor.gravity-moon.jumping-moon .penguin-sprite,
 .penguin-actor.jumping-moon .penguin-sprite {
-  animation: penguinJumpMoon 1.12s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation: penguinJumpMoon 1.32s cubic-bezier(0.2, 0.65, 0.35, 1) forwards;
 }
 
 .penguin-actor.gravity-mars.jumping-mars .penguin-sprite,
 .penguin-actor.jumping-mars .penguin-sprite {
-  animation: penguinJumpMars 0.52s cubic-bezier(0.32, 0.72, 0.45, 1) forwards;
+  animation: penguinJumpMars 0.46s cubic-bezier(0.35, 0.75, 0.45, 1) forwards;
 }
 
 .penguin-actor.gravity-eros.jumping-eros .penguin-sprite,
 .penguin-actor.jumping-eros .penguin-sprite {
-  animation: penguinJumpEros 1.48s cubic-bezier(0.18, 0.78, 0.32, 1) forwards;
+  animation: penguinJumpEros 2.5s cubic-bezier(0.12, 0.85, 0.25, 1) forwards;
 }
 
 .penguin-actor.gravity-deep.jumping-deep .penguin-sprite,
 .penguin-actor.jumping-deep .penguin-sprite {
-  animation: penguinJumpDeep 1.32s cubic-bezier(0.22, 0.68, 0.35, 1) forwards;
+  animation: penguinJumpDeep 2.1s cubic-bezier(0.16, 0.82, 0.28, 1) forwards;
+}
+
+.penguin-actor.jumping-mars .cp-shadow {
+  animation: cpJumpShadowMars 0.46s ease-in-out forwards;
+}
+
+.penguin-actor.jumping-moon .cp-shadow {
+  animation: cpJumpShadowMoon 1.32s ease-in-out forwards;
+}
+
+.penguin-actor.jumping-eros .cp-shadow {
+  animation: cpJumpShadowEros 2.5s ease-in-out forwards;
+}
+
+@keyframes cpJumpShadowMars {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  38% { transform: scale(0.82); opacity: 0.45; }
+}
+
+@keyframes cpJumpShadowMoon {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  48% { transform: scale(0.5); opacity: 0.18; }
+}
+
+@keyframes cpJumpShadowEros {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  52% { transform: scale(0.2); opacity: 0.04; }
 }
 
 .penguin-actor.descending-moon .penguin-sprite {
@@ -1622,53 +1649,34 @@ a:focus-visible {
   }
 }
 
-/* Luna (1.62 m/s², 0.165 g): salto alto con prolongada suspensión en el ápice */
+/* Luna (1.62 m/s², 0.165 g): Salto alto parabólico con prolongada suspensión Apolo en el ápice */
 @keyframes penguinJumpMoon {
-  0% {
-    transform: translateY(0px) scaleY(0.92) scaleX(1.06);
-  }
-
-  14% {
-    transform: translateY(-32px) scaleY(1.05) scaleX(0.96);
-  }
-
-  38% {
-    transform: translateY(-56px) scaleY(1.02) scaleX(0.98);
-  }
-
-  48% {
-    transform: translateY(-58px) rotate(-3deg) scale(1.01);
-  }
-
-  58% {
-    transform: translateY(-55px) rotate(2deg) scale(1.01);
-  }
-
-  84% {
-    transform: translateY(-22px) scaleY(1.02) scaleX(0.98);
-  }
-
-  95% {
-    transform: translateY(2px) scaleY(0.93) scaleX(1.05);
-  }
-
-  100% {
-    transform: translateY(0px) scaleY(1) scaleX(1);
-  }
-}
-
-/* Marte (3.71 m/s², 0.379 g = 2.29x Luna): 44% de altura y caída rápida */
-@keyframes penguinJumpMars {
   0% {
     transform: translateY(0px) scaleY(0.9) scaleX(1.08);
   }
 
-  42% {
-    transform: translateY(-25px) scaleY(1.03) scaleX(0.97);
+  12% {
+    transform: translateY(-40px) scaleY(1.06) scaleX(0.95);
   }
 
-  86% {
-    transform: translateY(2px) scaleY(0.88) scaleX(1.09);
+  34% {
+    transform: translateY(-68px) scaleY(1.02) scaleX(0.98);
+  }
+
+  48% {
+    transform: translateY(-72px) rotate(-4deg) scale(1.02);
+  }
+
+  62% {
+    transform: translateY(-69px) rotate(3deg) scale(1.01);
+  }
+
+  82% {
+    transform: translateY(-30px) scaleY(1.03) scaleX(0.97);
+  }
+
+  95% {
+    transform: translateY(3px) scaleY(0.91) scaleX(1.07);
   }
 
   100% {
@@ -1676,22 +1684,49 @@ a:focus-visible {
   }
 }
 
-/* Asteroide 433 Eros (0.0059 m/s², 0.0006 g): elevación lenta y flotación muy prolongada */
+/* Marte (3.71 m/s², 0.379 g = 2.29x Luna): Salto corto, ágil y de rápida caída balística */
+@keyframes penguinJumpMars {
+  0% {
+    transform: translateY(0px) scaleY(0.88) scaleX(1.1);
+  }
+
+  38% {
+    transform: translateY(-24px) scaleY(1.04) scaleX(0.96);
+  }
+
+  80% {
+    transform: translateY(3px) scaleY(0.86) scaleX(1.12);
+  }
+
+  100% {
+    transform: translateY(0px) scaleY(1) scaleX(1);
+  }
+}
+
+/* Asteroide 433 Eros (0.0059 m/s², 0.0006 g): Microgravedad extrema, elevación lenta y deriva espacial */
 @keyframes penguinJumpEros {
   0% {
     transform: translateY(-3px) rotate(0deg) scale(1);
   }
 
-  24% {
-    transform: translateY(-48px) rotate(-6deg) scale(1.03);
+  18% {
+    transform: translateY(-68px) rotate(-8deg) scale(1.04);
   }
 
-  52% {
-    transform: translateY(-72px) rotate(-10deg) scale(1.05);
+  44% {
+    transform: translateY(-114px) rotate(-14deg) scale(1.08);
   }
 
-  76% {
-    transform: translateY(-44px) rotate(-4deg) scale(1.02);
+  58% {
+    transform: translateY(-118px) rotate(-10deg) scale(1.07);
+  }
+
+  74% {
+    transform: translateY(-88px) rotate(6deg) scale(1.04);
+  }
+
+  90% {
+    transform: translateY(-38px) rotate(2deg) scale(1.01);
   }
 
   100% {
@@ -1699,18 +1734,22 @@ a:focus-visible {
   }
 }
 
-/* Vacío interestelar (0 m/s², 0 g): impulso RCS sin caída balística */
+/* Vacío interestelar (0 m/s², 0 g): Impulso RCS en ingravidez completa */
 @keyframes penguinJumpDeep {
   0% {
     transform: translateY(-3px) rotate(0deg) scale(1);
   }
 
-  35% {
-    transform: translateY(-34px) rotate(-12deg) scale(1.04);
+  28% {
+    transform: translateY(-56px) rotate(-14deg) scale(1.05);
   }
 
-  68% {
-    transform: translateY(-38px) rotate(6deg) scale(1.03);
+  58% {
+    transform: translateY(-62px) rotate(8deg) scale(1.04);
+  }
+
+  85% {
+    transform: translateY(-26px) rotate(-2deg) scale(1.02);
   }
 
   100% {
