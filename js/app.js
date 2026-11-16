@@ -143,7 +143,7 @@
       } else {
         navigator.vibrate(20);
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   document.addEventListener('DOMContentLoaded', init);
@@ -164,7 +164,7 @@
     if (isManual) {
       try {
         global.localStorage.setItem('cyberpenguins_lang_manual', 'true');
-      } catch (_e) {}
+      } catch (_e) { }
     }
     if (TTS && typeof TTS.stop === 'function') {
       TTS.stop();
@@ -348,7 +348,7 @@
       const registerSW = () => {
         navigator.serviceWorker.register('./sw.js').then((reg) => {
           if (reg && typeof reg.update === 'function') reg.update();
-        }).catch(() => {});
+        }).catch(() => { });
       };
       window.addEventListener('load', registerSW);
       if (document.readyState === 'complete') {
@@ -826,7 +826,7 @@
           if (code.startsWith('en')) return 'en';
         }
       }
-    } catch (_e) {}
+    } catch (_e) { }
     // Si no es detectable o es otro idioma: predeterminada en inglés
     return 'en';
   }
@@ -838,7 +838,7 @@
       try {
         isManualChoice = global.localStorage.getItem('cyberpenguins_lang_manual') === 'true';
         manualLang = global.localStorage.getItem('cyberpenguins_lang');
-      } catch (_e) {}
+      } catch (_e) { }
 
       const detectedLang = detectDeviceLanguage();
       const resolvedLang = (isManualChoice && (manualLang === 'es' || manualLang === 'en'))
@@ -2430,10 +2430,10 @@
       const btnLabel = !unlocked
         ? (isEn ? 'Complete previous mission to unlock' : 'Completa la misión anterior para desbloquear')
         : completed
-        ? (isEn ? 'Explore again' : 'Explorar de nuevo')
-        : inProgress
-        ? (isEn ? 'Continue' : 'Continuar')
-        : (isEn ? 'Explore' : 'Explorar');
+          ? (isEn ? 'Explore again' : 'Explorar de nuevo')
+          : inProgress
+            ? (isEn ? 'Continue' : 'Continuar')
+            : (isEn ? 'Explore' : 'Explorar');
 
       return `
         <div class="home-chapter-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${isCardActive ? 'is-active' : ''
@@ -2448,13 +2448,12 @@
 
           <div class="flex flex-col items-center gap-3 w-full">
             <button type="button"
-              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 px-3 sm:px-4 font-medium transition-colors ${
-                !unlocked
-                  ? 'bg-white/[0.04] text-slate-300/85 border border-white/[0.06] cursor-not-allowed text-[11px] sm:text-xs leading-snug'
-                  : isCardActive
-                    ? 'bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm text-xs sm:text-sm'
-                    : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-200 border border-white/[0.08] text-xs sm:text-sm'
-              }"
+              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 px-3 sm:px-4 font-medium transition-colors ${!unlocked
+          ? 'bg-white/[0.04] text-slate-300/85 border border-white/[0.06] cursor-not-allowed text-[11px] sm:text-xs leading-snug'
+          : isCardActive
+            ? 'bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm text-xs sm:text-sm'
+            : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-200 border border-white/[0.08] text-xs sm:text-sm'
+        }"
               ${!unlocked ? 'disabled' : ''}
               data-enter-chapter="${chapter.id}">
               ${btnLabel}
@@ -2612,8 +2611,8 @@
       const defaultName = isPenguin
         ? 'Cyberpenguin'
         : isShip
-        ? (isEnglish ? "Cyberpenguin's Ship" : 'Nave de Cyberpenguin')
-        : (isEnglish ? 'Spacecraft' : 'Máquina');
+          ? (isEnglish ? "Cyberpenguin's Ship" : 'Nave de Cyberpenguin')
+          : (isEnglish ? 'Spacecraft' : 'Máquina');
       dom.speechBubbleName.textContent = name || defaultName;
     }
     if (dom.speechBubbleText) {
@@ -2863,8 +2862,8 @@
       const avatar = isPenguin
         ? MODELS.cyberpenguin('right')
         : isShip
-        ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true })
-        : (MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '');
+          ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true })
+          : (MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '');
 
       showSpeechBubbleStep({
         speaker: t.speaker,

@@ -793,33 +793,28 @@ a:focus-visible {
   background: rgba(255, 190, 118, 0.08);
 }
 
-.back-home-btn,
-.pause-btn,
-.sound-toggle-btn {
+.back-home-btn {
   position: absolute;
   top: 1rem;
+  left: 1rem;
   z-index: 95;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 999px;
   background: rgba(14, 19, 40, 0.56);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: rgba(245, 247, 255, 0.92);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   cursor: pointer;
-}
-
-.back-home-btn {
-  left: 1rem;
-  width: 42px;
-  height: 42px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .back-home-btn:hover {
@@ -836,71 +831,82 @@ a:focus-visible {
   top: 1rem;
   right: 1rem;
   z-index: 95;
-  height: 40px;
+  height: 42px;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 3px 0.75rem 3px 0.35rem;
-  background: rgba(255, 255, 255, 0.06);
+  gap: 0.45rem;
+  padding: 0 0.85rem 0 0.45rem;
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   user-select: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
 .sound-control-group:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .sound-toggle-btn {
-  width: 32px;
-  height: 32px;
+  position: static !important;
+  width: 32px !important;
+  height: 32px !important;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.82);
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.88) !important;
   cursor: pointer;
-  padding: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex-shrink: 0;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   transition: all 0.2s ease;
 }
 
 .sound-toggle-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.14) !important;
 }
 
 .sound-slider-wrap {
   display: flex;
   align-items: center;
-  width: 65px;
+  justify-content: center;
+  width: 70px;
+  flex-shrink: 0;
 }
 
 .sound-volume-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.18);
+  height: 5px;
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 999px;
   outline: none;
   cursor: pointer;
+  margin: 0;
+  padding: 0;
 }
 
 .sound-volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
   cursor: pointer;
   transition: transform 0.15s ease;
 }
@@ -910,26 +916,27 @@ a:focus-visible {
 }
 
 .sound-volume-slider::-moz-range-thumb {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #ffffff;
   border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
   cursor: pointer;
 }
 
 @media (max-width: 480px) {
   .sound-control-group {
-    height: 36px;
-    padding: 2px 0.55rem 2px 0.25rem;
+    height: 38px;
+    padding: 0 0.65rem 0 0.35rem;
+    gap: 0.35rem;
   }
   .sound-toggle-btn {
-    width: 28px;
-    height: 28px;
+    width: 28px !important;
+    height: 28px !important;
   }
   .sound-slider-wrap {
-    width: 45px;
+    width: 52px;
   }
 }
 
@@ -1013,9 +1020,9 @@ a:focus-visible {
 .stage-lang-selector {
   position: absolute;
   top: 1rem;
-  right: 9.2rem;
+  right: 9.8rem;
   z-index: 95;
-  height: 40px;
+  height: 42px;
   padding: 4px;
 }
 
@@ -1025,8 +1032,8 @@ a:focus-visible {
 
 @media (max-width: 480px) {
   .stage-lang-selector {
-    right: 7.2rem;
-    height: 36px;
+    right: 7.6rem;
+    height: 38px;
     padding: 3px;
   }
   .stage-lang-selector .lang-selector-btn {
