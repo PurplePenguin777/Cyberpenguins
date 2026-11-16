@@ -2412,6 +2412,7 @@
   }
 
   function updateHUD() {
+    const isEn = (state.currentLanguage === 'en');
     const totalStars = getTotalStars();
     const badge = getCurrentBadge();
     const chaptersList = getChaptersList();
