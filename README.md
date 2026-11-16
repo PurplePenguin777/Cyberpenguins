@@ -98,3 +98,11 @@ No se requiere ninguna instalación compleja para probar el proyecto:
 ## Equipo y créditos
 
 Creado con cariño por el team **Cyberpenguins** para el **NASA Space Apps Challenge 2026**.
+
+---
+
+## Colaboración y desarrollo futuro
+
+Dado el entusiasmo y el interés por continuar expandiendo este universo educativo, cualquier persona interesada en seguir desarrollando nuevas misiones, características o mejoras es más que bienvenida.
+
+Puedes ponerte en contacto directamente con el creador del repositorio para colaborar y trabajar juntos en ramas de desarrollo independientes y separadas a la versión oficial del challenge. De esta forma, la entrega del concurso se conserva intacta mientras el proyecto continúa creciendo con nuevas ideas.
