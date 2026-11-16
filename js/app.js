@@ -59,6 +59,7 @@
   let soundEnabled = true;
   let soundVolume = 0.8;
   let previousVolume = 0.8;
+  let quizSubmitted = false;
   let audioCtx = null;
 
   // Datos gravitacionales reales por cuerpo celeste
@@ -226,11 +227,17 @@
     const certDownloadBtn = document.getElementById('home-download-certificate-btn');
     if (certDownloadBtn) certDownloadBtn.textContent = isEn ? 'Download' : 'Descargar';
 
-    const quizValidateBtn = document.getElementById('quiz-validate-btn');
-    if (quizValidateBtn) quizValidateBtn.textContent = isEn ? 'Validate' : 'Validar';
+    const quizModalTitle = document.getElementById('quiz-modal-title');
+    if (quizModalTitle) quizModalTitle.textContent = isEn ? 'Quiz' : 'Cuestionario';
 
-    const quizTravelBtn = document.getElementById('quiz-travel-btn');
-    if (quizTravelBtn) quizTravelBtn.textContent = isEn ? 'Travel' : 'Viajar';
+    const quizSubmitBtn = document.getElementById('quiz-submit-btn');
+    if (quizSubmitBtn) quizSubmitBtn.textContent = isEn ? 'Submit' : 'Enviar';
+
+    const quizRetryBtn = document.getElementById('quiz-retry-btn');
+    if (quizRetryBtn) quizRetryBtn.textContent = isEn ? 'Retry' : 'Reintentar';
+
+    const quizContinueBtn = document.getElementById('quiz-continue-btn');
+    if (quizContinueBtn) quizContinueBtn.textContent = isEn ? 'Continue journey ▶' : 'Continuar viaje ▶';
 
     // Textos de registro inicial de cadete (minimalista en sentence case)
     if (dom.cadetIntroTitle) {
@@ -483,11 +490,13 @@
     dom.sampleDiscoveryCollectBtn = document.getElementById('sample-discovery-collect-btn');
 
     dom.quizModal = document.getElementById('quiz-modal');
-    dom.quizStarsBadge = document.getElementById('quiz-stars-badge');
-    dom.quizChapterTabs = document.getElementById('quiz-chapter-tabs');
+    dom.quizModalTitle = document.getElementById('quiz-modal-title');
     dom.quizQuestionsContainer = document.getElementById('quiz-questions-container');
-    dom.quizValidateBtn = document.getElementById('quiz-validate-btn');
-    dom.quizTravelBtn = document.getElementById('quiz-travel-btn');
+    dom.quizSubmitBtn = document.getElementById('quiz-submit-btn');
+    dom.quizRetryBtn = document.getElementById('quiz-retry-btn');
+    dom.quizScoreContainer = document.getElementById('quiz-score-container');
+    dom.quizScoreText = document.getElementById('quiz-score-text');
+    dom.quizContinueBtn = document.getElementById('quiz-continue-btn');
     dom.quizCloseBtn = document.getElementById('quiz-close-btn');
 
     dom.passportModal = document.getElementById('passport-modal');
@@ -666,8 +675,21 @@
     renderHomeBackground();
 
     dom.quizCloseBtn.addEventListener('click', closeQuizModal);
-    dom.quizValidateBtn.addEventListener('click', validateActiveQuiz);
-    dom.quizTravelBtn.addEventListener('click', travelFromQuiz);
+    if (dom.quizSubmitBtn) {
+      dom.quizSubmitBtn.addEventListener('click', () => {
+        validateActiveQuiz();
+      });
+    }
+    if (dom.quizRetryBtn) {
+      dom.quizRetryBtn.addEventListener('click', () => {
+        retryActiveQuiz();
+      });
+    }
+    if (dom.quizContinueBtn) {
+      dom.quizContinueBtn.addEventListener('click', () => {
+        travelFromQuiz();
+      });
+    }
 
     dom.passportCloseBtn.addEventListener('click', () => hideModal(dom.passportModal));
     dom.badgesCloseBtn.addEventListener('click', () => hideModal(dom.badgesModal));
@@ -3219,12 +3241,13 @@
   }
 
   /* ========================================================================
-     Escotilla de Nave & 3 Espacios de Quiz (2 preguntas x 4 opciones en blanco)
+     Escotilla de Nave & Cuestionario Minimalista
      ======================================================================== */
 
   function closeHatchAndOpenQuiz(chapter) {
     closeDialogueModal();
     hatchOpen = false;
+    quizSubmitted = false;
     const inSpace = !chapter.hasSurface;
     const shipSvg = document.getElementById('stage-ship-svg');
     if (shipSvg) {
@@ -3256,75 +3279,49 @@
     hideModal(dom.quizModal);
   }
 
+  function retryActiveQuiz() {
+    triggerHaptic('tap');
+    state.quizAnswers[activeQuizChapterId] = [null, null];
+    quizSubmitted = false;
+    saveState();
+    renderQuizModal();
+  }
+
   function renderQuizModal() {
     const allQuizzes = DATA.getQuizzes ? DATA.getQuizzes(state.currentLanguage) : DATA.QUIZZES;
     const quiz = allQuizzes[activeQuizChapterId] || allQuizzes.moon;
-    const chapter = getChapter(quiz.chapterId);
-    const stars = state.chapterStars[quiz.chapterId] || 0;
+    const isEn = (state.currentLanguage === 'en');
     const savedAnswers = state.quizAnswers[quiz.chapterId] || [null, null];
-    const { siteIdx } = getActiveSite(chapter);
 
-    dom.quizStarsBadge.textContent = `★ ${stars}/5`;
-
-    // Etiquetas de lugares del capítulo + regreso en vuelo al primer lugar
-    const stopPills = chapter.machines.map((machine) => {
-      const inspected = state.inspectedMachines.includes(machine.id);
-      return `
-        <span class="squircle-pill px-3 py-1 text-xs font-medium inline-flex items-center justify-center text-center gap-1.5 bg-white/[0.07] text-slate-200 border border-white/10">
-          <span class="entity-dot ${inspected ? 'done' : ''}"></span>
-          <span class="text-center">${machine.name}</span>
-        </span>
-      `;
-    }).join('');
-
-    const returnFlightBtn =
-      chapter.id === state.currentChapterId && siteIdx === 1 && chapter.machines.length > 1
-        ? `
-          <button id="quiz-return-stop1-btn" type="button"
-            class="squircle-btn inline-flex items-center justify-center text-center px-3 py-1 text-xs font-medium bg-cyan-300/15 hover:bg-cyan-300/25 border border-cyan-300/30 text-cyan-200">
-            ✈ ${chapter.machines[0].name}
-          </button>
-        `
-        : '';
-
-    dom.quizChapterTabs.innerHTML = stopPills + returnFlightBtn;
-
-    const returnBtn = document.getElementById('quiz-return-stop1-btn');
-    if (returnBtn) {
-      returnBtn.addEventListener('click', () => {
-        hideModal(dom.quizModal);
-        travelBetweenSites(chapter.id, 1, 0);
-      });
-    }
-
-    // 2 Preguntas de opción múltiple con 4 posibles respuestas en blanco
+    // Contenedor minimalista: solo preguntas numeradas y sus opciones
     const letters = ['A', 'B', 'C', 'D'];
     dom.quizQuestionsContainer.innerHTML = quiz.questions.map((q, qIdx) => {
       const selectedOpt = savedAnswers[qIdx];
       return `
-        <div class="squircle-card p-4 flex flex-col items-center justify-center text-center gap-3">
-          <div class="w-full flex items-center justify-center gap-2 text-center">
-            <span class="text-xs font-medium text-cyan-200 text-center">${q.hardwareName}</span>
-            <span class="text-xs font-medium text-slate-400 text-center">${qIdx + 1}/2</span>
-          </div>
-          <!-- Espacio en blanco para la pregunta -->
-          <div class="blank-template-slot w-full min-h-[54px] px-3.5 py-2.5 text-sm font-medium text-slate-100 flex items-center justify-center text-center">
-            ${q.question || ''}
-          </div>
-          <!-- 4 posibles respuestas en blanco -->
-          <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
-            ${q.options.map((optText, oIdx) => `
-              <button type="button"
-                class="quiz-option-btn px-3.5 py-2.5 flex items-center justify-center text-center gap-2.5 text-sm font-normal text-slate-100 ${selectedOpt === oIdx ? 'selected' : ''
-        }"
-                data-q-idx="${qIdx}"
-                data-o-idx="${oIdx}">
-                <span class="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-xs font-medium text-amber-200 shrink-0">
-                  ${letters[oIdx]}
-                </span>
-                <span class="text-center empty:hidden">${optText || ''}</span>
-              </button>
-            `).join('')}
+        <div class="quiz-question-card flex flex-col gap-2 p-3 sm:p-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
+          <p class="text-xs sm:text-sm font-semibold text-slate-100 text-center leading-snug">
+            <span class="text-cyan-300 mr-1">${qIdx + 1}.</span>${q.question || ''}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
+            ${q.options.map((optText, oIdx) => {
+              const isSelected = (selectedOpt === oIdx);
+              let optionClass = isSelected ? 'selected' : '';
+              if (quizSubmitted && isSelected) {
+                const isCorrect = (oIdx === q.correctIndex);
+                optionClass += isCorrect ? ' correct' : ' incorrect';
+              }
+              return `
+                <button type="button"
+                  class="quiz-option-btn px-2.5 py-1.5 sm:py-2 flex items-center gap-2 text-xs font-normal text-slate-200 transition-all ${optionClass}"
+                  data-q-idx="${qIdx}"
+                  data-o-idx="${oIdx}">
+                  <span class="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-[10px] font-bold text-amber-200 shrink-0">
+                    ${letters[oIdx]}
+                  </span>
+                  <span class="text-left flex-1 leading-snug empty:hidden">${optText || ''}</span>
+                </button>
+              `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -3338,10 +3335,38 @@
           state.quizAnswers[activeQuizChapterId] = [null, null];
         }
         state.quizAnswers[activeQuizChapterId][qIdx] = oIdx;
+        quizSubmitted = false;
         saveState();
         renderQuizModal();
       });
     });
+
+    // Al darle a enviar se muestra el puntaje debajo
+    if (dom.quizScoreContainer) {
+      if (quizSubmitted) {
+        let scoreCount = 0;
+        quiz.questions.forEach((q, idx) => {
+          const selected = savedAnswers[idx];
+          if (selected === q.correctIndex) scoreCount += 1;
+        });
+
+        const scoreMsg = isEn
+          ? `Score: ${scoreCount}/${quiz.questions.length} correct`
+          : `Puntaje: ${scoreCount} de ${quiz.questions.length} aciertos`;
+
+        if (dom.quizScoreText) {
+          dom.quizScoreText.textContent = scoreMsg;
+          dom.quizScoreText.className = scoreCount === quiz.questions.length
+            ? 'text-xs sm:text-sm font-semibold text-emerald-300'
+            : (scoreCount > 0
+              ? 'text-xs sm:text-sm font-semibold text-amber-300'
+              : 'text-xs sm:text-sm font-semibold text-slate-300');
+        }
+        dom.quizScoreContainer.classList.remove('is-hidden');
+      } else {
+        dom.quizScoreContainer.classList.add('is-hidden');
+      }
+    }
   }
 
   function validateActiveQuiz() {
@@ -3360,6 +3385,7 @@
       }
     });
 
+    quizSubmitted = true;
     const starsEarned = scoreCount === 2 ? 5 : scoreCount === 1 ? 3 : 0;
     if (starsEarned > 0) {
       triggerHaptic('success');

@@ -38,7 +38,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link rel="stylesheet" href="css/styles.css?v=20261115k" />
+  <link rel="stylesheet" href="css/styles.css?v=20261115l" />
 </head>
 <body class="font-sans antialiased">
   <div class="starfield" aria-hidden="true"></div>
@@ -442,33 +442,39 @@
     </div>
   </div>
 
-  <!-- Modal 2: Escotilla de Nave & 3 Espacios de Quiz (2 preguntas x 4 opciones en blanco) -->
-  <div id="quiz-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Quiz">
+  <!-- Modal 2: Cuestionario Minimalista Liquid Glass -->
+  <div id="quiz-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Cuestionario">
     <div
-      class="squircle-panel max-w-2xl w-full p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto text-center relative">
+      class="squircle-panel quiz-modal-panel max-w-lg w-full p-4 sm:p-5 flex flex-col gap-3 max-h-[94vh] overflow-y-auto text-center relative">
       <div class="relative w-full flex items-center justify-center">
-        <h2 class="text-lg font-semibold tracking-tight text-white text-center">Quiz</h2>
-        <span id="quiz-stars-badge" class="hidden">★ 0/5</span>
+        <h2 id="quiz-modal-title" class="text-base sm:text-lg font-semibold tracking-tight text-white text-center">Cuestionario</h2>
         <button id="quiz-close-btn" type="button" aria-label="Cerrar"
-          class="absolute right-0 w-8 h-8 rounded-full flex items-center justify-center text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors text-xl font-bold">
+          class="absolute right-0 w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-lg font-medium">
           ✕
         </button>
       </div>
 
-      <!-- Selector de los 3 espacios de quiz -->
-      <div id="quiz-chapter-tabs" class="flex flex-wrap items-center justify-center text-center gap-2"></div>
+      <!-- Contenedor minimalista: solo preguntas y respuestas -->
+      <div id="quiz-questions-container" class="flex flex-col gap-2.5 text-center"></div>
 
-      <!-- Contenedor de las 2 preguntas con 4 opciones en blanco -->
-      <div id="quiz-questions-container" class="flex flex-col gap-3.5"></div>
-
-      <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
-        <button id="quiz-validate-btn" type="button"
-          class="squircle-btn inline-flex items-center justify-center text-center px-5 py-2.5 text-sm font-medium bg-white/90 hover:bg-white text-slate-950">
-          Validar
+      <!-- Botones de Enviar y Reintentar debajo -->
+      <div class="flex items-center justify-center gap-2.5 pt-1">
+        <button id="quiz-submit-btn" type="button"
+          class="squircle-btn px-5 py-2 text-xs sm:text-sm font-semibold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all">
+          Enviar
         </button>
-        <button id="quiz-travel-btn" type="button"
-          class="squircle-btn inline-flex items-center justify-center text-center px-5 py-2.5 text-sm font-medium bg-amber-300 hover:bg-amber-200 text-slate-950">
-          Viajar
+        <button id="quiz-retry-btn" type="button"
+          class="squircle-btn px-4 py-2 text-xs sm:text-sm font-medium bg-white/10 hover:bg-white/15 text-slate-200 border border-white/15 transition-all">
+          Reintentar
+        </button>
+      </div>
+
+      <!-- Al darle a enviar se muestra el puntaje debajo -->
+      <div id="quiz-score-container" class="flex flex-col items-center justify-center gap-2 pt-1 is-hidden">
+        <span id="quiz-score-text" class="text-xs sm:text-sm font-semibold text-emerald-300"></span>
+        <button id="quiz-continue-btn" type="button"
+          class="squircle-btn px-5 py-2 text-xs sm:text-sm font-semibold bg-amber-400 hover:bg-amber-300 text-slate-950 transition-all">
+          Continuar viaje ▶
         </button>
       </div>
     </div>
@@ -562,26 +568,26 @@
 
 
 
-  <script defer src="js/data.js?v=20261115k"></script>
-  <script defer src="js/elementos/pinguino.js?v=20261115k"></script>
-  <script defer src="js/elementos/nave-pinguino.js?v=20261115k"></script>
-  <script defer src="js/elementos/surveyor-3.js?v=20261115k"></script>
-  <script defer src="js/elementos/apollo-11-eagle.js?v=20261115k"></script>
-  <script defer src="js/elementos/viking-1.js?v=20261115k"></script>
-  <script defer src="js/elementos/sojourner.js?v=20261115k"></script>
-  <script defer src="js/elementos/pioneer-10.js?v=20261115k"></script>
-  <script defer src="js/elementos/near-shoemaker.js?v=20261115k"></script>
-  <script defer src="js/elementos/tierra.js?v=20261115k"></script>
-  <script defer src="js/elementos/luna.js?v=20261115k"></script>
-  <script defer src="js/elementos/marte.js?v=20261115k"></script>
-  <script defer src="js/elementos/asteroide-eros.js?v=20261115k"></script>
-  <script defer src="js/elementos/espacio-profundo.js?v=20261115k"></script>
-  <script defer src="js/elementos/superficies.js?v=20261115k"></script>
-  <script defer src="js/elementos/cuerpos.js?v=20261115k"></script>
-  <script defer src="js/models.js?v=20261115k"></script>
-  <script defer src="js/elementos/realismo.js?v=20261115k"></script>
-  <script defer src="js/tts.js?v=20261115k"></script>
-  <script defer src="js/fx.js?v=20261115k"></script>
-  <script defer src="js/app.js?v=20261115k"></script>
+  <script defer src="js/data.js?v=20261115l"></script>
+  <script defer src="js/elementos/pinguino.js?v=20261115l"></script>
+  <script defer src="js/elementos/nave-pinguino.js?v=20261115l"></script>
+  <script defer src="js/elementos/surveyor-3.js?v=20261115l"></script>
+  <script defer src="js/elementos/apollo-11-eagle.js?v=20261115l"></script>
+  <script defer src="js/elementos/viking-1.js?v=20261115l"></script>
+  <script defer src="js/elementos/sojourner.js?v=20261115l"></script>
+  <script defer src="js/elementos/pioneer-10.js?v=20261115l"></script>
+  <script defer src="js/elementos/near-shoemaker.js?v=20261115l"></script>
+  <script defer src="js/elementos/tierra.js?v=20261115l"></script>
+  <script defer src="js/elementos/luna.js?v=20261115l"></script>
+  <script defer src="js/elementos/marte.js?v=20261115l"></script>
+  <script defer src="js/elementos/asteroide-eros.js?v=20261115l"></script>
+  <script defer src="js/elementos/espacio-profundo.js?v=20261115l"></script>
+  <script defer src="js/elementos/superficies.js?v=20261115l"></script>
+  <script defer src="js/elementos/cuerpos.js?v=20261115l"></script>
+  <script defer src="js/models.js?v=20261115l"></script>
+  <script defer src="js/elementos/realismo.js?v=20261115l"></script>
+  <script defer src="js/tts.js?v=20261115l"></script>
+  <script defer src="js/fx.js?v=20261115l"></script>
+  <script defer src="js/app.js?v=20261115l"></script>
 </body>
 </html>
