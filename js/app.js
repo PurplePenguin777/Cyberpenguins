@@ -2126,7 +2126,9 @@
     } else if (type === 'ship-leave') {
       label = isEn ? 'Board spaceship' : 'Entrar a la nave';
     } else if (type === 'ship-locked') {
-      label = isEn ? 'Complete previous mission to enter' : 'Completa la misión anterior para poder entrar';
+      label = isEn
+        ? 'Complete all mission tasks to explore more places'
+        : 'Termina todas las tareas de la misión para explorar más lugares';
     }
 
     if (dom.stageActionIcon) dom.stageActionIcon.textContent = '';
@@ -2173,10 +2175,11 @@
     if (!chapter) return { canLeave: true, missing: [] };
     const { activeMachine } = getActiveSite(chapter);
     const missing = [];
+    const isEn = (state.currentLanguage === 'en');
 
-    // 1. Hablar con la sonda o máquina de la NASA en este sitio
+    // 1. Hablar con la sonda o máquina histórica en este sitio
     if (activeMachine && !state.inspectedMachines.includes(activeMachine.id)) {
-      missing.push(`Hablar con ${activeMachine.name}`);
+      missing.push(isEn ? `Talk to ${activeMachine.name}` : `Hablar con ${activeMachine.name}`);
     }
 
     // 2. Recolectar todas las muestras geológicas del sitio
@@ -2186,8 +2189,8 @@
       if (pendingSamples.length > 0) {
         missing.push(
           pendingSamples.length === 1
-            ? 'Recoger la roca pendiente'
-            : `Recoger las ${pendingSamples.length} rocas pendientes`
+            ? (isEn ? 'Collect the pending rock sample' : 'Recoger la roca pendiente')
+            : (isEn ? `Collect all ${pendingSamples.length} pending rock samples` : `Recoger las ${pendingSamples.length} rocas pendientes`)
         );
       }
     }
@@ -2200,8 +2203,11 @@
 
   function showPendingTasksNotice(chapter, missing) {
     if (!missing || missing.length === 0) return;
-    const taskText = missing.join(' y ');
-    const speechText = `¡Aún no podemos despegar! Necesitamos ${taskText}. ¡Vamos a completarlo antes de continuar el viaje!`;
+    const isEn = (state.currentLanguage === 'en');
+    const taskText = missing.join(isEn ? ' and ' : ' y ');
+    const speechText = isEn
+      ? `We can't take off yet! We still need to ${taskText}. Complete all mission tasks to explore more places!`
+      : `¡Aún no podemos despegar! Necesitamos ${taskText}. ¡Termina todas las tareas de la misión para explorar más lugares!`;
 
     openDialogueModal({
       id: 'mission-checklist',
@@ -2413,7 +2419,7 @@
       const sceneHtml = MODELS.chapterScene(chapter.id, singleMachineSvg);
 
       const btnLabel = !unlocked
-        ? (isEn ? 'Complete previous mission to unlock' : 'Completa la misión anterior para poder entrar')
+        ? (isEn ? 'Complete previous mission to unlock' : 'Completa la misión anterior para desbloquear')
         : completed
         ? (isEn ? 'Explore again' : 'Explorar de nuevo')
         : inProgress
