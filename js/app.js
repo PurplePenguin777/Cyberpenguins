@@ -1687,17 +1687,27 @@
     if (!chapter) return [];
     const { activeMachine } = getActiveSite(chapter);
     const shipPos = (activeMachine && activeMachine.shipPos) || chapter.shipPos;
-    // La huella cubre todo el fuselaje vertical de la nave (evita que Cyberpenguin camine sobre el cono o cabina)
+    // 1. Huella completa del fuselaje de la nave de Cyberpenguin (evita caminar sobre cabina o cono)
     const obstacles = [
       { id: 'ship', cx: shipPos.x, cy: shipPos.y - 6.5, rx: 9.6, ry: 11.0 }
     ];
+    // 2. Huellas físicas calibradas según las dimensiones reales de cada máquina espacial
     if (activeMachine && activeMachine.pos) {
+      const machineProfiles = {
+        'apollo-11-eagle': { offsetY: -5.0, rx: 11.5, ry: 9.5 }, // Módulo lunar grande (190px alto, cabina y patas)
+        'surveyor-3':      { offsetY: -4.0, rx: 8.8,  ry: 7.5 }, // Mástil solar y cámara de TV
+        'viking-1':        { offsetY: -4.5, rx: 9.2,  ry: 8.0 }, // Aterrizador marciano con antena y mástiles
+        'sojourner':       { offsetY: -0.5, rx: 4.8,  ry: 3.5 }, // Pequeño rover de 6 ruedas
+        'pioneer-10':      { offsetY: -1.0, rx: 10.5, ry: 8.5 }, // Gran antena parabólica de 3m y mástiles RTG
+        'near-shoemaker':  { offsetY: -3.5, rx: 10.5, ry: 8.0 }  // Paneles solares anchos y cuerpo sobre Eros
+      };
+      const prof = machineProfiles[activeMachine.id] || { offsetY: -2.0, rx: 8.2, ry: 5.5 };
       obstacles.push({
         id: activeMachine.id,
         cx: activeMachine.pos.x,
-        cy: activeMachine.pos.y - 1.5,
-        rx: 8.2,
-        ry: 5.2
+        cy: activeMachine.pos.y + prof.offsetY,
+        rx: prof.rx,
+        ry: prof.ry
       });
     }
     return obstacles;
@@ -2010,8 +2020,14 @@
       btn.addEventListener('click', () => {
         const machine = chapter.machines.find((m) => m.id === btn.dataset.machineId);
         if (!machine) return;
-        const offsetX = machine.pos.x > penguinPos.x ? -9.5 : 9.5;
-        const approachY = chapter.hasSurface ? machine.pos.y + 5.5 : machine.pos.y + 4.8;
+        const approachOffsets = {
+          'apollo-11-eagle': { x: 12.5, y: 6.0 },
+          'sojourner':       { x: 6.2,  y: 4.2 },
+          'near-shoemaker':  { x: 11.5, y: 5.5 }
+        };
+        const off = approachOffsets[machine.id] || { x: 9.5, y: chapter.hasSurface ? 5.5 : 4.8 };
+        const offsetX = machine.pos.x > penguinPos.x ? -off.x : off.x;
+        const approachY = machine.pos.y + off.y;
         const target = resolveSurfacePoint(machine.pos.x + offsetX, approachY, chapter);
         routeAndMove(target.x, target.y, () => {
           openDialogueModal(machine);
@@ -2456,8 +2472,14 @@
 
     // 2. Máquina o sonda histórica
     if (activeMachine) {
+      const machineThresholds = {
+        'apollo-11-eagle': 17.5,
+        'sojourner':       12.0,
+        'near-shoemaker':  16.5
+      };
+      const thresh = machineThresholds[activeMachine.id] || 15.5;
       const dist = getDist(penguinPos, activeMachine.pos);
-      if (dist <= 15.5) {
+      if (dist <= thresh) {
         candidates.push({
           type: 'machine',
           target: activeMachine,
