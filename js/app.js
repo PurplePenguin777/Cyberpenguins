@@ -126,6 +126,7 @@
   let activeBranchState = null;
   let thoughtBubbleTimer = null;
   let activeAmbientThought = null;
+  let thoughtTrackingRaf = null;
   let lastRenderedDir = null;
 
   const dom = {};
@@ -1628,6 +1629,7 @@
     isJumping = false;
     closeDialogueModal();
     hideStageActionPrompt();
+    hideThoughtBubble();
     saveState();
 
     updateLocationPill(chapter, activeMachine);
@@ -2781,27 +2783,109 @@
     TTS.stop();
   }
 
+  function stopThoughtTracking() {
+    if (thoughtTrackingRaf && typeof global.cancelAnimationFrame === 'function') {
+      global.cancelAnimationFrame(thoughtTrackingRaf);
+    }
+    thoughtTrackingRaf = null;
+    if (dom.stageThoughtBubble) {
+      dom.stageThoughtBubble.classList.remove('is-tracking');
+    }
+  }
+
+  function hideThoughtBubble() {
+    clearTimeout(thoughtBubbleTimer);
+    stopThoughtTracking();
+    if (dom.stageThoughtBubble) {
+      dom.stageThoughtBubble.classList.add('is-hidden');
+      dom.stageThoughtBubble.classList.remove('bubble-flipped');
+    }
+    activeAmbientThought = null;
+  }
+
+  function updateThoughtBubblePosition() {
+    if (!dom.stageThoughtBubble || dom.stageThoughtBubble.classList.contains('is-hidden')) {
+      stopThoughtTracking();
+      return;
+    }
+    const spriteEl = dom.penguinSprite || dom.penguinActor;
+    if (!spriteEl || !dom.isoBoard) return;
+
+    const spriteRect = spriteEl.getBoundingClientRect();
+    const boardRect = dom.isoBoard.getBoundingClientRect();
+    if (!boardRect.width || !boardRect.height) return;
+
+    // Centro horizontal del pingüino en porcentaje del escenario
+    const centerX = ((spriteRect.left + spriteRect.width / 2) - boardRect.left) / boardRect.width * 100;
+    const clampedX = Math.max(16, Math.min(84, centerX));
+
+    // Coordenadas verticales relativas al tablero
+    const headTopPx = spriteRect.top - boardRect.top;
+    const feetBottomPx = spriteRect.bottom - boardRect.top;
+
+    // Altura del globo para cálculo de espacio seguro
+    const bubbleRect = dom.stageThoughtBubble.getBoundingClientRect();
+    const bubbleHeight = bubbleRect.height > 20 ? bubbleRect.height : 110;
+
+    // Margen superior mínimo para no chocar con la barra superior de la app
+    const minCeilingMarginPx = 16;
+    const minAnchorAbovePx = bubbleHeight + minCeilingMarginPx + 16;
+    const canFitAbove = (headTopPx - 6) >= minAnchorAbovePx;
+    const spaceBelow = boardRect.height - feetBottomPx;
+    const canFitBelow = spaceBelow >= (bubbleHeight + 28);
+
+    const shouldFlip = !canFitAbove && canFitBelow;
+    dom.stageThoughtBubble.classList.toggle('bubble-flipped', shouldFlip);
+
+    let targetYPx;
+    if (shouldFlip) {
+      targetYPx = Math.min(boardRect.height - bubbleHeight - 14, feetBottomPx + 4);
+    } else {
+      targetYPx = Math.max(minAnchorAbovePx, headTopPx - 6);
+    }
+
+    const targetYPct = (targetYPx / boardRect.height) * 100;
+    dom.stageThoughtBubble.style.left = `${clampedX.toFixed(2)}%`;
+    dom.stageThoughtBubble.style.top = `${targetYPct.toFixed(2)}%`;
+  }
+
+  function startThoughtTracking() {
+    stopThoughtTracking();
+    if (!dom.stageThoughtBubble || dom.stageThoughtBubble.classList.contains('is-hidden')) return;
+
+    dom.stageThoughtBubble.classList.add('is-tracking');
+    updateThoughtBubblePosition();
+
+    if (typeof global.requestAnimationFrame !== 'function') return;
+
+    const track = () => {
+      if (!dom.stageThoughtBubble || dom.stageThoughtBubble.classList.contains('is-hidden')) {
+        stopThoughtTracking();
+        return;
+      }
+      updateThoughtBubblePosition();
+      thoughtTrackingRaf = global.requestAnimationFrame(track);
+    };
+
+    thoughtTrackingRaf = global.requestAnimationFrame(track);
+  }
+
   function showPenguinThought(text) {
     if (!dom.stageThoughtBubble || !dom.thoughtBubbleText || !text) return;
     clearTimeout(thoughtBubbleTimer);
 
     dom.thoughtBubbleText.textContent = text;
-    const clampedX = Math.max(18, Math.min(82, penguinPos.x));
-    const targetY = Math.max(12, penguinPos.y - 12);
-    dom.stageThoughtBubble.style.left = `${clampedX}%`;
-    dom.stageThoughtBubble.style.top = `${targetY}%`;
     dom.stageThoughtBubble.classList.remove('is-hidden');
+    startThoughtTracking();
 
     thoughtBubbleTimer = setTimeout(() => {
-      if (dom.stageThoughtBubble) {
-        dom.stageThoughtBubble.classList.add('is-hidden');
-      }
-      activeAmbientThought = null;
-    }, 4500);
+      hideThoughtBubble();
+    }, 4800);
   }
 
   function showSpeechBubbleStep({ speaker, name, avatarSvg, text, audioUrl, anchorPos, choices, onNext, onChoice }) {
     if (!dom.stageSpeechBubble) return;
+    hideThoughtBubble();
     const turnToken = ++activeDialogueToken;
     clearTimeout(dialogueAutoTimer);
     TTS.stop();
