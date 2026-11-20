@@ -1391,7 +1391,7 @@ const CHAPTERS_EN = [
         "label": "Chryse Planitia Hematite",
         "pos": {
           "x": 42,
-          "y": 80
+          "y": 79
         }
       },
       {
@@ -1401,7 +1401,7 @@ const CHAPTERS_EN = [
         "label": "Martian Volcanic Basalt",
         "pos": {
           "x": 52,
-          "y": 69
+          "y": 68
         }
       },
       {
@@ -1455,8 +1455,8 @@ const CHAPTERS_EN = [
         "locationDetail": "Viking 1 Lander: Chryse Planitia (Plains of Gold)",
         "nasaUrl": "https://science.nasa.gov/mission/viking-1/",
         "pos": {
-          "x": 62,
-          "y": 59
+          "x": 64,
+          "y": 60
         },
         "shipPos": {
           "x": 20,
@@ -1587,8 +1587,8 @@ const CHAPTERS_EN = [
         "locationDetail": "Sojourner Rover: Ares Vallis (ancient Martian outflow channel)",
         "nasaUrl": "https://science.nasa.gov/mission/mars-pathfinder/",
         "pos": {
-          "x": 67,
-          "y": 63
+          "x": 66,
+          "y": 62
         },
         "shipPos": {
           "x": 20,
@@ -1736,8 +1736,8 @@ const CHAPTERS_EN = [
         "locationDetail": "Pioneer 10: Cruising inert ~118.8 AU from Earth · En route toward giant red star Aldebaran",
         "nasaUrl": "https://science.nasa.gov/mission/pioneer-10/",
         "pos": {
-          "x": 63,
-          "y": 56
+          "x": 64,
+          "y": 46
         },
         "shipPos": {
           "x": 22,
@@ -1868,8 +1868,8 @@ const CHAPTERS_EN = [
         "locationDetail": "NEAR Shoemaker: Resting on the south polar tip of Asteroid 433 Eros",
         "nasaUrl": "https://science.nasa.gov/mission/near-shoemaker/",
         "pos": {
-          "x": 65,
-          "y": 58
+          "x": 68,
+          "y": 56
         },
         "shipPos": {
           "x": 22,
