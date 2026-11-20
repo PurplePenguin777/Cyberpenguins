@@ -13,13 +13,13 @@
   function stageBackdropAsteroideEros() {
     const id = M.uid('eros');
 
-    // Terreno triangulado con perspectiva
+    // Terreno triangulado con perspectiva (posicionado para dar amplio cielo cósmico)
     const mesh = typeof M.groundMesh === 'function'
       ? M.groundMesh({
           x0: -60,
-          y0: 250,
+          y0: 305,
           w: 1120,
-          h: 360,
+          h: 320,
           cols: 18,
           rows: 7,
           seed: 303,
@@ -29,19 +29,19 @@
           persp: true,
           noise: 0.42
         })
-      : `<rect x="0" y="260" width="1000" height="340" fill="${REGOLITH.mid}" />`;
+      : `<rect x="0" y="315" width="1000" height="280" fill="${REGOLITH.mid}" />`;
 
     const craters =
-      M.surfaceCrater(216, 380, 64, 18, '#1e2733', '#dfe5ee') +
-      M.surfaceCrater(498, 364, 72, 19, '#1e2733', '#dfe5ee') +
-      M.surfaceCrater(822, 396, 52, 15, '#1e2733', '#dfe5ee') +
-      M.surfaceCrater(470, 520, 46, 13, '#1e2733', '#cbd3de');
+      M.surfaceCrater(216, 435, 64, 18, '#1e2733', '#dfe5ee') +
+      M.surfaceCrater(498, 419, 72, 19, '#1e2733', '#dfe5ee') +
+      M.surfaceCrater(822, 451, 52, 15, '#1e2733', '#dfe5ee') +
+      M.surfaceCrater(470, 545, 46, 13, '#1e2733', '#cbd3de');
 
     const rocks =
-      M.surfaceRock(96, 430, 20, '#dfe5ee', '#8f99a8', '#2a3340') +
-      M.surfaceRock(884, 486, 24, '#dfe5ee', '#8f99a8', '#2a3340') +
-      M.surfaceRock(330, 506, 18, '#cbd3de', '#7d8797', '#2a3340') +
-      M.surfaceRock(640, 436, 14, '#cbd3de', '#7d8797', '#2a3340');
+      M.surfaceRock(96, 485, 20, '#dfe5ee', '#8f99a8', '#2a3340') +
+      M.surfaceRock(884, 541, 24, '#dfe5ee', '#8f99a8', '#2a3340') +
+      M.surfaceRock(330, 561, 18, '#cbd3de', '#7d8797', '#2a3340') +
+      M.surfaceRock(640, 491, 14, '#cbd3de', '#7d8797', '#2a3340');
 
     return `
       <svg viewBox="0 0 1000 594" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -55,16 +55,16 @@
             <stop offset="0%" stop-color="#02060f" stop-opacity="0" />
             <stop offset="100%" stop-color="#02060f" stop-opacity="0.38" />
           </linearGradient>
-          <!-- Horizonte muy curvo: un cuerpo de 34 km se curva mucho más que la Luna -->
+          <!-- Horizonte muy curvo posicionado en y ~315 para dar más espacio vertical en el cielo -->
           <clipPath id="${id}-surf">
-            <ellipse cx="500" cy="900" rx="900" ry="640" />
+            <ellipse cx="500" cy="955" rx="900" ry="640" />
           </clipPath>
         </defs>
 
         <!-- Cielo negro sin atmósfera -->
         <rect width="1000" height="594" fill="url(#${id}-sky)" />
 
-        <!-- Estrellas solo sobre el horizonte -->
+        <!-- Estrellas distribuidas en el cielo cósmico -->
         <g fill="#ffffff">
           <circle cx="54" cy="48" r="1.4" opacity="0.86" />
           <circle cx="132" cy="84" r="1.2" opacity="0.72" />
@@ -75,6 +75,10 @@
           <circle cx="788" cy="42" r="1.6" opacity="0.88" />
           <circle cx="924" cy="76" r="1.3" opacity="0.78" />
           <circle cx="72" cy="212" r="1.2" opacity="0.74" />
+          <circle cx="168" cy="180" r="1.3" opacity="0.75" />
+          <circle cx="380" cy="220" r="1.5" opacity="0.82" />
+          <circle cx="590" cy="190" r="1.4" opacity="0.78" />
+          <circle cx="810" cy="210" r="1.3" opacity="0.8" />
           <circle cx="946" cy="224" r="1.2" opacity="0.74" />
         </g>
 
@@ -82,15 +86,15 @@
         <g clip-path="url(#${id}-surf)">
           ${mesh}
           <!-- Depósitos planos de polvo ("ponds") -->
-          <ellipse cx="610" cy="384" rx="70" ry="11" fill="#aab4c2" opacity="0.35" />
-          <ellipse cx="300" cy="446" rx="54" ry="9" fill="#aab4c2" opacity="0.3" />
+          <ellipse cx="610" cy="439" rx="70" ry="11" fill="#aab4c2" opacity="0.35" />
+          <ellipse cx="300" cy="501" rx="54" ry="9" fill="#aab4c2" opacity="0.3" />
           ${craters}
           ${rocks}
-          <rect x="0" y="250" width="1000" height="344" fill="url(#${id}-depth)" />
+          <rect x="0" y="305" width="1000" height="289" fill="url(#${id}-depth)" />
         </g>
 
         <!-- Borde iluminado del horizonte -->
-        <ellipse cx="500" cy="900" rx="900" ry="640" fill="none" stroke="#e8edf5" stroke-opacity="0.4" stroke-width="2" />
+        <ellipse cx="500" cy="955" rx="900" ry="640" fill="none" stroke="#e8edf5" stroke-opacity="0.4" stroke-width="2" />
       </svg>
     `;
   }

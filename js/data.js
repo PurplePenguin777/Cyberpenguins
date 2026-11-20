@@ -717,9 +717,9 @@
           locationShort: 'Asteroide 433 Eros',
           locationDetail: 'NEAR Shoemaker: aterrizó en la superficie del asteroide 433 Eros',
           nasaUrl: 'https://science.nasa.gov/mission/near-shoemaker/',
-          pos: { x: 68, y: 56 },
-          shipPos: { x: 22, y: 58 },
-          spawnPos: { x: 22, y: 58 },
+          pos: { x: 68, y: 64 },
+          shipPos: { x: 22, y: 66 },
+          spawnPos: { x: 22, y: 66 },
           penguinText: '¡Hola! Este lugar no parece un planeta. ¿Dónde estoy?',
           penguinAudioUrl: 'audio/cp_near_opc_1a.mp3',
           dialogueText: '¡Cuidado al caminar, Cyberpenguin! ¡La gravedad aquí en el asteroide Eros es tan débil que si estornudas con fuerza podrías salir volando al espacio!',
@@ -1869,15 +1869,15 @@ const CHAPTERS_EN = [
         "nasaUrl": "https://science.nasa.gov/mission/near-shoemaker/",
         "pos": {
           "x": 68,
-          "y": 56
+          "y": 64
         },
         "shipPos": {
           "x": 22,
-          "y": 58
+          "y": 66
         },
         "spawnPos": {
           "x": 22,
-          "y": 58
+          "y": 66
         },
         "penguinText": "Hello! This doesn't look like a round planet. Where am I?",
         "penguinAudioUrl": "audio/en/cp_near_opc_1a.mp3",

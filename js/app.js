@@ -2543,8 +2543,12 @@
   function clampToSurface(x, y, chapterOverride) {
     const chapter = chapterOverride || getChapter(state.currentChapterId);
     if (chapter && !chapter.hasSurface) {
+      const { activeMachine } = getActiveSite(chapter);
+      const isEros = activeMachine && activeMachine.siteId === 'asteroid-eros';
       const clampedX = Math.max(16, Math.min(84, x));
-      const clampedY = Math.max(28, Math.min(84, y));
+      // En el asteroide Eros la superficie reposa en la mitad inferior (53-86%), mientras que en Pioneer 10 es vacío abierto (28-84%)
+      const minY = isEros ? 53 : 28;
+      const clampedY = Math.max(minY, Math.min(86, y));
       return {
         x: Number(clampedX.toFixed(1)),
         y: Number(clampedY.toFixed(1))
