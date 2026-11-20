@@ -3011,31 +3011,6 @@ a:focus-visible {
   transition: none !important;
 }
 
-.stage-thought-bubble.bubble-flipped {
-  transform: translate(-50%, 0);
-  margin-top: 14px;
-  flex-direction: column-reverse;
-  animation-name: thoughtBubblePopInFlipped;
-}
-
-@keyframes thoughtBubblePopInFlipped {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -25%) scale(0.75);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-}
-
-.stage-thought-bubble.bubble-flipped .thought-bubble-trail {
-  flex-direction: column-reverse;
-  margin-top: 0;
-  margin-bottom: 4px;
-}
-
 @keyframes thoughtBubblePopIn {
   0% {
     opacity: 0;

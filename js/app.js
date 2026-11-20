@@ -2262,6 +2262,9 @@
       if (hopTarget.x > penguinPos.x + 0.5) penguinDir = 'right';
     }
 
+    const jumpOrigin = { x: penguinPos.x, y: penguinPos.y };
+    const jumpTarget = { x: hopTarget.x, y: hopTarget.y };
+
     dom.penguinActor.classList.remove('jumping-moon', 'jumping-mars', 'jumping-eros', 'jumping-deep');
     void dom.penguinActor.offsetWidth;
     dom.penguinActor.style.transitionDuration = `${profile.jumpDurationMs}ms`;
@@ -2297,7 +2300,13 @@
       const thoughts = allThoughts[chapter.id];
       const randomIndex = Math.floor(Math.random() * thoughts.length);
       activeAmbientThought = { chapterId: chapter.id, index: randomIndex };
-      showPenguinThought(thoughts[randomIndex]);
+      const jumpArcPct = (siteId === 'asteroid-eros' ? 16.5 : (chapter.id === 'moon' ? 8.5 : 3.5));
+      showPenguinThought(thoughts[randomIndex], {
+        origin: jumpOrigin,
+        target: jumpTarget,
+        durationMs: profile.jumpDurationMs,
+        arcPct: jumpArcPct
+      });
     }
 
     if (!chapter.hasSurface) {
@@ -2783,11 +2792,14 @@
     TTS.stop();
   }
 
+  let thoughtJumpParams = null;
+
   function stopThoughtTracking() {
     if (thoughtTrackingRaf && typeof global.cancelAnimationFrame === 'function') {
       global.cancelAnimationFrame(thoughtTrackingRaf);
     }
     thoughtTrackingRaf = null;
+    thoughtJumpParams = null;
     if (dom.stageThoughtBubble) {
       dom.stageThoughtBubble.classList.remove('is-tracking');
     }
@@ -2798,85 +2810,74 @@
     stopThoughtTracking();
     if (dom.stageThoughtBubble) {
       dom.stageThoughtBubble.classList.add('is-hidden');
-      dom.stageThoughtBubble.classList.remove('bubble-flipped');
     }
     activeAmbientThought = null;
   }
 
-  function updateThoughtBubblePosition() {
-    if (!dom.stageThoughtBubble || dom.stageThoughtBubble.classList.contains('is-hidden')) {
-      stopThoughtTracking();
-      return;
-    }
-    const spriteEl = dom.penguinSprite || dom.penguinActor;
-    if (!spriteEl || !dom.isoBoard) return;
-
-    const spriteRect = spriteEl.getBoundingClientRect();
-    const boardRect = dom.isoBoard.getBoundingClientRect();
-    if (!boardRect.width || !boardRect.height) return;
-
-    // Centro horizontal del pingüino en porcentaje del escenario
-    const centerX = ((spriteRect.left + spriteRect.width / 2) - boardRect.left) / boardRect.width * 100;
-    const clampedX = Math.max(16, Math.min(84, centerX));
-
-    // Coordenadas verticales relativas al tablero
-    const headTopPx = spriteRect.top - boardRect.top;
-    const feetBottomPx = spriteRect.bottom - boardRect.top;
-
-    // Altura del globo para cálculo de espacio seguro
-    const bubbleRect = dom.stageThoughtBubble.getBoundingClientRect();
-    const bubbleHeight = bubbleRect.height > 20 ? bubbleRect.height : 110;
-
-    // Margen superior mínimo para no chocar con la barra superior de la app
-    const minCeilingMarginPx = 16;
-    const minAnchorAbovePx = bubbleHeight + minCeilingMarginPx + 16;
-    const canFitAbove = (headTopPx - 6) >= minAnchorAbovePx;
-    const spaceBelow = boardRect.height - feetBottomPx;
-    const canFitBelow = spaceBelow >= (bubbleHeight + 28);
-
-    const shouldFlip = !canFitAbove && canFitBelow;
-    dom.stageThoughtBubble.classList.toggle('bubble-flipped', shouldFlip);
-
-    let targetYPx;
-    if (shouldFlip) {
-      targetYPx = Math.min(boardRect.height - bubbleHeight - 14, feetBottomPx + 4);
-    } else {
-      targetYPx = Math.max(minAnchorAbovePx, headTopPx - 6);
-    }
-
-    const targetYPct = (targetYPx / boardRect.height) * 100;
+  function applyThoughtBubblePosition(x, y) {
+    if (!dom.stageThoughtBubble) return;
+    const clampedX = Math.max(16, Math.min(84, x));
+    // Clamping superior en 22% para que el globo nunca toque el borde superior ni se corte
+    const safeY = Math.max(22, y - 14);
     dom.stageThoughtBubble.style.left = `${clampedX.toFixed(2)}%`;
-    dom.stageThoughtBubble.style.top = `${targetYPct.toFixed(2)}%`;
+    dom.stageThoughtBubble.style.top = `${safeY.toFixed(2)}%`;
   }
 
-  function startThoughtTracking() {
+  function startThoughtTrackingJump(jumpData) {
     stopThoughtTracking();
-    if (!dom.stageThoughtBubble || dom.stageThoughtBubble.classList.contains('is-hidden')) return;
+    if (!dom.stageThoughtBubble || dom.stageThoughtBubble.classList.contains('is-hidden') || !jumpData) return;
+
+    thoughtJumpParams = {
+      origin: jumpData.origin,
+      target: jumpData.target,
+      durationMs: jumpData.durationMs || 1000,
+      arcPct: jumpData.arcPct || 0,
+      startTime: Date.now()
+    };
 
     dom.stageThoughtBubble.classList.add('is-tracking');
-    updateThoughtBubblePosition();
+    applyThoughtBubblePosition(thoughtJumpParams.origin.x, thoughtJumpParams.origin.y);
 
     if (typeof global.requestAnimationFrame !== 'function') return;
 
-    const track = () => {
-      if (!dom.stageThoughtBubble || dom.stageThoughtBubble.classList.contains('is-hidden')) {
+    const tick = () => {
+      if (!dom.stageThoughtBubble || dom.stageThoughtBubble.classList.contains('is-hidden') || !thoughtJumpParams) {
         stopThoughtTracking();
         return;
       }
-      updateThoughtBubblePosition();
-      thoughtTrackingRaf = global.requestAnimationFrame(track);
+
+      const elapsed = Date.now() - thoughtJumpParams.startTime;
+      const t = Math.min(1, Math.max(0, elapsed / thoughtJumpParams.durationMs));
+      const arc = thoughtJumpParams.arcPct * Math.sin(t * Math.PI);
+      const curX = thoughtJumpParams.origin.x + (thoughtJumpParams.target.x - thoughtJumpParams.origin.x) * t;
+      const curY = thoughtJumpParams.origin.y + (thoughtJumpParams.target.y - thoughtJumpParams.origin.y) * t - arc;
+
+      applyThoughtBubblePosition(curX, curY);
+
+      if (t < 1) {
+        thoughtTrackingRaf = global.requestAnimationFrame(tick);
+      } else {
+        stopThoughtTracking();
+        applyThoughtBubblePosition(thoughtJumpParams.target.x, thoughtJumpParams.target.y);
+      }
     };
 
-    thoughtTrackingRaf = global.requestAnimationFrame(track);
+    thoughtTrackingRaf = global.requestAnimationFrame(tick);
   }
 
-  function showPenguinThought(text) {
+  function showPenguinThought(text, jumpData) {
     if (!dom.stageThoughtBubble || !dom.thoughtBubbleText || !text) return;
     clearTimeout(thoughtBubbleTimer);
 
     dom.thoughtBubbleText.textContent = text;
     dom.stageThoughtBubble.classList.remove('is-hidden');
-    startThoughtTracking();
+
+    if (jumpData) {
+      startThoughtTrackingJump(jumpData);
+    } else {
+      stopThoughtTracking();
+      applyThoughtBubblePosition(penguinPos.x, penguinPos.y);
+    }
 
     thoughtBubbleTimer = setTimeout(() => {
       hideThoughtBubble();
