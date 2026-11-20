@@ -1687,8 +1687,9 @@
     if (!chapter) return [];
     const { activeMachine } = getActiveSite(chapter);
     const shipPos = (activeMachine && activeMachine.shipPos) || chapter.shipPos;
+    // La huella cubre todo el fuselaje vertical de la nave (evita que Cyberpenguin camine sobre el cono o cabina)
     const obstacles = [
-      { id: 'ship', cx: shipPos.x, cy: shipPos.y - 1.5, rx: 8.5, ry: 5.2 }
+      { id: 'ship', cx: shipPos.x, cy: shipPos.y - 6.5, rx: 9.6, ry: 11.0 }
     ];
     if (activeMachine && activeMachine.pos) {
       obstacles.push({
@@ -2467,8 +2468,9 @@
     }
 
     // 3. Escotilla de la nave espacial (solo permite despegar si se completaron las tareas)
-    const distToShip = getDist(penguinPos, shipPos);
-    if (distToShip <= 14.5) {
+    const hatchPoint = getHatchAnchor(chapter);
+    const distToShip = getDist(penguinPos, hatchPoint);
+    if (distToShip <= 13.0) {
       const reqs = checkSiteRequirements(chapter);
       if (reqs.canLeave) {
         if (isFirstStop) {
