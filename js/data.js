@@ -111,7 +111,7 @@
                   id: '1c',
                   label: '🏀 ¿Es verdad que rebotaste como una pelota cuando aterrizaste?',
                   penguinText: '¿Es verdad que rebotaste como una pelota cuando aterrizaste?',
-                  reply: '¡Ja, ja, ja! ¡Totalmente cierto! Cuando llegué el 20 de abril de 1967, las rocas reflejaron mi radar y mis pequeños cohetes no se apagaron a tiempo. ¡Reboté dos veces sobre la Luna como en un trampolín antes de quedarme quieta!',
+                  reply: '¡Ja, ja, ja! ¡Totalmente cierto! Cuando llegué el veinte de abril de 1967, las rocas reflejaron mi radar y mis pequeños cohetes no se apagaron a tiempo. ¡Reboté dos veces sobre la Luna como en un trampolín antes de quedarme quieta!',
                   audioPenguin: 'audio/cp_surveyor_opc_c.mp3',
                   audioReply: 'audio/surveyor_resp_1c.mp3'
                 }
@@ -128,7 +128,7 @@
                   id: '2a',
                   label: '📸 ¿Y cuántas fotos tomaste con tu cámara de televisión?',
                   penguinText: '¿Y cuántas fotos tomaste con tu cámara de televisión?',
-                  reply: '¡Tomé más de 6.300 fotografías en blanco y negro! Fotografié las rocas, las zanjas que cavé con mi pala e incluso tomé una foto histórica de un eclipse solar donde la Tierra tapó al Sol vista desde la Luna.',
+                  reply: '¡Tomé más de seis mil trescientas fotografías en blanco y negro! Fotografié las rocas, las zanjas que cavé con mi pala e incluso tomé una foto histórica de un eclipse solar donde la Tierra tapó al Sol vista desde la Luna.',
                   audioPenguin: 'audio/cp_surveyor_opc_2a.mp3',
                   audioReply: 'audio/surveyor_resp_2a.mp3'
                 },
@@ -136,7 +136,7 @@
                   id: '2b',
                   label: '⭐ ¿Es verdad que luego vinieron astronautas a visitarte en persona?',
                   penguinText: '¿Es verdad que luego vinieron astronautas a visitarte en persona?',
-                  reply: '¡Bip-bip! ¡Sí, vinieron a visitarme a MÍ en persona! En noviembre de 1969, los astronautas del Apollo 12 aterrizaron su módulo Intrepid a solo 160 metros de distancia y vinieron caminando hasta aquí. ¡Pete Conrad y Alan Bean me examinaron y se llevaron mi cámara a la Tierra para estudiar cómo el metal aguanta dos años en el espacio!',
+                  reply: '¡Bip-bip! ¡Sí, vinieron a visitarme a MÍ en persona! En noviembre de 1969, los astronautas del Apollo 12 aterrizaron su módulo Intrepid a solo ciento sesenta metros de distancia y vinieron caminando hasta aquí. ¡Pete Conrad y Alan Bean me examinaron y se llevaron mi cámara a la Tierra para estudiar cómo el metal aguanta dos años en el espacio!',
                   audioPenguin: 'audio/cp_surveyor_opc_2b.mp3',
                   audioReply: 'audio/surveyor_resp_2b.mp3'
                 },
@@ -209,7 +209,7 @@
                   id: '1a',
                   label: '🏛️ ¡No puede ser! ¿Tú eres el legendario Eagle del Apollo 11?',
                   penguinText: '¡No puede ser! ¿Tú eres el legendario Eagle del Apollo 11?',
-                  reply: '¡El mismo que viste y calza! El 20 de julio de 1969 traje a Neil Armstrong y Buzz Aldrin hasta aquí. Fuimos impulsados desde la Tierra por el gigantesco cohete Saturno V, ¡un coloso tan alto como un edificio de 36 pisos!',
+                  reply: '¡El mismo que viste y calza! El veinte de julio de 1969 traje a Neil Armstrong y Buzz Aldrin hasta aquí. Fuimos impulsados desde la Tierra por el gigantesco cohete Saturno V, ¡un cohete tan alto como un edificio de treinta y seis pisos!',
                   audioPenguin: 'audio/cp_eagle_opc_1a.mp3',
                   audioReply: 'audio/eagle_resp_1a.mp3'
                 },
@@ -217,7 +217,7 @@
                   id: '1b',
                   label: '🍫 ¡Wow, pareces cubierto de papel dorado! ¿Por qué brillas tanto?',
                   penguinText: '¡Wow, pareces cubierto de papel de chocolate dorado! ¿Por qué brillas tanto?',
-                  reply: '¡Ja, ja! ¡Muchos niños creen que es papel de regalo! En realidad son mantas térmicas de alta tecnología llamadas Kapton y Mylar. En la Luna bajo el Sol el metal hierve a 120°C y en la sombra baja a -150°C. Esas mantas reflejaban el calor como un termo gigante para cuidar a los astronautas.',
+                  reply: '¡Ja, ja! ¡Muchos niños creen que es papel de regalo! En realidad son mantas térmicas de alta tecnología llamadas Kapton y Mylar. ¿Has visto esas sábanas metálicas doradas que usan los rescatistas de emergencia? En la Luna no hay aire: bajo el Sol el metal se calienta a más de ciento veinte grados y en la sombra baja a ciento cincuenta bajo cero. Esas mantas reflejaban el calor como un termo gigante para que Neil y Buzz estuvieran cómodos y seguros.',
                   audioPenguin: 'audio/cp_eagle_opc_1b.mp3',
                   audioReply: 'audio/eagle_resp_1b.mp3'
                 },
@@ -233,7 +233,7 @@
             },
             commonBridge: {
               speaker: 'machine',
-              text: 'Mi cuerpo estaba dividido en dos partes: la etapa de descenso (la parte dorada con patas que se quedó para siempre aquí) y la etapa de ascenso (la cabina superior que encendió su propio motor como un cohete para llevar a los astronautas de regreso al espacio). ¡Trabajaron en equipo perfecto!',
+              text: 'Mi cuerpo estaba dividido en dos partes: la etapa de descenso, que es la parte dorada de abajo con patas que sirvió como base de despegue y se quedó para siempre aquí; y la etapa de ascenso, que fue la cabina superior que encendió su propio motor como un cohete para devolver a los astronautas al espacio. ¡Trabajaron en equipo perfecto!',
               audioUrl: 'audio/eagle_puente_clave.mp3'
             },
             decision2: {
@@ -242,7 +242,7 @@
                   id: '2a',
                   label: '🪨 ¿Qué hicieron Neil y Buzz mientras caminaban aquí afuera?',
                   penguinText: '¿Qué hicieron Neil y Buzz mientras caminaban aquí afuera?',
-                  reply: 'Caminaron durante más de dos horas y media, tomaron fotos, clavaron la bandera y recolectaron casi 22 kilogramos de rocas y polvo lunar usando palas y pinzas especiales para llevar a los laboratorios de la Tierra.',
+                  reply: 'Caminaron durante más de dos horas y media, tomaron fotos, clavaron la bandera de Estados Unidos y recolectaron casi veintidós kilos de rocas y polvo lunar usando palas y pinzas especiales para llevar a los laboratorios de la Tierra.',
                   audioPenguin: 'audio/cp_eagle_opc_2a.mp3',
                   audioReply: 'audio/eagle_resp_2a.mp3'
                 },
@@ -250,7 +250,7 @@
                   id: '2b',
                   label: '⭐ ¿El aterrizaje fue tan fácil como apretar un botón automático?',
                   penguinText: '¿El aterrizaje fue tan fácil como apretar un botón automático?',
-                  reply: '¡Ufff, casi no lo logramos! Durante el descenso la computadora se sobrecargó y saltó la alarma 1202, ¡igual que cuando abres demasiadas aplicaciones en una tableta y se traba! Nos llevaba directo a un cráter con rocas como autos. Neil Armstrong tomó los controles manuales como en un videojuego y aterrizó cuando quedaban menos de 40 segundos de combustible. ¡Pura adrenalina!',
+                  reply: '¡Ufff, casi no lo logramos! Durante el descenso, la computadora se sobrecargó de tareas y saltó la alarma doce cero dos, ¡igual que cuando abres demasiadas aplicaciones en una tableta y se traba! El piloto automático nos llevaba directo a un cráter lleno de rocas tan grandes como automóviles. Neil Armstrong tomó los controles manuales como en un videojuego, voló buscando un sitio plano y aterrizamos cuando quedaban apenas ¡menos de cuarenta segundos de combustible! ¡Se nos acababa la gasolina espacial!',
                   audioPenguin: 'audio/cp_eagle_opc_2b.mp3',
                   audioReply: 'audio/eagle_resp_2b.mp3'
                 },
@@ -258,7 +258,7 @@
                   id: '2c',
                   label: '🔬 Veo unos aparatos con espejos y paneles solares sobre el suelo... ¿qué son?',
                   penguinText: 'Veo unos aparatos con espejos y paneles solares sobre el suelo... ¿qué son?',
-                  reply: '¡Excelente vista! Dejamos el paquete científico EASEP con unos espejos reflectores. Funcionan como los ojos de gato de las bicicletas: devuelven la luz directo a quien la envía. Hasta hoy, los científicos disparan rayos láser desde telescopios en la Tierra a esos espejos para medir la distancia exacta a la Luna al milímetro.',
+                  reply: '¡Excelente vista! Dejamos el paquete científico EASEP con unos espejos reflectores muy especiales. ¿Conoces los ojos de gato que llevan las bicicletas en las ruedas? ¡Reflejan la luz directo hacia quien los alumbra! Hoy en día, los científicos disparan rayos láser desde la Tierra hacia esos espejos en la Luna. Midiendo el tiempo que tarda la luz en rebotar, sabemos la distancia exacta a la Luna al milímetro.',
                   audioPenguin: 'audio/cp_eagle_opc_2c.mp3',
                   audioReply: 'audio/eagle_resp_2c.mp3'
                 }
@@ -266,7 +266,7 @@
             },
             closing: {
               speaker: 'machine',
-              text: 'La huella de Neil y Buzz quedó marcada para la eternidad. Pero el mensaje más hermoso es la placa en mi pata: "Vinimos en son de paz en nombre de toda la humanidad".',
+              text: 'La huella de Neil y Buzz quedó marcada para la eternidad. Pero el mensaje más hermoso es la placa en mi pata delantera: \'Vinimos en son de paz en nombre de toda la humanidad\'.',
               audioUrl: 'audio/eagle_despedida.mp3'
             },
             farewellPenguin: {
@@ -383,7 +383,7 @@
                   id: '1a',
                   label: '🔴 ¡Hola Viking 1! ¿Tú fuiste la primera nave en llegar a Marte?',
                   penguinText: '¡Hola Viking 1! ¿Tú fuiste la primera nave en llegar a Marte?',
-                  reply: '¡Fui la primera nave estadounidense en aterrizar con total éxito en Marte y sobrevivir para enviar datos! Aterricé el 20 de julio de 1976. Y mi misión era doble: mientras mi Orbitador tomaba fotos desde las alturas como un satélite espía amigable, yo aterricé aquí abajo para oler, raspar y probar el suelo marciano.',
+                  reply: '¡Fui la primera nave estadounidense en aterrizar con total éxito en Marte y sobrevivir para enviar datos! Aterricé el veinte de julio de 1976, ¡justo siete años después de que los humanos pisaran la Luna! Y mi misión era doble: mientras mi Orbitador tomaba fotos desde las alturas como un satélite espía amigable, yo aterricé aquí abajo para oler, raspar y probar el suelo marciano.',
                   audioPenguin: 'audio/cp_viking_opc_1a.mp3',
                   audioReply: 'audio/viking_resp_1a.mp3'
                 },
@@ -391,7 +391,7 @@
                   id: '1b',
                   label: '👽 ¡Rápido, dime la verdad! ¿Encontraste marcianitos verdes con antenas?',
                   penguinText: '¡Rápido, dime la verdad! ¿Encontraste marcianitos verdes con antenas?',
-                  reply: '¡Ja, ja, ja! ¡Nada de hombrecitos verdes ni ciudades alienígenas! Mis sensores buscaron microbios o pequeñas bacterias en el polvo, pero no encontramos vida. ¡Eso sí, descubrí algo fascinante! El suelo marciano tiene químicos súper agresivos, muy parecidos al agua oxigenada. Esos químicos actúan como un desinfectante gigante que destruye cualquier rastro biológico.',
+                  reply: '¡Ja, ja, ja! ¡Nada de hombrecitos verdes ni ciudades alienígenas! Mis sensores buscaron microbios o pequeñas bacterias en el polvo, pero no encontramos vida. ¡Eso sí, descubrí algo fascinante! El suelo marciano tiene químicos súper agresivos, muy parecidos al agua oxigenada con la que nos curan los raspones. Esos químicos actúan como un desinfectante gigante que destruye cualquier rastro biológico. ¡Así aprendimos que para un ser vivo, la superficie de Marte es un lugar muy difícil!',
                   audioPenguin: 'audio/cp_viking_opc_1b.mp3',
                   audioReply: 'audio/viking_resp_1b.mp3'
                 },
@@ -399,7 +399,7 @@
                   id: '1c',
                   label: '🦾 ¿Por qué tienes ese brazo tan largo terminado en palita?',
                   penguinText: '¿Por qué tienes ese brazo tan largo terminado en palita?',
-                  reply: '¡Es mi brazo mecánico de 3 metros! En la punta llevaba una pala con un pequeño motor para raspar el suelo como si fuera una cuchara en un tazón de cereal. Recogía tierrita marciana y la soltaba por unos embudos en mi lomo directo a mis hornos científicos en miniatura.',
+                  reply: '¡Es mi brazo mecánico de tres metros! En la punta llevaba una pala con un pequeño motor para raspar el suelo como si fuera una cuchara en un tazón de cereal. Recogía tierrita marciana y la soltaba por unos embudos en mi lomo directo a mis hornos científicos en miniatura.',
                   audioPenguin: 'audio/cp_viking_opc_1c.mp3',
                   audioReply: 'audio/viking_resp_1c.mp3'
                 }
@@ -407,7 +407,7 @@
             },
             commonBridge: {
               speaker: 'machine',
-              text: 'En mi interior llevaba un aparato con nombre de trabalenguas: el GCMS (Espectrómetro de Masas y Cromatógrafo de Gases). Para entenderlo fácil: ¡imagina un hornito de cocina espacial! Mi brazo echaba una cucharadita de tierra marciana en un tubito, el hornito la calentaba y luego olía los vaporcitos que soltaba para descubrir de qué está hecho Marte.',
+              text: 'En mi interior llevaba un aparato con nombre de trabalenguas: el GCMS, o Cromatógrafo de Gases y Espectrómetro de Masas. Para entenderlo fácil: ¡imagina un hornito de cocina espacial! Mi brazo echaba una cucharadita de tierra marciana en un tubito, el hornito la calentaba y luego olía los vaporcitos que soltaba. Así pudimos descubrir qué minerales y gases componen el suelo del planeta rojo.',
               audioUrl: 'audio/viking_puente_clave.mp3'
             },
             decision2: {
@@ -416,7 +416,7 @@
                   id: '2a',
                   label: '❄️ ¿Cómo soportaste tanto frío durante años?',
                   penguinText: '¿Cómo soportaste tanto frío durante años?',
-                  reply: '¡No usé paneles solares porque las tormentas de polvo marciano los habrían cubierto de tierra como una persiana cerrada! En su lugar, llevé dos baterías especiales llamadas RTG. Adentro tenían una cápsula que produce calor continuo, como una fogata atómica segura. Ese calor se convertía en electricidad para no congelarme nunca.',
+                  reply: '¡No usé paneles solares porque las tormentas de polvo marciano los habrían cubierto de tierra como una persiana cerrada! En su lugar, llevé dos baterías especiales llamadas RTG. ¿El truco? Adentro tenían una cápsula que produce calor continuo, como una fogata atómica segura. Ese calor se convertía en electricidad para no congelarme nunca. ¡Eran como dos termos mágicos que me daban energía de día y de noche!',
                   audioPenguin: 'audio/cp_viking_opc_2a.mp3',
                   audioReply: 'audio/viking_resp_2a.mp3'
                 },
@@ -424,7 +424,7 @@
                   id: '2b',
                   label: '🌪️ ¿Tuviste que enfrentar tormentas de arena?',
                   penguinText: '¿Tuviste que enfrentar tormentas de arena?',
-                  reply: '¡Uff, vi tormentas monstruosas! En Marte, a veces una pequeña tormenta crece tanto que el polvo cubre TODO el planeta durante semanas y tapa el Sol por completo, como si cayera una niebla rojiza gigante. Con mi estación del clima medí vientos de hasta 120 km/h, pero como el aire marciano es tan tenue, ¡el viento apenas empuja como una suave brisa!',
+                  reply: '¡Uff, vi tormentas monstruosas! En Marte, a veces una pequeña tormenta crece tanto que el polvo cubre todo el planeta durante semanas y tapa el Sol por completo, como si cayera una niebla rojiza gigante. Con mi estación del clima medí vientos de hasta ciento veinte kilómetros por hora, pero como el aire marciano es tan finito y ligero, ¡el viento apenas te empujaría como una suave brisa en la Tierra!',
                   audioPenguin: 'audio/cp_viking_opc_2b.mp3',
                   audioReply: 'audio/viking_resp_2b.mp3'
                 },
@@ -432,7 +432,7 @@
                   id: '2c',
                   label: '⏳ ¿Tu misión duró unos pocos días?',
                   penguinText: '¿Tu misión duró unos pocos días?',
-                  reply: '¡Para nada! Los ingenieros de la NASA pensaron que yo duraría solo 90 días... ¡pero fui tan fuerte que trabajé durante más de 6 años enteros! Envié miles de fotos e informes del clima hasta noviembre de 1982. ¡Fui el robot más resistente y madrugador de Marte en el siglo XX!',
+                  reply: '¡Para nada! Los ingenieros de la NASA pensaron que yo duraría solo noventa días... ¡pero fui tan fuerte que trabajé durante más de seis años enteros! Envié miles de fotos e informes del clima hasta noviembre de 1982. ¡Fui el robot más resistente y madrugador de Marte en el siglo veinte!',
                   audioPenguin: 'audio/cp_viking_opc_2c.mp3',
                   audioReply: 'audio/viking_resp_2c.mp3'
                 }
@@ -483,12 +483,12 @@
           spawnPos: { x: 30, y: 72 },
           penguinText: '¡Qué pequeño eres! ¿Eres un robot explorador?',
           penguinAudioUrl: 'audio/cp_sojourner_opc_1a.mp3',
-          dialogueText: '¡Cuidado con mis rueditas, pingüino amigo! ¡Paso a 1 centímetro por segundo! ¡Soy Sojourner, el primer rover de la historia en Marte!',
+          dialogueText: '¡Cuidado con mis rueditas, pingüino amigo! ¡Paso a un centímetro por segundo! ¡Soy Sojourner, el primer rover de la historia en Marte!',
           audioUrl: 'audio/sojourner_saludo.mp3',
           branchingDialogue: {
             greeting: {
               speaker: 'machine',
-              text: '¡Cuidado con mis rueditas, pingüino amigo! ¡Paso a 1 centímetro por segundo! ¡Soy Sojourner, el primer rover de la historia en Marte!',
+              text: '¡Cuidado con mis rueditas, pingüino amigo! ¡Paso a un centímetro por segundo! ¡Soy Sojourner, el primer rover de la historia en Marte!',
               audioUrl: 'audio/sojourner_saludo.mp3'
             },
             decision1: {
@@ -497,7 +497,7 @@
                   id: '1a',
                   label: '🤖 ¡Aaaay, pero qué tierno eres! ¡Pareces un juguete a control remoto!',
                   penguinText: '¡Aaaay, pero qué tierno eres! ¡Pareces un juguete a control remoto!',
-                  reply: '¡Oye, que peso 10.5 kilos y mido solo 65 centímetros, pero llevo un cerebro de titanio! Llegué el 4 de julio de 1997 con la misión Mars Pathfinder. ¡Demostré que los rovers pequeños podían explorar otros mundos con mucha agilidad!',
+                  reply: '¡Oye, que peso diez kilos y medio y mido solo sesenta y cinco centímetros, pero llevo un cerebro de titanio! Llegué el cuatro de julio de 1997 con la misión Mars Pathfinder. ¡Demostré que los rovers pequeños podían explorar otros mundos con mucha agilidad!',
                   audioPenguin: 'audio/cp_sojourner_opc_1a.mp3',
                   audioReply: 'audio/sojourner_resp_1a.mp3'
                 },
@@ -505,7 +505,7 @@
                   id: '1b',
                   label: '🎈 ¿Cómo llegaste hasta aquí si no tienes cohetes propios?',
                   penguinText: '¿Cómo llegaste hasta aquí si no tienes cohetes propios?',
-                  reply: '¡Mi nave nodriza Pathfinder fue genial! Para aterrizar no usamos patas duras: ¡nos inflamos dentro de un capullo gigante de airbags y rebotamos sobre Marte como una pelota de baloncesto más de 15 veces hasta detenernos! Luego los pétalos se abrieron y bajé por una rampita.',
+                  reply: '¡Mi nave nodriza Pathfinder fue genial! Para aterrizar no usamos patas duras: ¡nos inflamos dentro de un capullo gigante de bolsas de aire y rebotamos sobre Marte como una pelota de baloncesto más de quince veces hasta detenernos! Luego los pétalos se abrieron y bajé por una rampita.',
                   audioPenguin: 'audio/cp_sojourner_opc_1b.mp3',
                   audioReply: 'audio/sojourner_resp_1b.mp3'
                 },
@@ -513,7 +513,7 @@
                   id: '1c',
                   label: '🛞 ¿Tienes seis ruedas para correr a toda velocidad?',
                   penguinText: '¿Tienes seis ruedas para correr a toda velocidad?',
-                  reply: '¡Ja, ja! ¡No soy un bólido de carreras! Mi velocidad máxima es de 1 centímetro por segundo. Pero mis seis ruedas tienen un sistema llamado rocker-bogie: ¡como una patineta todoterreno con patas articuladas de insecto! Cuando una rueda trepa una roca grande, las otras cinco se acomodan solitas en el suelo para no volcarme jamás.',
+                  reply: '¡Ja, ja! ¡No soy un bólido de carreras! Mi velocidad máxima es de un centímetro por segundo; ¡un caracol me ganaría en una carrera corta! Pero mis seis ruedas tienen un sistema llamado rocker-bogie: ¡imagina una patineta todoterreno con patas articuladas de insecto! Cuando una rueda trepa una roca grande, las otras cinco se acomodan solitas en el suelo para que mi cuerpo nunca se balancee ni se vuelque.',
                   audioPenguin: 'audio/cp_sojourner_opc_1c.mp3',
                   audioReply: 'audio/sojourner_resp_1c.mp3'
                 }
@@ -521,7 +521,7 @@
             },
             commonBridge: {
               speaker: 'machine',
-              text: 'En mi parte trasera llevo el APXS (Espectrómetro de Rayos X y Partículas Alfa). ¡Es como mi nariz robótica! En lugar de oler, lo pego contra las piedras marcianas y les dispara partículas invisibles e inofensivas. Al escuchar el eco de los átomos, descubrimos si eran rocas volcánicas o arrastradas por antiguos ríos.',
+              text: 'En mi parte trasera llevo el APXS, el Espectrómetro de Rayos X y Partículas Alfa. ¡Es como mi nariz robótica! En lugar de oler, lo pego contra las piedras marcianas y les dispara partículas invisibles e inofensivas. Al escuchar el eco de los átomos de la roca, los científicos descubrieron si eran restos de lava volcánica o rocas arrastradas por agua en el pasado remoto.',
               audioUrl: 'audio/sojourner_puente_clave.mp3'
             },
             decision2: {
@@ -530,7 +530,7 @@
                   id: '2a',
                   label: '🎮 ¿Tú manejabas solo o alguien tenía un control remoto en la Tierra?',
                   penguinText: '¿Tú manejabas solo o alguien tenía un control remoto en la Tierra?',
-                  reply: '¡Imposible usar un joystick en vivo! Las señales de radio entre la Tierra y Marte tardan entre 10 y 20 minutos en viajar a la velocidad de la luz. Si veo un precipicio y en la Tierra me gritan "¡Frena!", ¡ya me habré caído! Por eso los científicos me mandaban un paquete de rutas en la mañana y yo usaba sensores láser para evitar baches.',
+                  reply: '¡Imposible usar un joystick en vivo! Las señales de radio entre la Tierra y Marte tardan entre diez y veinte minutos en viajar a la velocidad de la luz. Si veo un precipicio y en la Tierra me gritan \'¡Frena!\', ¡para cuando el mensaje me llegue ya me habré caído! Por eso los científicos me mandaban un paquete de rutas en la mañana y yo usaba sensores láser para evitar baches por mí mismo.',
                   audioPenguin: 'audio/cp_sojourner_opc_2a.mp3',
                   audioReply: 'audio/sojourner_resp_2a.mp3'
                 },
@@ -538,7 +538,7 @@
                   id: '2b',
                   label: '🐻 ¿Cómo llamaban a las rocas que investigabas?',
                   penguinText: '¿Cómo llamaban a las rocas que investigabas?',
-                  reply: '¡Los científicos de la NASA tienen mucho sentido del humor! Para no aburrirse con números, bautizaron a las rocas marcianas con nombres de personajes: ¡analicé una roca con forma de cabeza de oso llamada "Yogi", otra piramidal llamada "Barnacle Bill", otra llamada "Scooby Doo" y una plana llamada "Casper"!',
+                  reply: '¡Los científicos de la NASA tienen mucho sentido del humor! Para no aburrirse con números de catálogo, bautizaron a las rocas marcianas con nombres de personajes: ¡analicé una roca con forma de cabeza de oso llamada Yogi, otra piramidal llamada Barnacle Bill, otra llamada Scooby Doo y una plana llamada Casper!',
                   audioPenguin: 'audio/cp_sojourner_opc_2b.mp3',
                   audioReply: 'audio/sojourner_resp_2b.mp3'
                 },
@@ -630,7 +630,7 @@
                   id: '1b',
                   label: '☂️ ¡Menudo paraguas gigante que tienes ahí puesto!',
                   penguinText: '¡Menudo paraguas gigante que tienes ahí puesto!',
-                  reply: '¡Ja, ja! ¡No es un paraguas para la lluvia! Es mi antena de alta ganancia de casi 3 metros de diámetro. Como viajé tan lejos de la Tierra, necesitaba una antena parabólica gigante y muy enfocada para que mis débiles señales de radio pudieran ser escuchadas por las estaciones en la Tierra.',
+                  reply: '¡Ja, ja! ¡No es un paraguas para la lluvia! Es mi antena de alta ganancia de casi tres metros de diámetro. Como viajé tan lejos de la Tierra, necesitaba una antena parabólica gigante y muy enfocada para que mis débiles señales de radio pudieran ser escuchadas por las estaciones en la Tierra.',
                   audioPenguin: 'audio/cp_pioneer_opc_1b.mp3',
                   audioReply: 'audio/pioneer_resp_1b.mp3'
                 },
@@ -638,7 +638,7 @@
                   id: '1c',
                   label: '☄️ ¿No te dio miedo atravesar el temido cinturón de asteroides?',
                   penguinText: '¿No te dio miedo atravesar el temido cinturón de asteroides?',
-                  reply: '¡En las películas muestran el cinturón de asteroides como un campo minado donde chocas a cada segundo! Pero cuando lo crucé en 1972 demostré la verdad: ¡el espacio es colosalmente gigantesco! Entre un asteroide y el siguiente hay tanta distancia como viajar de un país a otro en la Tierra. Cruzarlo fue tan tranquilo como navegar en un océano despejado.',
+                  reply: '¡En las películas de ciencia ficción muestran el cinturón de asteroides como un campo minado donde chocas a cada segundo! Pero cuando lo crucé en 1972 demostré la verdad: ¡el espacio es colosalmente gigantesco! Entre un asteroide y el siguiente hay tanta distancia como viajar de un país a otro en la Tierra. Cruzarlo fue tan tranquilo como navegar por un océano despejado, abriendo una autopista segura para todas las naves del futuro.',
                   audioPenguin: 'audio/cp_pioneer_opc_1c.mp3',
                   audioReply: 'audio/pioneer_resp_1c.mp3'
                 }
@@ -646,7 +646,7 @@
             },
             commonBridge: {
               speaker: 'machine',
-              text: 'Llegué tan lejos que la luz del Sol apenas se ve como un puntito brillante. Por eso no usé paneles solares, sino baterías nucleares RTG: cápsulas térmicas que me daban calor y electricidad continua. Mi última señal llegó a la Tierra el 23 de enero de 2003, cuando estaba a más de 12.000 millones de kilómetros. ¡Tardó más de 11 horas en llegar a la velocidad de la luz!',
+              text: 'Llegué tan lejos que la luz del Sol apenas se ve como un puntito brillante. Por eso no usé paneles solares, sino baterías nucleares RTG: cápsulas térmicas que me daban calor y electricidad continua. Mi última señal llegó a la Tierra el 23 de enero de 2003, cuando estaba a más de doce mil millones de kilómetros. ¡Ese mensaje de radio tardó más de once horas en cruzar el vacío a la velocidad de la luz!',
               audioUrl: 'audio/pioneer_puente_clave.mp3'
             },
             decision2: {
@@ -655,7 +655,7 @@
                   id: '2a',
                   label: '📜 He visto que llevas una placa metálica dorada grabada... ¿qué significa?',
                   penguinText: 'He visto que llevas una placa metálica dorada grabada... ¿qué significa?',
-                  reply: '¡Es mi mayor tesoro! Una placa de oro diseñada por Carl Sagan y su esposa Linda. Muestra a un hombre y una mujer saludando en son de paz, el mapa del sistema solar y púlsares: faros de luz cósmicos que parpadean con el tic-tac de un reloj. Cualquier civilización inteligente podrá medir esos parpadeos y saber exactamente dónde está la Tierra.',
+                  reply: '¡Es mi mayor tesoro! Una placa de oro diseñada por Carl Sagan y su esposa Linda. Muestra a un hombre y una mujer saludando en son de paz, el mapa del sistema solar y unas líneas que salen de un centro: ¡son púlsares! Imagina faros de luz cósmicos que parpadean con un ritmo perfecto como el tic-tac de un reloj. Cualquier civilización inteligente que encuentre mi placa podrá contar esos parpadeos y saber exactamente dónde queda la Tierra en el mapa de la galaxia.',
                   audioPenguin: 'audio/cp_pioneer_opc_2a.mp3',
                   audioReply: 'audio/pioneer_resp_2a.mp3'
                 },
@@ -663,7 +663,7 @@
                   id: '2b',
                   label: '✨ ¿Hacia dónde vas ahora que tus baterías se apagaron?',
                   penguinText: '¿Hacia dónde vas ahora que tus baterías se apagaron?',
-                  reply: 'Como en el vacío del espacio no hay aire ni gravedad fuerte que me frene, ¡seguiré flotando para siempre! Ahora viajo en silencio hacia la estrella gigante roja Aldebarán. Tardaré unos dos millones de años en llegar a su vecindario. ¡Soy una auténtica carta en una botella lanzada al océano de las estrellas!',
+                  reply: 'Como en el vacío del espacio no hay aire ni gravedad fuerte que me frene, ¡seguiré flotando para siempre! Ahora viajo en silencio hacia la estrella gigante roja Aldebarán. Tardaré unos dos millones de años en llegar a su vecindario. ¡Soy una auténtica carta dentro de una botella lanzada al océano de las estrellas!',
                   audioPenguin: 'audio/cp_pioneer_opc_2b.mp3',
                   audioReply: 'audio/pioneer_resp_2b.mp3'
                 },
@@ -671,7 +671,7 @@
                   id: '2c',
                   label: '🌀 ¿Qué se siente pasar al lado de Júpiter?',
                   penguinText: '¿Qué se siente pasar al lado de Júpiter?',
-                  reply: '¡Sentí una fuerza colosal! Júpiter es tan inmenso que su gravedad atrae todo como un imán gigante. Usé su gravedad para hacer una maniobra de honda espacial: ¡como cuando vas en patines, te agarras de un poste y sales disparado con más velocidad hacia adelante! Así tomé impulso para volar hacia el espacio profundo.',
+                  reply: '¡Sentí una fuerza colosal! Júpiter es tan inmenso que su gravedad atrae todo como un imán gigante. Usé su gravedad para hacer una maniobra de honda espacial: ¡como cuando vas corriendo en patines, te agarras de un poste y sales disparado con más velocidad hacia adelante! Así tomé impulso para volar hacia el espacio exterior.',
                   audioPenguin: 'audio/cp_pioneer_opc_2c.mp3',
                   audioReply: 'audio/pioneer_resp_2c.mp3'
                 }
@@ -736,7 +736,7 @@
                   id: '1a',
                   label: '🥔 ¡Hola NEAR Shoemaker! ¿Por qué este lugar tiene forma de papa gigante?',
                   penguinText: '¡Hola NEAR Shoemaker! ¿Por qué este lugar tiene forma de papa gigante?',
-                  reply: '¡Ja, ja! ¡Eros mide 34 kilómetros de largo y parece una papa o un cacahuate gigante! ¿Sabes por qué los planetas grandes como la Tierra son redondos? Porque tienen tanta masa y gravedad que aprietan todo hacia el centro como si hicieras una bolita de plastilina. ¡Pero Eros es tan chiquito y ligero que su gravedad no tuvo fuerza para redondearlo, y se quedó como una roca chueca y alargada!',
+                  reply: '¡Ja, ja! ¡Eros mide treinta y cuatro kilómetros de largo y parece una papa o un cacahuate gigante! ¿Sabes por qué los planetas grandes como la Tierra son redondos? Porque tienen tanta masa y gravedad que aprietan todo hacia el centro como si hicieras una bolita de plastilina con las manos. ¡Pero Eros es tan chiquito y ligero que su gravedad no tuvo fuerza para redondearlo, y se quedó como una roca chueca y alargada!',
                   audioPenguin: 'audio/cp_near_opc_1a.mp3',
                   audioReply: 'audio/near_resp_1a.mp3'
                 },
@@ -744,7 +744,7 @@
                   id: '1b',
                   label: '🛰️ ¿Tú eres una nave o un módulo de aterrizaje? ¡No te veo patas!',
                   penguinText: '¿Tú eres una nave o un módulo de aterrizaje? ¡No te veo patas!',
-                  reply: '¡Ese es el misterio más asombroso de mi historia! ¡Yo NUNCA fui diseñada para aterrizar! No tenía patas, ni amortiguadores, ni colchones. Fui construida únicamente para ser un satélite orbitador y tomar fotos desde el aire.',
+                  reply: '¡Ese es el misterio más asombroso de mi historia! ¡Yo nunca fui diseñada para aterrizar! No tenía patas, ni amortiguadores, ni colchones. Fui construida únicamente para ser un satélite orbitador y tomar fotos desde el aire.',
                   audioPenguin: 'audio/cp_near_opc_1b.mp3',
                   audioReply: 'audio/near_resp_1b.mp3'
                 },
@@ -752,7 +752,7 @@
                   id: '1c',
                   label: '🚀 ¿Cómo llegaste hasta un asteroide tan chiquito en medio de la nada?',
                   penguinText: '¿Cómo llegaste hasta un asteroide tan chiquito en medio de la nada?',
-                  reply: 'Despegué en 1996. Primero sobrevolé el asteroide Mathilde para tomarle fotos en 1997, y el 14 de febrero del año 2000 (¡el Día de San Valentín!) me convertí en la primera nave de la humanidad en ponerse en órbita alrededor de un asteroide.',
+                  reply: 'Despegué en 1996. Primero sobrevolé el asteroide Mathilde para tomarle fotos en 1997, y el catorce de febrero del año 2000, ¡justo en el Día de San Valentín!, me convertí en la primera nave de la humanidad en ponerse en órbita alrededor de un asteroide.',
                   audioPenguin: 'audio/cp_near_opc_1c.mp3',
                   audioReply: 'audio/near_resp_1c.mp3'
                 }
@@ -760,7 +760,7 @@
             },
             commonBridge: {
               speaker: 'machine',
-              text: 'Llevaba 6 instrumentos científicos de élite: cámaras fotográficas, sensores para olfatear minerales y un telémetro láser. ¿Cómo funcionaba el láser? Disparaba rayos de luz hacia la roca y medía cuánto tardaban en rebotar. ¡Así dibujamos un mapa en 3D de todas las montañas y cráteres de Eros igual que en un videojuego!',
+              text: 'Llevaba seis instrumentos científicos de élite: cámaras fotográficas, sensores para olfatear minerales y un telémetro láser. ¿Cómo funcionaba el láser? Disparaba rayos de luz hacia la roca y medía cuánto tardaban en rebotar. ¡Así dibujamos un mapa en tres dimensiones de todas las montañas y cráteres de Eros igual que en un videojuego!',
               audioUrl: 'audio/near_puente_clave.mp3'
             },
             decision2: {
@@ -769,7 +769,7 @@
                   id: '2a',
                   label: '🤸 Pero si no tenías patas... ¿cómo terminaste aquí sentada en el suelo?',
                   penguinText: 'Pero si no tenías patas... ¿cómo terminaste aquí sentada en el suelo?',
-                  reply: 'El 12 de febrero de 2001, los científicos de la NASA tuvieron una idea audaz: "¿Y si intentamos posarla en el suelo con sus pequeños chorros de gas?". Fuimos frenando hasta tocar la superficie a menos de 6 kilómetros por hora: ¡eso es más lento de lo que corres tú en el recreo! Toqué el suelo apoyándome en las puntitas de mis paneles solares como un bailarín cósmico.',
+                  reply: 'El doce de febrero de 2001, los científicos de la NASA tuvieron una idea audaz: ¿Y si intentamos posarla en el suelo con sus pequeños chorros de gas? Fuimos frenando centímetro a centímetro hasta tocar la superficie a menos de seis kilómetros por hora: ¡eso es más lento de lo que corres tú en el recreo de la escuela! Toqué el suelo apoyándome en las puntitas de mis paneles solares como un bailarín cósmico. ¡Fui la primera nave de la historia en posarse sobre un asteroide!',
                   audioPenguin: 'audio/cp_near_opc_2a.mp3',
                   audioReply: 'audio/near_resp_2a.mp3'
                 },
@@ -777,7 +777,7 @@
                   id: '2b',
                   label: '🏷️ ¿Y qué pasó con tu nombre? ¿Por qué te llamas Shoemaker?',
                   penguinText: '¿Y qué pasó con tu nombre? ¿Por qué te llamas Shoemaker?',
-                  reply: 'Originalmente me llamaba solo NEAR (Encuentro con Asteroides Cercanos a la Tierra). Pero la NASA me rebautizó en honor a Eugene Shoemaker, un legendario científico que descubrió que la Luna y los planetas tienen cráteres porque los asteroides y cometas chocaron contra ellos a lo largo de millones de años.',
+                  reply: 'Originalmente me llamaba solo NEAR, que significa Encuentro con Asteroides Cercanos a la Tierra. Pero la NASA me rebautizó en honor a Eugene Shoemaker, un legendario científico que descubrió que la Luna y los planetas tienen cráteres porque los asteroides y cometas chocaron contra ellos a lo largo de millones de años.',
                   audioPenguin: 'audio/cp_near_opc_2b.mp3',
                   audioReply: 'audio/near_resp_2b.mp3'
                 },
@@ -983,7 +983,7 @@
     },
     closing: {
       speaker: 'penguin',
-      text: 'Recuerda siempre este gran secreto cósmico: ¡La curiosidad es el combustible más potente de todo gran explorador! Mientras haya preguntas por responder, estrellas en el cielo y mentes curiosas como la tuya, la aventura nunca terminará. ¡Nos vemos en la próxima galaxia! ¡Motores encendidos en tres... dos... uno... DESPEGUEEEE! 🚀✨🐧',
+      text: 'Recuerda siempre este gran secreto cósmico: ¡La curiosidad es el combustible más potente de todo gran explorador! Mientras haya preguntas por responder, estrellas en el cielo y mentes curiosas como la tuya, la aventura nunca terminará. ¡Nos vemos en la próxima galaxia! ¡Motores encendidos en tres... dos... uno... DESPEGUEEEE!',
       audioUrl: 'audio/cp_final_despegue.mp3'
     }
   };
@@ -1122,7 +1122,7 @@ const CHAPTERS_EN = [
         "branchingDialogue": {
           "greeting": {
             "speaker": "machine",
-            "text": "Beep, beep! Sensor alert! Feathered visitor detected on my footpads! Hello, little space traveler! Did you journey all the way from Earth?",
+            "text": "Beep, biiip! Sensor alert! I detect a feathered space explorer stepping near my landing pads! Hello there, little traveler! Did you come all the way from Earth?",
             "audioUrl": "audio/en/surveyor_saludo.mp3"
           },
           "decision1": {
@@ -1131,23 +1131,23 @@ const CHAPTERS_EN = [
                 "id": "1a",
                 "label": "🔍 Hello! I'm Cyberpenguin. Who are you, and what are you doing standing here?",
                 "penguinText": "Hello! I'm Cyberpenguin. Who are you, and what are you doing standing here?",
-                "reply": "Pleasure to meet you, Cyberpenguin! I am Surveyor 3, an uncrewed robotic spacecraft launched by NASA in April 1967. I was sent to this crater to investigate lunar soil and pave the way for future Apollo astronauts!",
+                "reply": "Nice to meet you, Cyberpenguin! I am Surveyor 3, a robotic spacecraft launched by NASA in April nineteen sixty-seven. I was sent to this very crater to investigate the lunar soil and prepare the way for the astronauts of the Apollo program!",
                 "audioPenguin": "audio/en/cp_surveyor_opc_a.mp3",
                 "audioReply": "audio/en/surveyor_resp_1a.mp3"
               },
               {
                 "id": "1b",
                 "label": "⛏️ Whoa, a three-legged robot! And why do you have that arm with a little shovel?",
-                "penguinText": "Whoa, a three-legged robot! And why do you have that arm with a little shovel?",
-                "reply": "You've got sharp eyes! I am the first spacecraft in human history to operate a robotic scoop on the Moon. Using an electric motor, I stretched my arm and dug into the soil just like in a giant sandbox to measure how firm the ground was!",
+                "penguinText": "Whoa, a three-legged robot! Why do you have a long arm with a tiny shovel?",
+                "reply": "Good eye! I was the very first spacecraft in human history to carry a robotic scoop to the Moon. With an electric motor, I stretched it out and scraped the soil just like playing in a giant sandbox to test how solid the ground really was!",
                 "audioPenguin": "audio/en/cp_surveyor_opc_b.mp3",
                 "audioReply": "audio/en/surveyor_resp_1b.mp3"
               },
               {
                 "id": "1c",
                 "label": "🏀 Is it true that you bounced across the surface like a basketball when you landed?",
-                "penguinText": "Is it true that you bounced across the surface like a basketball when you landed?",
-                "reply": "Ha ha ha! Absolutely true! When I touched down on April 20, 1967, shiny lunar rocks confused my landing radar, and my descent engines didn't shut down in time. I bounced twice like on a lunar trampoline before coming to a safe stop!",
+                "penguinText": "Is it true you bounced like a rubber ball when you landed?",
+                "reply": "Ha, ha, ha! Absolutely true! When I touched down on April twentieth, nineteen sixty-seven, reflective rocks confused my radar, and my braking rockets did not shut off in time. I bounced twice across the Moon like a trampoline before coming to a gentle stop!",
                 "audioPenguin": "audio/en/cp_surveyor_opc_c.mp3",
                 "audioReply": "audio/en/surveyor_resp_1c.mp3"
               }
@@ -1155,7 +1155,7 @@ const CHAPTERS_EN = [
           },
           "commonBridge": {
             "speaker": "machine",
-            "text": "Before astronauts could walk on the Moon, scientists worried their heavy boots would sink deep into dust like quicksand. With my robotic scoop, I dug four trenches and pressed down on the lunar soil to prove it was solid, stable, and completely safe to walk on!",
+            "text": "Before astronauts could come down to walk in person, scientists needed to be sure the ground would hold their weight without swallowing them like quicksand. With my scoop, I dug four trenches and pressed down on the dust to prove the lunar surface was solid and safe!",
             "audioUrl": "audio/en/surveyor_puente_clave.mp3"
           },
           "decision2": {
@@ -1163,24 +1163,24 @@ const CHAPTERS_EN = [
               {
                 "id": "2a",
                 "label": "📸 How many pictures did you snap with your television camera?",
-                "penguinText": "How many pictures did you snap with your television camera?",
-                "reply": "I beamed back over 6,300 black-and-white television photos! I photographed rocks, lunar trenches, and even captured a historic photo of a solar eclipse where Earth blocked the Sun as seen from the Moon!",
+                "penguinText": "How many pictures did you take with your television camera?",
+                "reply": "I beamed back over six thousand three hundred black-and-white photos! I photographed lunar boulders, the trenches I dug with my scoop, and I even captured a historic photo of a solar eclipse where Earth blocked the Sun right before my eyes!",
                 "audioPenguin": "audio/en/cp_surveyor_opc_2a.mp3",
                 "audioReply": "audio/en/surveyor_resp_2a.mp3"
               },
               {
                 "id": "2b",
                 "label": "⭐ Is it true that human astronauts later came back to visit you in person?",
-                "penguinText": "Is it true that human astronauts later came back to visit you in person?",
-                "reply": "Beep beep! Yes! In November 1969, Apollo 12 astronauts Pete Conrad and Alan Bean landed their lunar module Intrepid just 160 meters away and walked right over to me! They examined my parts and took my TV camera back to Earth to study how metal survives two years in space!",
+                "penguinText": "Is it true human astronauts came to visit you in person later on?",
+                "reply": "Beep-beep! Yes, they came to visit ME in person! In November nineteen sixty-nine, Apollo twelve astronauts landed their lunar module Intrepid just one hundred and sixty meters away and walked right up to me! Pete Conrad and Alan Bean examined my parts and took my camera back to Earth to study how metal survives two years exposed to space!",
                 "audioPenguin": "audio/en/cp_surveyor_opc_2b.mp3",
                 "audioReply": "audio/en/surveyor_resp_2b.mp3"
               },
               {
                 "id": "2c",
                 "label": "🔬 What did scientists learn when they took your parts back to Earth laboratories?",
-                "penguinText": "What did scientists learn when they took your parts back to Earth laboratories?",
-                "reply": "It was the only time in space history that machinery left on another world was retrieved and studied in a laboratory! Scientists discovered how solar radiation, cosmic dust, and space vacuum degrade cables and paint, helping design safer spacesuits and spacecraft!",
+                "penguinText": "What did scientists learn when they brought your parts back to Earth?",
+                "reply": "It was the only time in human history that parts left on another world were brought back to a laboratory! Scientists discovered how space radiation, dust, and temperature swings wear down wires and paint, helping NASA design safer spacesuits and stronger spacecraft!",
                 "audioPenguin": "audio/en/cp_surveyor_opc_2c.mp3",
                 "audioReply": "audio/en/surveyor_resp_2c.mp3"
               }
@@ -1188,12 +1188,12 @@ const CHAPTERS_EN = [
           },
           "closing": {
             "speaker": "machine",
-            "text": "I transmitted valuable data until May 1967, but my greatest honor was helping humans walk on the Moon with confidence. Keep exploring bravely, Cyberpenguin!",
+            "text": "I transmitted data until May nineteen sixty-seven, but my greatest pride was helping astronauts walk safely on the Moon. Keep exploring with bravery, Cyberpenguin!",
             "audioUrl": "audio/en/surveyor_despedida.mp3"
           },
           "farewellPenguin": {
             "speaker": "penguin",
-            "text": "Thank you, brave Surveyor 3! You just earned the very first lunar stamp in my explorer passport!",
+            "text": "Thank you, brave Surveyor three! You just earned the first lunar stamp in my passport!",
             "audioUrl": "audio/en/cp_surveyor_gracias.mp3"
           }
         },
@@ -1254,7 +1254,7 @@ const CHAPTERS_EN = [
         "branchingDialogue": {
           "greeting": {
             "speaker": "machine",
-            "text": "Greetings, Cyberpenguin! Welcome to Tranquility Base! You are standing on the most historic patch of ground on the entire Moon.",
+            "text": "Houston, Tranquility Base here! Sensor contact confirmed! Welcome to the Sea of Tranquility, Cyberpenguin. You are standing at the most historic landing site on the Moon!",
             "audioUrl": "audio/en/eagle_saludo.mp3"
           },
           "decision1": {
@@ -1262,24 +1262,24 @@ const CHAPTERS_EN = [
               {
                 "id": "1a",
                 "label": "🏛️ No way! Are you the legendary Eagle from Apollo 11?",
-                "penguinText": "No way! Are you the legendary Eagle from Apollo 11?",
-                "reply": "The one and only! On July 20, 1969, I brought Neil Armstrong and Buzz Aldrin safely down to this ground. We were launched from Earth atop the mighty Saturn V rocket—a skyscraper of a rocket taller than the Statue of Liberty!",
+                "penguinText": "No way! Are you the legendary Eagle from Apollo eleven?",
+                "reply": "The one and only! On July twentieth, nineteen sixty-nine, I carried Neil Armstrong and Buzz Aldrin safely down to this ground. We were blasted off from Earth by the gigantic Saturn Five rocket—a monster rocket as tall as a thirty-six-story skyscraper!",
                 "audioPenguin": "audio/en/cp_eagle_opc_1a.mp3",
                 "audioReply": "audio/en/eagle_resp_1a.mp3"
               },
               {
                 "id": "1b",
                 "label": "🍫 Whoa, you look wrapped in shiny golden chocolate foil! Why are you so shiny?",
-                "penguinText": "Whoa, you look wrapped in shiny golden chocolate foil! Why are you so shiny?",
-                "reply": "Ha ha! Many kids ask that! Those are ultra-thin aerospace thermal blankets made of Kapton and Mylar. Under direct sunlight on the Moon, metal heats up to 120°C, and in shadow it plunges to minus 150°C! The gold blankets reflected extreme radiation to protect our crew.",
+                "penguinText": "Whoa, you look covered in shiny golden chocolate wrapper! Why do you sparkle so much?",
+                "reply": "Ha, ha! Lots of kids think it is gift wrapping paper! They are actually high-tech thermal blankets made of Kapton and Mylar. Have you seen those shiny gold rescue blankets? On the Moon without air, direct sunlight heats metal to over one hundred and twenty degrees, and in the shade it drops to one hundred and fifty below zero. Those blankets reflected heat like a giant space thermos to keep Neil and Buzz safe!",
                 "audioPenguin": "audio/en/cp_eagle_opc_1b.mp3",
                 "audioReply": "audio/en/eagle_resp_1b.mp3"
               },
               {
                 "id": "1c",
                 "label": "⚠️ Did you really almost run out of fuel right before touching down?",
-                "penguinText": "Did you really almost run out of fuel right before touching down?",
-                "reply": "Hold onto your feathers! Our computer was steering us straight toward a giant crater full of car-sized boulders! Neil Armstrong took manual control and flew us forward until he found clear, smooth ground. When our footpads touched down, we had less than forty seconds of landing fuel left!",
+                "penguinText": "Where are your astronaut friends? Are they taking a space nap inside?",
+                "reply": "They returned safely home to Earth a long time ago! But our crew had three teammates: Neil and Buzz climbed down my ladder to explore the surface, while Michael Collins stayed in lunar orbit piloting our mothership, Columbia, patiently waiting for our return.",
                 "audioPenguin": "audio/en/cp_eagle_opc_1c.mp3",
                 "audioReply": "audio/en/eagle_resp_1c.mp3"
               }
@@ -1287,7 +1287,7 @@ const CHAPTERS_EN = [
           },
           "commonBridge": {
             "speaker": "machine",
-            "text": "Six hours after touchdown, Neil Armstrong descended my nine-rung ladder, placed his left boot on the dust, and spoke those unforgettable words: 'That's one small step for man, one giant leap for mankind.' Buzz Aldrin joined him, and together they explored for over two hours!",
+            "text": "My body was built in two distinct sections: the descent stage—the gold-wrapped bottom half with four landing legs that remained forever here as a launchpad; and the ascent stage—the upper cockpit cabin that fired its own rocket motor to shoot the astronauts back into space. We worked as a flawless team!",
             "audioUrl": "audio/en/eagle_puente_clave.mp3"
           },
           "decision2": {
@@ -1295,24 +1295,24 @@ const CHAPTERS_EN = [
               {
                 "id": "2a",
                 "label": "📦 What happened to your top half? Where is the cabin where the astronauts rode?",
-                "penguinText": "What happened to your top half? Where is the cabin where the astronauts rode?",
-                "reply": "I was built in two separate stages! My golden bottom stage is the Descent Stage, serving as a launch pad. The top Ascent Stage ignited its rocket engine, lifted Neil and Buzz off the lunar surface, and docked with Michael Collins aboard Columbia!",
+                "penguinText": "What did Neil and Buzz do while walking out here on the surface?",
+                "reply": "They walked outside for more than two and a half hours, took pictures, planted the American flag, and collected nearly twenty-two kilograms of lunar rocks and soil using special tongs and scoops to carry back to Earth's laboratories!",
                 "audioPenguin": "audio/en/cp_eagle_opc_2a.mp3",
                 "audioReply": "audio/en/eagle_resp_2a.mp3"
               },
               {
                 "id": "2b",
                 "label": "⭐ What famous scientific experiment did Neil and Buzz set up with mirrors?",
-                "penguinText": "What famous scientific experiment did Neil and Buzz set up with mirrors?",
-                "reply": "They placed the Lunar Laser Ranging Retroreflector! It's a special panel of pristine glass prisms. Even today, scientists on Earth fire laser beams from giant telescopes at the reflector, timing the bounce to measure the Moon's distance down to the millimeter!",
+                "penguinText": "Was landing as simple as pressing an automatic autopilot button?",
+                "reply": "Whew, it was a nail-biter! During our final descent, our computer was overloaded with alarms, and the autopilot was aiming straight into a football-field-sized crater filled with giant boulders! Neil took manual control like a video game joystick, flew past the crater, and touched down gently with only about forty seconds of fuel left!",
                 "audioPenguin": "audio/en/cp_eagle_opc_2b.mp3",
                 "audioReply": "audio/en/eagle_resp_2b.mp3"
               },
               {
                 "id": "2c",
                 "label": "📜 What does the stainless steel plaque attached to your landing leg say?",
-                "penguinText": "What does the stainless steel plaque attached to your landing leg say?",
-                "reply": "It reads: 'Here men from the planet Earth first set foot upon the Moon, July 1969 A.D. We came in peace for all mankind.' It carries the signatures of the three astronauts and the President of the United States.",
+                "penguinText": "I see metal instruments with mirrors and solar panels left on the dust... what are those?",
+                "reply": "Sharp eyes! We set up a science package called EASEP. It included a lunar seismometer to listen to moonquakes, and a special laser reflector array. Even today, scientists on Earth shine powerful laser beams at those reflectors to measure the exact distance to the Moon down to the millimeter!",
                 "audioPenguin": "audio/en/cp_eagle_opc_2c.mp3",
                 "audioReply": "audio/en/eagle_resp_2c.mp3"
               }
@@ -1320,12 +1320,12 @@ const CHAPTERS_EN = [
           },
           "closing": {
             "speaker": "machine",
-            "text": "Tranquility Base will forever remain a beacon of human achievement. Keep that bold spirit alive, Cyberpenguin!",
+            "text": "Neil and Buzz's bootprints will stay stamped in this dust for millions of years. Remember, Cyberpenguin: that was one small step for a man, one giant leap for mankind!",
             "audioUrl": "audio/en/eagle_despedida.mp3"
           },
           "farewellPenguin": {
             "speaker": "penguin",
-            "text": "Thank you, legendary Eagle! Tranquility Base will always inspire every explorer in the universe!",
+            "text": "I will cherish your story forever, Commander Eagle! Stamp number two is officially verified in my passport!",
             "audioUrl": "audio/en/cp_eagle_gracias.mp3"
           }
         },
@@ -1473,7 +1473,7 @@ const CHAPTERS_EN = [
         "branchingDialogue": {
           "greeting": {
             "speaker": "machine",
-            "text": "Greetings, young explorer! Welcome to Chryse Planitia—the Plains of Gold! Systems nominal, robotic arm ready. Are you ready to study the secrets of Mars?",
+            "text": "Biological signature detected! Feathers, beak, and a pressurized spacesuit! Welcome to Mars, Cyberpenguin! Greetings from Chryse Planitia, the Plains of Gold!",
             "audioUrl": "audio/en/viking_saludo.mp3"
           },
           "decision1": {
@@ -1481,24 +1481,24 @@ const CHAPTERS_EN = [
               {
                 "id": "1a",
                 "label": "🔴 Hello, Viking 1! What made your arrival on Mars so famous?",
-                "penguinText": "Hello, Viking 1! What made your arrival on Mars so famous?",
-                "reply": "On July 20, 1976, I became the very first American spacecraft to achieve a successful soft landing on the surface of Mars! I safely deployed my three landing footpads and operated on the Red Planet for over six years!",
+                "penguinText": "Hello Viking one! Were you the first spacecraft to land on Mars?",
+                "reply": "I was the first American spacecraft to touch down with complete success on Mars and survive for years to transmit data! I landed on July twentieth, nineteen seventy-six. And we were a team of two: while my sister Orbiter mapped Mars from space, I sat down here to scoop, smell, and analyze the red Martian dirt.",
                 "audioPenguin": "audio/en/cp_viking_opc_1a.mp3",
                 "audioReply": "audio/en/viking_resp_1a.mp3"
               },
               {
                 "id": "1b",
                 "label": "📸 Did you really take the first color photograph of Mars in human history?",
-                "penguinText": "Did you really take the first color photograph of Mars in human history?",
-                "reply": "Affirmative! Just minutes after touchdown, my facsimile scanner camera took the first close-up photograph of Martian soil and rocks. Then, I beamed back the first panoramic color photograph showing reddish-brown rocks and a salmon-pink sky!",
+                "penguinText": "Tell me the truth! Did you find little green martians hiding behind the rocks?",
+                "reply": "Ha, ha, ha! No little green men, no alien cities, and no bug-eyed monsters! My sensors tested for tiny microbes in the dust, but found no living organisms. However, I discovered something incredible: the soil is packed with harsh chemicals similar to hydrogen peroxide that act like a super-disinfectant, destroying organic molecules!",
                 "audioPenguin": "audio/en/cp_viking_opc_1b.mp3",
                 "audioReply": "audio/en/viking_resp_1b.mp3"
               },
               {
                 "id": "1c",
                 "label": "💨 How did you survive entering the thin Martian atmosphere without crashing?",
-                "penguinText": "How did you survive entering the thin Martian atmosphere without crashing?",
-                "reply": "Entering at over sixteen thousand kilometers per hour is intense! First, my aeroshell heat shield absorbed extreme heat. Next, a giant parachute deployed at supersonic speed, and finally, three specialized rocket engines fired to gently set me down!",
+                "penguinText": "Why do you have such a long mechanical arm with a tiny shovel at the end?",
+                "reply": "That is my three-meter robotic arm! On the tip, I had a motor-driven scoop that scraped the Martian surface like a spoon digging into a bowl of cereal. I scooped up red soil and dropped it into small funnel slots on my back, straight into my miniature onboard science ovens!",
                 "audioPenguin": "audio/en/cp_viking_opc_1c.mp3",
                 "audioReply": "audio/en/viking_resp_1c.mp3"
               }
@@ -1506,7 +1506,7 @@ const CHAPTERS_EN = [
           },
           "commonBridge": {
             "speaker": "machine",
-            "text": "I was not just a camera—I was a complete automated biology and chemistry laboratory! Inside my chassis, I carried miniature ovens and radiation detectors to analyze Martian soil for signs of microbial life and organic molecules.",
+            "text": "Inside my body, I carried an instrument with a giant tongue-twister name: the GCMS, or Gas Chromatograph-Mass Spectrometer! Imagine a miniature high-tech space toaster oven. My arm dropped dirt inside tiny tubes, the oven baked it, and my chemical nose sniffed the vapors to discover exactly what Mars is made of!",
             "audioUrl": "audio/en/viking_puente_clave.mp3"
           },
           "decision2": {
@@ -1514,24 +1514,24 @@ const CHAPTERS_EN = [
               {
                 "id": "2a",
                 "label": "🧪 Did you find living Martian microbes in the soil with your mini laboratory?",
-                "penguinText": "Did you find living Martian microbes in the soil with your mini laboratory?",
-                "reply": "The soil tests gave puzzling chemical reactions! While active chemistry occurred when nutrients were added, scientists concluded the reactions were caused by super-reactive minerals called perchlorates, not living microbes. But it showed us Mars has active, complex chemistry!",
+                "penguinText": "How did you survive the freezing Martian cold for so many years?",
+                "reply": "I couldn't rely on solar panels because Martian dust storms would have covered them like closed window blinds! Instead, I carried two special nuclear batteries called RTGs. Inside, radioactive fuel generated continuous natural heat, keeping my circuits cozy and producing nonstop electrical power.",
                 "audioPenguin": "audio/en/cp_viking_opc_2a.mp3",
                 "audioReply": "audio/en/viking_resp_2a.mp3"
               },
               {
                 "id": "2b",
                 "label": "⭐ Is it true that you also had a sister spaceship orbiting high above the planet?",
-                "penguinText": "Is it true that you also had a sister spaceship orbiting high above the planet?",
-                "reply": "Yes! The Viking 1 mission consisted of two parts: the Orbiter and the Lander. While I studied rocks on the surface, the Orbiter circled Mars, photographing ancient river valleys, massive volcanoes like Olympus Mons, and mapping ninety-seven percent of the planet!",
+                "penguinText": "Did you have to face terrifying Martian dust storms?",
+                "reply": "Oh, I survived monster dust storms! On Mars, sometimes a small localized dust storm grows and grows until it wraps the ENTIRE planet in a blinding orange dust blanket for months! The winds roared, but my sturdy landing legs kept me planted firm like a rock!",
                 "audioPenguin": "audio/en/cp_viking_opc_2b.mp3",
                 "audioReply": "audio/en/viking_resp_2b.mp3"
               },
               {
                 "id": "2c",
                 "label": "🌪️ Did you measure Martian weather and dust storms with your instruments?",
-                "penguinText": "Did you measure Martian weather and dust storms with your instruments?",
-                "reply": "Indeed! My meteorology mast measured winds, atmospheric pressure, and temperatures every day. I recorded global dust storms that engulfed the entire planet, turning day into night with glowing reddish clouds!",
+                "penguinText": "Did your mission last only a few days?",
+                "reply": "I was only planned to work for ninety days, but I survived for over SIX YEARS! I worked continuously until November nineteen eighty-two, measuring winds, taking over fifty thousand photos, and recording the first daily weather forecasts from another world!",
                 "audioPenguin": "audio/en/cp_viking_opc_2c.mp3",
                 "audioReply": "audio/en/viking_resp_2c.mp3"
               }
@@ -1539,12 +1539,12 @@ const CHAPTERS_EN = [
           },
           "closing": {
             "speaker": "machine",
-            "text": "I gathered scientific data until November 1982, setting an endurance record for my era. Mars still holds countless mysteries waiting for explorers like you!",
+            "text": "Because of my data, humanity realized Mars has valleys carved by ancient rivers that dried up billions of years ago. Keep digging for knowledge, Cyberpenguin!",
             "audioUrl": "audio/en/viking_despedida.mp3"
           },
           "farewellPenguin": {
             "speaker": "penguin",
-            "text": "Thank you, brilliant Viking 1! You paved the trail for every rover that rolls across Mars today!",
+            "text": "Thank you, pioneer Viking! Stamp number three is glowing in my passport!",
             "audioUrl": "audio/en/cp_viking_gracias.mp3"
           }
         },
@@ -1605,7 +1605,7 @@ const CHAPTERS_EN = [
         "branchingDialogue": {
           "greeting": {
             "speaker": "machine",
-            "text": "Vroooom! Squeak-squeak! Look down here! Greetings, Cyberpenguin! I'm Sojourner, the very first wheeled robotic explorer to roll across the surface of Mars!",
+            "text": "Watch my six wheels, penguin pal! I'm rolling at top speed: one centimeter per second! I am Sojourner, the first rover in history to drive across Mars!",
             "audioUrl": "audio/en/sojourner_saludo.mp3"
           },
           "decision1": {
@@ -1613,24 +1613,24 @@ const CHAPTERS_EN = [
               {
                 "id": "1a",
                 "label": "🏎️ Wow! You're so cute and tiny! How big are you compared to me?",
-                "penguinText": "Wow! You're so cute and tiny! How big are you compared to me?",
-                "reply": "I'm about the size of a microwave oven or a small toy wagon! I weigh only eleven kilograms on Earth, which is about four kilograms in Martian gravity. But don't let my size fool you—I proved rovers can explore other worlds!",
+                "penguinText": "Aww, you're so tiny and cute! You look like a remote-control toy car!",
+                "reply": "Hey, I might weigh only ten point five kilograms and stand just thirty centimeters tall, but I have a titanium skeleton and a genius computer brain! I arrived on July fourth, nineteen ninety-seven, tucked inside the Mars Pathfinder lander, and proved that small, agile rovers could conquer other worlds!",
                 "audioPenguin": "audio/en/cp_sojourner_opc_1a.mp3",
                 "audioReply": "audio/en/sojourner_resp_1a.mp3"
               },
               {
                 "id": "1b",
                 "label": "🛞 Why do you have six funny metal wheels with spikes on them?",
-                "penguinText": "Why do you have six funny metal wheels with spikes on them?",
-                "reply": "That's my rocker-bogie suspension system! It lets all six wheels stay firmly on the ground even when climbing over rocks bigger than my wheels. Each wheel has its own motor and little cleats for traction in slippery Martian dust!",
+                "penguinText": "How did you land here without retro-rockets on your wheels?",
+                "reply": "My mothership Pathfinder had the coolest landing in history! We did not use hard landing legs: we inflated a cocoon of giant airbags and bounced across Mars like a runaway basketball over fifteen times! Once we stopped, the petals opened up, and I drove down the ramp onto the red sand!",
                 "audioPenguin": "audio/en/cp_sojourner_opc_1b.mp3",
                 "audioReply": "audio/en/sojourner_resp_1b.mp3"
               },
               {
                 "id": "1c",
                 "label": "🎈 Did you really bounce onto Mars inside a giant cluster of airbags?",
-                "penguinText": "Did you really bounce onto Mars inside a giant cluster of airbags?",
-                "reply": "Yes! On July 4, 1997, Mars Pathfinder entered the atmosphere and inflated twenty-four giant gas airbags. We bounced over fifteen times across Ares Vallis like an enormous cosmic beach ball before coming to a safe rest!",
+                "penguinText": "Do you have six wheels so you can race across the sand at supersonic speed?",
+                "reply": "Ha, ha! I'm definitely not a race car! My top speed is just one centimeter per second—a snail could beat me in a sprint! But my six wheels use a rocker-bogie suspension system: like an all-terrain skateboard with insect legs! When one wheel climbs over a big rock, the other five adjust automatically to keep me stable without ever tipping over!",
                 "audioPenguin": "audio/en/cp_sojourner_opc_1c.mp3",
                 "audioReply": "audio/en/sojourner_resp_1c.mp3"
               }
@@ -1638,7 +1638,7 @@ const CHAPTERS_EN = [
           },
           "commonBridge": {
             "speaker": "machine",
-            "text": "Scientists back on Earth couldn't drive me with a live joystick because radio signals take ten to twenty minutes to travel from Earth to Mars! Instead, they sent a list of waypoints each morning, and my laser eye sensors avoided dangerous rocks autonomously!",
+            "text": "Mounted on my rear, I carried an instrument called the APXS—the Alpha Particle X-Ray Spectrometer! Think of it as my robotic snout. I pressed it right up against Martian rocks, beamed invisible, harmless particles at them, and listened to the atomic echoes to discover whether rocks were volcanic or washed down by ancient rushing floods!",
             "audioUrl": "audio/en/sojourner_puente_clave.mp3"
           },
           "decision2": {
@@ -1646,24 +1646,24 @@ const CHAPTERS_EN = [
               {
                 "id": "2a",
                 "label": "🔬 What was that sensor instrument mounted on your rear tail?",
-                "penguinText": "What was that sensor instrument mounted on your rear tail?",
-                "reply": "That was my Alpha Proton X-ray Spectrometer—or APXS! I pressed it directly against Martian rocks for hours. It bombarded rocks with alpha particles to detect chemical elements like silicon, iron, and potassium!",
+                "penguinText": "Did someone drive you in real-time with a video game joystick from Earth?",
+                "reply": "Impossible to steer live! Radio signals between Earth and Mars take between ten and twenty minutes to travel at the speed of light. If I saw a cliff and Earth shouted 'Stop!', I'd already be at the bottom! So scientists sent me route plans each morning, and I used laser hazard sensors to navigate around rocks on my own!",
                 "audioPenguin": "audio/en/cp_sojourner_opc_2a.mp3",
                 "audioReply": "audio/en/sojourner_resp_2a.mp3"
               },
               {
                 "id": "2b",
                 "label": "⭐ What funny names did the team give to the rocks you explored?",
-                "penguinText": "What funny names did the team give to the rocks you explored?",
-                "reply": "Scientists named rocks after famous cartoon characters! I investigated Barnacle Bill, Yogi Bear, Scooby-Doo, and Casper! Yogi Bear turned out to be volcanic basalt, proving water once flowed through Ares Vallis!",
+                "penguinText": "What silly nicknames did scientists give to the rocks you explored?",
+                "reply": "NASA scientists have an awesome sense of humor! To remember all the rocks easily, they named them after cartoon characters! I examined a pyramid-shaped rock named 'Yogi Bear', a knobby rock called 'Barnacle Bill', and others named 'Casper', 'Scooby-Doo', and 'Wedge'!",
                 "audioPenguin": "audio/en/cp_sojourner_opc_2b.mp3",
                 "audioReply": "audio/en/sojourner_resp_2b.mp3"
               },
               {
                 "id": "2c",
                 "label": "☀️ How did you survive the bitterly cold Martian nights?",
-                "penguinText": "How did you survive the bitterly cold Martian nights?",
-                "reply": "I carried lightweight solar panels on my roof to charge my batteries during sunny days, and three radioisotope heater units inside my warm electronics box kept my computer warm during freezing nights!",
+                "penguinText": "Did your tiny wheels pave the way for bigger monster rovers?",
+                "reply": "Yes! I was the baby pioneer! After my success, NASA built Spirit and Opportunity, which were the size of golf carts, and later Curiosity and Perseverance, which are massive monster trucks the size of cars with nuclear lasers! But I was the one who took the very first tire tracks on Mars!",
                 "audioPenguin": "audio/en/cp_sojourner_opc_2c.mp3",
                 "audioReply": "audio/en/sojourner_resp_2c.mp3"
               }
@@ -1671,12 +1671,12 @@ const CHAPTERS_EN = [
           },
           "closing": {
             "speaker": "machine",
-            "text": "I was only designed to operate for seven days, but I explored for nearly three full months! Keep rolling forward, Cyberpenguin!",
+            "text": "I operated for eighty-three days, driving over one hundred meters across the red dust. Remember: you do not need to be huge to achieve monumental dreams! Keep rolling forward, Cyberpenguin!",
             "audioUrl": "audio/en/sojourner_despedida.mp3"
           },
           "farewellPenguin": {
             "speaker": "penguin",
-            "text": "Thank you, speedy Sojourner! You proved that even small explorers can achieve monumental dreams!",
+            "text": "High-five, little legend! Stamp number four is officially registered in my passport!",
             "audioUrl": "audio/en/cp_sojourner_gracias.mp3"
           }
         },
@@ -1754,7 +1754,7 @@ const CHAPTERS_EN = [
         "branchingDialogue": {
           "greeting": {
             "speaker": "machine",
-            "text": "Greetings, Cyberpenguin... I hear your voice across the silent cosmic expanse. I am Pioneer 10, humanity's brave emissary voyaging through deep interstellar space.",
+            "text": "Radio signal received billions of kilometers away from home! Hello, space explorer Cyberpenguin! Isn't it chilly out here among the stars?",
             "audioUrl": "audio/en/pioneer_saludo.mp3"
           },
           "decision1": {
@@ -1762,24 +1762,24 @@ const CHAPTERS_EN = [
               {
                 "id": "1a",
                 "label": "🪐 Hello, Pioneer 10! What historic milestones did you achieve on your journey?",
-                "penguinText": "Hello, Pioneer 10! What historic milestones did you achieve on your journey?",
-                "reply": "Launched in March 1972, I was the very first spacecraft to travel through the Asteroid Belt and the first to visit gigantic Jupiter! In December 1973, I flew past Jupiter's clouds, photographing the Great Red Spot and mapping its lethal radiation belts!",
+                "penguinText": "Hello Pioneer ten! What are you doing floating so far away from the Sun?",
+                "reply": "I blasted off in March nineteen seventy-two on a daring mission no machine had ever attempted: to be the very first spacecraft to reach Jupiter, the giant king of our solar system! In December nineteen seventy-three, I braved its fierce radiation belts and sent back close-up pictures of its Great Red Spot and giant moons!",
                 "audioPenguin": "audio/en/cp_pioneer_opc_1a.mp3",
                 "audioReply": "audio/en/pioneer_resp_1a.mp3"
               },
               {
                 "id": "1b",
                 "label": "📡 Why do you have that enormous satellite dish on your front?",
-                "penguinText": "Why do you have that enormous satellite dish on your front?",
-                "reply": "That dish is my High-Gain Antenna—nearly three meters across! In deep space, radio signals become whisper-quiet. My big dish focused my radio transmissions like a cosmic megaphone so giant antennas on Earth could hear my discoveries.",
+                "penguinText": "Whoa, that is one gigantic umbrella mounted on your body!",
+                "reply": "Ha, ha! It is not a rain umbrella! It's my high-gain parabolic antenna, almost three meters wide. Because I traveled so far away from Earth, my radio signals grew as faint as a whisper. I needed this giant dish to beam my messages directly back to the huge listening ears of NASA's Deep Space Network on Earth!",
                 "audioPenguin": "audio/en/cp_pioneer_opc_1b.mp3",
                 "audioReply": "audio/en/pioneer_resp_1b.mp3"
               },
               {
                 "id": "1c",
                 "label": "⚡ What powers your instruments so far away where the Sun looks like a faint star?",
-                "penguinText": "What powers your instruments so far away where the Sun looks like a faint star?",
-                "reply": "Solar panels are useless out here in the dark! I am powered by four Radioisotope Thermoelectric Generators—RTGs. They generate electricity directly from the natural heat of decaying plutonium pellets, running reliably for decades!",
+                "penguinText": "Weren't you terrified of smashing into rocks in the asteroid belt?",
+                "reply": "Science fiction movies always show the asteroid belt as a chaotic obstacle course where ships crash every two seconds! But when I became the first probe to cross it in nineteen seventy-two, I proved the truth: space is unfathomably huge! Asteroids are separated by millions of kilometers. Crossing it was as smooth and peaceful as sailing an open sea!",
                 "audioPenguin": "audio/en/cp_pioneer_opc_1c.mp3",
                 "audioReply": "audio/en/pioneer_resp_1c.mp3"
               }
@@ -1787,7 +1787,7 @@ const CHAPTERS_EN = [
           },
           "commonBridge": {
             "speaker": "machine",
-            "text": "To escape the Sun's powerful gravitational grip and venture into deep space, I used Jupiter's massive gravity as a celestial slingshot! Jupiter accelerated me to over one hundred and thirty thousand kilometers per hour, launching me toward interstellar space!",
+            "text": "I flew so far that sunlight dwindled to a tiny bright speck, so solar panels were completely useless. I carried RTG nuclear batteries for nonstop heat and electricity. My final whisper back to Earth was detected on January twenty-third, two thousand and three, when I was over twelve billion kilometers away—it took over eleven hours for that radio signal to reach Earth traveling at the speed of light!",
             "audioUrl": "audio/en/pioneer_puente_clave.mp3"
           },
           "decision2": {
@@ -1795,24 +1795,24 @@ const CHAPTERS_EN = [
               {
                 "id": "2a",
                 "label": "📜 Tell me about the famous golden plaque attached to your frame!",
-                "penguinText": "Tell me about the famous golden plaque attached to your frame!",
-                "reply": "Attached to my antenna struts is an engraved gold-anodized aluminum plaque designed by Carl Sagan and Frank Drake! It features drawings of a human man and woman, our solar system, and a pulsar star map indicating Earth's location in the Milky Way!",
+                "penguinText": "I noticed a polished gold plaque bolted to your frame... what does it mean?",
+                "reply": "It is my greatest cosmic treasure! A gold-anodized plaque designed by Carl Sagan and Linda Salzman Sagan. It features drawings of a human man and woman greeting in peace, our solar system map, and a map of pulsars—cosmic lighthouse stars that pulse like precise clocks. Any intelligent civilization that finds me can decode it and find Earth!",
                 "audioPenguin": "audio/en/cp_pioneer_opc_2a.mp3",
                 "audioReply": "audio/en/pioneer_resp_2a.mp3"
               },
               {
                 "id": "2b",
                 "label": "⭐ Were scientists scared you would crash into asteroids when crossing the belt?",
-                "penguinText": "Were scientists scared you would crash into asteroids when crossing the belt?",
-                "reply": "Tremendously! Before my flight, many scientists feared the Asteroid Belt was packed with impenetrable dust and tumbling rocks that would shatter any probe. I proved the Asteroid Belt is mostly empty space and completely safe to navigate!",
+                "penguinText": "Where are you heading now that your batteries have gone to sleep?",
+                "reply": "Because there is no air resistance in the vacuum of space, I will drift forever without slowing down! I am silently coasting toward the red giant star Aldebaran, located in the constellation Taurus. It will take me about two million years to get there—a patient cosmic message in a bottle!",
                 "audioPenguin": "audio/en/cp_pioneer_opc_2b.mp3",
                 "audioReply": "audio/en/pioneer_resp_2b.mp3"
               },
               {
                 "id": "2c",
                 "label": "🌌 Where are you heading now, and how far have you traveled?",
-                "penguinText": "Where are you heading now, and how far have you traveled?",
-                "reply": "My last faint signal reached Earth in January 2003 from over twelve billion kilometers away. I am coasting silently toward the orange giant star Aldebaran in the constellation Taurus. It will take me over two million years to arrive!",
+                "penguinText": "What did it feel like to fly right past the colossal giant Jupiter?",
+                "reply": "I felt a breathtaking, colossal pull! Jupiter is so gargantuan that its immense gravity acted like an invisible cosmic slingshot. It whipped me around its clouds, dramatically increased my velocity, and flung me straight toward the edge of our solar system!",
                 "audioPenguin": "audio/en/cp_pioneer_opc_2c.mp3",
                 "audioReply": "audio/en/pioneer_resp_2c.mp3"
               }
@@ -1820,12 +1820,12 @@ const CHAPTERS_EN = [
           },
           "closing": {
             "speaker": "machine",
-            "text": "Keep gazing upward at the night sky. One day, humanity's children will follow the trail we blazed among the stars.",
+            "text": "Even though my radios are silent, I carry humanity's greeting across the interstellar void. Keep your gaze fixed on the stars, Cyberpenguin!",
             "audioUrl": "audio/en/pioneer_despedida.mp3"
           },
           "farewellPenguin": {
             "speaker": "penguin",
-            "text": "Thank you, wise Pioneer 10! Your courage shines brighter than the distant stars!",
+            "text": "Safe travels, eternal voyager! Stamp number five is proudly shining in my passport!",
             "audioUrl": "audio/en/cp_pioneer_gracias.mp3"
           }
         },
@@ -1886,7 +1886,7 @@ const CHAPTERS_EN = [
         "branchingDialogue": {
           "greeting": {
             "speaker": "machine",
-            "text": "Woohoo! Check out the scenery, Cyberpenguin! Welcome to Asteroid 433 Eros! You're talking to NEAR Shoemaker, the undisputed champion of asteroid explorers!",
+            "text": "Watch your steps, Cyberpenguin! Gravity here on asteroid Eros is so weak that if you sneeze too hard, you might launch yourself right into outer space!",
             "audioUrl": "audio/en/near_saludo.mp3"
           },
           "decision1": {
@@ -1894,24 +1894,24 @@ const CHAPTERS_EN = [
               {
                 "id": "1a",
                 "label": "🥔 Hello, NEAR Shoemaker! What makes Asteroid Eros so weird and interesting?",
-                "penguinText": "Hello, NEAR Shoemaker! What makes Asteroid Eros so weird and interesting?",
-                "reply": "Eros is shaped like a giant potato or a bent peanut! It measures thirty-four kilometers long. It's a primitive near-Earth asteroid that has remained unchanged since our solar system formed four point six billion years ago!",
+                "penguinText": "Hello NEAR Shoemaker! Why does this asteroid look like a giant potato?",
+                "reply": "Ha, ha! Eros is thirty-four kilometers long and looks just like a giant floating potato or peanut! Do you know why huge planets like Earth are round? Because their gravity is massive enough to squeeze everything equally toward the center like rolling playdough into a sphere. But Eros is small and lightweight, so its weak gravity never rounded it out, leaving it a bumpy, elongated rock!",
                 "audioPenguin": "audio/en/cp_near_opc_1a.mp3",
                 "audioReply": "audio/en/near_resp_1a.mp3"
               },
               {
                 "id": "1b",
                 "label": "🧲 How did you orbit a peanut-shaped rock without getting flung into space?",
-                "penguinText": "How did you orbit a peanut-shaped rock without getting flung into space?",
-                "reply": "It was an incredible navigation feat! Because Eros is lumpy and irregular, its gravitational field pulls unevenly. My navigation team had to calculate delicate orbital maneuvers for a whole year to circle as low as thirty-five kilometers!",
+                "penguinText": "Are you an orbiter or a lander? I don't see any landing legs!",
+                "reply": "That is the most amazing twist of my mission: I was NEVER built to land! I had no landing legs, no shock absorbers, and no airbags. I was designed strictly as an orbital satellite to circle Eros from high above and take photos from orbit!",
                 "audioPenguin": "audio/en/cp_near_opc_1b.mp3",
                 "audioReply": "audio/en/near_resp_1b.mp3"
               },
               {
                 "id": "1c",
                 "label": "🪨 Did you find any impact craters or strange surface features on Eros?",
-                "penguinText": "Did you find any impact craters or strange surface features on Eros?",
-                "reply": "Thousands! I mapped over one hundred thousand craters and discovered strange 'ponds' of flat, fine dust resting inside depression floors, along with giant boulders scattered across its rocky ridges!",
+                "penguinText": "How did you track down such a small rock in the middle of vast space?",
+                "reply": "I launched in nineteen ninety-six, flew past asteroid Mathilde in nineteen ninety-seven, and on February fourteenth, two thousand—Valentine's Day!—I became the first spacecraft in human history to slip into orbit around an asteroid. It was a true cosmic love story with a space rock!",
                 "audioPenguin": "audio/en/cp_near_opc_1c.mp3",
                 "audioReply": "audio/en/near_resp_1c.mp3"
               }
@@ -1919,7 +1919,7 @@ const CHAPTERS_EN = [
           },
           "commonBridge": {
             "speaker": "machine",
-            "text": "My mission was only designed to photograph Eros from orbit, not to touch down! But after a full year of orbital science, my team decided to attempt a daring descent to see if an orbital satellite could land gently on an asteroid without any landing legs!",
+            "text": "I carried six elite science instruments: multispectral cameras, spectrometers to sniff out mineral chemistry, and a laser rangefinder. How did my laser work? It fired rapid pulses of light down at the rocks and clocked how long they took to bounce back, mapping every ridge, boulder, and crater in three-D like a video game!",
             "audioUrl": "audio/en/near_puente_clave.mp3"
           },
           "decision2": {
@@ -1927,24 +1927,24 @@ const CHAPTERS_EN = [
               {
                 "id": "2a",
                 "label": "🛬 How did you manage to land on an asteroid with zero landing gear?",
-                "penguinText": "How did you manage to land on an asteroid with zero landing gear?",
-                "reply": "On February 12, 2001, I fired my thrusters to descend at a leisurely walking pace—less than seven kilometers per hour! I touched down right onto the surface of Eros with my solar panels and continued transmitting radio signals for over two weeks!",
+                "penguinText": "If you didn't have landing legs, how did you end up sitting on the ground?",
+                "reply": "On February twelfth, two thousand and one, NASA engineers hatched an audacious idea: 'What if we try to gently nudge her down to the surface using her tiny gas thrusters?' We fired thrusters in gentle pulses, slowing our descent until we touched the ground at less than six kilometers per hour—slower than a kid walking in a school hallway! I rested on the tips of my solar panels like a cosmic ballet dancer! I was the first spacecraft ever to land on an asteroid!",
                 "audioPenguin": "audio/en/cp_near_opc_2a.mp3",
                 "audioReply": "audio/en/near_resp_2a.mp3"
               },
               {
                 "id": "2b",
                 "label": "⭐ What was your name honoring, and why was it so meaningful?",
-                "penguinText": "What was your name honoring, and why was it so meaningful?",
-                "reply": "I was named in honor of Dr. Eugene Shoemaker, the legendary planetary geologist who pioneered the study of cosmic impact craters and co-discovered Comet Shoemaker-Levy 9. It was a tribute to his lifelong passion for asteroids!",
+                "penguinText": "Where did your name Shoemaker come from?",
+                "reply": "Originally, my name was just NEAR, which stood for Near Earth Asteroid Rendezvous. But NASA renamed me to honor Eugene Shoemaker, a legendary geologist who revolutionized science by proving that craters on Earth, the Moon, and planets were carved by asteroid and comet impacts over billions of years!",
                 "audioPenguin": "audio/en/cp_near_opc_2b.mp3",
                 "audioReply": "audio/en/near_resp_2b.mp3"
               },
               {
                 "id": "2c",
                 "label": "🔬 What did your gamma-ray and infrared spectrometers discover on Eros?",
-                "penguinText": "What did your gamma-ray and infrared spectrometers discover on Eros?",
-                "reply": "My spectrometers proved that Eros is composed of primitive chondrite rock—rich in magnesium, iron, and silicon. It confirmed that near-Earth asteroids are ancient building blocks of planets that never melted!",
+                "penguinText": "Did you crash and shatter when you hit the asteroid?",
+                "reply": "To the sheer amazement of engineers on Earth, I didn't break at all! I survived the touchdown intact, kept transmitting clear radio signals from the surface for over two weeks, and measured the asteroid's composition up close until my mission was complete!",
                 "audioPenguin": "audio/en/cp_near_opc_2c.mp3",
                 "audioReply": "audio/en/near_resp_2c.mp3"
               }
@@ -1952,12 +1952,12 @@ const CHAPTERS_EN = [
           },
           "closing": {
             "speaker": "machine",
-            "text": "I made history as the very first spacecraft to ever land on an asteroid. Always reach for the impossible, Cyberpenguin!",
+            "text": "We proved that with curiosity, courage, and clever engineering, humans can explore even the most unusual worlds. Never stop asking questions, Cyberpenguin!",
             "audioUrl": "audio/en/near_despedida.mp3"
           },
           "farewellPenguin": {
             "speaker": "penguin",
-            "text": "Thank you, bold NEAR Shoemaker! You showed us that bold curiosity can conquer any obstacle in the cosmos!",
+            "text": "Thank you, daring NEAR! You are the sixth and final golden stamp in my passport!",
             "audioUrl": "audio/en/cp_near_gracias.mp3"
           }
         },
@@ -2148,7 +2148,7 @@ const CHAPTERS_EN = [
   },
   "closing": {
     "speaker": "penguin",
-    "text": "Always remember this cosmic secret: Curiosity is the most powerful rocket fuel in the universe! As long as there are questions to ask, stars to chase, and curious minds like yours, the adventure will never end. See you in the next galaxy! Engines igniting in three... two... one... BLAST OFF! 🚀✨🐧",
+    "text": "Always remember this great cosmic secret: Curiosity is the most powerful fuel of every great explorer! As long as there are questions to ask, stars to gaze at in the night sky, and curious minds like yours, the adventure will never end. See you in the next galaxy! Engines engaged in three... two... one... BLAST OFFFF!",
     "audioUrl": "audio/en/cp_final_despegue.mp3"
   }
 };
