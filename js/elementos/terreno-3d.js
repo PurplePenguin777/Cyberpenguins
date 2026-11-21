@@ -1438,15 +1438,8 @@ class Terrain3DController {
     this.speakingActor = (speaker === 'penguin' || speaker === 'machine' || speaker === 'ship') ? speaker : null;
   }
 
-  setDialogueZoom(active, charA, charB) {
-    if (active && charA && charB) {
-      this.dialogueZoom.active = true;
-      this.dialogueZoom.midX = (charA.x + charB.x) * 0.5;
-      this.dialogueZoom.midY = ((charA.y || 0) + (charB.y || 0)) * 0.5;
-      this.dialogueZoom.midZ = (charA.z + charB.z) * 0.5;
-    } else {
-      this.dialogueZoom.active = false;
-    }
+  setDialogueZoom(active) {
+    this.dialogueZoom.active = Boolean(active);
   }
 
   animateMachineActor(now) {
@@ -2409,36 +2402,23 @@ class Terrain3DController {
       this.dialogueZoom.progress += (targetZoom - this.dialogueZoom.progress) * 0.075;
       const zp = this.dialogueZoom.progress;
 
+      const baseFov = (this.siteConfig && this.siteConfig.exploreFov) || 37;
       if (zp > 0.001) {
-        // Enfoque y zoom estilo Animal Crossing: acercamiento suave y menor FOV
-        const baseFov = (this.siteConfig && this.siteConfig.exploreFov) || 37;
-        const curFov = baseFov - (10.5 * zp);
+        // Enfoque y zoom estilo Animal Crossing: acercamiento suave (~18%) y compresión focal manteniendo la perspectiva isométrica auténtica
+        const curFov = baseFov - (5.5 * zp);
         if (Math.abs(this.camera.fov - curFov) > 0.01) {
           this.camera.fov = curFov;
           this.camera.updateProjectionMatrix();
         }
 
-        const dialTgtX = this.dialogueZoom.midX;
-        const dialTgtY = this.dialogueZoom.midY + 0.38;
-        const dialTgtZ = this.dialogueZoom.midZ;
-
-        // Cámara frontal-elevada respetando la línea de visión del escenario
-        const dialCamX = this.dialogueZoom.midX - 0.72;
-        const dialCamY = this.dialogueZoom.midY + 1.28;
-        const dialCamZ = this.dialogueZoom.midZ + 4.15;
-
+        const zoomScale = 1.0 - (0.18 * zp);
         this.camera.position.set(
-          normCamX + (dialCamX - normCamX) * zp,
-          normCamY + (dialCamY - normCamY) * zp,
-          normCamZ + (dialCamZ - normCamZ) * zp
+          normTgtX + (normCamX - normTgtX) * zoomScale,
+          normTgtY + (normCamY - normTgtY) * zoomScale,
+          normTgtZ + (normCamZ - normTgtZ) * zoomScale
         );
-        this.controls.target.set(
-          normTgtX + (dialTgtX - normTgtX) * zp,
-          normTgtY + (dialTgtY - normTgtY) * zp,
-          normTgtZ + (dialTgtZ - normTgtZ) * zp
-        );
+        this.controls.target.set(normTgtX, normTgtY, normTgtZ);
       } else {
-        const baseFov = (this.siteConfig && this.siteConfig.exploreFov) || 37;
         if (Math.abs(this.camera.fov - baseFov) > 0.01) {
           this.camera.fov = baseFov;
           this.camera.updateProjectionMatrix();

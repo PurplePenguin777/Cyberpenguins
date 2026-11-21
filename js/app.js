@@ -4086,16 +4086,23 @@
       dom.stageSpeechBubble.style.setProperty('--tail-shift', `${Math.max(-maxShift, Math.min(maxShift, shift)).toFixed(1)}px`);
     }
 
+    const boardH = board ? board.clientHeight : (window.innerHeight || 600);
+    const bubbleH = dom.stageSpeechBubble.offsetHeight || 220;
+    const bubbleHPct = (bubbleH / Math.max(1, boardH)) * 100;
+    // Margen superior absoluto: el borde superior del globo NUNCA puede cortarse con la parte superior
+    const minSafeBottomPct = Math.min(58, bubbleHPct + 6.0);
+
     let targetY;
     if (world3d.active && activeDialogueMachine) {
       // Regla UX: anclar el globo por encima de los personajes para que, por muy largo
       // que sea el texto, crezca hacia el cielo sin tapar a Cyberpenguin ni a Sojourner
       const charTop = getDialogueAnchorY();
-      targetY = charTop ? Math.max(12, charTop - 3.2) : Math.max(15, y - 8);
+      const desiredBottom = charTop ? (charTop - 2.5) : (y - 8);
+      targetY = Math.max(minSafeBottomPct, Math.min(62, desiredBottom));
     } else {
       targetY = isExactTop
-        ? (isFlipped ? Math.min(78, y + 6) : Math.max(15, y - 1.5))
-        : (isFlipped ? Math.min(78, y + 8) : Math.max(15, y - 8));
+        ? (isFlipped ? Math.min(78, y + 6) : Math.max(minSafeBottomPct, y - 1.5))
+        : (isFlipped ? Math.min(78, y + 8) : Math.max(minSafeBottomPct, y - 8));
     }
     dom.stageSpeechBubble.style.top = `${targetY}%`;
   }
@@ -4422,7 +4429,7 @@
           if (typeof t3d.setPenguinPose === 'function') t3d.setPenguinPose({ yaw: pYaw });
           if (typeof t3d.setMachinePose === 'function') t3d.setMachinePose({ yaw: mYaw });
           if (typeof t3d.setDialogueZoom === 'function') {
-            t3d.setDialogueZoom(true, { x: p.x, y: p.y, z: p.z }, { x: m.x, y: m.y || p.y, z: m.z });
+            t3d.setDialogueZoom(true);
           }
         }
       }
@@ -4629,7 +4636,7 @@
           if (typeof t3d.setPenguinPose === 'function') t3d.setPenguinPose({ yaw: pYaw });
           if (typeof t3d.setMachinePose === 'function') t3d.setMachinePose({ yaw: mYaw });
           if (typeof t3d.setDialogueZoom === 'function') {
-            t3d.setDialogueZoom(true, { x: p.x, y: p.y, z: p.z }, { x: m.x, y: m.y || p.y, z: m.z });
+            t3d.setDialogueZoom(true);
           }
         }
       }
