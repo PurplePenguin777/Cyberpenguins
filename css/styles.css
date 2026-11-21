@@ -3224,11 +3224,18 @@ a:focus-visible {
   display: block;
   width: 100%;
   font-size: 0.94rem;
-  line-height: 1.55;
+  line-height: 1.48;
   color: #f8fafc;
   font-weight: 400;
   text-align: center;
+  text-wrap: balance;
   user-select: text;
+}
+
+.dialogue-break {
+  display: block;
+  content: "";
+  margin-top: 0.35rem;
 }
 
 /* Opciones de respuesta Animal Crossing (Liquid Glass Centrado) */

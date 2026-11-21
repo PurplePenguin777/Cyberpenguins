@@ -138,5 +138,64 @@
     `;
   }
 
+  function sojournerAvatar() {
+    return `
+      <svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true">
+        <defs>
+          <linearGradient id="soj-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c2410c" />
+            <stop offset="100%" stop-color="#7c2d12" />
+          </linearGradient>
+          <linearGradient id="soj-solar" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#1e3a8a" />
+            <stop offset="100%" stop-color="#2563eb" />
+          </linearGradient>
+        </defs>
+        <circle cx="32" cy="32" r="30" fill="url(#soj-bg)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" />
+
+        <!-- Sombra en suelo -->
+        <ellipse cx="32" cy="49" rx="20" ry="4" fill="rgba(0,0,0,0.35)" />
+
+        <!-- Antena UHF -->
+        <line x1="20" y1="28" x2="16" y2="10" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
+        <circle cx="15.5" cy="9" r="2.2" fill="#fbbf24" stroke="#d97706" stroke-width="0.8" />
+
+        <!-- Ruedas traseras/medias lejanas -->
+        <circle cx="21" cy="44" r="5" fill="#475569" stroke="#94a3b8" stroke-width="1" />
+        <circle cx="33" cy="44" r="5" fill="#475569" stroke="#94a3b8" stroke-width="1" />
+        <circle cx="45" cy="44" r="5" fill="#475569" stroke="#94a3b8" stroke-width="1" />
+
+        <!-- Chasis dorado (Warm Electronics Box) -->
+        <polygon points="18,34 46,34 44,42 16,42" fill="#d97706" stroke="#78350f" stroke-width="0.9" />
+        <polygon points="44,42 46,34 50,30 48,38" fill="#b45309" stroke="#78350f" stroke-width="0.8" />
+
+        <!-- Panel solar azul en la cara superior -->
+        <polygon points="15,28 47,28 51,21 19,21" fill="url(#soj-solar)" stroke="#60a5fa" stroke-width="0.9" />
+        <line x1="23" y1="21" x2="19" y2="28" stroke="#93c5fd" stroke-width="0.6" opacity="0.8" />
+        <line x1="31" y1="21" x2="27" y2="28" stroke="#93c5fd" stroke-width="0.6" opacity="0.8" />
+        <line x1="39" y1="21" x2="35" y2="28" stroke="#93c5fd" stroke-width="0.6" opacity="0.8" />
+        <line x1="47" y1="21" x2="43" y2="28" stroke="#93c5fd" stroke-width="0.6" opacity="0.8" />
+
+        <!-- Cámaras estéreo frontales (ojitos del robot) -->
+        <rect x="44" y="32" width="6" height="5" rx="1.5" fill="#0f172a" stroke="#cbd5e1" stroke-width="0.8" />
+        <circle cx="46" cy="34.5" r="1.3" fill="#38bdf8" />
+        <circle cx="48.5" cy="34.5" r="1.3" fill="#38bdf8" />
+
+        <!-- Brazos rocker-bogie cercanos -->
+        <polyline points="20,47 28,40 46,47" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="28" cy="40" r="1.8" fill="#64748b" stroke="#ffffff" stroke-width="0.8" />
+
+        <!-- 3 Ruedas delanteras/cercanas metálicas con tacos -->
+        <circle cx="20" cy="47" r="5.5" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
+        <circle cx="20" cy="47" r="2.2" fill="#64748b" />
+        <circle cx="33" cy="47" r="5.5" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
+        <circle cx="33" cy="47" r="2.2" fill="#64748b" />
+        <circle cx="46" cy="47" r="5.5" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
+        <circle cx="46" cy="47" r="2.2" fill="#64748b" />
+      </svg>
+    `;
+  }
+
   M.sojourner = sojourner;
+  M.sojournerAvatar = sojournerAvatar;
 })(typeof window !== 'undefined' ? window : globalThis);

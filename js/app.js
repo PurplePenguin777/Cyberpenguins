@@ -1428,7 +1428,7 @@
       windLfo.start(now);
 
       const windGain = ctx.createGain();
-      windGain.gain.setValueAtTime(0.55, now);
+      windGain.gain.setValueAtTime(0.32, now);
 
       windSource.connect(windFilter);
       windFilter.connect(windGain);
@@ -1440,18 +1440,18 @@
       marsAmbience.windLfo = windLfo;
       marsAmbience.windGain = windGain;
 
-      // 2. MÚSICA AMBIENTAL PROCEDURAL (Acordes etéreos espaciales)
+      // 2. MÚSICA AMBIENTAL PROCEDURAL (Acordes relajantes, alegres y motivadores)
       const musicGain = ctx.createGain();
-      musicGain.gain.setValueAtTime(0.65, now);
+      musicGain.gain.setValueAtTime(0.78, now);
       musicGain.connect(master);
       marsAmbience.musicGain = musicGain;
 
-      // Progresión de acordes espaciales marcianos (Dm9 -> Bbmaj7 -> Csus2 -> Am7)
+      // Progresión armónica motivadora, alegre, relajante y feliz (Cmaj9 -> Fmaj7 -> G6/9 -> Am9)
       const chords = [
-        [73.42, 146.83, 220.0, 261.63, 329.63], // Dm9
-        [58.27, 116.54, 174.61, 220.0, 293.66], // Bbmaj7
-        [65.41, 130.81, 196.0, 293.66, 329.63], // Csus2
-        [55.0, 110.0, 164.81, 261.63, 329.63]   // Am7
+        [130.81, 196.0, 246.94, 293.66, 329.63], // Cmaj9: C3, G3, B3, D4, E4 (cálido, brillante, esperanzador)
+        [87.31, 174.61, 261.63, 329.63, 392.0],  // Fmaj7: F2, F3, C4, E4, G4 (dulce, expansivo)
+        [98.0, 196.0, 246.94, 293.66, 392.0],   // G6/9: G2, G3, B3, D4, G4 (alegre, juguetón)
+        [110.0, 164.81, 220.0, 261.63, 329.63]   // Am9: A2, E3, A3, C4, E4 (sereno, tierno)
       ];
 
       let chordIdx = 0;
@@ -1473,18 +1473,18 @@
             const filter = padCtx.createBiquadFilter();
 
             osc.type = (fIdx === 0) ? 'sine' : (fIdx % 2 === 0 ? 'triangle' : 'sine');
-            const detune = (fIdx % 2 === 0 ? 3 : -3) + (Math.random() * 2 - 1);
+            const detune = (fIdx % 2 === 0 ? 2 : -2) + (Math.random() * 2 - 1);
             osc.frequency.setValueAtTime(freq, tNow);
             osc.detune.setValueAtTime(detune, tNow);
 
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(fIdx === 0 ? 220 : 680, tNow);
+            filter.frequency.setValueAtTime(fIdx === 0 ? 240 : 720, tNow);
 
-            const voiceGain = (fIdx === 0 ? 0.22 : 0.16) / Math.sqrt(chord.length);
+            const voiceGain = (fIdx === 0 ? 0.24 : 0.18) / Math.sqrt(chord.length);
             gain.gain.setValueAtTime(0.0001, tNow);
-            gain.gain.exponentialRampToValueAtTime(voiceGain, tNow + 2.8);
-            gain.gain.setValueAtTime(voiceGain, tNow + chordDuration - 2.8);
-            gain.gain.exponentialRampToValueAtTime(0.0001, tNow + chordDuration);
+            gain.gain.linearRampToValueAtTime(voiceGain, tNow + 2.4);
+            gain.gain.setValueAtTime(voiceGain, tNow + chordDuration - 2.4);
+            gain.gain.linearRampToValueAtTime(0.0001, tNow + chordDuration);
 
             osc.connect(filter);
             filter.connect(gain);
@@ -1494,21 +1494,25 @@
             osc.stop(tNow + chordDuration + 0.1);
           });
 
-          // Destello estelar armónico ocasional
+          // Campanitas y destellos pentatónicos estilo Animal Crossing (dulces, alegres y motivadores)
           if (chordIdx % 2 === 0) {
-            const twinkleFreqs = [587.33, 880.0, 1046.5, 1318.51];
-            const tf = twinkleFreqs[Math.floor(Math.random() * twinkleFreqs.length)];
-            const twOsc = padCtx.createOscillator();
-            const twGain = padCtx.createGain();
-            twOsc.type = 'sine';
-            twOsc.frequency.setValueAtTime(tf, tNow + 2.0);
-            twGain.gain.setValueAtTime(0.0001, tNow + 2.0);
-            twGain.gain.exponentialRampToValueAtTime(0.065, tNow + 2.3);
-            twGain.gain.exponentialRampToValueAtTime(0.0001, tNow + 5.5);
-            twOsc.connect(twGain);
-            twGain.connect(musicGain);
-            twOsc.start(tNow + 2.0);
-            twOsc.stop(tNow + 5.6);
+            const chimeNotes = [523.25, 659.25, 783.99, 880.0, 1046.5];
+            const noteCount = 2;
+            for (let cI = 0; cI < noteCount; cI++) {
+              const cf = chimeNotes[Math.floor(Math.random() * chimeNotes.length)];
+              const cOsc = padCtx.createOscillator();
+              const cGain = padCtx.createGain();
+              cOsc.type = 'sine';
+              const noteOffset = 1.6 + cI * 0.38;
+              cOsc.frequency.setValueAtTime(cf, tNow + noteOffset);
+              cGain.gain.setValueAtTime(0.0001, tNow + noteOffset);
+              cGain.gain.linearRampToValueAtTime(0.055, tNow + noteOffset + 0.04);
+              cGain.gain.exponentialRampToValueAtTime(0.0001, tNow + noteOffset + 1.2);
+              cOsc.connect(cGain);
+              cGain.connect(musicGain);
+              cOsc.start(tNow + noteOffset);
+              cOsc.stop(tNow + noteOffset + 1.25);
+            }
           }
         } catch (_err) { }
 
@@ -2108,9 +2112,10 @@
     const obs = [];
     if (world3d.ship) {
       // Casco principal de la nave espacial
-      obs.push({ id: 'ship-hull', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.55 });
+      obs.push({ id: 'ship-hull', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.75 });
       // Las 4 patas telescópicas y zapatas circulares (footpads)
-      const shipYaw = 0.36;
+      const t3d = getTerrain3D();
+      const shipYaw = (t3d && t3d.shipState && typeof t3d.shipState.yaw === 'number') ? t3d.shipState.yaw : 0.36;
       const shipScale = 1.82;
       const cosY = Math.cos(shipYaw);
       const sinY = Math.sin(shipYaw);
@@ -2125,7 +2130,7 @@
         const lz = l.z * shipScale;
         const wx = world3d.ship.x + (lx * cosY + lz * sinY);
         const wz = world3d.ship.z + (-lx * sinY + lz * cosY);
-        obs.push({ id: l.id, cx: wx, cz: wz, r: 0.44 });
+        obs.push({ id: l.id, cx: wx, cz: wz, r: 0.78 });
       });
     }
     if (world3d.machine) {
@@ -2471,6 +2476,8 @@
           if (FX && typeof FX.emitBurst === 'function') {
             FX.emitBurst({ x: pNow.pctX, y: pNow.pctY }, 'step', state.currentChapterId, world3d.siteId);
           }
+          const isMars = state.currentChapterId === 'mars' || (world3d.siteId && world3d.siteId.includes('mars')) || world3d.siteId === 'ares-vallis';
+          playHarmony(isMars ? 'stepMars' : 'step');
         }
 
         // Evaluar proximidad continuamente para activar el texto al acercarse y desactivarlo al alejarse
@@ -3566,6 +3573,10 @@
 
   function showStageActionPrompt(type, target, onAction) {
     if (!dom.stageActionPrompt || !dom.stageActionBtn) return;
+    if (isSpeechBubbleOpen()) {
+      hideStageActionPrompt();
+      return;
+    }
     // Prioridad UX: la acción interactiva prevalece sobre pensamientos ambientales
     hideThoughtBubble();
     activeInteractable = { type, target, onAction };
@@ -3686,7 +3697,7 @@
   function checkSurfaceProximity() {
     const chapter = getChapter(state.currentChapterId);
     if (!chapter) return;
-    if (dom.gameScreen.classList.contains('is-hidden') || isBlockingModalOpen()) {
+    if (dom.gameScreen.classList.contains('is-hidden') || isBlockingModalOpen() || isSpeechBubbleOpen()) {
       hideStageActionPrompt();
       return;
     }
@@ -4040,10 +4051,29 @@
      Globos de Diálogo Encima de los Personajes (Estilo Animal Crossing)
      ======================================================================== */
 
+  function formatDialogueText(raw) {
+    if (!raw) return '';
+    const text = String(raw).trim();
+    // Al terminar en signo de exclamación (!) o pregunta (?), continuar en otra línea de forma balanceada
+    return text.replace(/([!¡?¿]*[!?.])\s+([¡¿A-ZÁÉÍÓÚa-záéíóú0-9])/g, '$1<br class="dialogue-break" />$2');
+  }
+
+  function getDialogueAnchorY() {
+    let topY = 99;
+    const head = getPenguinHeadPct();
+    if (head && typeof head.y === 'number') {
+      topY = Math.min(topY, head.y);
+    }
+    if (world3d.active && world3d.machine && typeof world3d.machine.screenY === 'number') {
+      topY = Math.min(topY, world3d.machine.screenY - 14);
+    }
+    return topY < 90 ? topY : null;
+  }
+
   function positionSpeechBubble(x, y, isExactTop = false) {
     if (!dom.stageSpeechBubble) return;
     const clampedX = Math.max(22, Math.min(78, x));
-    const isFlipped = y < 30;
+    const isFlipped = y < 28;
     dom.stageSpeechBubble.classList.toggle('bubble-flipped', isFlipped);
     dom.stageSpeechBubble.style.left = `${clampedX}%`;
     // La colita sigue apuntando al personaje aunque el globo quede acotado dentro de la pantalla
@@ -4055,9 +4085,18 @@
       const maxShift = Math.max(0, bubbleW / 2 - 30);
       dom.stageSpeechBubble.style.setProperty('--tail-shift', `${Math.max(-maxShift, Math.min(maxShift, shift)).toFixed(1)}px`);
     }
-    const targetY = isExactTop
-      ? (isFlipped ? Math.min(78, y + 6) : Math.max(15, y - 1.5))
-      : (isFlipped ? Math.min(78, y + 8) : Math.max(15, y - 8));
+
+    let targetY;
+    if (world3d.active && activeDialogueMachine) {
+      // Regla UX: anclar el globo por encima de los personajes para que, por muy largo
+      // que sea el texto, crezca hacia el cielo sin tapar a Cyberpenguin ni a Sojourner
+      const charTop = getDialogueAnchorY();
+      targetY = charTop ? Math.max(12, charTop - 3.2) : Math.max(15, y - 8);
+    } else {
+      targetY = isExactTop
+        ? (isFlipped ? Math.min(78, y + 6) : Math.max(15, y - 1.5))
+        : (isFlipped ? Math.min(78, y + 8) : Math.max(15, y - 8));
+    }
     dom.stageSpeechBubble.style.top = `${targetY}%`;
   }
 
@@ -4081,6 +4120,11 @@
     }
     clearTimeout(dialogueAutoTimer);
     TTS.stop();
+    const t3d = getTerrain3D();
+    if (t3d && typeof t3d.setDialogueZoom === 'function') {
+      t3d.setDialogueZoom(false);
+    }
+    checkSurfaceProximity();
   }
 
   let thoughtJumpParams = null;
@@ -4202,6 +4246,7 @@
   function showSpeechBubbleStep({ speaker, name, avatarSvg, text, audioUrl, anchorPos, choices, onNext, onChoice }) {
     if (!dom.stageSpeechBubble) return;
     hideThoughtBubble();
+    hideStageActionPrompt();
     const turnToken = ++activeDialogueToken;
     clearTimeout(dialogueAutoTimer);
     setActiveSpeakerVisual(null);
@@ -4243,10 +4288,10 @@
     if (dom.speechBubbleText) {
       const cleanText = (text || '').trim();
       if (cleanText) {
-        dom.speechBubbleText.textContent = cleanText;
+        dom.speechBubbleText.innerHTML = formatDialogueText(cleanText);
         dom.speechBubbleText.style.display = 'block';
       } else {
-        dom.speechBubbleText.textContent = '';
+        dom.speechBubbleText.innerHTML = '';
         dom.speechBubbleText.style.display = 'none';
       }
     }
@@ -4358,6 +4403,31 @@
     if (machine && machine.id === 'sojourner') {
       playHarmony('sojournerRadio');
     }
+    hideStageActionPrompt();
+
+    // Orientación recíproca frente a frente y zoom conversacional estilo Animal Crossing
+    if (world3d.active && world3d.penguin && machine) {
+      const t3d = getTerrain3D();
+      const p = world3d.penguin;
+      const m = world3d.machine || (machine.pos ? { x: 1.8, y: 0.4, z: 0.5 } : null);
+      if (m) {
+        const dx = m.x - p.x;
+        const dz = m.z - p.z;
+        const pYaw = Math.atan2(dx, dz);
+        const mYaw = Math.atan2(-dx, -dz);
+        p.yaw = pYaw;
+        p.targetYaw = pYaw;
+        penguinDir = dx >= 0 ? 'right' : 'left';
+        if (t3d) {
+          if (typeof t3d.setPenguinPose === 'function') t3d.setPenguinPose({ yaw: pYaw });
+          if (typeof t3d.setMachinePose === 'function') t3d.setMachinePose({ yaw: mYaw });
+          if (typeof t3d.setDialogueZoom === 'function') {
+            t3d.setDialogueZoom(true, { x: p.x, y: p.y, z: p.z }, { x: m.x, y: m.y || p.y, z: m.z });
+          }
+        }
+      }
+    }
+
     const branch = machine.branchingDialogue;
     if (!branch) {
       fallbackLinearDialogue(machine);
@@ -4378,7 +4448,9 @@
     if (!activeBranchState || !activeBranchState.machine) return;
     const { machine, step, choice1, choice2 } = activeBranchState;
     const branch = machine.branchingDialogue;
-    const machineSvg = MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '';
+    const machineSvg = (machine.id === 'sojourner' && typeof MODELS.sojournerAvatar === 'function')
+      ? MODELS.sojournerAvatar()
+      : (MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '');
     const penguinSvg = MODELS.cyberpenguin ? MODELS.cyberpenguin('right') : '';
 
     if (step === 'greeting') {
@@ -4539,6 +4611,29 @@
   }
 
   function fallbackLinearDialogue(machine) {
+    activeDialogueMachine = machine;
+    hideStageActionPrompt();
+    if (world3d.active && world3d.penguin && machine) {
+      const t3d = getTerrain3D();
+      const p = world3d.penguin;
+      const m = world3d.machine || (machine.pos ? { x: 1.8, y: 0.4, z: 0.5 } : null);
+      if (m) {
+        const dx = m.x - p.x;
+        const dz = m.z - p.z;
+        const pYaw = Math.atan2(dx, dz);
+        const mYaw = Math.atan2(-dx, -dz);
+        p.yaw = pYaw;
+        p.targetYaw = pYaw;
+        penguinDir = dx >= 0 ? 'right' : 'left';
+        if (t3d) {
+          if (typeof t3d.setPenguinPose === 'function') t3d.setPenguinPose({ yaw: pYaw });
+          if (typeof t3d.setMachinePose === 'function') t3d.setMachinePose({ yaw: mYaw });
+          if (typeof t3d.setDialogueZoom === 'function') {
+            t3d.setDialogueZoom(true, { x: p.x, y: p.y, z: p.z }, { x: m.x, y: m.y || p.y, z: m.z });
+          }
+        }
+      }
+    }
     const turns = getMachineDialogueTurns(machine);
     const shipLabel = (state.currentLanguage === 'en') ? "Cyberpenguin's Ship" : 'Nave de Cyberpenguin';
     let turnIdx = 0;
@@ -4556,7 +4651,9 @@
         ? MODELS.cyberpenguin('right')
         : isShip
           ? MODELS.spaceship({ hatchOpen: false, launching: false, inSpaceFlight: true })
-          : (MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : '');
+          : ((machine.id === 'sojourner' && typeof MODELS.sojournerAvatar === 'function')
+              ? MODELS.sojournerAvatar()
+              : (MODELS[machine.modelKey] ? MODELS[machine.modelKey]() : ''));
 
       showSpeechBubbleStep({
         speaker: t.speaker,
