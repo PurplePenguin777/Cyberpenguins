@@ -428,7 +428,8 @@
         midGrad: '#64748b',
         lightGrad: '#e2e8f0',
         atmoColor: '#94a3b8',
-        atmoOp: 0
+        atmoOp: 0,
+        texture: 'assets/textures/luna-4k.jpg'
       },
       mars: {
         baseColor: '#b44214',
@@ -436,7 +437,8 @@
         midGrad: '#a83c12',
         lightGrad: '#ea7238',
         atmoColor: '#fed7aa',
-        atmoOp: 0.16
+        atmoOp: 0.16,
+        texture: 'assets/textures/marte-2k.jpg'
       },
       earth: {
         baseColor: '#1d4ed8',
@@ -444,7 +446,8 @@
         midGrad: '#1d4ed8',
         lightGrad: '#60a5fa',
         atmoColor: '#38bdf8',
-        atmoOp: 0.35
+        atmoOp: 0.35,
+        texture: 'assets/textures/tierra-4k.jpg'
       }
     }[kind] || {
       baseColor: '#64748b',
@@ -489,6 +492,7 @@
         <!-- Base esférica continua y curvada sin líneas radiales en el centro -->
         <circle r="${n(r)}" fill="url(#sphereLight-${uid})" />
         <g clip-path="url(#clip-${uid})">
+          ${baseConfig.texture ? `<image href="${baseConfig.texture}" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" opacity="0.88" />` : ''}
           ${featuresSvg}
           <!-- Terminador nocturno y sombreado esférico tridimensional -->
           ${M.facetShade ? M.facetShade(r, { seed: seed + 7, strength: kind === 'earth' ? 0.12 : 0.18 }) : ''}

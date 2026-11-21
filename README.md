@@ -106,3 +106,13 @@ Creado con cariño por el team **Cyberpenguins** para el **NASA Space Apps Chall
 Dado el entusiasmo y el interés por continuar expandiendo este universo educativo, cualquier persona interesada en seguir desarrollando nuevas misiones, características o mejoras es más que bienvenida.
 
 Puedes ponerte en contacto directamente con el creador del repositorio para colaborar y trabajar juntos en ramas de desarrollo independientes y separadas a la versión oficial del challenge. De esta forma, la entrega del concurso se conserva intacta mientras el proyecto continúa creciendo con nuevas ideas.
+
+---
+
+## Créditos y recursos públicos
+
+Las texturas planetarias y el fondo espacial de la Vía Láctea provienen de fuentes abiertas y de dominio público:
+- **Fondo de la Vía Láctea y texturas de alta resolución:** [Solar System Scope](https://www.solarsystemscope.com/textures/) (Licencia Creative Commons Attribution 4.0 International - CC BY 4.0), basados en datos e imaginería de la NASA.
+- **Mapa y relieve de la Luna:** NASA Scientific Visualization Studio (SVS), [CGI Moon Kit](https://svs.gsfc.nasa.gov/4720), Lunar Reconnaissance Orbiter Camera (LROC) / NASA Goddard / Arizona State University.
+- **Mapa de la Tierra:** [NASA Visible Earth (Blue Marble)](https://visibleearth.nasa.gov/collection/1484/blue-marble), NASA Earth Observatory.
+- **Modelos y recursos 3D:** [NASA 3D Resources](https://science.nasa.gov/3d-resources/) / [GitHub NASA 3D Resources](https://github.com/nasa/NASA-3D-Resources), NASA / JPL-Caltech.

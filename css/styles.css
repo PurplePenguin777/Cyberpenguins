@@ -126,23 +126,38 @@ a:focus-visible {
   inset: 0;
   pointer-events: none;
   overflow: hidden;
+  background-color: #030712;
   background-image:
-    radial-gradient(2px 2px at 11% 14%, rgba(255, 255, 255, 0.9) 45%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 22% 38%, rgba(168, 230, 207, 0.78) 50%, transparent 100%),
-    radial-gradient(1.2px 1.2px at 28% 72%, rgba(255, 255, 255, 0.72) 50%, transparent 100%),
-    radial-gradient(2.2px 2.2px at 43% 12%, rgba(255, 214, 153, 0.88) 45%, transparent 100%),
-    radial-gradient(1px 1px at 52% 29%, rgba(255, 255, 255, 0.65) 50%, transparent 100%),
-    radial-gradient(1.6px 1.6px at 67% 32%, rgba(158, 226, 255, 0.84) 50%, transparent 100%),
-    radial-gradient(2px 2px at 78% 15%, rgba(255, 255, 255, 0.86) 45%, transparent 100%),
-    radial-gradient(1.8px 1.8px at 84% 26%, rgba(212, 186, 245, 0.8) 50%, transparent 100%),
-    radial-gradient(1.4px 1.4px at 92% 48%, rgba(255, 255, 255, 0.7) 50%, transparent 100%),
-    radial-gradient(1.3px 1.3px at 91% 76%, rgba(126, 232, 250, 0.78) 50%, transparent 100%),
-    radial-gradient(1.1px 1.1px at 8% 86%, rgba(255, 255, 255, 0.62) 50%, transparent 100%),
-    radial-gradient(1.6px 1.6px at 36% 88%, rgba(180, 224, 255, 0.72) 50%, transparent 100%),
-    radial-gradient(1.8px 1.8px at 54% 84%, rgba(255, 218, 185, 0.78) 50%, transparent 100%),
-    radial-gradient(1px 1px at 72% 90%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
-  opacity: 0.96;
+    linear-gradient(180deg, rgba(3, 7, 18, 0.58) 0%, rgba(3, 7, 18, 0.8) 100%),
+    url('../assets/textures/via-lactea.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  opacity: 0.88;
   z-index: 0;
+}
+
+.starfield::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 11% 14%, rgba(255, 255, 255, 0.95) 45%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 22% 38%, rgba(168, 230, 207, 0.85) 50%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 28% 72%, rgba(255, 255, 255, 0.8) 50%, transparent 100%),
+    radial-gradient(2.2px 2.2px at 43% 12%, rgba(255, 214, 153, 0.9) 45%, transparent 100%),
+    radial-gradient(1px 1px at 52% 29%, rgba(255, 255, 255, 0.7) 50%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 67% 32%, rgba(158, 226, 255, 0.88) 50%, transparent 100%),
+    radial-gradient(2px 2px at 78% 15%, rgba(255, 255, 255, 0.9) 45%, transparent 100%),
+    radial-gradient(1.8px 1.8px at 84% 26%, rgba(212, 186, 245, 0.85) 50%, transparent 100%),
+    radial-gradient(1.4px 1.4px at 92% 48%, rgba(255, 255, 255, 0.75) 50%, transparent 100%),
+    radial-gradient(1.3px 1.3px at 91% 76%, rgba(126, 232, 250, 0.85) 50%, transparent 100%),
+    radial-gradient(1.1px 1.1px at 8% 86%, rgba(255, 255, 255, 0.65) 50%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 36% 88%, rgba(180, 224, 255, 0.75) 50%, transparent 100%),
+    radial-gradient(1.8px 1.8px at 54% 84%, rgba(255, 218, 185, 0.8) 50%, transparent 100%),
+    radial-gradient(1px 1px at 72% 90%, rgba(255, 255, 255, 0.7) 50%, transparent 100%);
+  opacity: 0.92;
+  pointer-events: none;
 }
 
 .cosmic-panorama-svg {
@@ -364,7 +379,13 @@ a:focus-visible {
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: #040712;
+  background-color: #040712;
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 18, 0.45) 0%, rgba(4, 7, 18, 0.75) 100%),
+    url('../assets/textures/via-lactea.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
