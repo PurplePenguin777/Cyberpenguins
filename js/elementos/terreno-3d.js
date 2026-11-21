@@ -6,14 +6,15 @@
  */
 import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
+import { KTX2Loader } from '../vendor/three/loaders/KTX2Loader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 import { MeshoptDecoder } from '../vendor/three/libs/meshopt_decoder.module.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121v';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121v';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121v';
-const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121v';
-const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121v';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121w';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121w';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121w';
+const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121w';
+const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121w';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -24,10 +25,8 @@ const SITE_CONFIGS = {
     shipModelUrl: SHIP_MODEL_URL,
     shipScale: 1.82,
     shipDefaultYaw: 0.36,
-    titleEs: 'Ares Vallis · 19.09°N, 33.25°W · ESA/NASA Mars Express HRSC DTM (H3147_0000_DA4)',
-    titleEn: 'Ares Vallis · 19.09°N, 33.25°W · ESA/NASA Mars Express HRSC DTM (H3147_0000_DA4)',
-    hintEs: 'Arrastra para orbitar · Rueda/pellizco para zoom · Clic derecho para desplazar',
-    hintEn: 'Drag to orbit · Scroll/pinch to zoom · Right-drag to pan',
+    titleEs: 'Ares Vallis',
+    titleEn: 'Ares Vallis',
     exploreFov: 37,
     inspectFov: 44,
     exploreCamPos: [-1.15, 1.96, 10.6],
@@ -197,6 +196,128 @@ function createMarsSkyDome(sunDir) {
   return new THREE.Mesh(geo, mat);
 }
 
+function createFacetedRockGeometry(detail = 1, seed = 42) {
+  const geo = new THREE.IcosahedronGeometry(1.0, detail);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i += 1) {
+    const vx = pos.getX(i);
+    const vy = pos.getY(i);
+    const vz = pos.getZ(i);
+    const n1 = Math.sin(vx * 2.7 + seed) * Math.cos(vy * 3.1 - seed * 0.5);
+    const n2 = Math.cos(vz * 4.3 + vx * 2.1 + seed * 0.7);
+    const facet = 0.84 + 0.18 * n1 + 0.08 * n2;
+    const flatBottom = vy < -0.25 ? 0.62 : 1.0;
+    pos.setXYZ(i, vx * 1.18 * facet, vy * 0.74 * facet * flatBottom, vz * 0.96 * facet);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function createInstancedMarsRocks(getHeightFn, regolithTextures) {
+  const group = new THREE.Group();
+  group.name = 'InstancedMarsRockField';
+  const rand = createSeededRng(199707042);
+
+  // Zonas despejadas: nave Ranger, spawn de Cyberpenguin, Sojourner y zona central de muestras
+  const clearZones = [
+    { x: -4.6, z: 1.4, r: 3.4 },  // Ranger VTOL
+    { x: -2.2, z: 1.8, r: 2.1 },  // Spawn Cyberpenguin
+    { x: 2.35, z: 0.45, r: 2.0 }, // Sojourner
+    { x: 0.0, z: 0.0, r: 1.6 }    // Centro de aterrizaje
+  ];
+  const isClear = (x, z) => {
+    for (let i = 0; i < clearZones.length; i += 1) {
+      const c = clearZones[i];
+      if (Math.hypot(x - c.x, z - c.z) < c.r) return false;
+    }
+    return true;
+  };
+
+  const palette = [
+    new THREE.Color('#9c5a3e'), // Oxido de hierro polvoriento
+    new THREE.Color('#6a4e40'), // Basalto marciano oscuro
+    new THREE.Color('#b67350'), // Costra ocre
+    new THREE.Color('#7d6153'), // Andesita gris-marrón
+    new THREE.Color('#543f36')  // Roca volcánica sombreada
+  ];
+
+  const dummy = new THREE.Object3D();
+
+  // Nivel LOD 0 (Primer plano: 180 rocas angulosas detalladas en 1 sola draw call)
+  const nearGeo = createFacetedRockGeometry(2, 11.3);
+  const nearMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.93,
+    metalness: 0.04,
+    bumpMap: regolithTextures ? regolithTextures.bumpMap : null,
+    bumpScale: regolithTextures && regolithTextures.bumpMap ? 0.04 : 0
+  });
+  const nearCount = 180;
+  const nearInst = new THREE.InstancedMesh(nearGeo, nearMat, nearCount);
+  let placedNear = 0;
+  let attempts = 0;
+  while (placedNear < nearCount && attempts < 1400) {
+    attempts += 1;
+    const ang = rand() * Math.PI * 2;
+    const dist = 2.4 + Math.pow(rand(), 0.78) * 16.5;
+    const rx = Math.cos(ang) * dist;
+    const rz = Math.sin(ang) * dist - 1.5;
+    if (!isClear(rx, rz)) continue;
+
+    const s = 0.065 + Math.pow(rand(), 2.4) * 0.34;
+    const ry = getHeightFn(rx, rz);
+    dummy.position.set(rx, ry - s * 0.18, rz);
+    dummy.rotation.set((rand() - 0.5) * 0.5, rand() * Math.PI * 2, (rand() - 0.5) * 0.5);
+    dummy.scale.set(s * (0.85 + rand() * 0.45), s * (0.65 + rand() * 0.45), s * (0.85 + rand() * 0.45));
+    dummy.updateMatrix();
+    nearInst.setMatrixAt(placedNear, dummy.matrix);
+    nearInst.setColorAt(placedNear, palette[Math.floor(rand() * palette.length)]);
+    placedNear += 1;
+  }
+  nearInst.count = placedNear;
+  nearInst.instanceMatrix.needsUpdate = true;
+  if (nearInst.instanceColor) nearInst.instanceColor.needsUpdate = true;
+  nearInst.frustumCulled = true;
+  group.add(nearInst);
+
+  // Nivel LOD 1 (Plano medio/lejano: 280 rocas y cantos de la inundación de Ares Vallis en 1 sola draw call)
+  const farGeo = createFacetedRockGeometry(1, 29.7);
+  const farMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.96,
+    metalness: 0.02
+  });
+  const farCount = 280;
+  const farInst = new THREE.InstancedMesh(farGeo, farMat, farCount);
+  let placedFar = 0;
+  attempts = 0;
+  while (placedFar < farCount && attempts < 1800) {
+    attempts += 1;
+    const ang = rand() * Math.PI * 2;
+    const dist = 11.5 + Math.pow(rand(), 0.72) * 24.0;
+    const rx = Math.cos(ang) * dist;
+    const rz = Math.sin(ang) * dist - 4.0;
+    if (!isClear(rx, rz)) continue;
+
+    const s = 0.16 + Math.pow(rand(), 2.1) * 0.68;
+    const ry = getHeightFn(rx, rz);
+    dummy.position.set(rx, ry - s * 0.22, rz);
+    dummy.rotation.set((rand() - 0.5) * 0.6, rand() * Math.PI * 2, (rand() - 0.5) * 0.6);
+    dummy.scale.set(s * (0.8 + rand() * 0.55), s * (0.6 + rand() * 0.5), s * (0.8 + rand() * 0.55));
+    dummy.updateMatrix();
+    farInst.setMatrixAt(placedFar, dummy.matrix);
+    farInst.setColorAt(placedFar, palette[Math.floor(rand() * palette.length)]);
+    placedFar += 1;
+  }
+  farInst.count = placedFar;
+  farInst.instanceMatrix.needsUpdate = true;
+  if (farInst.instanceColor) farInst.instanceColor.needsUpdate = true;
+  farInst.frustumCulled = true;
+  group.add(farInst);
+
+  return { group, totalRocks: placedNear + placedFar };
+}
+
 function createPhobosMesh() {
   const geo = new THREE.IcosahedronGeometry(1.15, 2);
   const pos = geo.attributes.position;
@@ -313,6 +434,7 @@ class Terrain3DController {
     this.resizeObserver = null;
     this.boundWindowResize = null;
     this.loader = new GLTFLoader();
+    this.ktx2Loader = null;
     if (MeshoptDecoder && typeof this.loader.setMeshoptDecoder === 'function') {
       this.loader.setMeshoptDecoder(MeshoptDecoder);
     }
@@ -320,6 +442,14 @@ class Terrain3DController {
     this.machineModelCache = new Map();
     this.shipModelCache = new Map();
     this.terrainHeightGrid = null;
+    this.perfState = {
+      currentPixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
+      maxPixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
+      minPixelRatio: 0.85,
+      lastFrameAt: 0,
+      accumMs: 0,
+      frameCount: 0
+    };
     this.penguinModelPromise = null;
     this.penguinActor = null;
     this.machineActor = null;
@@ -433,10 +563,24 @@ class Terrain3DController {
           powerPreference: 'high-performance',
           alpha: false
         });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+        this.perfState.maxPixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+        this.perfState.currentPixelRatio = this.perfState.maxPixelRatio;
+        renderer.setPixelRatio(this.perfState.currentPixelRatio);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.05;
+
+        // Configurar KTX2Loader (Basis Universal GPU textures) con transcodificador WASM local
+        try {
+          if (typeof KTX2Loader === 'function') {
+            this.ktx2Loader = new KTX2Loader()
+              .setTranscoderPath('js/vendor/three/libs/basis/')
+              .detectSupport(renderer);
+            this.loader.setKTX2Loader(this.ktx2Loader);
+          }
+        } catch (_ktxErr) {
+          // Continuar sin KTX2 si el entorno no soporta WebGL compressed textures
+        }
 
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0xd69d76, 0.0175);
@@ -446,18 +590,20 @@ class Terrain3DController {
         scene.add(skyDome);
         this.skyDome = skyDome;
 
-        // Luna marciana Fobos en el cielo: modelo 3D oficial de la NASA (Phobos_1_1000.glb, 1 u = 1 km)
-        // Normalizado a un tamaño angular natural y teñido con dispersión atmosférica diurna de Marte
-        // para que su lado en sombra se funda con el cielo ocre en lugar de verse negro espacial.
-        this.phobosGroup = new THREE.Group();
+        // Luna marciana Fobos en el cielo con THREE.LOD:
+        // Nivel 0: Modelo 3D oficial de la NASA (KTX2 + Meshopt); Nivel 1 (>68 u): proxy ligero
+        this.phobosGroup = new THREE.LOD();
         this.phobosGroup.position.set(18.5, 11.4, -52.0);
         this.phobosGroup.rotation.set(0.22, -0.45, -0.16);
+        const phobosLowProxy = createPhobosMesh();
+        phobosLowProxy.position.set(0, 0, 0);
+        phobosLowProxy.scale.setScalar(0.65);
+        this.phobosGroup.addLevel(phobosLowProxy, 68);
         scene.add(this.phobosGroup);
         this.loader.load(
           PHOBOS_MODEL_URL,
           (gltf) => {
             const pRoot = gltf.scene || new THREE.Group();
-            // Normalizar el radio nativo (~13 km en Phobos_1_1000.glb) a ~0.78 u en el cielo
             const box = new THREE.Box3().setFromObject(pRoot);
             const size = new THREE.Vector3();
             box.getSize(size);
@@ -477,24 +623,20 @@ class Terrain3DController {
               }
               obj.material.needsUpdate = true;
             });
-            this.phobosGroup.clear();
-            this.phobosGroup.add(pRoot);
-          },
-          undefined,
-          () => {
-            const fallback = createPhobosMesh();
-            fallback.position.set(0, 0, 0);
-            fallback.scale.setScalar(0.65);
-            this.phobosGroup.add(fallback);
+            this.phobosGroup.addLevel(pRoot, 0);
           }
         );
 
-        // Deimos (la segunda luna de Marte, ~20,060 km de distancia): modelo 3D oficial de la NASA
-        // (24879_Deimos_1_1000.glb), normalizado a una escala angular mucho más pequeña y lejana que Fobos
-        // y con el mismo tinte de dispersión atmosférica diurna marciana.
-        this.deimosGroup = new THREE.Group();
+        // Deimos (segunda luna de Marte) con THREE.LOD:
+        // Nivel 0: Modelo 3D oficial de la NASA (KTX2 + Meshopt); Nivel 1 (>74 u): punto estelar ligero
+        this.deimosGroup = new THREE.LOD();
         this.deimosGroup.position.set(-15.5, 13.8, -58.0);
         this.deimosGroup.rotation.set(0.15, 0.55, 0.12);
+        const deimosLowProxy = new THREE.Mesh(
+          new THREE.SphereGeometry(0.16, 8, 6),
+          new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffeed8'), fog: false })
+        );
+        this.deimosGroup.addLevel(deimosLowProxy, 74);
         scene.add(this.deimosGroup);
         this.loader.load(
           DEIMOS_MODEL_URL,
@@ -504,7 +646,6 @@ class Terrain3DController {
             const size = new THREE.Vector3();
             box.getSize(size);
             const maxDim = Math.max(size.x, size.y, size.z, 0.001);
-            // Más pequeño y lejano que Fobos (diámetro ~0.46 u vs 1.56 u de Fobos)
             dRoot.scale.setScalar(0.46 / maxDim);
             dRoot.traverse((obj) => {
               if (!obj.isMesh || !obj.material) return;
@@ -520,17 +661,7 @@ class Terrain3DController {
               }
               obj.material.needsUpdate = true;
             });
-            this.deimosGroup.clear();
-            this.deimosGroup.add(dRoot);
-          },
-          undefined,
-          () => {
-            const deimosGeo = new THREE.SphereGeometry(0.14, 12, 10);
-            const deimosMat = new THREE.MeshBasicMaterial({
-              color: new THREE.Color('#ffeed8'),
-              fog: false
-            });
-            this.deimosGroup.add(new THREE.Mesh(deimosGeo, deimosMat));
+            this.deimosGroup.addLevel(dRoot, 0);
           }
         );
 
@@ -653,7 +784,7 @@ class Terrain3DController {
                   )
                   .replace(
                     '#include <begin_vertex>',
-                    'vTerrainXZ = (modelMatrix * vec4(position, 1.0)).xz;\n#include <begin_vertex>'
+                    'vTerrainXZ = position.xz;\n#include <begin_vertex>'
                   );
                 shader.fragmentShader = shader.fragmentShader
                   .replace(
@@ -673,7 +804,6 @@ class Terrain3DController {
               }
             }
           });
-          root.updateMatrixWorld(true);
           root.userData.terrainMeshes = meshes;
           root.userData.heightGrid = this.buildTerrainHeightGrid(meshes);
           resolve(root);
@@ -1156,18 +1286,17 @@ class Terrain3DController {
     const side = Math.round(Math.sqrt(pos.count));
     if (Math.abs(side * side - pos.count) > side * 0.15) return null;
 
-    const matWorld = primary.matrixWorld;
-    const vTmp = new THREE.Vector3();
     let minX = Infinity;
     let maxX = -Infinity;
     let minZ = Infinity;
     let maxZ = -Infinity;
     for (let i = 0; i < pos.count; i += 1) {
-      vTmp.fromBufferAttribute(pos, i).applyMatrix4(matWorld);
-      if (vTmp.x < minX) minX = vTmp.x;
-      if (vTmp.x > maxX) maxX = vTmp.x;
-      if (vTmp.z < minZ) minZ = vTmp.z;
-      if (vTmp.z > maxZ) maxZ = vTmp.z;
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (z < minZ) minZ = z;
+      if (z > maxZ) maxZ = z;
     }
     const spanX = maxX - minX;
     const spanZ = maxZ - minZ;
@@ -1178,11 +1307,13 @@ class Terrain3DController {
     const data = new Float32Array(cols * rows);
     const counts = new Uint8Array(cols * rows);
     for (let i = 0; i < pos.count; i += 1) {
-      vTmp.fromBufferAttribute(pos, i).applyMatrix4(matWorld);
-      const ix = clampVal(Math.round(((vTmp.x - minX) / spanX) * (cols - 1)), 0, cols - 1);
-      const iz = clampVal(Math.round(((vTmp.z - minZ) / spanZ) * (rows - 1)), 0, rows - 1);
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const z = pos.getZ(i);
+      const ix = clampVal(Math.round(((x - minX) / spanX) * (cols - 1)), 0, cols - 1);
+      const iz = clampVal(Math.round(((z - minZ) / spanZ) * (rows - 1)), 0, rows - 1);
       const idx = iz * cols + ix;
-      data[idx] += vTmp.y;
+      data[idx] += y;
       counts[idx] += 1;
     }
     for (let i = 0; i < data.length; i += 1) {
@@ -1370,6 +1501,14 @@ class Terrain3DController {
         : [];
       this.terrainHeightGrid = modelRoot.userData.heightGrid || null;
 
+      // Campo de ~460 rocas marcianas 3D reales en Ares Vallis mediante GPU Instancing (2 draw calls)
+      const rockField = createInstancedMarsRocks(
+        (rx, rz) => this.getGroundHeightAt(rx, rz),
+        this.regolithTextures
+      );
+      wrapper.add(rockField.group);
+      this.instancedRockCount = rockField.totalRocks;
+
       this.marker = createLandingMarker(cfg.landerPos || [0, 0.08, 0]);
       wrapper.add(this.marker.group);
 
@@ -1545,8 +1684,37 @@ class Terrain3DController {
     }
   }
 
+  updateAdaptivePixelRatio(now) {
+    if (!this.renderer || !this.perfState) return;
+    const ps = this.perfState;
+    if (ps.lastFrameAt > 0) {
+      const dt = now - ps.lastFrameAt;
+      if (dt > 0 && dt < 150) {
+        ps.accumMs += dt;
+        ps.frameCount += 1;
+        if (ps.frameCount >= 45) {
+          const avgMs = ps.accumMs / ps.frameCount;
+          ps.accumMs = 0;
+          ps.frameCount = 0;
+          let nextRatio = ps.currentPixelRatio;
+          if (avgMs > 22.5 && nextRatio > ps.minPixelRatio) {
+            nextRatio = Math.max(ps.minPixelRatio, Number((nextRatio - 0.15).toFixed(2)));
+          } else if (avgMs < 14.5 && nextRatio < ps.maxPixelRatio) {
+            nextRatio = Math.min(ps.maxPixelRatio, Number((nextRatio + 0.1).toFixed(2)));
+          }
+          if (Math.abs(nextRatio - ps.currentPixelRatio) > 0.01) {
+            ps.currentPixelRatio = nextRatio;
+            this.renderer.setPixelRatio(nextRatio);
+          }
+        }
+      }
+    }
+    ps.lastFrameAt = now;
+  }
+
   step(now) {
     if (!this.renderer || !this.scene || !this.camera) return;
+    this.updateAdaptivePixelRatio(now);
 
     if (this.camTransition) {
       const elapsed = now - this.camTransition.startTime;
@@ -1622,6 +1790,9 @@ class Terrain3DController {
       isPaused: this.isPaused,
       hasCanvas: Boolean(this.canvas && this.container && this.container.contains(this.canvas)),
       meshCount: this.terrainMeshes.length,
+      instancedRockCount: this.instancedRockCount || 0,
+      pixelRatio: this.perfState ? this.perfState.currentPixelRatio : 1,
+      hasKtx2: Boolean(this.ktx2Loader),
       webglFailed: this.webglFailed
     };
   }
