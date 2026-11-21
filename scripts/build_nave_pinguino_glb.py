@@ -495,10 +495,11 @@ MAT_TPS_CERAMIC = 1     # Dark charcoal silica heat-shield ceramic (#1e293b)
 MAT_ALU_STRUT = 2       # Brushed aerospace aluminum landing gear, docking ring & trim (#e2e8f0)
 MAT_DARK_TITANIUM = 3   # Dark titanium nozzles, flush window mullions & actuators (#334155)
 MAT_COBALT_NASA = 4     # NASA anodized cobalt blue accents (#2563eb)
-MAT_CANOPY_GLASS = 5    # Flush panoramic cockpit tinted quartz glass (#38bdf8)
+MAT_CANOPY_GLASS = 5    # Flush panoramic cockpit gloss-black smoked quartz glass (#0a0f18)
 MAT_CYAN_GLOW = 6       # Emissive cyan airlock & ramp guide rails (#38bdf8)
 MAT_ENGINE_GLOW = 7     # Subtle standby methalox-fusion nozzle throat glow (#60a5fa)
 MAT_GOLD_FOIL = 8       # Gold thermal docking & sensor accents (#eab308)
+MAT_WINDOW_FRAME = 9    # Matte-black carbon/titanium cockpit window frames & mullions (#11151d)
 
 C_WHITE = (1.0, 1.0, 1.0)
 
@@ -648,6 +649,7 @@ def build_hull_primitives():
         MAT_CYAN_GLOW: MeshBuilder(),
         MAT_ENGINE_GLOW: MeshBuilder(),
         MAT_GOLD_FOIL: MeshBuilder(),
+        MAT_WINDOW_FRAME: MeshBuilder(),
     }
 
     # 1. Main G2 Delta-Wedge Lifting-Body Fuselage (100% watertight nose & tail poles)
@@ -705,7 +707,7 @@ def build_hull_primitives():
         p, n = eval_hull_surface_frame(u_h, v_h)
         return v_add(p, v_scale(n, h_off)), C_WHITE
 
-    mbs[MAT_DARK_TITANIUM].add_grid_surface(
+    mbs[MAT_WINDOW_FRAME].add_grid_surface(
         14,
         24,
         eval_flush_bezel,
@@ -714,15 +716,15 @@ def build_hull_primitives():
         interior_ref=(0.0, 0.45, 0.45),
     )
 
-    # 4 Flush Titanium Windshield Mullions dividing the 5 panoramic panes along the exact hull contour
+    # 4 Flush Black Carbon/Titanium Windshield Mullions dividing the 5 panoramic panes
     for u_m in (0.415, 0.472, 0.528, 0.585):
         p_top_m, n_top_m = eval_hull_surface_frame(u_m, v_win_min)
         p_bot_m, n_bot_m = eval_hull_surface_frame(u_m, v_win_max)
-        mbs[MAT_ALU_STRUT].add_cylinder(
+        mbs[MAT_WINDOW_FRAME].add_cylinder(
             v_add(p_top_m, v_scale(n_top_m, 0.0035)),
             v_add(p_bot_m, v_scale(n_bot_m, 0.0035)),
+            0.0085,
             0.0075,
-            0.0065,
             C_WHITE,
             radial_segs=10,
             height_segs=2,
@@ -1185,14 +1187,16 @@ def pack_glb():
         make_pbr_mat("RangerDarkTitanium", "#3b495e", roughness=0.40, metallic=0.16),
         # 4: MAT_COBALT_NASA
         make_pbr_mat("RangerNasaCobalt", "#2563eb", roughness=0.28, metallic=0.16),
-        # 5: MAT_CANOPY_GLASS
-        make_pbr_mat("RangerCanopyQuartzGlass", "#38bdf8", roughness=0.08, metallic=0.10, emissive_hex="#075985"),
+        # 5: MAT_CANOPY_GLASS (Gloss-black smoked fused-silica aerospace quartz, Interstellar Ranger style)
+        make_pbr_mat("RangerCanopyQuartzGlass", "#0a0f18", roughness=0.05, metallic=0.22),
         # 6: MAT_CYAN_GLOW
         make_pbr_mat("RangerCyanAirlockGlow", "#38bdf8", roughness=0.12, metallic=0.05, emissive_hex="#0ea5e9"),
         # 7: MAT_ENGINE_GLOW
         make_pbr_mat("RangerMethaloxNozzleGlow", "#60a5fa", roughness=0.15, metallic=0.08, emissive_hex="#1d4ed8"),
         # 8: MAT_GOLD_FOIL
         make_pbr_mat("RangerGoldKaptonTrim", "#eab308", roughness=0.24, metallic=0.22, emissive_hex="#422006"),
+        # 9: MAT_WINDOW_FRAME (Matte-black carbon/titanium window frames & mullions)
+        make_pbr_mat("RangerWindowFrameBlack", "#11151d", roughness=0.42, metallic=0.15),
     ]
 
     gltf = {

@@ -1580,6 +1580,11 @@ a:focus-visible {
   top: -36px;
 }
 
+/* Scooby Doo (sample-mars-6) es una losa plana y baja (~18 cm): bajamos su marcador azul */
+.iso-board.has-3d-samples .stage-entity[data-entity-id="sample-mars-6"] .sample-beacon {
+  top: -4px;
+}
+
 .iso-board.has-3d-ship .ship-beacon {
   top: -82px;
 }
