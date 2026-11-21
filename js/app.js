@@ -538,6 +538,7 @@
     dom.stage3dCaptionHint = document.getElementById('stage-3d-caption-hint');
 
     dom.sampleDiscoveryModal = document.getElementById('sample-discovery-modal');
+    dom.sampleDiscoveryCloseBtn = document.getElementById('sample-discovery-close-btn');
     dom.sampleDiscoveryCrystal = document.getElementById('sample-discovery-crystal');
     dom.sampleDiscoveryTitle = document.getElementById('sample-discovery-title');
     dom.sampleDiscoveryType = document.getElementById('sample-discovery-type');
@@ -777,11 +778,13 @@
       dom.sampleDiscoveryCollectBtn.addEventListener('click', () => {
         if (pendingSampleToCollect) {
           const { chapter, sampleObj } = pendingSampleToCollect;
-          pendingSampleToCollect = null;
-          hideModal(dom.sampleDiscoveryModal);
+          closeSampleDiscoveryModal();
           collectSample(chapter, sampleObj);
         }
       });
+    }
+    if (dom.sampleDiscoveryCloseBtn) {
+      dom.sampleDiscoveryCloseBtn.addEventListener('click', closeSampleDiscoveryModal);
     }
     renderHomeBackground();
 
@@ -833,7 +836,7 @@
       { el: dom.passportModal, onClose: () => hideModal(dom.passportModal) },
       { el: dom.badgesModal, onClose: () => hideModal(dom.badgesModal) },
       { el: dom.certificateModal, onClose: () => hideModal(dom.certificateModal) },
-      { el: dom.sampleDiscoveryModal, onClose: () => hideModal(dom.sampleDiscoveryModal) }
+      { el: dom.sampleDiscoveryModal, onClose: closeSampleDiscoveryModal }
     ].forEach(({ el, onClose }) => {
       if (!el) return;
       el.addEventListener('click', (event) => {
@@ -4114,10 +4117,11 @@
     const bubbleW = dom.stageSpeechBubble.offsetWidth || 0;
     const bubbleH = dom.stageSpeechBubble.offsetHeight || 220;
 
-    // Regla de barra superior: los controles de audio (top: 1rem, h: 42px) e idioma ocupan ~60px
-    // El borde superior del globo debe comenzar con margen holgado debajo de la barra superior (>= 72px)
-    const topBarClearancePx = 74;
-    const minSafeBottomPct = ((topBarClearancePx + bubbleH) / Math.max(1, boardH)) * 100;
+    // Regla estricta de barra superior: los controles de audio e idioma ocupan ~60px
+    // El borde superior del globo (en cualquier punto de la pantalla) nunca debe estar a la altura
+    // de los controles de idioma y volumen, sino que debe comenzar estrictamente debajo (>= 74px)
+    const minTopClearancePx = 74;
+    const minSafeBottomPct = ((minTopClearancePx + 16 + bubbleH) / Math.max(1, boardH)) * 100;
 
     let posX;
     let targetY;
@@ -4136,12 +4140,9 @@
       const clearance = isMachine ? 5.2 : 4.8;
       const desiredBottom = isExactTop ? (y - clearance) : (y - 8.5);
 
-      // Límites de seguridad:
-      // Sojourner (derecha) respeta la barra superior de audio/idioma (72px)
-      // Cyberpenguin (izquierda) tiene toda la zona superior despejada (margen mínimo 22px)
-      const topBarClearancePx = isMachine ? 72 : 22;
-      const minSafeBottomPct = ((topBarClearancePx + bubbleH) / Math.max(1, boardH)) * 100;
-      targetY = Math.max(minSafeBottomPct, Math.min(isMachine ? 50 : 47, desiredBottom));
+      // El fondo del globo garantiza comenzar debajo de los controles superiores (>= 74px)
+      // y anclarse con holgura por encima del personaje
+      targetY = Math.max(minSafeBottomPct, desiredBottom);
     } else {
       posX = Math.max(22, Math.min(78, x));
       const isFlipped = y < 28;
@@ -5064,11 +5065,35 @@
     hideStageActionPrompt();
     showModal(dom.sampleDiscoveryModal);
     playHarmony('dialogue');
+
+    // Zoom cinematográfico sobre Cyberpenguin y la roca analizada
+    if (world3d.active && world3d.penguin && world3d.samples[sampleObj.id]) {
+      const t3d = getTerrain3D();
+      const p = world3d.penguin;
+      const s = world3d.samples[sampleObj.id];
+      if (t3d && typeof t3d.setDialogueZoom === 'function') {
+        t3d.setDialogueZoom(true, { x: p.x, y: p.y, z: p.z }, { x: s.x, y: s.y || p.y, z: s.z });
+      }
+    }
+  }
+
+  function closeSampleDiscoveryModal() {
+    if (!dom.sampleDiscoveryModal) return;
+    pendingSampleToCollect = null;
+    hideModal(dom.sampleDiscoveryModal);
+    const t3d = getTerrain3D();
+    if (t3d && typeof t3d.setDialogueZoom === 'function') {
+      t3d.setDialogueZoom(false);
+    }
   }
 
   function collectSample(chapter, sampleObj) {
     const targetSample = sampleObj || (chapter && chapter.sample);
     if (!chapter || !chapter.hasSurface || !targetSample) return;
+    const t3d = getTerrain3D();
+    if (t3d && typeof t3d.setDialogueZoom === 'function') {
+      t3d.setDialogueZoom(false);
+    }
     triggerHaptic('collect');
     if (!state.collectedSamples.includes(targetSample.id)) {
       state.collectedSamples.push(targetSample.id);
