@@ -2124,7 +2124,7 @@
     if (activeMachine) {
       const mHit = t3d.screenPctToWorld(activeMachine.pos.x, activeMachine.pos.y, { useBaseExploreCamera: true });
       const machineBaseScale = {
-        'sojourner': 0.72,
+        'sojourner': 1.0,
         'apollo-11-eagle': 1.25,
         'viking-1': 1.05,
         'surveyor-3': 0.95
@@ -2587,12 +2587,10 @@
       parts.push(`
         <div class="stage-entity ${floatClass}" data-entity-kind="machine" data-entity-id="${activeMachine.id}" data-sort-y="${activeMachine.pos.y}" style="left: ${activeMachine.pos.x}%; top: ${activeMachine.pos.y}%;">
           <button type="button" class="stage-hotspot machine-hotspot" data-machine-id="${activeMachine.id}" aria-label="${activeMachine.name}">
-            ${!inspected ? `
-              <div class="sample-beacon machine-beacon" aria-hidden="true">
-                <span class="sample-beacon-star">✦</span>
-                <span class="sample-beacon-ring"></span>
-              </div>
-            ` : ''}
+            <div class="sample-beacon machine-beacon ${inspected ? 'inspected' : ''}" aria-hidden="true">
+              <span class="sample-beacon-star">✦</span>
+              <span class="sample-beacon-ring"></span>
+            </div>
             <div class="entity-svg-wrap">${modelSvg}</div>
           </button>
         </div>

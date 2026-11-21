@@ -1548,6 +1548,23 @@ a:focus-visible {
   opacity: 0 !important;
 }
 
+.iso-board.has-3d-ship .ship-beacon {
+  top: -82px;
+}
+
+.iso-board.has-3d-machine .machine-beacon {
+  top: -46px;
+}
+
+.machine-beacon.inspected .sample-beacon-star {
+  color: #34d399;
+  filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.92));
+}
+
+.machine-beacon.inspected .sample-beacon-ring {
+  border-color: rgba(52, 211, 153, 0.58);
+}
+
 .iso-board.is-3d-inspect .iso-backdrop {
   pointer-events: auto;
   cursor: grab;

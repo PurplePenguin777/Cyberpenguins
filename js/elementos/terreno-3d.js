@@ -8,9 +8,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121r';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121r';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121r';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121s';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121s';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121s';
+const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121s';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -437,8 +438,36 @@ class Terrain3DController {
         const sunDir = new THREE.Vector3(-0.56, 0.36, -0.74).normalize();
         const skyDome = createMarsSkyDome(sunDir);
         scene.add(skyDome);
-        scene.add(createPhobosMesh());
         this.skyDome = skyDome;
+
+        // Luna marciana Fobos en el cielo: cargar el modelo 3D de alta resolución (phobos.glb)
+        // con el cráter Stickney y surcos reales; respaldo temporal mientras carga
+        this.phobosGroup = new THREE.Group();
+        this.phobosGroup.position.set(16.8, 10.0, -48.0);
+        this.phobosGroup.scale.setScalar(1.38);
+        this.phobosGroup.rotation.set(0.18, -0.35, -0.14);
+        scene.add(this.phobosGroup);
+        this.loader.load(
+          PHOBOS_MODEL_URL,
+          (gltf) => {
+            const pRoot = gltf.scene || new THREE.Group();
+            pRoot.traverse((obj) => {
+              if (!obj.isMesh || !obj.material) return;
+              obj.material.fog = false;
+              obj.material.roughness = 0.92;
+              obj.material.metalness = 0.03;
+              obj.material.needsUpdate = true;
+            });
+            this.phobosGroup.clear();
+            this.phobosGroup.add(pRoot);
+          },
+          undefined,
+          () => {
+            const fallback = createPhobosMesh();
+            fallback.position.set(0, 0, 0);
+            this.phobosGroup.add(fallback);
+          }
+        );
 
         const hemi = new THREE.HemisphereLight(0xf6dfd0, 0x7a3e26, 1.05);
         scene.add(hemi);
@@ -1444,6 +1473,9 @@ class Terrain3DController {
     this.animatePenguinActor(now);
     this.animateMachineActor(now);
     this.animateShipActor(now);
+    if (this.phobosGroup) {
+      this.phobosGroup.rotation.y = -0.35 + Math.sin(now * 0.00006) * 0.12;
+    }
 
     this.renderer.render(this.scene, this.camera);
   }
