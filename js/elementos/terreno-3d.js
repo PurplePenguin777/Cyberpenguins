@@ -474,54 +474,6 @@ function createPenguinContactShadow() {
   return mesh;
 }
 
-function createLandingMarker(landerPos) {
-  const group = new THREE.Group();
-  group.position.set(landerPos[0], landerPos[1], landerPos[2]);
-
-  const ringGeo = new THREE.RingGeometry(0.55, 0.82, 48);
-  ringGeo.rotateX(-Math.PI / 2);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: 0x38bdf8,
-    transparent: true,
-    opacity: 0.88,
-    side: THREE.DoubleSide,
-    depthWrite: false
-  });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  group.add(ring);
-
-  const outerGeo = new THREE.RingGeometry(1.15, 1.26, 48);
-  outerGeo.rotateX(-Math.PI / 2);
-  const outerMat = new THREE.MeshBasicMaterial({
-    color: 0x7dd3fc,
-    transparent: true,
-    opacity: 0.45,
-    side: THREE.DoubleSide,
-    depthWrite: false
-  });
-  const outer = new THREE.Mesh(outerGeo, outerMat);
-  group.add(outer);
-
-  const beaconGeo = new THREE.CylinderGeometry(0.035, 0.035, 2.2, 12);
-  const beaconMat = new THREE.MeshBasicMaterial({
-    color: 0x38bdf8,
-    transparent: true,
-    opacity: 0.72
-  });
-  const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-  beacon.position.y = 1.1;
-  group.add(beacon);
-
-  const capGeo = new THREE.SphereGeometry(0.16, 16, 12);
-  const capMat = new THREE.MeshBasicMaterial({ color: 0xe0f2fe });
-  const cap = new THREE.Mesh(capGeo, capMat);
-  cap.position.y = 2.25;
-  group.add(cap);
-
-  group.visible = false;
-  return { group, ring, outer };
-}
-
 class Terrain3DController {
   constructor() {
     this.container = null;
@@ -2055,9 +2007,6 @@ class Terrain3DController {
       this.sampleActors = this.createSampleActors(sampleTemplate, cfg.sampleNodeMap);
       this.sampleActors.forEach((entry) => wrapper.add(entry.group));
 
-      this.marker = createLandingMarker(cfg.landerPos || [0, 0.08, 0]);
-      wrapper.add(this.marker.group);
-
       if (shipTemplate) {
         this.shipState.yaw = typeof cfg.shipDefaultYaw === 'number' ? cfg.shipDefaultYaw : 0.62;
         this.shipState.slopeSampled = false;
@@ -2183,9 +2132,6 @@ class Terrain3DController {
     if (this.inspectMode === next) return this.inspectMode;
 
     this.inspectMode = next;
-    if (this.marker && this.marker.group) {
-      this.marker.group.visible = next;
-    }
 
     if (next) {
       // Centrar el punto focal inicial directamente en Cyberpenguin y Sojourner
@@ -2331,10 +2277,6 @@ class Terrain3DController {
             this.camera.position.y = minCamY;
           }
         }
-      }
-      if (this.marker && this.marker.group && this.marker.group.visible) {
-        const pulse = 1 + 0.12 * Math.sin(now * 0.004);
-        this.marker.outer.scale.set(pulse, pulse, 1);
       }
     } else {
       this.currentParallax.x += (this.targetParallax.x - this.currentParallax.x) * 0.065;
