@@ -1576,13 +1576,42 @@ a:focus-visible {
   opacity: 0 !important;
 }
 
-.iso-board.has-3d-samples .stage-entity[data-entity-kind="sample"] .sample-beacon {
-  top: -36px;
+.iso-board.has-3d-samples .stage-entity[data-entity-kind="sample"] {
+  width: 0;
+  height: 0;
+  overflow: visible;
 }
 
-/* Scooby Doo (sample-mars-6) es una losa plana y baja (~18 cm): bajamos su marcador azul */
-.iso-board.has-3d-samples .stage-entity[data-entity-id="sample-mars-6"] .sample-beacon {
-  top: -4px;
+.iso-board.has-3d-samples .stage-entity[data-entity-kind="sample"] .stage-hotspot {
+  width: 0;
+  height: 0;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iso-board.has-3d-samples .stage-entity[data-entity-kind="sample"] .sample-beacon {
+  top: 0;
+  left: 0;
+  animation-name: sampleBeaconBob3D;
+}
+
+.iso-board.has-3d-samples .stage-entity[data-entity-kind="sample"] .sample-hotspot::before {
+  top: -24px;
+  left: -24px;
+  right: -24px;
+  bottom: -24px;
+}
+
+@keyframes sampleBeaconBob3D {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translateY(-5px);
+  }
 }
 
 .iso-board.has-3d-ship .ship-beacon {

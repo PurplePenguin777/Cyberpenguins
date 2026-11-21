@@ -1977,14 +1977,36 @@
         let anchor = null;
         if (kind === 'ship') anchor = world3d.ship;
         else if (kind === 'machine') anchor = world3d.machine;
-        else if (kind === 'sample' && id) anchor = world3d.samples[id];
+        else if (kind === 'sample' && id) {
+          const orig = world3d.samples[id];
+          const peak = typeof t3d.getSampleWorldPeak === 'function' ? t3d.getSampleWorldPeak(id) : null;
+          if (peak && orig) {
+            anchor = {
+              ...orig,
+              x: peak.x,
+              y: peak.y,
+              z: peak.z
+            };
+            orig.x = peak.x;
+            orig.z = peak.z;
+          } else {
+            anchor = orig;
+          }
+        }
         if (!anchor) return;
 
         const { proj, scale } = projectAnchorScreen(anchor, t3d, 0.44, 1.55);
+        if (kind === 'sample' && world3d.samples[id]) {
+          world3d.samples[id].screenX = proj.pctX;
+          world3d.samples[id].screenY = proj.pctY;
+        }
         el.style.visibility = proj.visible ? '' : 'hidden';
         el.style.left = `${proj.pctX.toFixed(2)}%`;
         el.style.top = `${proj.pctY.toFixed(2)}%`;
-        el.style.transform = `translate3d(-50%, -72%, 0) scale(${scale.toFixed(3)})`;
+        const is3dSample = kind === 'sample' && has3dSamples;
+        el.style.transform = is3dSample
+          ? `translate3d(-50%, -50%, 0) scale(${scale.toFixed(3)})`
+          : `translate3d(-50%, -72%, 0) scale(${scale.toFixed(3)})`;
         el.style.zIndex = String(Math.max(18, Math.min(89, Math.round(92 - proj.dist * 2.2))));
 
         // Oclusión / atenuación dinámica de la baliza:
@@ -2254,9 +2276,9 @@
     }
 
     const sampleBaseScale = {
-      'sample-mars-2': 0.64, // Barnacle Bill (~25-30 cm)
-      'sample-mars-3': 0.98, // Yogi (~1.1 m boulder)
-      'sample-mars-4': 0.74  // Scooby Doo (~40 cm flat rock)
+      'sample-mars-4': 0.74, // Barnacle Bill (~25-30 cm)
+      'sample-mars-5': 0.98, // Yogi (~1.1 m boulder)
+      'sample-mars-6': 0.64  // Scooby Doo (~40 cm flat rock)
     };
     world3d.samples = {};
     const siteSamples = getSiteSamples(chapter, activeMachine);

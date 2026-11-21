@@ -1134,9 +1134,32 @@ class Terrain3DController {
         this.getGroundHeightAt(anchor.x, anchor.z + rEdge),
         this.getGroundHeightAt(anchor.x, anchor.z - rEdge)
       );
-      entry.group.position.set(anchor.x, minY - 0.045, anchor.z);
+      if (entry.group.position.y !== minY - 0.045 || entry.group.position.x !== anchor.x || entry.group.position.z !== anchor.z) {
+        entry.group.position.set(anchor.x, minY - 0.045, anchor.z);
+        entry._cachedPeak = null;
+      }
       entry.group.visible = true;
     });
+  }
+
+  getSampleWorldPeak(sampleId) {
+    if (!this.sampleActors) return null;
+    const entry = this.sampleActors.get(sampleId);
+    if (!entry || !entry.group || !entry.group.visible) return null;
+    if (entry._cachedPeak && entry._cachedGroupY === entry.group.position.y) {
+      return entry._cachedPeak;
+    }
+    const targetObj = entry.mesh || entry.group;
+    targetObj.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(targetObj);
+    if (!Number.isFinite(box.min.x) || !Number.isFinite(box.max.y)) return null;
+    entry._cachedGroupY = entry.group.position.y;
+    entry._cachedPeak = {
+      x: (box.min.x + box.max.x) * 0.5,
+      y: box.max.y + 0.035,
+      z: (box.min.z + box.max.z) * 0.5
+    };
+    return entry._cachedPeak;
   }
 
   loadShipActorModel(modelUrl) {

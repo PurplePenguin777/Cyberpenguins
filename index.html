@@ -8,7 +8,8 @@
   <meta name="theme-color" content="#050714" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Cyberpenguin: The Explorers We Must Never Forget" />
-  <meta property="og:description" content="Explora el sistema solar, recolecta muestras cósmicas y descubre las legendarias sondas espaciales que nunca debemos olvidar." />
+  <meta property="og:description"
+    content="Explora el sistema solar, recolecta muestras cósmicas y descubre las legendarias sondas espaciales que nunca debemos olvidar." />
   <meta property="og:image" content="favicon.svg" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,7 +46,7 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="css/styles.css?v=20261121af" />
+  <link rel="stylesheet" href="css/styles.css?v=20261121ak" />
 </head>
 <body class="font-sans antialiased">
   <div class="starfield" aria-hidden="true"></div>
@@ -224,19 +225,23 @@
         <div class="home-header-grid w-full flex flex-col md:grid md:grid-cols-3 items-center justify-between gap-3">
           <!-- Opciones: Cómo se juega y Acerca del proyecto -->
           <div class="home-nav-group flex items-center justify-center md:justify-start gap-2 order-2 md:order-1">
-            <button id="home-how-to-play-btn" type="button" class="home-nav-pill squircle-btn" aria-label="Cómo se juega">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            <button id="home-how-to-play-btn" type="button" class="home-nav-pill squircle-btn"
+              aria-label="Cómo se juega">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
               <span id="home-how-to-play-label">Cómo se juega</span>
             </button>
-            <button id="home-about-btn" type="button" class="home-nav-pill squircle-btn" aria-label="Acerca del proyecto">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="16" x2="12" y2="12"/>
-                <line x1="12" y1="8" x2="12.01" y2="8"/>
+            <button id="home-about-btn" type="button" class="home-nav-pill squircle-btn"
+              aria-label="Acerca del proyecto">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
               <span id="home-about-label">Acerca del proyecto</span>
             </button>
@@ -244,7 +249,8 @@
 
           <!-- Título Central -->
           <div class="flex flex-col items-center justify-center text-center px-2 order-1 md:order-2">
-            <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white text-center leading-tight">
+            <h1
+              class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white text-center leading-tight">
               Cyberpenguin
             </h1>
             <p class="text-[10px] sm:text-xs md:text-sm font-semibold tracking-wide text-cyan-300 text-center mt-0.5">
@@ -255,12 +261,15 @@
           <!-- Selector de Idioma -->
           <div class="flex items-center justify-center md:justify-end gap-2 order-3">
             <button id="home-start-btn" type="button" aria-hidden="true" tabindex="-1" class="hidden">Explorar</button>
-            <div id="home-lang-selector" class="lang-selector-group" role="group" aria-label="Selector de idioma / Language selector">
-              <button id="home-lang-es" type="button" class="lang-selector-btn is-active" data-lang="es" aria-pressed="true" title="Idioma actual: Español">
+            <div id="home-lang-selector" class="lang-selector-group" role="group"
+              aria-label="Selector de idioma / Language selector">
+              <button id="home-lang-es" type="button" class="lang-selector-btn is-active" data-lang="es"
+                aria-pressed="true" title="Idioma actual: Español">
                 <span class="lang-opt-long">Español</span>
                 <span class="lang-opt-short">ES</span>
               </button>
-              <button id="home-lang-en" type="button" class="lang-selector-btn" data-lang="en" aria-pressed="false" title="Switch to English">
+              <button id="home-lang-en" type="button" class="lang-selector-btn" data-lang="en" aria-pressed="false"
+                title="Switch to English">
                 <span class="lang-opt-long">English</span>
                 <span class="lang-opt-short">EN</span>
               </button>
@@ -304,7 +313,8 @@
             class="certificate-card-preview w-full min-h-[54px] rounded-xl bg-white/[0.03] hover:bg-white/[0.08] cursor-pointer border border-white/[0.08] hover:border-amber-300/40 px-3 py-2 flex items-center justify-center gap-2.5 text-center transition-all"
             title="Disponible al completar todos los capítulos">
           </div>
-          <p id="home-certificate-status" class="text-xs font-normal text-slate-300 text-center py-0.5">Disponible al completar todos los capítulos</p>
+          <p id="home-certificate-status" class="text-xs font-normal text-slate-300 text-center py-0.5">Disponible al
+            completar todos los capítulos</p>
           <div id="home-certificate-actions" class="w-full flex items-center justify-center gap-2 hidden">
             <button id="open-certificate-btn" type="button" disabled
               class="squircle-btn rounded-full flex-1 inline-flex items-center justify-center text-center px-3 py-1.5 text-xs font-semibold bg-white/[0.08] hover:bg-white/[0.16] text-white border border-white/10 transition-colors">
@@ -346,12 +356,15 @@
         <div id="stage-location-pill" class="stage-location-pill" aria-live="polite"></div>
 
         <!-- Selector de idioma izquierda/derecha en juego -->
-        <div id="stage-lang-selector" class="stage-lang-selector lang-selector-group" role="group" aria-label="Selector de idioma / Language selector">
-          <button id="stage-lang-es" type="button" class="lang-selector-btn is-active" data-lang="es" aria-pressed="true" title="Idioma actual: Español">
+        <div id="stage-lang-selector" class="stage-lang-selector lang-selector-group" role="group"
+          aria-label="Selector de idioma / Language selector">
+          <button id="stage-lang-es" type="button" class="lang-selector-btn is-active" data-lang="es"
+            aria-pressed="true" title="Idioma actual: Español">
             <span class="lang-opt-long">Español</span>
             <span class="lang-opt-short">ES</span>
           </button>
-          <button id="stage-lang-en" type="button" class="lang-selector-btn" data-lang="en" aria-pressed="false" title="Switch to English">
+          <button id="stage-lang-en" type="button" class="lang-selector-btn" data-lang="en" aria-pressed="false"
+            title="Switch to English">
             <span class="lang-opt-long">English</span>
             <span class="lang-opt-short">EN</span>
           </button>
@@ -360,16 +373,16 @@
         <!-- Control minimalista liquid glass de volumen -->
         <div id="sound-control-group" class="sound-control-group" role="group" aria-label="Control de sonido">
           <button id="sound-toggle-btn" type="button" aria-label="Silenciar sonido" class="sound-toggle-btn">
-            <svg id="sound-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg id="sound-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
               <path class="sound-wave-1" d="M15.54 8.46a5 5 0 0 1 0 7.07" />
               <path class="sound-wave-2" d="M18.7 5.3a9.5 9.5 0 0 1 0 13.4" />
             </svg>
           </button>
           <div class="sound-slider-wrap">
-            <input id="sound-volume-slider" type="range" min="0" max="100" value="80"
-              class="sound-volume-slider" aria-label="Volumen general" />
+            <input id="sound-volume-slider" type="range" min="0" max="100" value="80" class="sound-volume-slider"
+              aria-label="Volumen general" />
           </div>
         </div>
 
@@ -404,7 +417,8 @@
             <div class="speech-bubble-header">
               <div id="speech-bubble-avatar" class="speech-bubble-avatar"></div>
               <span id="speech-bubble-name" class="speech-bubble-name">Cyberpenguin</span>
-              <button id="speech-bubble-close-btn" type="button" class="speech-bubble-close" aria-label="Cerrar diálogo">✕</button>
+              <button id="speech-bubble-close-btn" type="button" class="speech-bubble-close"
+                aria-label="Cerrar diálogo">✕</button>
             </div>
             <div id="speech-bubble-text" class="speech-bubble-text"></div>
             <div id="speech-bubble-options" class="speech-bubble-options empty:hidden"></div>
@@ -428,16 +442,20 @@
         </div>
 
         <!-- Botón flotante Liquid Glass de salto según la gravedad -->
-        <button id="stage-jump-btn" type="button" aria-label="Saltar según la gravedad" class="stage-jump-btn squircle-btn">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <button id="stage-jump-btn" type="button" aria-label="Saltar según la gravedad"
+          class="stage-jump-btn squircle-btn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 19V5M5 12l7-7 7 7" />
           </svg>
           <span id="stage-jump-label" class="stage-jump-label">Saltar</span>
         </button>
 
         <!-- Botón flotante Liquid Glass para alternar vista 3D orbital en sitios con DTM real -->
-        <button id="stage-3d-toggle-btn" type="button" aria-label="Vista 3D" aria-pressed="false" class="stage-3d-toggle-btn squircle-btn is-hidden">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <button id="stage-3d-toggle-btn" type="button" aria-label="Vista 3D" aria-pressed="false"
+          class="stage-3d-toggle-btn squircle-btn is-hidden">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" />
             <path d="M12 12l8-4.5M12 12v9M12 12L4 7.5" />
           </svg>
@@ -465,7 +483,8 @@
         class="sample-discovery-crystal w-20 h-16 flex items-center justify-center py-1">
       </div>
       <div class="flex flex-col items-center text-center gap-1">
-        <h3 id="sample-discovery-title" class="text-base font-semibold text-white tracking-tight leading-snug text-center">
+        <h3 id="sample-discovery-title"
+          class="text-base font-semibold text-white tracking-tight leading-snug text-center">
         </h3>
         <span id="sample-discovery-site" class="text-xs text-slate-400 font-normal text-center"></span>
       </div>
@@ -502,7 +521,8 @@
     <div
       class="squircle-panel quiz-modal-panel max-w-lg w-full p-4 sm:p-5 flex flex-col gap-3 max-h-[94vh] overflow-y-auto text-center relative">
       <div class="relative w-full flex items-center justify-center">
-        <h2 id="quiz-modal-title" class="text-base sm:text-lg font-semibold tracking-tight text-white text-center">Cuestionario</h2>
+        <h2 id="quiz-modal-title" class="text-base sm:text-lg font-semibold tracking-tight text-white text-center">
+          Cuestionario</h2>
         <button id="quiz-close-btn" type="button" aria-label="Cerrar"
           class="absolute right-0 w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-lg font-medium">
           ✕
@@ -566,13 +586,16 @@
 
   <!-- Modal 5: Certificado Memorable de Honor de la Academia Espacial -->
   <div id="certificate-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-label="Certificado">
-    <div class="squircle-panel max-w-4xl w-full p-4 sm:p-6 flex flex-col gap-4 text-center relative max-h-[94vh] overflow-y-auto">
+    <div
+      class="squircle-panel max-w-4xl w-full p-4 sm:p-6 flex flex-col gap-4 text-center relative max-h-[94vh] overflow-y-auto">
       <div class="relative w-full flex items-center justify-between pb-3 border-b border-white/10">
         <div class="flex items-center gap-2.5">
           <span class="text-2xl" aria-hidden="true">🏆</span>
           <div class="text-left">
-            <h2 id="cert-modal-title" class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">Diploma de honor astronáutico</h2>
-            <p id="cert-modal-subtitle" class="text-xs text-slate-400">Cyberpenguin: The Explorers We Must Never Forget</p>
+            <h2 id="cert-modal-title" class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
+              Diploma de honor astronáutico</h2>
+            <p id="cert-modal-subtitle" class="text-xs text-slate-400">Cyberpenguin: The Explorers We Must Never Forget
+            </p>
           </div>
         </div>
         <button id="certificate-close-btn" type="button" aria-label="Cerrar"
@@ -582,10 +605,12 @@
       </div>
 
       <!-- Barra para personalizar / editar el nombre del cadete en vivo -->
-      <div class="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-3 rounded-xl bg-white/[0.04] border border-white/10 text-left">
+      <div
+        class="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-3 rounded-xl bg-white/[0.04] border border-white/10 text-left">
         <div class="flex items-center gap-2 shrink-0">
           <span class="text-lg">🧑‍🚀</span>
-          <label for="certificate-cadet-input" id="cert-cadet-label" class="text-xs sm:text-sm font-semibold text-cyan-200">
+          <label for="certificate-cadet-input" id="cert-cadet-label"
+            class="text-xs sm:text-sm font-semibold text-cyan-200">
             Nombre del astronauta en el diploma:
           </label>
         </div>
@@ -596,7 +621,8 @@
       </div>
 
       <!-- Contenedor del Diploma SVG interactivo -->
-      <div id="certificate-svg-wrapper" class="w-full rounded-2xl overflow-hidden shadow-2xl border border-amber-300/30 bg-slate-950 flex items-center justify-center min-h-[300px]">
+      <div id="certificate-svg-wrapper"
+        class="w-full rounded-2xl overflow-hidden shadow-2xl border border-amber-300/30 bg-slate-950 flex items-center justify-center min-h-[300px]">
         <!-- El SVG del diploma se inserta dinámicamente aquí -->
       </div>
 
@@ -622,13 +648,17 @@
   </div>
 
   <!-- Modal: Cómo se juega (Minimalista Liquid Glass Centrado) -->
-  <div id="how-to-play-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="how-to-play-title">
-    <div class="info-modal-card how-to-play-card squircle-panel max-w-[460px] md:max-w-[680px] w-full p-5 sm:p-6 flex flex-col items-center text-center gap-3.5 relative">
-      <div class="info-modal-badge w-9 h-9 rounded-full flex items-center justify-center text-cyan-300 bg-cyan-400/10 border border-cyan-400/20">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
+  <div id="how-to-play-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true"
+    aria-labelledby="how-to-play-title">
+    <div
+      class="info-modal-card how-to-play-card squircle-panel max-w-[460px] md:max-w-[680px] w-full p-5 sm:p-6 flex flex-col items-center text-center gap-3.5 relative">
+      <div
+        class="info-modal-badge w-9 h-9 rounded-full flex items-center justify-center text-cyan-300 bg-cyan-400/10 border border-cyan-400/20">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       </div>
 
@@ -641,22 +671,28 @@
         </p>
       </div>
 
-      <div id="how-to-play-content" class="info-modal-body how-to-play-grid flex flex-col gap-2.5 w-full text-center"></div>
+      <div id="how-to-play-content" class="info-modal-body how-to-play-grid flex flex-col gap-2.5 w-full text-center">
+      </div>
 
-      <button id="how-to-play-close-btn" type="button" class="squircle-btn rounded-full w-full max-w-[240px] py-2 px-5 font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all mt-1">
+      <button id="how-to-play-close-btn" type="button"
+        class="squircle-btn rounded-full w-full max-w-[240px] py-2 px-5 font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all mt-1">
         Entendido
       </button>
     </div>
   </div>
 
   <!-- Modal: Acerca del proyecto (Minimalista Liquid Glass Centrado) -->
-  <div id="about-project-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="about-project-title">
-    <div class="info-modal-card squircle-panel max-w-[460px] w-full p-6 sm:p-7 flex flex-col items-center text-center gap-4 relative">
-      <div class="info-modal-badge w-10 h-10 rounded-full flex items-center justify-center text-amber-300 bg-amber-400/10 border border-amber-400/20">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="16" x2="12" y2="12"/>
-          <line x1="12" y1="8" x2="12.01" y2="8"/>
+  <div id="about-project-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true"
+    aria-labelledby="about-project-title">
+    <div
+      class="info-modal-card squircle-panel max-w-[460px] w-full p-6 sm:p-7 flex flex-col items-center text-center gap-4 relative">
+      <div
+        class="info-modal-badge w-10 h-10 rounded-full flex items-center justify-center text-amber-300 bg-amber-400/10 border border-amber-400/20">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
         </svg>
       </div>
 
@@ -671,7 +707,8 @@
 
       <div id="about-project-content" class="info-modal-body flex flex-col gap-2.5 w-full text-center"></div>
 
-      <button id="about-project-close-btn" type="button" class="squircle-btn rounded-full w-full py-2.5 px-4 font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all mt-1">
+      <button id="about-project-close-btn" type="button"
+        class="squircle-btn rounded-full w-full py-2.5 px-4 font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all mt-1">
         Cerrar
       </button>
     </div>
@@ -697,9 +734,9 @@
   <script defer src="js/elementos/cuerpos.js?v=20261121"></script>
   <script defer src="js/models.js?v=20261119"></script>
   <script defer src="js/elementos/realismo.js?v=20261121c"></script>
-  <script type="module" src="js/elementos/terreno-3d.js?v=20261121aj"></script>
+  <script type="module" src="js/elementos/terreno-3d.js?v=20261121ak"></script>
   <script defer src="js/tts.js?v=20261119"></script>
   <script defer src="js/fx.js?v=20261119"></script>
-  <script defer src="js/app.js?v=20261121aj"></script>
+  <script defer src="js/app.js?v=20261121ak"></script>
 </body>
 </html>
