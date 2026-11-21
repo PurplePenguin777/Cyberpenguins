@@ -39,7 +39,7 @@ const SITE_CONFIGS = {
     exploreCamPos: [-1.15, 1.96, 10.6],
     exploreCamTarget: [1.35, 0.72, -12.0],
     inspectCamPos: [21.0, 18.0, 28.5],
-    inspectCamTarget: [2.5, -0.8, 4.0],
+    inspectCamTarget: [2.5, 0.35, 4.0],
     landerPos: [0, 0.08, 0],
     penguinScale: 0.82,
     walkBounds: { minZ: -8.8, maxZ: 6.4, maxRadius: 21.0 }
@@ -790,9 +790,9 @@ class Terrain3DController {
         const controls = new OrbitControls(camera, canvas);
         controls.enableDamping = true;
         controls.dampingFactor = 0.07;
-        controls.maxPolarAngle = Math.PI * 0.468;
+        controls.maxPolarAngle = Math.PI * 0.445;
         controls.minPolarAngle = 0.14;
-        controls.minDistance = 6;
+        controls.minDistance = 4.5;
         controls.maxDistance = 58;
         controls.enablePan = true;
         controls.enabled = false;
@@ -2215,6 +2215,39 @@ class Terrain3DController {
     } else if (this.inspectMode) {
       if (this.controls.enabled) {
         this.controls.update();
+        if (this.terrainMeshes.length > 0) {
+          // Mantener el foco de la cámara dentro del mapa y sobre la superficie
+          const tgt = this.controls.target;
+          const maxPanR = 26.0;
+          const tgtR = Math.hypot(tgt.x, tgt.z);
+          if (tgtR > maxPanR) {
+            const s = maxPanR / tgtR;
+            tgt.x *= s;
+            tgt.z *= s;
+          }
+          const tgtGround = this.getGroundHeightAt(tgt.x, tgt.z);
+          if (tgt.y < tgtGround + 0.25) {
+            tgt.y = tgtGround + 0.25;
+          }
+
+          // Colisión real de la cámara con el relieve marciano (5 puntos) para
+          // impedir que al hacer zoom o girar atraviese el suelo y lo vea transparente
+          const cx = this.camera.position.x;
+          const cz = this.camera.position.z;
+          const rProbe = 1.05;
+          const localPeakY = Math.max(
+            this.getGroundHeightAt(cx, cz),
+            this.getGroundHeightAt(cx + rProbe, cz),
+            this.getGroundHeightAt(cx - rProbe, cz),
+            this.getGroundHeightAt(cx, cz + rProbe),
+            this.getGroundHeightAt(cx, cz - rProbe)
+          );
+          const minCamY = localPeakY + 0.72;
+          if (this.camera.position.y < minCamY) {
+            this.camera.position.y = minCamY;
+            this.camera.lookAt(tgt);
+          }
+        }
       }
       if (this.marker && this.marker.group && this.marker.group.visible) {
         const pulse = 1 + 0.12 * Math.sin(now * 0.004);
