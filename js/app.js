@@ -3167,7 +3167,7 @@
 
     // Globo de pensamiento ambiental sobre Cyberpenguin al saltar en gravedad especial
     const allThoughts = DATA.getAmbientThoughts ? DATA.getAmbientThoughts(state.currentLanguage) : DATA.AMBIENT_THOUGHTS;
-    if (!isSpeechBubbleOpen() && allThoughts && allThoughts[chapter.id]) {
+    if (!isSpeechBubbleOpen() && !isStageActionPromptOpen() && allThoughts && allThoughts[chapter.id]) {
       const thoughts = allThoughts[chapter.id];
       const randomIndex = Math.floor(Math.random() * thoughts.length);
       activeAmbientThought = { chapterId: chapter.id, index: randomIndex };
@@ -3225,6 +3225,8 @@
 
   function showStageActionPrompt(type, target, onAction) {
     if (!dom.stageActionPrompt || !dom.stageActionBtn) return;
+    // Prioridad UX: la acción interactiva prevalece sobre pensamientos ambientales
+    hideThoughtBubble();
     activeInteractable = { type, target, onAction };
 
     const isEn = (state.currentLanguage === 'en');
@@ -3452,6 +3454,7 @@
     if (candidates.length > 0) {
       candidates.sort((a, b) => a.dist - b.dist);
       const nearest = candidates[0];
+      hideThoughtBubble();
       showStageActionPrompt(nearest.type, nearest.target, nearest.onAction);
     } else {
       hideStageActionPrompt();
@@ -3834,6 +3837,7 @@
 
   function showPenguinThought(text, jumpData) {
     if (!dom.stageThoughtBubble || !dom.thoughtBubbleText || !text) return;
+    if (isStageActionPromptOpen() || isSpeechBubbleOpen()) return;
     clearTimeout(thoughtBubbleTimer);
 
     dom.thoughtBubbleText.textContent = text;
@@ -5192,6 +5196,13 @@
 
   function isSpeechBubbleOpen() {
     return Boolean(dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden'));
+  }
+
+  function isStageActionPromptOpen() {
+    return Boolean(
+      activeInteractable ||
+      (dom.stageActionPrompt && !dom.stageActionPrompt.classList.contains('is-hidden'))
+    );
   }
 
   function isBlockingModalOpen() {
