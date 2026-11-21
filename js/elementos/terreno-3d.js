@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121f';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121g';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -714,15 +714,15 @@ class Terrain3DController {
       }
     }
 
-    const jumpFlap = Math.min(0.55, jh * 0.65);
+    const jumpFlap = Math.min(0.38, jh * 0.52);
     if (actor.flipperL) {
-      // Aletas ligeramente abiertas para equilibrar el centro de masa al caminar
-      actor.flipperL.rotation.z = 0.12 + 0.13 * wb + Math.max(0, sinP) * 0.085 * wb + jumpFlap;
-      actor.flipperL.rotation.x = -sinP * 0.15 * wb;
+      // Aletas ligeramente abiertas desde el hombro para equilibrar el centro de masa al caminar
+      actor.flipperL.rotation.z = 0.04 + 0.09 * wb + Math.max(0, sinP) * 0.075 * wb + jumpFlap;
+      actor.flipperL.rotation.x = -sinP * 0.14 * wb;
     }
     if (actor.flipperR) {
-      actor.flipperR.rotation.z = -(0.12 + 0.13 * wb + Math.max(0, -sinP) * 0.085 * wb + jumpFlap);
-      actor.flipperR.rotation.x = sinP * 0.15 * wb;
+      actor.flipperR.rotation.z = -(0.04 + 0.09 * wb + Math.max(0, -sinP) * 0.075 * wb + jumpFlap);
+      actor.flipperR.rotation.x = sinP * 0.14 * wb;
     }
 
     if (actor.footL) {
