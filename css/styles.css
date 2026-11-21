@@ -3666,3 +3666,111 @@ a:focus-visible {
 .stage-action-prompt.prompt-for-sample .stage-action-btn::after {
   border: none;
 }
+
+/* Diálogo siguiendo 3D en tiempo real sin rezago de transición CSS */
+.stage-speech-bubble.is-tracking-3d {
+  transition: none !important;
+}
+
+.speech-bubble-header {
+  padding: 0 34px 0.5rem 34px;
+}
+
+.speech-bubble-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 0.5px solid rgba(255, 255, 255, 0.44);
+  color: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 2px 8px rgba(30, 12, 6, 0.22);
+  transition: transform 0.18s var(--spring-smooth), background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.speech-bubble-close:hover {
+  background: rgba(255, 255, 255, 0.34);
+  border-color: rgba(255, 255, 255, 0.65);
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.06);
+}
+
+.speech-bubble-close:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+/* Indicador minimalista tipo ondas sonoras Apple al hablar */
+.speech-speaking-wave {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 13px;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-left: 0;
+  flex-shrink: 0;
+  transition: width 0.22s ease, opacity 0.2s ease, margin-left 0.22s ease;
+}
+
+.stage-speech-bubble.is-speaking .speech-speaking-wave {
+  width: 15px;
+  opacity: 1;
+  margin-left: 2px;
+}
+
+.speech-speaking-wave i {
+  display: block;
+  width: 2px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  transform: scaleY(0.32);
+  transform-origin: center;
+}
+
+.stage-speech-bubble.is-speaking .speech-speaking-wave i:nth-child(1) {
+  animation: speechWaveBar 0.56s ease-in-out infinite alternate;
+}
+
+.stage-speech-bubble.is-speaking .speech-speaking-wave i:nth-child(2) {
+  animation: speechWaveBar 0.44s ease-in-out 0.12s infinite alternate;
+}
+
+.stage-speech-bubble.is-speaking .speech-speaking-wave i:nth-child(3) {
+  animation: speechWaveBar 0.64s ease-in-out 0.06s infinite alternate;
+}
+
+.stage-speech-bubble.is-speaking .speech-speaking-wave i:nth-child(4) {
+  animation: speechWaveBar 0.5s ease-in-out 0.18s infinite alternate;
+}
+
+@keyframes speechWaveBar {
+  0% {
+    transform: scaleY(0.28);
+    opacity: 0.65;
+  }
+
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.stage-speech-bubble.is-speaking .speech-bubble-avatar {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.34);
+  animation: speechAvatarPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes speechAvatarPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.22);
+  }
+
+  50% {
+    box-shadow: 0 0 0 3.5px rgba(255, 255, 255, 0.42);
+  }
+}

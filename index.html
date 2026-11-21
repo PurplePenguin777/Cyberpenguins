@@ -46,7 +46,7 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="css/styles.css?v=20261121aq" />
+  <link rel="stylesheet" href="css/styles.css?v=20261121ar" />
 </head>
 <body class="font-sans antialiased">
   <div class="starfield" aria-hidden="true"></div>
@@ -417,13 +417,18 @@
             <div class="speech-bubble-header">
               <div id="speech-bubble-avatar" class="speech-bubble-avatar"></div>
               <span id="speech-bubble-name" class="speech-bubble-name">Cyberpenguin</span>
+              <span id="speech-speaking-wave" class="speech-speaking-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
               <button id="speech-bubble-close-btn" type="button" class="speech-bubble-close"
-                aria-label="Cerrar diálogo">✕</button>
+                aria-label="Cerrar diálogo">
+                <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" />
+                </svg>
+              </button>
             </div>
             <div id="speech-bubble-text" class="speech-bubble-text"></div>
             <div id="speech-bubble-options" class="speech-bubble-options empty:hidden"></div>
             <div id="speech-bubble-action-row" class="speech-bubble-action-row">
-              <button id="speech-bubble-next-btn" type="button" class="speech-bubble-next-btn">Continuar ▶</button>
+              <button id="speech-bubble-next-btn" type="button" class="speech-bubble-next-btn">Continuar</button>
             </div>
           </div>
           <div class="speech-bubble-tail"></div>
@@ -716,7 +721,7 @@
 
 
 
-  <script defer src="js/data.js?v=20261120"></script>
+  <script defer src="js/data.js?v=20261121ar"></script>
   <script defer src="js/elementos/pinguino.js?v=20261119"></script>
   <script defer src="js/elementos/nave-pinguino.js?v=20261119"></script>
   <script defer src="js/elementos/surveyor-3.js?v=20261119"></script>
@@ -734,9 +739,9 @@
   <script defer src="js/elementos/cuerpos.js?v=20261121"></script>
   <script defer src="js/models.js?v=20261119"></script>
   <script defer src="js/elementos/realismo.js?v=20261121c"></script>
-  <script type="module" src="js/elementos/terreno-3d.js?v=20261121aq"></script>
+  <script type="module" src="js/elementos/terreno-3d.js?v=20261121ar"></script>
   <script defer src="js/tts.js?v=20261119"></script>
   <script defer src="js/fx.js?v=20261119"></script>
-  <script defer src="js/app.js?v=20261121aq"></script>
+  <script defer src="js/app.js?v=20261121ar"></script>
 </body>
 </html>

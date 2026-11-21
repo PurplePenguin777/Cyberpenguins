@@ -512,6 +512,7 @@ class Terrain3DController {
     this.penguinActor = null;
     this.machineActor = null;
     this.shipActor = null;
+    this.speakingActor = null;
     this.shipState = {
       x: -4.6,
       y: 0,
@@ -528,7 +529,9 @@ class Terrain3DController {
       yaw: -0.72,
       pitch: 0,
       roll: 0,
-      slopeSampled: false
+      slopeSampled: false,
+      speakBlend: 0,
+      lastAnimTime: 0
     };
     this.penguinState = {
       x: -2.2,
@@ -540,7 +543,8 @@ class Terrain3DController {
       walkBlend: 0,
       walkPhase: 0,
       lastAnimTime: 0,
-      jumpHeight: 0
+      jumpHeight: 0,
+      speakBlend: 0
     };
     this.regolithTextures = null;
 
@@ -1429,10 +1433,19 @@ class Terrain3DController {
     }
   }
 
+  setSpeakingActor(speaker) {
+    this.speakingActor = (speaker === 'penguin' || speaker === 'machine' || speaker === 'ship') ? speaker : null;
+  }
+
   animateMachineActor(now) {
     if (!this.machineActor) return;
     const actor = this.machineActor;
     const mst = this.machineState;
+    const dt = mst.lastAnimTime > 0 ? Math.min(0.08, Math.max(0.001, (now - mst.lastAnimTime) * 0.001)) : 0.016;
+    mst.lastAnimTime = now;
+
+    mst.speakBlend += ((this.speakingActor === 'machine' ? 1 : 0) - mst.speakBlend) * Math.min(1, dt * 9);
+    const sb = mst.speakBlend;
 
     actor.rigRoot.position.set(mst.x, mst.y, mst.z);
     actor.rigRoot.rotation.set(mst.pitch, mst.yaw, mst.roll);
@@ -1442,10 +1455,10 @@ class Terrain3DController {
       actor.shadow.rotation.set(0, mst.yaw, 0);
     }
 
-    // Vibración suave de la antena látigo UHF en la brisa marciana
+    // Vibración suave de la antena látigo UHF en la brisa marciana (+ pulso al hablar/transmitir)
     if (actor.antenna) {
-      actor.antenna.rotation.z = Math.sin(now * 0.0042) * 0.035;
-      actor.antenna.rotation.x = Math.cos(now * 0.0031) * 0.025;
+      actor.antenna.rotation.z = Math.sin(now * 0.0042) * 0.035 + Math.sin(now * 0.028) * 0.13 * sb;
+      actor.antenna.rotation.x = Math.cos(now * 0.0031) * 0.025 + Math.cos(now * 0.021) * 0.09 * sb;
     }
 
     // Micro-escaneo periódico de las ruedas direccionales delanteras y del brazo APXS
@@ -1456,7 +1469,7 @@ class Terrain3DController {
     if (actor.wheelRR) actor.wheelRR.rotation.y = -steerAngle * 0.6;
 
     if (actor.apxsArm) {
-      actor.apxsArm.rotation.x = Math.sin(now * 0.0018) * 0.045;
+      actor.apxsArm.rotation.x = Math.sin(now * 0.0018) * 0.045 + Math.sin(now * 0.014) * 0.085 * sb;
     }
   }
 
@@ -1501,6 +1514,9 @@ class Terrain3DController {
     const cosP = Math.cos(p);
 
     const jh = Math.max(0, st.jumpHeight || 0);
+    const speakTarget = (this.speakingActor === 'penguin' && jh < 0.02) ? 1 : 0;
+    st.speakBlend += (speakTarget - st.speakBlend) * Math.min(1, dt * 9);
+    const sb = st.speakBlend;
     actor.rigRoot.position.set(st.x, st.y + jh, st.z);
     actor.rigRoot.rotation.set(0, st.currentYaw, 0);
 
@@ -1524,13 +1540,15 @@ class Terrain3DController {
     }
 
     if (actor.head) {
-      // Estabilización de cabeza al caminar + ladeo curioso de bebé pingüino (head-tilt kawaii) en reposo
+      // Estabilización de cabeza al caminar + ladeo curioso de bebé pingüino (head-tilt kawaii) en reposo + gestos al hablar
       const idleLookY = Math.sin(now * 0.0012) * 0.11 * (1 - wb);
       const curiousWave = Math.sin(now * 0.0017);
       const idleTiltZ = Math.sign(curiousWave) * Math.pow(Math.abs(curiousWave), 1.6) * 0.095 * (1 - wb);
-      actor.head.rotation.z = -sinP * 0.095 * wb + idleTiltZ;
+      const speakNod = (Math.sin(now * 0.016) * 0.06 + Math.sin(now * 0.029) * 0.03) * sb;
+      const speakTilt = Math.sin(now * 0.009) * 0.055 * sb;
+      actor.head.rotation.z = -sinP * 0.095 * wb + idleTiltZ + speakTilt;
       actor.head.rotation.y = -cosP * 0.04 * wb + idleLookY;
-      actor.head.rotation.x = -0.03 * wb + Math.sin(now * 0.0023) * 0.025 * (1 - wb);
+      actor.head.rotation.x = -0.03 * wb + Math.sin(now * 0.0023) * 0.025 * (1 - wb) + speakNod;
       if (actor.helmetGlass) {
         actor.helmetGlass.rotation.copy(actor.head.rotation);
       }
@@ -1563,14 +1581,16 @@ class Terrain3DController {
 
     const jumpFlutter = jh > 0.02 ? Math.sin(now * 0.032) * 0.14 : 0;
     const jumpFlap = Math.min(0.42, jh * 0.56) + jumpFlutter;
+    const speakFlap = (0.07 + Math.abs(Math.sin(now * 0.011)) * 0.1) * sb;
+    const speakSwing = Math.sin(now * 0.013) * 0.09 * sb;
     if (actor.flipperL) {
-      // Aletas ligeramente abiertas desde el hombro + pequeño aleteo feliz en el aire
-      actor.flipperL.rotation.z = 0.04 + 0.09 * wb + Math.max(0, sinP) * 0.075 * wb + jumpFlap;
-      actor.flipperL.rotation.x = -sinP * 0.14 * wb;
+      // Aletas ligeramente abiertas desde el hombro + pequeño aleteo feliz en el aire / al hablar
+      actor.flipperL.rotation.z = 0.04 + 0.09 * wb + Math.max(0, sinP) * 0.075 * wb + jumpFlap + speakFlap;
+      actor.flipperL.rotation.x = -sinP * 0.14 * wb + speakSwing;
     }
     if (actor.flipperR) {
-      actor.flipperR.rotation.z = -(0.04 + 0.09 * wb + Math.max(0, -sinP) * 0.075 * wb + jumpFlap);
-      actor.flipperR.rotation.x = sinP * 0.14 * wb;
+      actor.flipperR.rotation.z = -(0.04 + 0.09 * wb + Math.max(0, -sinP) * 0.075 * wb + jumpFlap + speakFlap);
+      actor.flipperR.rotation.x = sinP * 0.14 * wb - speakSwing;
     }
 
     if (actor.footL) {
@@ -2147,6 +2167,7 @@ class Terrain3DController {
     this.penguinActor = null;
     this.machineActor = null;
     this.shipActor = null;
+    this.speakingActor = null;
     this.sampleActors = new Map();
     this.rockColliders = [];
     this.inspectMode = false;

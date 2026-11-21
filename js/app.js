@@ -135,6 +135,7 @@
   let activeDialogueMachine = null;
   let activeDialogueTurn = 0;
   let activeDialogueToken = 0;
+  let speakFallbackTimer = null;
   let activeQuizChapterId = state.currentChapterId;
   let activeInteractable = null;
   let pendingSampleToCollect = null;
@@ -341,7 +342,7 @@
       renderStageEntities(chapter);
 
       if (dom.speechBubbleNextBtn) {
-        dom.speechBubbleNextBtn.textContent = isEn ? 'Continue ▶' : 'Continuar ▶';
+        dom.speechBubbleNextBtn.textContent = isEn ? 'Continue' : 'Continuar';
       }
 
       // Actualizar globo de pensamiento si está activo
@@ -1015,7 +1016,7 @@
     // Teclado (Flechas / WASD para mover, Espacio para saltar, Escape para volver o cerrar modales)
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
-        if (isBlockingModalOpen()) {
+        if (isBlockingModalOpen() || isSpeechBubbleOpen()) {
           closeAllModals();
         } else if (is3dInspectMode) {
           set3dInspectMode(false);
@@ -1026,6 +1027,12 @@
       }
 
       if (is3dInspectMode || isBlockingModalOpen() || dom.gameScreen.classList.contains('is-hidden')) {
+        return;
+      }
+
+      if (event.key === 'Enter' && isSpeechBubbleOpen()) {
+        event.preventDefault();
+        advanceDialogue();
         return;
       }
 
@@ -2053,13 +2060,19 @@
     }
 
     if (dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden')) {
+      dom.stageSpeechBubble.classList.add('is-tracking-3d');
       if (activeSpeechAnchorKind === 'ship' && world3d.ship) {
-        positionSpeechBubble(world3d.ship.screenX, world3d.ship.screenY);
+        positionSpeechBubble(world3d.ship.screenX, world3d.ship.screenY, true);
       } else if (activeSpeechAnchorKind === 'machine' && world3d.machine) {
-        positionSpeechBubble(world3d.machine.screenX, world3d.machine.screenY);
+        positionSpeechBubble(world3d.machine.screenX, world3d.machine.screenY, false);
       } else {
-        positionSpeechBubble(penguinPos.x, penguinPos.y);
+        const head = getPenguinHeadPct();
+        positionSpeechBubble(head ? head.x : penguinPos.x, head ? head.y : penguinPos.y, Boolean(head));
       }
+    }
+
+    if (dom.stageThoughtBubble && !dom.stageThoughtBubble.classList.contains('is-hidden')) {
+      positionThoughtBubbleOnPenguin();
     }
   }
 
@@ -2856,6 +2869,10 @@
       dom.penguinSprite.innerHTML = MODELS.cyberpenguin(penguinDir);
       lastRenderedDir = penguinDir;
     }
+    if (!world3d.active && dom.stageThoughtBubble && !dom.stageThoughtBubble.classList.contains('is-hidden') && !thoughtTrackingRaf) {
+      dom.stageThoughtBubble.style.transitionDuration = (dom.penguinActor && dom.penguinActor.style.transitionDuration) || '300ms';
+      applyThoughtBubblePosition(penguinPos.x, penguinPos.y);
+    }
     updateDepthSorting();
     if (FX && typeof FX.setPenguinTarget === 'function') {
       FX.setPenguinTarget(penguinPos);
@@ -3150,7 +3167,7 @@
 
     // Globo de pensamiento ambiental sobre Cyberpenguin al saltar en gravedad especial
     const allThoughts = DATA.getAmbientThoughts ? DATA.getAmbientThoughts(state.currentLanguage) : DATA.AMBIENT_THOUGHTS;
-    if (allThoughts && allThoughts[chapter.id]) {
+    if (!isSpeechBubbleOpen() && allThoughts && allThoughts[chapter.id]) {
       const thoughts = allThoughts[chapter.id];
       const randomIndex = Math.floor(Math.random() * thoughts.length);
       activeAmbientThought = { chapterId: chapter.id, index: randomIndex };
@@ -3344,6 +3361,11 @@
       if (distToMachine > closeLimit && activeDialogueMachine && activeDialogueMachine.id === activeMachine.id) {
         closeDialogueModal();
       }
+    }
+
+    if (isSpeechBubbleOpen()) {
+      hideStageActionPrompt();
+      return;
     }
 
     // Evaluar interactuables dentro de rango
@@ -3674,7 +3696,7 @@
      Globos de Diálogo Encima de los Personajes (Estilo Animal Crossing)
      ======================================================================== */
 
-  function positionSpeechBubble(x, y) {
+  function positionSpeechBubble(x, y, isExactTop = false) {
     if (!dom.stageSpeechBubble) return;
     const clampedX = Math.max(22, Math.min(78, x));
     const isFlipped = y < 30;
@@ -3689,12 +3711,28 @@
       const maxShift = Math.max(0, bubbleW / 2 - 30);
       dom.stageSpeechBubble.style.setProperty('--tail-shift', `${Math.max(-maxShift, Math.min(maxShift, shift)).toFixed(1)}px`);
     }
-    const targetY = isFlipped ? Math.min(78, y + 8) : Math.max(15, y - 8);
+    const targetY = isExactTop
+      ? (isFlipped ? Math.min(78, y + 6) : Math.max(15, y - 1.5))
+      : (isFlipped ? Math.min(78, y + 8) : Math.max(15, y - 8));
     dom.stageSpeechBubble.style.top = `${targetY}%`;
   }
 
-  function hideSpeechBubble() {
+  function setActiveSpeakerVisual(speaker) {
+    clearTimeout(speakFallbackTimer);
+    speakFallbackTimer = null;
     if (dom.stageSpeechBubble) {
+      dom.stageSpeechBubble.classList.toggle('is-speaking', Boolean(speaker));
+    }
+    const t3d = getTerrain3D();
+    if (t3d && typeof t3d.setSpeakingActor === 'function') {
+      t3d.setSpeakingActor(speaker || null);
+    }
+  }
+
+  function hideSpeechBubble() {
+    setActiveSpeakerVisual(null);
+    if (dom.stageSpeechBubble) {
+      dom.stageSpeechBubble.classList.remove('is-tracking-3d');
       dom.stageSpeechBubble.classList.add('is-hidden');
     }
     clearTimeout(dialogueAutoTimer);
@@ -3718,6 +3756,7 @@
     clearTimeout(thoughtBubbleTimer);
     stopThoughtTracking();
     if (dom.stageThoughtBubble) {
+      dom.stageThoughtBubble.style.transitionDuration = '';
       dom.stageThoughtBubble.classList.add('is-hidden');
     }
     activeAmbientThought = null;
@@ -3730,6 +3769,22 @@
     const safeY = Math.max(22, y - 14);
     dom.stageThoughtBubble.style.left = `${clampedX.toFixed(2)}%`;
     dom.stageThoughtBubble.style.top = `${safeY.toFixed(2)}%`;
+  }
+
+  function positionThoughtBubbleOnPenguin() {
+    if (!dom.stageThoughtBubble) return;
+    if (world3d.active) {
+      const head = getPenguinHeadPct();
+      if (head) {
+        dom.stageThoughtBubble.classList.add('is-tracking');
+        const clampedX = Math.max(14, Math.min(86, head.x));
+        const safeY = Math.max(18, Math.min(92, head.y));
+        dom.stageThoughtBubble.style.left = `${clampedX.toFixed(2)}%`;
+        dom.stageThoughtBubble.style.top = `${safeY.toFixed(2)}%`;
+        return;
+      }
+    }
+    applyThoughtBubblePosition(penguinPos.x, penguinPos.y);
   }
 
   function startThoughtTrackingJump(jumpData) {
@@ -3784,7 +3839,10 @@
     dom.thoughtBubbleText.textContent = text;
     dom.stageThoughtBubble.classList.remove('is-hidden');
 
-    if (jumpData) {
+    if (world3d.active) {
+      stopThoughtTracking();
+      positionThoughtBubbleOnPenguin();
+    } else if (jumpData) {
       startThoughtTrackingJump(jumpData);
     } else {
       stopThoughtTracking();
@@ -3801,6 +3859,7 @@
     hideThoughtBubble();
     const turnToken = ++activeDialogueToken;
     clearTimeout(dialogueAutoTimer);
+    setActiveSpeakerVisual(null);
     TTS.stop();
 
     const isPenguin = speaker === 'penguin';
@@ -3838,12 +3897,27 @@
     // Ubicar el globo justo encima del personaje que habla
     activeSpeechAnchorKind = isPenguin ? 'penguin' : isShip ? 'ship' : 'machine';
     let resolvedAnchor = anchorPos || (isPenguin ? penguinPos : { x: 50, y: 50 });
+    let isExactTop = false;
     if (world3d.active) {
-      if (isPenguin) resolvedAnchor = penguinPos;
-      else if (isShip && world3d.ship) resolvedAnchor = { x: world3d.ship.screenX, y: world3d.ship.screenY };
-      else if (world3d.machine) resolvedAnchor = { x: world3d.machine.screenX, y: world3d.machine.screenY };
+      dom.stageSpeechBubble.classList.add('is-tracking-3d');
+      if (isPenguin) {
+        const head = getPenguinHeadPct();
+        if (head) {
+          resolvedAnchor = head;
+          isExactTop = true;
+        } else {
+          resolvedAnchor = penguinPos;
+        }
+      } else if (isShip && world3d.ship) {
+        resolvedAnchor = { x: world3d.ship.screenX, y: world3d.ship.screenY };
+        isExactTop = true;
+      } else if (world3d.machine) {
+        resolvedAnchor = { x: world3d.machine.screenX, y: world3d.machine.screenY };
+      }
+    } else {
+      dom.stageSpeechBubble.classList.remove('is-tracking-3d');
     }
-    positionSpeechBubble(resolvedAnchor.x, resolvedAnchor.y);
+    positionSpeechBubble(resolvedAnchor.x, resolvedAnchor.y, isExactTop);
 
     // Renderizar opciones interactivas de respuesta estilo Animal Crossing
     if (dom.speechBubbleOptions) {
@@ -3867,7 +3941,7 @@
 
     // Botón de continuar cuando no hay opciones múltiples
     if (dom.speechBubbleActionRow && dom.speechBubbleNextBtn) {
-      dom.speechBubbleNextBtn.textContent = (state.currentLanguage === 'en') ? 'Continue ▶' : 'Continuar ▶';
+      dom.speechBubbleNextBtn.textContent = (state.currentLanguage === 'en') ? 'Continue' : 'Continuar';
       if (Array.isArray(choices) && choices.length > 0) {
         dom.speechBubbleActionRow.style.display = 'none';
       } else {
@@ -3885,18 +3959,38 @@
     const pitch = isPenguin ? 1.22 : isShip ? 0.92 : 0.98;
     const rate = isPenguin ? 1.0 : 0.98;
 
-    if (text && text.trim()) {
+    const cleanSpeech = (text || '').trim();
+    if (cleanSpeech) {
+      setActiveSpeakerVisual(speaker);
+      let ttsStarted = false;
+      // Respaldo visual por si el navegador bloquea o demora el evento onstart de síntesis vocal
+      speakFallbackTimer = setTimeout(() => {
+        if (!ttsStarted && turnToken === activeDialogueToken) {
+          const estMs = Math.max(1800, Math.min(7500, cleanSpeech.length * 48));
+          speakFallbackTimer = setTimeout(() => {
+            if (turnToken === activeDialogueToken) setActiveSpeakerVisual(null);
+          }, estMs);
+        }
+      }, 650);
+
       TTS.speak({
-        text,
+        text: cleanSpeech,
         audioUrl: audioUrl || '',
         pitch,
         rate,
         lang: (state.currentLanguage === 'en') ? 'en-US' : 'es-ES',
+        onStart: () => {
+          if (turnToken !== activeDialogueToken) return;
+          ttsStarted = true;
+          clearTimeout(speakFallbackTimer);
+          speakFallbackTimer = null;
+          setActiveSpeakerVisual(speaker);
+        },
         onEnd: () => {
-          // En diálogos con botón siguiente, el usuario pulsa para avanzar
+          if (turnToken === activeDialogueToken) setActiveSpeakerVisual(null);
         },
         onEmpty: () => {
-          // Fallback
+          if (turnToken === activeDialogueToken) setActiveSpeakerVisual(null);
         }
       });
     }
@@ -4243,6 +4337,7 @@
   function closeDialogueModal() {
     activeDialogueToken++;
     clearTimeout(dialogueAutoTimer);
+    setActiveSpeakerVisual(null);
     TTS.stop();
     activeDialogueMachine = null;
     activeBranchState = null;
@@ -5095,10 +5190,11 @@
     ].some((m) => m && !m.classList.contains('is-hidden'));
   }
 
+  function isSpeechBubbleOpen() {
+    return Boolean(dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden'));
+  }
+
   function isBlockingModalOpen() {
-    if (dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden')) {
-      return true;
-    }
     return [
       dom.quizModal,
       dom.passportModal,
