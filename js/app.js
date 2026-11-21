@@ -1726,9 +1726,12 @@
       );
       dom.stage3dToggleBtn.classList.toggle('is-active', is3dInspectMode);
     }
-    if (meta && dom.stage3dCaptionTitle && dom.stage3dCaptionHint) {
+    if (meta && dom.stage3dCaptionTitle) {
       dom.stage3dCaptionTitle.textContent = isEn ? meta.titleEn : meta.titleEs;
-      dom.stage3dCaptionHint.textContent = isEn ? meta.hintEn : meta.hintEs;
+      if (dom.stage3dCaptionHint) {
+        dom.stage3dCaptionHint.textContent = '';
+        dom.stage3dCaptionHint.classList.add('hidden');
+      }
     }
   }
 

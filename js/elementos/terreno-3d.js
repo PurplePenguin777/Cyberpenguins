@@ -34,8 +34,6 @@ const SITE_CONFIGS = {
     },
     titleEs: 'Ares Vallis',
     titleEn: 'Ares Vallis',
-    hintEs: 'Doble clic para enfocar cualquier punto · Clic derecho para desplazar · Rueda para zoom',
-    hintEn: 'Double-click to focus any point · Right-click to pan · Scroll to zoom',
     exploreFov: 37,
     inspectFov: 42,
     exploreCamPos: [-1.15, 1.96, 10.6],

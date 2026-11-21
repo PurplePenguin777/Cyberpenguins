@@ -1522,8 +1522,8 @@ a:focus-visible {
   justify-content: center;
   gap: 0.12rem;
   max-width: min(560px, calc(100vw - 14rem));
-  padding: 0.48rem 1rem;
-  border-radius: 18px;
+  padding: 0.42rem 1.15rem;
+  border-radius: 9999px;
   background: rgba(14, 19, 40, 0.62);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
