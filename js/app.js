@@ -1987,8 +1987,6 @@
               y: peak.y,
               z: peak.z
             };
-            orig.x = peak.x;
-            orig.z = peak.z;
           } else {
             anchor = orig;
           }

@@ -1146,14 +1146,21 @@ class Terrain3DController {
     if (!this.sampleActors) return null;
     const entry = this.sampleActors.get(sampleId);
     if (!entry || !entry.group || !entry.group.visible) return null;
-    if (entry._cachedPeak && entry._cachedGroupY === entry.group.position.y) {
+    if (
+      entry._cachedPeak &&
+      entry._cachedGroupY === entry.group.position.y &&
+      entry._cachedGroupX === entry.group.position.x &&
+      entry._cachedGroupZ === entry.group.position.z
+    ) {
       return entry._cachedPeak;
     }
     const targetObj = entry.mesh || entry.group;
     targetObj.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(targetObj);
     if (!Number.isFinite(box.min.x) || !Number.isFinite(box.max.y)) return null;
+    entry._cachedGroupX = entry.group.position.x;
     entry._cachedGroupY = entry.group.position.y;
+    entry._cachedGroupZ = entry.group.position.z;
     entry._cachedPeak = {
       x: (box.min.x + box.max.x) * 0.5,
       y: box.max.y + 0.035,
