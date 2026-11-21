@@ -2009,6 +2009,9 @@
         if (kind === 'sample' && world3d.samples[id]) {
           world3d.samples[id].screenX = proj.pctX;
           world3d.samples[id].screenY = proj.pctY;
+        } else if (kind === 'ship' && world3d.ship) {
+          world3d.ship.screenX = proj.pctX;
+          world3d.ship.screenY = proj.pctY;
         }
         el.style.visibility = proj.visible ? '' : 'hidden';
         el.style.left = `${proj.pctX.toFixed(2)}%`;
@@ -2042,25 +2045,11 @@
     world3d.forceDomSync = false;
 
     if (dom.stageActionPrompt && !dom.stageActionPrompt.classList.contains('is-hidden') && activeInteractable) {
-      let ax = penguinPos.x;
-      let ay = penguinPos.y;
-      let offsetY = -10;
-      if (activeInteractable.type === 'sample' && activeInteractable.target && world3d.samples[activeInteractable.target.id]) {
-        const sA = world3d.samples[activeInteractable.target.id];
-        ax = sA.screenX;
-        ay = sA.screenY;
-        offsetY = -2.5;
-      } else if (activeInteractable.type === 'machine' && world3d.machine) {
-        ax = world3d.machine.screenX;
-        ay = world3d.machine.screenY;
-        offsetY = -12;
-      } else if (activeInteractable.type.startsWith('ship') && world3d.ship) {
-        ax = world3d.ship.screenX;
-        ay = world3d.ship.screenY;
-        offsetY = -12;
+      const head = getPenguinHeadPct();
+      if (head) {
+        dom.stageActionPrompt.style.left = `${Math.max(8, Math.min(92, head.x)).toFixed(2)}%`;
+        dom.stageActionPrompt.style.top = `${Math.max(10, Math.min(92, head.y)).toFixed(2)}%`;
       }
-      dom.stageActionPrompt.style.left = `${Math.max(8, Math.min(92, ax)).toFixed(2)}%`;
-      dom.stageActionPrompt.style.top = `${Math.max(10, Math.min(88, ay + offsetY)).toFixed(2)}%`;
     }
 
     if (dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden')) {
@@ -3209,6 +3198,14 @@
     return Math.hypot(a.x - b.x, a.y - b.y);
   }
 
+  function getPenguinHeadPct() {
+    const t3d = getTerrain3D();
+    if (!world3d.active || !world3d.penguin || !t3d || typeof t3d.projectWorldToScreen !== 'function') return null;
+    const p = world3d.penguin;
+    const proj = t3d.projectWorldToScreen(p.x, p.y + (p.jumpHeight || 0) + 0.86, p.z);
+    return { x: proj.pctX, y: proj.pctY };
+  }
+
   function showStageActionPrompt(type, target, onAction) {
     if (!dom.stageActionPrompt || !dom.stageActionBtn) return;
     activeInteractable = { type, target, onAction };
@@ -3258,8 +3255,14 @@
       offsetY = -12;
     }
 
-    const px = Math.max(8, Math.min(92, objX));
-    const py = Math.max(10, Math.min(88, objY + offsetY));
+    let px = Math.max(8, Math.min(92, objX));
+    let py = Math.max(10, Math.min(88, objY + offsetY));
+    // En 3D el globo acompaña a Cyberpenguin (sobre su cabeza) en tiempo real
+    const head = getPenguinHeadPct();
+    if (head) {
+      px = Math.max(8, Math.min(92, head.x));
+      py = Math.max(10, Math.min(92, head.y));
+    }
     dom.stageActionPrompt.style.left = `${px}%`;
     dom.stageActionPrompt.style.top = `${py}%`;
     dom.stageActionPrompt.classList.toggle('prompt-for-sample', type === 'sample');
@@ -3355,7 +3358,9 @@
           const dist = sA
             ? Math.hypot(world3d.penguin.x - sA.x, world3d.penguin.z - sA.z) * 6.0
             : getDist(penguinPos, sampleObj.pos);
-          if (dist <= 13.5) {
+          const reach3d = { 'sample-mars-4': 1.3, 'sample-mars-5': 2.0, 'sample-mars-6': 1.45 }[sampleObj.id] || 1.5;
+          const inRange = sA ? (dist / 6.0) <= reach3d : dist <= 13.5;
+          if (inRange) {
             candidates.push({
               type: 'sample',
               target: sampleObj,
