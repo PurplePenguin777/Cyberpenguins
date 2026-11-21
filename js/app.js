@@ -85,7 +85,7 @@
       jumpClass: 'jumping-moon',
       descendClass: 'descending-moon',
       descendDurationMs: 980,
-      stepDurationMs: 640,
+      stepDurationMs: 760,
       jumpDurationMs: 1320,
       jumpAdvanceDist: 9.5,
       dustOnJump: true,
@@ -96,10 +96,10 @@
       gravityClass: 'gravity-mars',
       jumpClass: 'jumping-mars',
       descendClass: 'descending-mars',
-      descendDurationMs: 460,
-      stepDurationMs: 380,
-      jumpDurationMs: 460,
-      jumpAdvanceDist: 3.5,
+      descendDurationMs: 520,
+      stepDurationMs: 680,
+      jumpDurationMs: 540,
+      jumpAdvanceDist: 3.2,
       dustOnJump: true,
       isEva: false
     },
@@ -1747,7 +1747,9 @@
       t3d.setOnFrameCallback(null);
     }
     if (!keepUiClasses) {
-      if (dom.isoBoard) dom.isoBoard.classList.remove('has-3d-terrain');
+      if (dom.isoBoard) {
+        dom.isoBoard.classList.remove('has-3d-terrain', 'has-3d-actor');
+      }
       if (dom.penguinActor) {
         dom.penguinActor.style.transform = '';
         dom.penguinActor.style.visibility = '';
@@ -1841,14 +1843,28 @@
   function projectAnchorScreen(anchor, t3d, minScale, maxScale) {
     const proj = t3d.projectWorldToScreen(anchor.x, anchor.y, anchor.z);
     const refDist = anchor.initDist || 12.0;
-    const scale = Math.max(minScale, Math.min(maxScale, refDist / Math.max(2.5, proj.dist)));
+    const mul = anchor.baseMul || 1.0;
+    const scale = Math.max(minScale, Math.min(maxScale, (refDist / Math.max(2.5, proj.dist)) * mul));
     anchor.screenX = proj.pctX;
     anchor.screenY = proj.pctY;
     return { proj, scale };
   }
 
+  function computeWalkDuration3d(fromPt, toPt) {
+    const segDist = Math.hypot(toPt.x - fromPt.x, toPt.z - fromPt.z);
+    const uphill = Math.max(0, (toPt.y || 0) - (fromPt.y || 0));
+    // Velocidad pausada y realista de polluelo de pingüino emperador (~2.15 u/s, más lento cuesta arriba)
+    const rawMs = (segDist / 2.15) * 1000 * (1 + uphill * 0.45);
+    return Math.max(540, Math.min(3800, Math.round(rawMs)));
+  }
+
   function syncDomEntitiesToWorld3d(t3d) {
     if (!t3d || !world3d.active) return;
+
+    const has3dPenguin = Boolean(typeof t3d.hasPenguinActor === 'function' && t3d.hasPenguinActor());
+    if (dom.isoBoard) {
+      dom.isoBoard.classList.toggle('has-3d-actor', has3dPenguin);
+    }
 
     if (dom.stageEntitiesLayer) {
       dom.stageEntitiesLayer.querySelectorAll('.stage-entity').forEach((el) => {
@@ -1860,7 +1876,7 @@
         else if (kind === 'sample' && id) anchor = world3d.samples[id];
         if (!anchor) return;
 
-        const { proj, scale } = projectAnchorScreen(anchor, t3d, 0.55, 1.42);
+        const { proj, scale } = projectAnchorScreen(anchor, t3d, 0.44, 1.55);
         el.style.visibility = proj.visible ? '' : 'hidden';
         el.style.left = `${proj.pctX.toFixed(2)}%`;
         el.style.top = `${proj.pctY.toFixed(2)}%`;
@@ -1870,8 +1886,12 @@
     }
 
     if (world3d.penguin && dom.penguinActor) {
-      const pProj = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y, world3d.penguin.z);
-      const pScale = Math.max(0.52, Math.min(1.48, world3d.penguinRefDist / Math.max(2.5, pProj.dist)));
+      if (typeof t3d.setPenguinPose === 'function') {
+        t3d.setPenguinPose(world3d.penguin);
+      }
+      const jh = world3d.penguin.jumpHeight || 0;
+      const pProj = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y + jh, world3d.penguin.z);
+      const pScale = Math.max(0.48, Math.min(1.45, world3d.penguinRefDist / Math.max(2.5, pProj.dist)));
       dom.penguinActor.style.visibility = pProj.visible ? '' : 'hidden';
       dom.penguinActor.style.left = `${pProj.pctX.toFixed(2)}%`;
       dom.penguinActor.style.top = `${pProj.pctY.toFixed(2)}%`;
@@ -1928,18 +1948,28 @@
       const segTo = wa.waypoints[wa.idx];
       if (!segTo) {
         world3d.walkAnim = null;
+        world3d.penguin.isWalking = false;
         if (dom.penguinActor) dom.penguinActor.classList.remove('walking');
         syncDomEntitiesToWorld3d(t3d);
         const cb = wa.onArrive;
         if (cb) cb();
       } else {
         const t = Math.min(1, Math.max(0, (now - wa.startTime) / Math.max(1, wa.durationMs)));
+        // Suavizado natural (aceleración y frenado suaves de caminata de pingüino)
         const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
         const nx = segFrom.x + (segTo.x - segFrom.x) * ease;
         const nz = segFrom.z + (segTo.z - segFrom.z) * ease;
-        world3d.penguin = { x: nx, y: t3d.getGroundHeightAt(nx, nz), z: nz };
+        const segHeading = Math.atan2(segTo.x - segFrom.x, segTo.z - segFrom.z);
+        world3d.penguin = {
+          x: nx,
+          y: t3d.getGroundHeightAt(nx, nz),
+          z: nz,
+          yaw: segHeading,
+          isWalking: true,
+          jumpHeight: 0
+        };
 
-        if (now - wa.lastDustAt >= 260) {
+        if (now - wa.lastDustAt >= 430) {
           wa.lastDustAt = now;
           const pNow = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y, world3d.penguin.z);
           if (FX && typeof FX.emitBurst === 'function') {
@@ -1951,6 +1981,12 @@
           wa.idx += 1;
           if (wa.idx >= wa.waypoints.length) {
             world3d.walkAnim = null;
+            world3d.penguin.isWalking = false;
+            // Al detenerse, girar levemente hacia un ángulo 3/4 frontal para mostrar el casco y rostro
+            const restSign = Math.sin(world3d.penguin.yaw) >= 0 ? 1 : -1;
+            if (Math.cos(world3d.penguin.yaw) < -0.25) {
+              world3d.penguin.yaw = restSign * 0.65;
+            }
             if (dom.penguinActor) dom.penguinActor.classList.remove('walking');
             syncDomEntitiesToWorld3d(t3d);
             if (wa.onArrive) wa.onArrive();
@@ -1958,8 +1994,8 @@
             const nextPt = wa.waypoints[wa.idx];
             wa.from = { ...world3d.penguin };
             wa.startTime = now;
-            const segDist = Math.hypot(nextPt.x - wa.from.x, nextPt.z - wa.from.z);
-            wa.durationMs = Math.max(220, Math.min(1300, Math.round((segDist / 7.5) * 850)));
+            wa.durationMs = computeWalkDuration3d(wa.from, nextPt);
+            world3d.penguin.yaw = Math.atan2(nextPt.x - wa.from.x, nextPt.z - wa.from.z);
             if (nextPt.x < wa.from.x - 0.15) penguinDir = 'left';
             else if (nextPt.x > wa.from.x + 0.15) penguinDir = 'right';
             if (penguinDir !== lastRenderedDir) {
@@ -1975,8 +2011,17 @@
       const t = Math.min(1, Math.max(0, (now - ja.startTime) / Math.max(1, ja.durationMs)));
       const nx = ja.from.x + (ja.to.x - ja.from.x) * t;
       const nz = ja.from.z + (ja.to.z - ja.from.z) * t;
-      world3d.penguin = { x: nx, y: t3d.getGroundHeightAt(nx, nz), z: nz };
+      const jh = 4 * t * (1 - t) * (ja.peakHeight || 0.55);
+      world3d.penguin = {
+        x: nx,
+        y: t3d.getGroundHeightAt(nx, nz),
+        z: nz,
+        yaw: ja.yaw,
+        isWalking: false,
+        jumpHeight: jh
+      };
       if (t >= 1) {
+        world3d.penguin.jumpHeight = 0;
         world3d.jumpAnim = null;
       }
     }
@@ -1993,6 +2038,7 @@
 
     const segDist = Math.hypot(firstPt.x - world3d.penguin.x, firstPt.z - world3d.penguin.z);
     if (segDist < 0.08 && route.length === 1) {
+      world3d.penguin.isWalking = false;
       if (onArrive) onArrive();
       return;
     }
@@ -2004,7 +2050,10 @@
       lastRenderedDir = penguinDir;
     }
 
-    const dur = Math.max(220, Math.min(1300, Math.round((segDist / 7.5) * 850)));
+    const dur = computeWalkDuration3d(world3d.penguin, firstPt);
+    const heading = Math.atan2(firstPt.x - world3d.penguin.x, firstPt.z - world3d.penguin.z);
+    world3d.penguin.yaw = heading;
+    world3d.penguin.isWalking = true;
     world3d.walkAnim = {
       waypoints: route,
       idx: 0,
@@ -2012,7 +2061,7 @@
       startTime: performance.now(),
       durationMs: dur,
       onArrive,
-      lastDustAt: performance.now() - 260
+      lastDustAt: performance.now() - 430
     };
     if (dom.penguinActor) {
       dom.penguinActor.classList.add('walking');
@@ -2034,18 +2083,26 @@
       y: shipHit.y,
       z: shipHit.z,
       initDist: t3d.getBaseExploreDistance(shipHit.x, shipHit.y, shipHit.z),
+      baseMul: 1.22,
       screenX: shipPos.x,
       screenY: shipPos.y
     };
 
     if (activeMachine) {
       const mHit = t3d.screenPctToWorld(activeMachine.pos.x, activeMachine.pos.y, { useBaseExploreCamera: true });
+      const machineBaseScale = {
+        'sojourner': 0.72,
+        'apollo-11-eagle': 1.25,
+        'viking-1': 1.05,
+        'surveyor-3': 0.95
+      };
       world3d.machine = {
         id: activeMachine.id,
         x: mHit.x,
         y: mHit.y,
         z: mHit.z,
         initDist: t3d.getBaseExploreDistance(mHit.x, mHit.y, mHit.z),
+        baseMul: machineBaseScale[activeMachine.id] || 1.0,
         screenX: activeMachine.pos.x,
         screenY: activeMachine.pos.y
       };
@@ -2053,6 +2110,11 @@
       world3d.machine = null;
     }
 
+    const sampleBaseScale = {
+      'sample-mars-2': 0.64, // Barnacle Bill (~25-30 cm)
+      'sample-mars-3': 0.98, // Yogi (~1.1 m boulder)
+      'sample-mars-4': 0.74  // Scooby Doo (~40 cm flat rock)
+    };
     world3d.samples = {};
     const siteSamples = getSiteSamples(chapter, activeMachine);
     siteSamples.forEach((sampleObj) => {
@@ -2063,6 +2125,7 @@
         y: sHit.y,
         z: sHit.z,
         initDist: t3d.getBaseExploreDistance(sHit.x, sHit.y, sHit.z),
+        baseMul: sampleBaseScale[sampleObj.id] || 0.82,
         screenX: sampleObj.pos.x,
         screenY: sampleObj.pos.y
       };
@@ -2071,7 +2134,15 @@
     if (!preservePenguin) {
       const spawn = (activeMachine && activeMachine.spawnPos) || chapter.spawnPos;
       const pRaw = t3d.screenPctToWorld(spawn.x, spawn.y, { useBaseExploreCamera: true, clampWalkable: true });
-      world3d.penguin = resolveWorld3dPoint(pRaw.x, pRaw.z);
+      const resolvedP = resolveWorld3dPoint(pRaw.x, pRaw.z);
+      world3d.penguin = {
+        x: resolvedP.x,
+        y: resolvedP.y,
+        z: resolvedP.z,
+        yaw: 0.42,
+        isWalking: false,
+        jumpHeight: 0
+      };
       world3d.penguinRefDist = t3d.getBaseExploreDistance(world3d.penguin.x, world3d.penguin.y, world3d.penguin.z);
     }
 
@@ -2533,7 +2604,12 @@
         };
         if (world3d.active && world3d.ship) {
           const destW = resolveWorld3dPoint(world3d.ship.x + 1.55, world3d.ship.z + 1.15);
-          walkPenguin3dTo(destW.x, destW.z, finishHatch);
+          walkPenguin3dTo(destW.x, destW.z, () => {
+            if (world3d.penguin && world3d.ship) {
+              world3d.penguin.yaw = Math.atan2(world3d.ship.x - world3d.penguin.x, 0.65);
+            }
+            finishHatch();
+          });
           return;
         }
         const boardingPoint = resolveSurfacePoint(shipPos.x + 9.5, shipPos.y + 4.8, chapter);
@@ -2550,6 +2626,9 @@
           const sideSign = world3d.penguin.x < world3d.machine.x ? -1 : 1;
           const destW = resolveWorld3dPoint(world3d.machine.x + sideSign * 1.25, world3d.machine.z + 0.75);
           walkPenguin3dTo(destW.x, destW.z, () => {
+            if (world3d.penguin && world3d.machine) {
+              world3d.penguin.yaw = Math.atan2(world3d.machine.x - world3d.penguin.x, 0.65);
+            }
             openDialogueModal(machine);
           });
           return;
@@ -2646,6 +2725,10 @@
     isJumping = false;
     world3d.walkAnim = null;
     world3d.jumpAnim = null;
+    if (world3d.penguin) {
+      world3d.penguin.isWalking = false;
+      world3d.penguin.jumpHeight = 0;
+    }
     walkSequenceTimers.forEach((id) => clearTimeout(id));
     walkSequenceTimers = [];
     stopEvaTetherLoop();
@@ -2807,19 +2890,24 @@
     const t3d = getTerrain3D();
     if (world3d.active && world3d.penguin && t3d) {
       const orig = { ...world3d.penguin };
-      let destW = resolveWorld3dPoint(orig.x + dirSign * 1.65, orig.z);
-      if (Math.hypot(destW.x - orig.x, destW.z - orig.z) < 0.4) {
-        destW = resolveWorld3dPoint(orig.x - dirSign * 1.65, orig.z);
+      let destW = resolveWorld3dPoint(orig.x + dirSign * 1.15, orig.z);
+      if (Math.hypot(destW.x - orig.x, destW.z - orig.z) < 0.35) {
+        destW = resolveWorld3dPoint(orig.x - dirSign * 1.15, orig.z);
         if (destW.x < orig.x - 0.15) penguinDir = 'left';
         if (destW.x > orig.x + 0.15) penguinDir = 'right';
       }
+      const jumpYaw = Math.atan2(destW.x - orig.x, destW.z - orig.z + 0.35);
+      const peakH = siteId === 'asteroid-eros' ? 1.45 : (chapter.id === 'moon' ? 0.92 : 0.48);
       const pOrig = t3d.projectWorldToScreen(orig.x, orig.y, orig.z);
       const pTgt = t3d.projectWorldToScreen(destW.x, destW.y, destW.z);
       jumpOrigin = { x: pOrig.pctX, y: pOrig.pctY };
       jumpTarget = { x: pTgt.pctX, y: pTgt.pctY };
+      world3d.penguin.yaw = jumpYaw;
       world3d.jumpAnim = {
         from: { x: orig.x, z: orig.z },
         to: { x: destW.x, z: destW.z },
+        yaw: jumpYaw,
+        peakHeight: peakH,
         startTime: performance.now(),
         durationMs: profile.jumpDurationMs
       };
@@ -2901,7 +2989,14 @@
       if (world3d.active && world3d.jumpAnim) {
         const ja = world3d.jumpAnim;
         const t3 = getTerrain3D();
-        world3d.penguin = { x: ja.to.x, y: t3 ? t3.getGroundHeightAt(ja.to.x, ja.to.z) : 0, z: ja.to.z };
+        world3d.penguin = {
+          x: ja.to.x,
+          y: t3 ? t3.getGroundHeightAt(ja.to.x, ja.to.z) : 0,
+          z: ja.to.z,
+          yaw: ja.yaw || (world3d.penguin ? world3d.penguin.yaw : 0.42),
+          isWalking: false,
+          jumpHeight: 0
+        };
         world3d.jumpAnim = null;
         syncDomEntitiesToWorld3d(t3);
       }

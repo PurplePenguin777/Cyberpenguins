@@ -1539,6 +1539,10 @@ a:focus-visible {
   transition: opacity 0.3s ease !important;
 }
 
+.iso-board.has-3d-actor .penguin-actor .penguin-sprite {
+  opacity: 0 !important;
+}
+
 .iso-board.is-3d-inspect .iso-backdrop {
   pointer-events: auto;
   cursor: grab;
@@ -1884,79 +1888,79 @@ a:focus-visible {
   transform-origin: 55px 114px;
 }
 
-/* Ciclo de caminata: Bamboleo corporal (Waddle) + Zancadas alternadas + Balanceo de aletas */
+/* Ciclo de caminata: Bamboleo corporal lento de pingüino real (Waddle) + Pasitos cortos + Equilibrio de aletas */
 .penguin-actor.walking .cp-body {
-  animation: cpBodyWaddle 0.30s ease-in-out infinite alternate;
+  animation: cpBodyWaddle 0.52s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking .cp-leg-left {
-  animation: cpLegStepL 0.30s ease-in-out infinite alternate;
+  animation: cpLegStepL 0.52s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking .cp-leg-right {
-  animation: cpLegStepR 0.30s ease-in-out infinite alternate;
+  animation: cpLegStepR 0.52s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking .cp-arm-front {
-  animation: cpArmSwingFront 0.30s ease-in-out infinite alternate;
+  animation: cpArmSwingFront 0.52s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking .cp-arm-back {
-  animation: cpArmSwingBack 0.30s ease-in-out infinite alternate;
+  animation: cpArmSwingBack 0.52s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking .cp-shadow {
-  animation: cpShadowPulse 0.30s ease-in-out infinite alternate;
+  animation: cpShadowPulse 0.52s ease-in-out infinite alternate;
 }
 
 /* Caminata Lunar: Moon Lope a dos tiempos (el galope elástico de Apolo) */
 .penguin-actor.walking.gravity-moon .cp-body {
-  animation: cpBodyMoonLope 0.52s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
+  animation: cpBodyMoonLope 0.56s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
 }
 
 .penguin-actor.walking.gravity-moon .cp-leg-left {
-  animation: cpLegMoonL 0.52s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
+  animation: cpLegMoonL 0.56s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
 }
 
 .penguin-actor.walking.gravity-moon .cp-leg-right {
-  animation: cpLegMoonR 0.52s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
+  animation: cpLegMoonR 0.56s cubic-bezier(0.25, 0.8, 0.35, 1) infinite alternate;
 }
 
 .penguin-actor.walking.gravity-moon .cp-arm-front {
-  animation: cpArmMoonFront 0.52s ease-in-out infinite alternate;
+  animation: cpArmMoonFront 0.56s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking.gravity-moon .cp-arm-back {
-  animation: cpArmMoonBack 0.52s ease-in-out infinite alternate;
+  animation: cpArmMoonBack 0.56s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking.gravity-moon .cp-shadow {
-  animation: cpShadowMoon 0.52s ease-in-out infinite alternate;
+  animation: cpShadowMoon 0.56s ease-in-out infinite alternate;
 }
 
-/* Caminata Marciana: Paso ágil y dinámico */
+/* Caminata Marciana: Bamboleo pausado y suave de polluelo de pingüino emperador */
 .penguin-actor.walking.gravity-mars .cp-body {
-  animation: cpBodyWaddle 0.26s ease-in-out infinite alternate;
+  animation: cpBodyWaddle 0.48s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking.gravity-mars .cp-leg-left {
-  animation: cpLegStepL 0.26s ease-in-out infinite alternate;
+  animation: cpLegStepL 0.48s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking.gravity-mars .cp-leg-right {
-  animation: cpLegStepR 0.26s ease-in-out infinite alternate;
+  animation: cpLegStepR 0.48s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking.gravity-mars .cp-arm-front {
-  animation: cpArmSwingFront 0.26s ease-in-out infinite alternate;
+  animation: cpArmSwingFront 0.48s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking.gravity-mars .cp-arm-back {
-  animation: cpArmSwingBack 0.26s ease-in-out infinite alternate;
+  animation: cpArmSwingBack 0.48s ease-in-out infinite alternate;
 }
 
 .penguin-actor.walking.gravity-mars .cp-shadow {
-  animation: cpShadowPulse 0.26s ease-in-out infinite alternate;
+  animation: cpShadowPulse 0.48s ease-in-out infinite alternate;
 }
 
 .penguin-actor.gravity-eros .penguin-sprite,
@@ -2054,25 +2058,25 @@ a:focus-visible {
   animation: penguinDescend 0.75s var(--spring-smooth);
 }
 
-/* Bamboleo de pingüino (Waddle) */
+/* Bamboleo lateral suave de pingüino real (Waddle) */
 @keyframes cpBodyWaddle {
   0% {
-    transform: translateY(0px) rotate(-5deg);
+    transform: translateX(-2.6px) translateY(0px) rotate(-8.2deg);
   }
 
   50% {
-    transform: translateY(-5px) rotate(0deg);
+    transform: translateX(0px) translateY(-2.2px) rotate(0deg);
   }
 
   100% {
-    transform: translateY(0px) rotate(5deg);
+    transform: translateX(2.6px) translateY(0px) rotate(8.2deg);
   }
 }
 
-/* Zancadas alternadas de piernas */
+/* Pasitos cortos alternados de patitas de pingüino */
 @keyframes cpLegStepL {
   0% {
-    transform: rotate(-18deg) translateY(-2px);
+    transform: rotate(-9deg) translateY(-2.2px);
   }
 
   50% {
@@ -2080,13 +2084,13 @@ a:focus-visible {
   }
 
   100% {
-    transform: rotate(18deg) translateY(2px);
+    transform: rotate(9deg) translateY(1px);
   }
 }
 
 @keyframes cpLegStepR {
   0% {
-    transform: rotate(18deg) translateY(2px);
+    transform: rotate(9deg) translateY(1px);
   }
 
   50% {
@@ -2094,28 +2098,28 @@ a:focus-visible {
   }
 
   100% {
-    transform: rotate(-18deg) translateY(-2px);
+    transform: rotate(-9deg) translateY(-2.2px);
   }
 }
 
-/* Balanceo de aletas para equilibrar la mochila de soporte vital */
+/* Balanceo suave de aletas para equilibrar el peso lateral */
 @keyframes cpArmSwingFront {
   0% {
-    transform: rotate(-14deg);
+    transform: rotate(-7deg);
   }
 
   100% {
-    transform: rotate(16deg);
+    transform: rotate(9deg);
   }
 }
 
 @keyframes cpArmSwingBack {
   0% {
-    transform: rotate(14deg);
+    transform: rotate(8deg);
   }
 
   100% {
-    transform: rotate(-14deg);
+    transform: rotate(-7deg);
   }
 }
 

@@ -1,9 +1,13 @@
 /**
- * Elemento visual (estética low-poly):
- * - Cyberpenguin low-poly con casco blanco de auriculares laterales, cuello y mochila azul cobalto,
- *   rostro en máscara blanca, ojos grandes expresivos, pico naranja y botas naranjas.
- * - Cuerda umbilical EVA luminosa.
- * - Sello de patita de 4 dedos geométricos (Estilo Pasaporte Diapositiva 3).
+ * Modelo visual realista de Cyberpenguin (CyberPenguin 2.0):
+ * - Polluelo de pingüino emperador (*Aptenodytes forsteri*) anatómico con plumón gris ceniza/plateado,
+ *   capucha negro-azabache suave, máscara facial blanca en mejillas y ojos, pico corto oscuro con base coral
+ *   y cuerpo rechoncho en forma de perita con patitas cortas.
+ * - Traje espacial EVA de la NASA (inspirado en Apollo A7L / EMU): casco de burbuja de policarbonato
+ *   con sobrevisor solar dorado (LEVA) levantado, anillo metálico de desconexión en el cuello,
+ *   módulo de control frontal (DCM) con válvulas umbilicales roja y azul, mochila de soporte vital PLSS
+ *   con antena UHF, mangas anatómicas para aletas y sobrebotas lunares con suela acanalada.
+ * - Cuerda umbilical EVA luminosa y sello de patita palmeada de 3 dedos.
  */
 (function (global) {
   'use strict';
@@ -22,144 +26,221 @@
     const id = uid('cp');
     const flip = direction === 'left' ? 'transform="translate(110,0) scale(-1,1)"' : '';
     return `
-      <svg viewBox="0 0 110 124" width="56" height="63" aria-hidden="true">
+      <svg viewBox="0 0 110 128" width="58" height="67" aria-hidden="true">
         <defs>
           <radialGradient id="${id}-shadow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="rgba(3,6,18,0.62)" />
-            <stop offset="100%" stop-color="rgba(3,6,18,0)" />
+            <stop offset="0%" stop-color="rgba(4,7,20,0.68)" />
+            <stop offset="65%" stop-color="rgba(4,7,20,0.28)" />
+            <stop offset="100%" stop-color="rgba(4,7,20,0)" />
           </radialGradient>
-          <linearGradient id="${id}-suit" x1="0" y1="0" x2="1" y2="0.6">
+          <radialGradient id="${id}-suit-body" cx="42%" cy="35%" r="65%">
             <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="55%" stop-color="#e2e8f0" />
-            <stop offset="100%" stop-color="#94a3b8" />
+            <stop offset="52%" stop-color="#f1f0ec" />
+            <stop offset="82%" stop-color="#d5dce6" />
+            <stop offset="100%" stop-color="#9aa6b8" />
+          </radialGradient>
+          <linearGradient id="${id}-plss" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f8fafc" />
+            <stop offset="55%" stop-color="#cbd5e1" />
+            <stop offset="100%" stop-color="#64748b" />
           </linearGradient>
           <linearGradient id="${id}-cobalt" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#38bdf8" />
-            <stop offset="35%" stop-color="#2563eb" />
-            <stop offset="100%" stop-color="#1e3a8a" />
+            <stop offset="0%" stop-color="#60a5fa" />
+            <stop offset="40%" stop-color="#2563eb" />
+            <stop offset="100%" stop-color="#172554" />
           </linearGradient>
-          <linearGradient id="${id}-visor" x1="0.2" y1="0" x2="0.8" y2="1">
+          <linearGradient id="${id}-alu" x1="0" y1="0" x2="1" y2="0.8">
+            <stop offset="0%" stop-color="#f1f5f9" />
+            <stop offset="48%" stop-color="#94a3b8" />
+            <stop offset="100%" stop-color="#475569" />
+          </linearGradient>
+          <linearGradient id="${id}-gold-visor" x1="0.15" y1="0" x2="0.85" y2="1">
+            <stop offset="0%" stop-color="#fef08a" />
+            <stop offset="35%" stop-color="#eab308" />
+            <stop offset="75%" stop-color="#b45309" />
+            <stop offset="100%" stop-color="#78350f" />
+          </linearGradient>
+          <radialGradient id="${id}-helmet-back" cx="50%" cy="42%" r="58%">
             <stop offset="0%" stop-color="#1e293b" />
-            <stop offset="55%" stop-color="#0f172a" />
-            <stop offset="100%" stop-color="#090f24" />
+            <stop offset="70%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#060a17" />
+          </radialGradient>
+          <radialGradient id="${id}-chick-hood" cx="46%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#272c3a" />
+            <stop offset="55%" stop-color="#151821" />
+            <stop offset="100%" stop-color="#090b10" />
+          </radialGradient>
+          <radialGradient id="${id}-chick-mask" cx="48%" cy="42%" r="60%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="68%" stop-color="#f1f5f9" />
+            <stop offset="100%" stop-color="#cbd5e1" />
+          </radialGradient>
+          <linearGradient id="${id}-chick-down" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e2e8f0" />
+            <stop offset="55%" stop-color="#b6c0ce" />
+            <stop offset="100%" stop-color="#7c8798" />
           </linearGradient>
-          <linearGradient id="${id}-beak" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#ffb347" />
-            <stop offset="60%" stop-color="#ff7b29" />
-            <stop offset="100%" stop-color="#c2410c" />
+          <linearGradient id="${id}-chick-beak" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#333947" />
+            <stop offset="55%" stop-color="#181b24" />
+            <stop offset="100%" stop-color="#0d0f14" />
           </linearGradient>
-          <linearGradient id="${id}-glass" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="rgba(186,230,253,0.42)" />
-            <stop offset="45%" stop-color="rgba(56,189,248,0.08)" />
-            <stop offset="100%" stop-color="rgba(14,165,233,0.22)" />
-          </linearGradient>
+          <radialGradient id="${id}-bubble-glass" cx="38%" cy="28%" r="68%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.45)" />
+            <stop offset="32%" stop-color="rgba(186,230,253,0.14)" />
+            <stop offset="78%" stop-color="rgba(56,189,248,0.06)" />
+            <stop offset="100%" stop-color="rgba(125,211,252,0.28)" />
+          </radialGradient>
         </defs>
         <g ${flip}>
-          <!-- Sombra suave de contacto dinámica -->
+          <!-- Sombra suave de contacto en el suelo -->
           <g class="cp-shadow">
-            <ellipse cx="55" cy="114" rx="26" ry="7.5" fill="url(#${id}-shadow)" />
+            <ellipse cx="55" cy="118" rx="26" ry="7" fill="url(#${id}-shadow)" />
           </g>
 
-          <!-- Pierna y bota izquierda articulada -->
+          <!-- Patita corta izquierda y sobrebota lunar A7L con suela acanalada -->
           <g class="cp-leg cp-leg-left">
-            <polygon points="37,86 52,86 50,104 36,104" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
-            <polygon points="36,94 51,94 50.5,98 36,98" fill="#1e293b" />
-            <polygon points="37,88 45,88 44,103 36,103" fill="#ffffff" opacity="0.45" />
-            <polygon points="35,104 49,104 51,111 33,111 32,107" fill="#ff8b29" stroke="#9a3412" stroke-width="1" stroke-linejoin="round" />
-            <polygon points="35,104 48,104 45,107 34,107" fill="#ffb86b" />
+            <path d="M 38,90 C 37,95 37,101 38,106 L 50,106 C 51,101 51,95 50,90 Z" fill="url(#${id}-suit-body)" stroke="#94a3b8" stroke-width="0.9" />
+            <path d="M 37.5,95 Q 44,97 50.5,95 M 37.5,99.5 Q 44,101.5 50.5,99.5" fill="none" stroke="#94a3b8" stroke-width="1" />
+            <!-- Sobrebota lunar redondeada -->
+            <path d="M 33,109 C 33,104.5 37,103 44,103 C 50,103 53,105 53,109.5 C 53,112.5 50,114 43,114 L 34.5,114 C 33.4,114 33,112 33,109 Z" fill="#e2e8f0" stroke="#64748b" stroke-width="1" />
+            <!-- Puntera azul cobalto NASA y suela acanalada gris oscuro -->
+            <path d="M 41,104.5 C 47.5,104.5 51.8,106.5 52.3,110.5 L 40,110.5 C 39.5,107.5 39.8,105 41,104.5 Z" fill="url(#${id}-cobalt)" />
+            <rect x="33" y="111.2" width="20" height="3.4" rx="1.6" fill="#334155" stroke="#1e293b" stroke-width="0.7" />
+            <path d="M 36,111.5 L 36,114.4 M 39.5,111.5 L 39.5,114.4 M 43,111.5 L 43,114.4 M 46.5,111.5 L 46.5,114.4 M 50,111.5 L 50,114.4" stroke="#0f172a" stroke-width="0.9" />
           </g>
 
-          <!-- Pierna y bota derecha articulada -->
+          <!-- Patita corta derecha y sobrebota lunar A7L con suela acanalada -->
           <g class="cp-leg cp-leg-right">
-            <polygon points="58,86 73,86 74,104 60,104" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
-            <polygon points="59,94 73.5,94 74,98 59.5,98" fill="#1e293b" />
-            <polygon points="59,88 66,88 66,103 60,103" fill="#ffffff" opacity="0.45" />
-            <polygon points="60,104 75,104 78,108 75,112 58,111" fill="#ff8b29" stroke="#9a3412" stroke-width="1" stroke-linejoin="round" />
-            <polygon points="61,104 74,104 75,107 60,107" fill="#ffb86b" />
+            <path d="M 59,90 C 58,95 58,101 59,106 L 71,106 C 72,101 72,95 71,90 Z" fill="url(#${id}-suit-body)" stroke="#94a3b8" stroke-width="0.9" />
+            <path d="M 58.5,95 Q 65,97 71.5,95 M 58.5,99.5 Q 65,101.5 71.5,99.5" fill="none" stroke="#94a3b8" stroke-width="1" />
+            <path d="M 57,109.5 C 57,105 60,103 66.5,103 C 73.5,103 77.5,105 77.5,109.5 C 77.5,112.5 76.2,114 74.5,114 L 59,114 C 57.5,114 57,112 57,109.5 Z" fill="#e2e8f0" stroke="#64748b" stroke-width="1" />
+            <path d="M 64,104.5 C 71,104.5 76,106.5 76.8,110.5 L 63,110.5 C 62.5,107.5 62.8,105 64,104.5 Z" fill="url(#${id}-cobalt)" />
+            <rect x="57" y="111.2" width="20.5" height="3.4" rx="1.6" fill="#334155" stroke="#1e293b" stroke-width="0.7" />
+            <path d="M 60,111.5 L 60,114.4 M 63.5,111.5 L 63.5,114.4 M 67,111.5 L 67,114.4 M 70.5,111.5 L 70.5,114.4 M 74,111.5 L 74,114.4" stroke="#0f172a" stroke-width="0.9" />
           </g>
 
-          <!-- Brazo / Aleta trasera articulada -->
+          <!-- Aleta trasera anatómica dentro de manga EVA curva -->
           <g class="cp-arm cp-arm-back">
-            <polygon points="73,59 86,70 83,84 72,82 70,69" fill="#cbd5e1" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
-            <polygon points="74,80 84,81 85,89 79,92 73,88" fill="#1e293b" stroke="#0f172a" stroke-width="1" />
+            <path d="M 73,58 C 80,61 86,69 87,79 C 88,86 85,92 81,92 C 77,92 73,86 71,77 C 69,69 70,61 73,58 Z" fill="#d5dce6" stroke="#64748b" stroke-width="1" />
+            <path d="M 74,64 Q 80,65 83,70 M 74,73 Q 81,74 86,78" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-linecap="round" />
+            <path d="M 75,81 C 79,81 84,82 86.8,84 C 86.2,89.5 83.5,92 80.5,92 C 77.5,92 75,87.5 75,81 Z" fill="#334155" />
           </g>
 
-          <!-- Cuerpo superior (Torso, Casco y Mochila PLSS con balanceo waddle) -->
+          <!-- Cuerpo rechoncho de bebé pingüino emperador, mochila PLSS y casco de burbuja -->
           <g class="cp-body">
-            <!-- Mochila azul cobalto (PLSS) estilizada tras la espalda -->
-            <polygon points="22,52 38,49 39,87 24,87 20,81" fill="url(#${id}-cobalt)" stroke="#172554" stroke-width="1.1" stroke-linejoin="round" />
-            <polygon points="22,55 30,54 30,83 22,82" fill="#3b82f6" opacity="0.55" />
-            <rect x="24" y="60" width="8" height="4" rx="1" fill="#7ee8fa" />
-            <circle cx="27" cy="77" r="1.8" fill="#fbbf24" />
+            <!-- Antena UHF y mochila de soporte vital PLSS de la NASA detrás del torso -->
+            <line x1="25" y1="50" x2="25" y2="33" stroke="#475569" stroke-width="2" stroke-linecap="round" />
+            <circle cx="25" cy="32.5" r="2.1" fill="#f59e0b" />
+            <rect x="19" y="51" width="21" height="39" rx="6" fill="url(#${id}-plss)" stroke="#475569" stroke-width="1.1" />
+            <rect x="20.5" y="55" width="7" height="31" rx="3" fill="url(#${id}-cobalt)" />
+            <rect x="22" y="61" width="4" height="2.5" rx="0.8" fill="#38bdf8" />
+            <circle cx="24" cy="76" r="1.6" fill="#fbbf24" />
 
-            <!-- Torso blanco facetado del traje EVA -->
-            <polygon points="36,56 74,56 76,87 55,90 34,87" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1.1" stroke-linejoin="round" />
-            <polygon points="36,56 56,56 55,89 34,87" fill="#ffffff" opacity="0.48" />
-            <!-- Parche azul de misión en pecho izquierdo -->
-            <polygon points="62,62 69,62 70,68 65.5,71 61,68" fill="#2563eb" stroke="#93c5fd" stroke-width="0.8" />
-            <!-- Cinturón técnico gris con hebilla -->
-            <polygon points="34,76 76,76 76,81 34,81" fill="#64748b" stroke="#334155" stroke-width="0.9" />
-            <rect x="51" y="75" width="9" height="7" rx="1.2" fill="#cbd5e1" stroke="#334155" stroke-width="0.9" />
-            <rect x="53.5" y="77" width="4" height="3" fill="#38bdf8" />
+            <!-- Torso rechoncho en forma de perita (tejido Beta-cloth con pliegues de presión) -->
+            <path d="M 35,55 C 31,64 30,77 33,87 C 36,94 45,97 55.5,97 C 66,97 75,94 77.5,87 C 80.5,77 79,64 75,55 Z" fill="url(#${id}-suit-body)" stroke="#64748b" stroke-width="1.15" />
+            <!-- Pliegues anulares suaves del traje presurizado -->
+            <path d="M 32.5,71 Q 55.5,75.5 78,71" fill="none" stroke="#94a3b8" stroke-width="0.95" opacity="0.65" />
+            <path d="M 32,81 Q 55.5,85.5 78.5,81" fill="none" stroke="#64748b" stroke-width="1.1" opacity="0.7" />
+            <path d="M 35,89.5 Q 55.5,93.5 76,89.5" fill="none" stroke="#94a3b8" stroke-width="0.9" opacity="0.6" />
 
-            <!-- Collarín grueso azul cobalto brillante -->
-            <polygon points="33,50 77,50 79,57 55,61 31,57" fill="url(#${id}-cobalt)" stroke="#1e3a8a" stroke-width="1.1" stroke-linejoin="round" />
-            <polygon points="35,51 64,51 55,55 34,54" fill="#60a5fa" opacity="0.55" />
+            <!-- Insignia circular azul estilo NASA en el pecho -->
+            <circle cx="67.5" cy="64.5" r="4.5" fill="url(#${id}-cobalt)" stroke="#e2e8f0" stroke-width="0.9" />
+            <path d="M 64.8,65.5 Q 67.5,62 70.2,64.8" fill="none" stroke="#ffffff" stroke-width="0.9" stroke-linecap="round" />
+            <circle cx="66.5" cy="63.3" r="0.6" fill="#ffffff" />
 
-            <!-- Auriculares laterales rectangulares del casco -->
+            <!-- Módulo de control frontal DCM (Display & Controls Module) en el pecho -->
+            <rect x="45.5" y="62" width="16.5" height="12.5" rx="2.6" fill="#e2e8f0" stroke="#64748b" stroke-width="1" />
+            <rect x="47.5" y="64" width="12.5" height="3.2" rx="1" fill="#0f172a" />
+            <rect x="48.5" y="64.8" width="4" height="1.6" rx="0.5" fill="#38bdf8" />
+            <circle cx="56.8" cy="65.6" r="0.9" fill="#f59e0b" />
+            <circle cx="51" cy="70.8" r="2.1" fill="#334155" stroke="#94a3b8" stroke-width="0.6" />
+            <rect x="55" y="69.5" width="4.5" height="2.4" rx="0.6" fill="#475569" />
+
+            <!-- Conectores umbilicales reales de oxígeno/refrigeración (válvulas roja y azul) -->
+            <circle cx="48.5" cy="79.5" r="2.8" fill="#2563eb" stroke="#1e3a8a" stroke-width="0.9" />
+            <circle cx="48.5" cy="79.5" r="1.1" fill="#93c5fd" />
+            <circle cx="62" cy="79.5" r="2.8" fill="#dc2626" stroke="#7f1d1d" stroke-width="0.9" />
+            <circle cx="62" cy="79.5" r="1.1" fill="#fca5a5" />
+
+            <!-- Anillo metálico de desconexión del cuello (Apollo A7L / EMU Neck Ring) -->
+            <ellipse cx="55.5" cy="54.5" rx="23.5" ry="5.5" fill="url(#${id}-cobalt)" stroke="#1e3a8a" stroke-width="1.1" />
+            <ellipse cx="55.5" cy="53.3" rx="22" ry="4.1" fill="none" stroke="url(#${id}-alu)" stroke-width="1.8" />
+            <!-- Seguros de bayoneta metálicos alrededor del anillo -->
+            <rect x="36" y="52.2" width="3.2" height="2.4" rx="0.6" fill="#e2e8f0" stroke="#475569" stroke-width="0.5" />
+            <rect x="46" y="54.5" width="3.4" height="2.4" rx="0.6" fill="#e2e8f0" stroke="#475569" stroke-width="0.5" />
+            <rect x="61" y="54.5" width="3.4" height="2.4" rx="0.6" fill="#e2e8f0" stroke="#475569" stroke-width="0.5" />
+            <rect x="71" y="52.2" width="3.2" height="2.4" rx="0.6" fill="#e2e8f0" stroke="#475569" stroke-width="0.5" />
+
+            <!-- Fondo interior oscuro de la burbuja del casco -->
+            <ellipse cx="55.5" cy="32.5" rx="22.8" ry="22.2" fill="url(#${id}-helmet-back)" stroke="#64748b" stroke-width="1.1" />
+
+            <!-- =================================================================
+                 POLLUELO DE PINGÜINO EMPERADOR (*Aptenodytes forsteri*) EN EL CASCO
+                 ================================================================= -->
+            <!-- Plumón esponjoso gris ceniza/plateado del cuello del polluelo -->
+            <path d="M 38.5,45 C 40,39 46,37 55.5,37 C 65,37 71,39 72.5,45 C 73.5,49.5 66,53 55.5,53 C 45,53 37.5,49.5 38.5,45 Z" fill="url(#${id}-chick-down)" />
+
+            <!-- Cabecita redondeada con capucha negro-azabache aterciopelada -->
+            <path d="M 36.5,33.5 C 36.5,20 44.5,14 55.8,14 C 67,14 74.8,20 74.8,33.5 C 74.8,43.5 67.5,48.5 55.8,48.5 C 44,48.5 36.5,43.5 36.5,33.5 Z" fill="url(#${id}-chick-hood)" />
+
+            <!-- Máscara facial blanca característica del bebé emperador (mejillas infladas y contorno de ojos) -->
+            <path d="M 39.2,34.8 C 38.8,26.8 43.8,22.2 49.8,23.2 C 53.2,23.8 55.2,26.5 56.5,26.5 C 57.8,26.5 59.8,23.8 63.2,23.2 C 69,22.2 73.8,26.8 73.4,34.8 C 73,42.5 66.8,46.8 56.5,46.8 C 45.8,46.8 39.6,42.5 39.2,34.8 Z" fill="url(#${id}-chick-mask)" />
+
+            <!-- Mentón/babero oscuro bajo el pico (rasgo auténtico del polluelo emperador) -->
+            <path d="M 51.5,39.5 C 53.5,37.8 59.5,37.8 61.5,39.5 C 62.5,43 60,46.5 56.5,46.5 C 53,46.5 50.5,43 51.5,39.5 Z" fill="url(#${id}-chick-hood)" />
+            <!-- Sombra suave de plumón en las mejillas -->
+            <path d="M 40.5,38.5 C 43,43.8 48.5,45.8 52.5,45.2" fill="none" stroke="#cbd5e1" stroke-width="1.3" stroke-linecap="round" />
+            <path d="M 72,38.5 C 69.5,43.8 64.5,45.8 60.5,45.2" fill="none" stroke="#cbd5e1" stroke-width="1.3" stroke-linecap="round" />
+
+            <!-- Ojos grandes oscuros y brillantes con iris cálido y doble reflejo especular -->
             <g>
-              <rect x="24" y="25" width="9" height="16" rx="3" fill="#e2e8f0" stroke="#64748b" stroke-width="1" />
-              <rect x="26" y="29" width="2.2" height="8" rx="1" fill="#2563eb" />
-              <rect x="29.5" y="29" width="2" height="8" rx="1" fill="#38bdf8" />
+              <ellipse cx="48.2" cy="32.2" rx="4.3" ry="4.6" fill="#070a12" />
+              <ellipse cx="48.2" cy="32.2" rx="3.4" ry="3.7" fill="none" stroke="#3b2618" stroke-width="0.85" opacity="0.8" />
+              <circle cx="46.8" cy="30.5" r="1.45" fill="#ffffff" />
+              <circle cx="49.7" cy="33.9" r="0.68" fill="#e0f2fe" />
 
-              <rect x="77" y="25" width="9" height="16" rx="3" fill="#cbd5e1" stroke="#64748b" stroke-width="1" />
-              <rect x="78.5" y="29" width="2" height="8" rx="1" fill="#38bdf8" />
-              <rect x="81.8" y="29" width="2.2" height="8" rx="1" fill="#2563eb" />
+              <ellipse cx="64.6" cy="32.2" rx="4.1" ry="4.4" fill="#070a12" />
+              <ellipse cx="64.6" cy="32.2" rx="3.2" ry="3.5" fill="none" stroke="#3b2618" stroke-width="0.85" opacity="0.8" />
+              <circle cx="63.3" cy="30.5" r="1.38" fill="#ffffff" />
+              <circle cx="66.0" cy="33.9" r="0.62" fill="#e0f2fe" />
             </g>
 
-            <!-- Carcasa exterior blanca facetada del casco -->
-            <path d="M 30,32 C 30,14 42,7 55,7 C 68,7 80,14 80,32 C 80,45 72,53 55,53 C 38,53 30,45 30,32 Z" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1.2" />
-            <path d="M 33,27 C 35,13 46,9 58,10 C 48,14 39,20 35,30 Z" fill="#ffffff" opacity="0.85" />
+            <!-- Pico corto y cónico de polluelo emperador (gris pizarra oscuro con base coral suave) -->
+            <path d="M 52.2,35.8 C 52.5,33.6 55.8,32.8 58.8,33.6 C 61.8,34.4 63.8,36.2 63.6,37.8 C 63.3,39.5 60.2,40.8 56.8,40.8 C 53.8,40.8 52.0,38.2 52.2,35.8 Z" fill="url(#${id}-chick-beak)" stroke="#0f172a" stroke-width="0.7" />
+            <!-- Matiz rosado/coral en la base de la mandíbula inferior del polluelo -->
+            <path d="M 53.3,38.0 C 55.5,39.4 59.8,39.4 62.2,38.0 C 60.8,40.1 55.2,40.2 53.3,38.0 Z" fill="#e07a5f" opacity="0.85" />
+            <path d="M 53.6,35.3 Q 57.5,34.1 61.5,36.2" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.9" stroke-linecap="round" />
 
-            <!-- Visor oscuro interior -->
-            <rect x="35" y="15" width="40" height="32" rx="14" fill="url(#${id}-visor)" stroke="#94a3b8" stroke-width="1.4" />
+            <!-- Cúpula cristalina del casco de burbuja con reflejos curvos -->
+            <ellipse cx="55.5" cy="32.5" rx="22.8" ry="22.2" fill="url(#${id}-bubble-glass)" stroke="#bae6fd" stroke-width="1.1" stroke-opacity="0.75" />
+            <path d="M 38.5,24 C 41.5,16.5 48.5,12.8 57,13.2" fill="none" stroke="rgba(255,255,255,0.72)" stroke-width="2.1" stroke-linecap="round" />
+            <path d="M 71.5,39 C 69.5,45 64.5,49 58.5,50.2" fill="none" stroke="rgba(186,230,253,0.42)" stroke-width="1.3" stroke-linecap="round" />
 
-            <!-- Cabeza azul marino oscuro del pingüino dentro del casco -->
-            <path d="M 38,32 C 38,20 45,16 55,16 C 65,16 72,20 72,32 C 72,41 65,45 55,45 C 45,45 38,41 38,32 Z" fill="#172b59" />
+            <!-- Sobrevisor solar dorado (NASA LEVA Gold Sun Visor) y carcasa protectora blanca levantados en la frente -->
+            <path d="M 32.8,26.5 C 33.8,13.5 43.5,6.8 55.5,6.8 C 67.5,6.8 77.2,13.5 78.2,26.5 C 71.5,20.2 63.8,17.5 55.5,17.5 C 47.2,17.5 39.5,20.2 32.8,26.5 Z" fill="url(#${id}-gold-visor)" stroke="#92400e" stroke-width="0.9" />
+            <path d="M 32.2,23.5 C 33.8,11.2 43.2,4.8 55.5,4.8 C 67.8,4.8 77.2,11.2 78.8,23.5 C 72.2,16.2 64.2,13.2 55.5,13.2 C 46.8,13.2 38.8,16.2 32.2,23.5 Z" fill="url(#${id}-suit-body)" stroke="#64748b" stroke-width="1.1" />
+            <path d="M 43,12.5 Q 55.5,9.8 68,12.5" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" />
 
-            <!-- Máscara facial blanca en forma de corazón -->
-            <path d="M 40,32 C 40,24 46,21 52,24 C 54,25.5 55,27 56,27 C 57,27 58,25.5 60,24 C 66,21 71,25 71,32 C 71,40 64,44 55,44 C 46,44 40,40 40,32 Z" fill="#f8fafc" />
-            <path d="M 41,37 Q 55,45 70,37 Q 63,44 55,44 Q 47,44 41,37 Z" fill="#e2e8f0" />
-
-            <!-- Grandes ojos expresivos -->
-            <circle cx="48" cy="31.5" r="4.4" fill="#090f24" />
-            <circle cx="48" cy="31.5" r="3.3" fill="#162954" />
-            <circle cx="48" cy="31.8" r="2.2" fill="#060914" />
-            <circle cx="46.6" cy="30.0" r="1.4" fill="#ffffff" />
-            <circle cx="49.5" cy="33.2" r="0.65" fill="#7ee8fa" />
-
-            <circle cx="64.5" cy="31.5" r="4.2" fill="#090f24" />
-            <circle cx="64.5" cy="31.5" r="3.1" fill="#162954" />
-            <circle cx="64.5" cy="31.8" r="2.1" fill="#060914" />
-            <circle cx="63.1" cy="30.0" r="1.3" fill="#ffffff" />
-            <circle cx="65.9" cy="33.2" r="0.6" fill="#7ee8fa" />
-
-            <!-- Pico triangular facetado naranja -->
-            <polygon points="52,35.5 58,34 65,37.5 57.5,41 52,38.5" fill="url(#${id}-beak)" stroke="#9a3412" stroke-width="0.7" stroke-linejoin="round" />
-            <polygon points="52.5,35.6 58,34.4 63.5,37.2 57.5,37.8" fill="#ffb86b" opacity="0.75" />
-
-            <!-- Cúpula cristalina del visor con brillo diagonal -->
-            <rect x="35" y="15" width="40" height="32" rx="14" fill="url(#${id}-glass)" stroke="#bae6fd" stroke-width="1.3" />
-            <path d="M 41,19 Q 51,16 61,19" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round" />
+            <!-- Pivotes laterales metálicos del visor LEVA y lámparas EVA compactas -->
+            <g>
+              <rect x="28.5" y="27" width="5.8" height="10.5" rx="2.6" fill="url(#${id}-alu)" stroke="#475569" stroke-width="0.9" />
+              <circle cx="31.4" cy="32.2" r="1.6" fill="#38bdf8" />
+              <rect x="76.7" y="27" width="5.8" height="10.5" rx="2.6" fill="url(#${id}-alu)" stroke="#475569" stroke-width="0.9" />
+              <circle cx="79.6" cy="32.2" r="1.6" fill="#38bdf8" />
+            </g>
           </g>
 
-          <!-- Brazo / Aleta delantera articulada -->
+          <!-- Aleta delantera anatómica dentro de manga EVA curva con pliegues de hombro -->
           <g class="cp-arm cp-arm-front">
-            <polygon points="36,59 24,71 27,84 38,81 39,68" fill="url(#${id}-suit)" stroke="#64748b" stroke-width="1" stroke-linejoin="round" />
-            <polygon points="28,67 34,64 35,70 29,72" fill="#2563eb" />
-            <!-- Guante azul marino oscuro -->
-            <polygon points="26,81 37,80 39,88 33,92 26,88" fill="#1e293b" stroke="#0f172a" stroke-width="1" />
+            <path d="M 37,58 C 30,61 24.5,69.5 23.8,79.5 C 23.2,86.5 26,92 30,92 C 34,92 38,85.5 39.5,76.5 C 41,68.5 40,60.5 37,58 Z" fill="url(#${id}-suit-body)" stroke="#64748b" stroke-width="1.05" />
+            <!-- Pliegues del hombro y franja azul de misión -->
+            <path d="M 30.5,63.5 Q 35.5,65 39.2,63.2 M 28.5,67.5 Q 34.5,69 39.2,67" fill="none" stroke="#94a3b8" stroke-width="0.9" />
+            <path d="M 25.2,74.5 Q 31.8,76.5 38.2,74.2" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" />
+            <!-- Punta térmica gris oscuro de la aleta EVA -->
+            <path d="M 24,81.5 C 27.5,82.5 32.5,82.5 36.5,81 C 34.8,87.8 32.2,92 29.5,92 C 26,92 23.5,87.5 24,81.5 Z" fill="#334155" stroke="#1e293b" stroke-width="0.8" />
           </g>
+        </g>
       </svg>
     `;
   }

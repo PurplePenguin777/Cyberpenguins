@@ -8,6 +8,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb';
+
 const SITE_CONFIGS = {
   'ares-vallis': {
     modelUrl: 'assets/models/ares-vallis-terrain.glb',
@@ -15,12 +17,15 @@ const SITE_CONFIGS = {
     titleEn: 'Ares Vallis · 19.09°N, 33.25°W · ESA/NASA Mars Express HRSC DTM (H3147_0000_DA4)',
     hintEs: 'Arrastra para orbitar · Rueda/pellizco para zoom · Clic derecho para desplazar',
     hintEn: 'Drag to orbit · Scroll/pinch to zoom · Right-drag to pan',
-    exploreCamPos: [-1.5, 2.55, 11.5],
-    exploreCamTarget: [1.5, 0.45, -12.0],
+    exploreFov: 37,
+    inspectFov: 44,
+    exploreCamPos: [-1.15, 1.96, 10.6],
+    exploreCamTarget: [1.35, 0.72, -12.0],
     inspectCamPos: [21.0, 18.0, 28.5],
     inspectCamTarget: [2.5, -0.8, 4.0],
     landerPos: [0, 0.08, 0],
-    walkBounds: { minZ: -9.5, maxZ: 6.8, maxRadius: 22.0 }
+    penguinScale: 0.82,
+    walkBounds: { minZ: -8.8, maxZ: 6.4, maxRadius: 21.0 }
   }
 };
 
@@ -202,9 +207,36 @@ function createPhobosMesh() {
     fog: false
   });
   const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(17.5, 11.5, -50.0);
+  mesh.position.set(17.2, 9.8, -50.0);
   mesh.scale.setScalar(0.95);
   mesh.rotation.set(0.3, 0.6, -0.25);
+  return mesh;
+}
+
+function createPenguinContactShadow() {
+  const size = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    const grad = ctx.createRadialGradient(size * 0.5, size * 0.5, 2, size * 0.5, size * 0.5, size * 0.48);
+    grad.addColorStop(0, 'rgba(18, 8, 4, 0.58)');
+    grad.addColorStop(0.55, 'rgba(24, 10, 5, 0.26)');
+    grad.addColorStop(1, 'rgba(24, 10, 5, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  const geo = new THREE.PlaneGeometry(0.68, 0.58);
+  geo.rotateX(-Math.PI / 2);
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex,
+    transparent: true,
+    depthWrite: false
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = 1;
   return mesh;
 }
 
@@ -271,6 +303,20 @@ class Terrain3DController {
     this.boundWindowResize = null;
     this.loader = new GLTFLoader();
     this.modelCache = new Map();
+    this.penguinModelPromise = null;
+    this.penguinActor = null;
+    this.penguinState = {
+      x: -2.2,
+      y: 0,
+      z: 1.0,
+      targetYaw: 0.38,
+      currentYaw: 0.38,
+      isWalking: false,
+      walkBlend: 0,
+      walkPhase: 0,
+      lastAnimTime: 0,
+      jumpHeight: 0
+    };
     this.regolithTextures = null;
 
     this.activeSiteId = null;
@@ -284,6 +330,8 @@ class Terrain3DController {
 
     this.targetParallax = { x: 0, y: 0 };
     this.currentParallax = { x: 0, y: 0 };
+    this.targetFocus = { x: 0, z: 0 };
+    this.currentFocus = { x: 0, z: 0 };
 
     this.camTransition = null;
     this.baseExplorePos = new THREE.Vector3();
@@ -369,11 +417,15 @@ class Terrain3DController {
         sunLight.position.copy(sunDir).multiplyScalar(80);
         scene.add(sunLight);
 
-        const fillAmb = new THREE.AmbientLight(0x8c5540, 0.24);
+        const frontFill = new THREE.DirectionalLight(0xfff1e0, 0.85);
+        frontFill.position.set(16, 22, 42);
+        scene.add(frontFill);
+
+        const fillAmb = new THREE.AmbientLight(0x8c5540, 0.26);
         scene.add(fillAmb);
 
-        const camera = new THREE.PerspectiveCamera(44, 1000 / 594, 0.25, 320);
-        const baseCamera = new THREE.PerspectiveCamera(44, 1000 / 594, 0.25, 320);
+        const camera = new THREE.PerspectiveCamera(37, 1000 / 594, 0.25, 320);
+        const baseCamera = new THREE.PerspectiveCamera(37, 1000 / 594, 0.25, 320);
 
         const controls = new OrbitControls(camera, canvas);
         controls.enableDamping = true;
@@ -512,6 +564,191 @@ class Terrain3DController {
     return promise;
   }
 
+  loadPenguinActorModel() {
+    if (this.penguinModelPromise) {
+      return this.penguinModelPromise;
+    }
+    this.penguinModelPromise = new Promise((resolve, reject) => {
+      this.loader.load(
+        PENGUIN_MODEL_URL,
+        (gltf) => {
+          const modelRoot = gltf.scene || new THREE.Group();
+          modelRoot.traverse((obj) => {
+            if (!obj.isMesh) return;
+            const matName = (obj.material && obj.material.name) || '';
+            const hasCol = Boolean(obj.geometry && obj.geometry.attributes && obj.geometry.attributes.color);
+            if (matName === 'HelmetPolycarbonateDome' || obj.name.includes('HelmetGlass')) {
+              obj.material = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color('#dff4ff'),
+                transparent: true,
+                opacity: 0.24,
+                roughness: 0.05,
+                metalness: 0.04,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.04,
+                depthWrite: false
+              });
+              obj.renderOrder = 3;
+            } else if (matName === 'PenguinEyesAndGoldVisor') {
+              obj.material = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                vertexColors: hasCol,
+                roughness: 0.13,
+                metalness: 0.45,
+                side: THREE.DoubleSide
+              });
+            } else {
+              obj.material = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                vertexColors: hasCol,
+                roughness: 0.66,
+                metalness: 0.07
+              });
+            }
+          });
+          resolve(modelRoot);
+        },
+        undefined,
+        (err) => {
+          this.penguinModelPromise = null;
+          reject(err);
+        }
+      );
+    });
+    return this.penguinModelPromise;
+  }
+
+  createPenguinInstance(templateRoot, scale = 0.82) {
+    const root = templateRoot.clone(true);
+    const rigRoot = root.getObjectByName('PenguinRoot') || root;
+    rigRoot.scale.setScalar(scale);
+
+    const shadow = createPenguinContactShadow();
+    shadow.scale.setScalar(scale * 1.15);
+
+    const group = new THREE.Group();
+    group.name = 'CyberpenguinActorGroup';
+    group.add(shadow);
+    group.add(root);
+
+    return {
+      group,
+      rigRoot,
+      shadow,
+      torso: root.getObjectByName('Torso'),
+      head: root.getObjectByName('Head'),
+      helmetGlass: root.getObjectByName('HelmetGlass'),
+      flipperL: root.getObjectByName('FlipperL'),
+      flipperR: root.getObjectByName('FlipperR'),
+      footL: root.getObjectByName('FootL'),
+      footR: root.getObjectByName('FootR'),
+      scale
+    };
+  }
+
+  hasPenguinActor() {
+    return Boolean(this.penguinActor && this.penguinActor.group);
+  }
+
+  setPenguinPose(pose = {}) {
+    const st = this.penguinState;
+    if (typeof pose.x === 'number') st.x = pose.x;
+    if (typeof pose.y === 'number') st.y = pose.y;
+    if (typeof pose.z === 'number') st.z = pose.z;
+    if (typeof pose.yaw === 'number') st.targetYaw = pose.yaw;
+    if (typeof pose.isWalking === 'boolean') st.isWalking = pose.isWalking;
+    if (typeof pose.jumpHeight === 'number') st.jumpHeight = pose.jumpHeight;
+
+    // Seguimiento suave de cámara acorde al desplazamiento de Cyberpenguin por el valle
+    this.targetFocus.x = clampVal((st.x - (-2.0)) * 0.16, -1.1, 1.45);
+    this.targetFocus.z = clampVal((st.z - 1.2) * 0.12, -0.95, 0.75);
+  }
+
+  animatePenguinActor(now) {
+    if (!this.penguinActor) return;
+    const actor = this.penguinActor;
+    const st = this.penguinState;
+    const dt = st.lastAnimTime > 0 ? Math.min(0.08, Math.max(0.001, (now - st.lastAnimTime) * 0.001)) : 0.016;
+    st.lastAnimTime = now;
+
+    // Giro suave en 360 grados por el arco angular más corto
+    let yawDiff = st.targetYaw - st.currentYaw;
+    while (yawDiff > Math.PI) yawDiff -= Math.PI * 2;
+    while (yawDiff < -Math.PI) yawDiff += Math.PI * 2;
+    st.currentYaw += yawDiff * Math.min(1, dt * 8.5);
+
+    // Transición suave entre reposo y bamboleo lento de pingüino emperador bebé
+    const targetBlend = st.isWalking ? 1 : 0;
+    st.walkBlend += (targetBlend - st.walkBlend) * Math.min(1, dt * 7.5);
+    const wb = st.walkBlend;
+
+    // Cadencia pausada de polluelo de pingüino emperador (~1.58 ciclos/s)
+    if (wb > 0.01) {
+      st.walkPhase += dt * 9.9;
+    }
+    const p = st.walkPhase;
+    const sinP = Math.sin(p);
+    const cosP = Math.cos(p);
+
+    const jh = Math.max(0, st.jumpHeight || 0);
+    actor.rigRoot.position.set(st.x, st.y + jh, st.z);
+    actor.rigRoot.rotation.set(0, st.currentYaw, 0);
+
+    if (actor.shadow) {
+      actor.shadow.position.set(st.x, st.y + 0.016, st.z);
+      const sScale = actor.scale * 1.15 * Math.max(0.45, 1 - jh * 0.42);
+      actor.shadow.scale.set(sScale, 1, sScale);
+      if (actor.shadow.material) {
+        actor.shadow.material.opacity = Math.max(0.22, 1 - jh * 0.55);
+      }
+    }
+
+    const breath = Math.sin(now * 0.0023) * 0.004;
+    if (actor.torso) {
+      // Bamboleo lateral auténtico (péndulo invertido: inclinación lateral + desplazamiento de cadera + torsión suave)
+      actor.torso.rotation.z = sinP * 0.165 * wb;
+      actor.torso.rotation.y = cosP * 0.085 * wb;
+      actor.torso.rotation.x = 0.065 * wb - Math.min(0.18, jh * 0.16);
+      actor.torso.position.x = -sinP * 0.032 * wb;
+      actor.torso.position.y = 0.20 + Math.abs(sinP) * 0.020 * wb + breath;
+    }
+
+    if (actor.head) {
+      // Los pingüinos estabilizan la cabeza compensando parte del balanceo lateral del tronco
+      const idleLookY = Math.sin(now * 0.0011) * 0.075 * (1 - wb);
+      const idleTiltZ = Math.cos(now * 0.0015) * 0.025 * (1 - wb);
+      actor.head.rotation.z = -sinP * 0.095 * wb + idleTiltZ;
+      actor.head.rotation.y = -cosP * 0.04 * wb + idleLookY;
+      actor.head.rotation.x = -0.03 * wb;
+      if (actor.helmetGlass) {
+        actor.helmetGlass.rotation.copy(actor.head.rotation);
+      }
+    }
+
+    const jumpFlap = Math.min(0.55, jh * 0.65);
+    if (actor.flipperL) {
+      // Aletas ligeramente abiertas para equilibrar el centro de masa al caminar
+      actor.flipperL.rotation.z = 0.12 + 0.13 * wb + Math.max(0, sinP) * 0.085 * wb + jumpFlap;
+      actor.flipperL.rotation.x = -sinP * 0.15 * wb;
+    }
+    if (actor.flipperR) {
+      actor.flipperR.rotation.z = -(0.12 + 0.13 * wb + Math.max(0, -sinP) * 0.085 * wb + jumpFlap);
+      actor.flipperR.rotation.x = sinP * 0.15 * wb;
+    }
+
+    if (actor.footL) {
+      // Pasitos cortos alternados de patitas palmeadas
+      actor.footL.rotation.x = -sinP * 0.26 * wb + (jh > 0.02 ? 0.25 : 0);
+      actor.footL.position.y = 0.18 + Math.max(0, sinP) * 0.034 * wb;
+      actor.footL.position.z = 0.01 + sinP * 0.032 * wb;
+    }
+    if (actor.footR) {
+      actor.footR.rotation.x = sinP * 0.26 * wb + (jh > 0.02 ? -0.18 : 0);
+      actor.footR.position.y = 0.18 + Math.max(0, -sinP) * 0.034 * wb;
+      actor.footR.position.z = 0.01 - sinP * 0.032 * wb;
+    }
+  }
+
   getGroundHeightAt(wx, wz) {
     if (!this.terrainMeshes.length) return 0;
     this.rayOrigin.set(wx, 50, wz);
@@ -627,6 +864,12 @@ class Terrain3DController {
     this.camTransition = null;
     this.targetParallax = { x: 0, y: 0 };
     this.currentParallax = { x: 0, y: 0 };
+    this.targetFocus = { x: 0, z: 0 };
+    this.currentFocus = { x: 0, z: 0 };
+
+    const exploreFov = cfg.exploreFov || 37;
+    this.camera.fov = exploreFov;
+    this.camera.updateProjectionMatrix();
 
     this.baseExplorePos.set(...cfg.exploreCamPos);
     this.baseExploreTarget.set(...cfg.exploreCamTarget);
@@ -640,7 +883,10 @@ class Terrain3DController {
     this.updateBaseExploreCamera();
 
     try {
-      const modelRoot = await this.loadSiteModel(siteId);
+      const [modelRoot, penguinTemplate] = await Promise.all([
+        this.loadSiteModel(siteId),
+        this.loadPenguinActorModel().catch(() => null)
+      ]);
       if (token !== this.mountToken || this.activeSiteId !== siteId) {
         return false;
       }
@@ -659,6 +905,14 @@ class Terrain3DController {
 
       this.marker = createLandingMarker(cfg.landerPos || [0, 0.08, 0]);
       wrapper.add(this.marker.group);
+
+      if (penguinTemplate) {
+        this.penguinActor = this.createPenguinInstance(penguinTemplate, cfg.penguinScale || 0.82);
+        wrapper.add(this.penguinActor.group);
+        this.animatePenguinActor(performance.now());
+      } else {
+        this.penguinActor = null;
+      }
 
       this.scene.add(wrapper);
       wrapper.updateMatrixWorld(true);
@@ -692,6 +946,7 @@ class Terrain3DController {
     this.mountToken += 1;
     this.activeSiteId = null;
     this.terrainMeshes = [];
+    this.penguinActor = null;
     this.inspectMode = false;
     this.camTransition = null;
     this.stopLoop();
@@ -827,20 +1082,24 @@ class Terrain3DController {
         this.marker.outer.scale.set(pulse, pulse, 1);
       }
     } else {
-      this.currentParallax.x += (this.targetParallax.x - this.currentParallax.x) * 0.08;
-      this.currentParallax.y += (this.targetParallax.y - this.currentParallax.y) * 0.08;
+      this.currentParallax.x += (this.targetParallax.x - this.currentParallax.x) * 0.065;
+      this.currentParallax.y += (this.targetParallax.y - this.currentParallax.y) * 0.065;
+      this.currentFocus.x += (this.targetFocus.x - this.currentFocus.x) * 0.045;
+      this.currentFocus.z += (this.targetFocus.z - this.currentFocus.z) * 0.045;
       const px = this.currentParallax.x;
       const py = this.currentParallax.y;
+      const fx = this.currentFocus.x;
+      const fz = this.currentFocus.z;
 
       this.camera.position.set(
-        this.baseExplorePos.x + px * 0.72,
-        this.baseExplorePos.y - py * 0.16,
-        this.baseExplorePos.z + py * 0.22
+        this.baseExplorePos.x + fx + px * 0.58,
+        this.baseExplorePos.y - py * 0.13,
+        this.baseExplorePos.z + fz * 0.65 + py * 0.18
       );
       this.controls.target.set(
-        this.baseExploreTarget.x + px * 1.1,
-        this.baseExploreTarget.y - py * 0.35,
-        this.baseExploreTarget.z
+        this.baseExploreTarget.x + fx * 1.15 + px * 0.92,
+        this.baseExploreTarget.y - py * 0.28,
+        this.baseExploreTarget.z + fz * 0.5
       );
       this.camera.lookAt(this.controls.target);
     }
@@ -856,6 +1115,7 @@ class Terrain3DController {
         console.error('[Terrain3D] frame callback error:', err);
       }
     }
+    this.animatePenguinActor(now);
 
     this.renderer.render(this.scene, this.camera);
   }
