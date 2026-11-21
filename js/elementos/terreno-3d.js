@@ -7,12 +7,13 @@
 import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
+import { MeshoptDecoder } from '../vendor/three/libs/meshopt_decoder.module.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121u';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121u';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121u';
-const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121u';
-const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121u';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121v';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121v';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121v';
+const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121v';
+const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121v';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -312,9 +313,13 @@ class Terrain3DController {
     this.resizeObserver = null;
     this.boundWindowResize = null;
     this.loader = new GLTFLoader();
+    if (MeshoptDecoder && typeof this.loader.setMeshoptDecoder === 'function') {
+      this.loader.setMeshoptDecoder(MeshoptDecoder);
+    }
     this.modelCache = new Map();
     this.machineModelCache = new Map();
     this.shipModelCache = new Map();
+    this.terrainHeightGrid = null;
     this.penguinModelPromise = null;
     this.penguinActor = null;
     this.machineActor = null;
@@ -428,7 +433,7 @@ class Terrain3DController {
           powerPreference: 'high-performance',
           alpha: false
         });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.05;
@@ -648,7 +653,7 @@ class Terrain3DController {
                   )
                   .replace(
                     '#include <begin_vertex>',
-                    'vTerrainXZ = position.xz;\n#include <begin_vertex>'
+                    'vTerrainXZ = (modelMatrix * vec4(position, 1.0)).xz;\n#include <begin_vertex>'
                   );
                 shader.fragmentShader = shader.fragmentShader
                   .replace(
@@ -668,7 +673,9 @@ class Terrain3DController {
               }
             }
           });
+          root.updateMatrixWorld(true);
           root.userData.terrainMeshes = meshes;
+          root.userData.heightGrid = this.buildTerrainHeightGrid(meshes);
           resolve(root);
         },
         undefined,
@@ -1140,7 +1147,73 @@ class Terrain3DController {
     }
   }
 
+  buildTerrainHeightGrid(meshes) {
+    if (!meshes || !meshes.length) return null;
+    const primary = meshes[0];
+    const pos = primary && primary.geometry && primary.geometry.attributes && primary.geometry.attributes.position;
+    if (!pos || pos.count < 100) return null;
+
+    const side = Math.round(Math.sqrt(pos.count));
+    if (Math.abs(side * side - pos.count) > side * 0.15) return null;
+
+    const matWorld = primary.matrixWorld;
+    const vTmp = new THREE.Vector3();
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minZ = Infinity;
+    let maxZ = -Infinity;
+    for (let i = 0; i < pos.count; i += 1) {
+      vTmp.fromBufferAttribute(pos, i).applyMatrix4(matWorld);
+      if (vTmp.x < minX) minX = vTmp.x;
+      if (vTmp.x > maxX) maxX = vTmp.x;
+      if (vTmp.z < minZ) minZ = vTmp.z;
+      if (vTmp.z > maxZ) maxZ = vTmp.z;
+    }
+    const spanX = maxX - minX;
+    const spanZ = maxZ - minZ;
+    if (spanX < 1e-3 || spanZ < 1e-3) return null;
+
+    const cols = side;
+    const rows = side;
+    const data = new Float32Array(cols * rows);
+    const counts = new Uint8Array(cols * rows);
+    for (let i = 0; i < pos.count; i += 1) {
+      vTmp.fromBufferAttribute(pos, i).applyMatrix4(matWorld);
+      const ix = clampVal(Math.round(((vTmp.x - minX) / spanX) * (cols - 1)), 0, cols - 1);
+      const iz = clampVal(Math.round(((vTmp.z - minZ) / spanZ) * (rows - 1)), 0, rows - 1);
+      const idx = iz * cols + ix;
+      data[idx] += vTmp.y;
+      counts[idx] += 1;
+    }
+    for (let i = 0; i < data.length; i += 1) {
+      if (counts[i] > 1) {
+        data[i] /= counts[i];
+      }
+    }
+    return { cols, rows, minX, maxX, minZ, maxZ, spanX, spanZ, data };
+  }
+
   getGroundHeightAt(wx, wz) {
+    const hg = this.terrainHeightGrid;
+    if (hg) {
+      const fx = ((wx - hg.minX) / hg.spanX) * (hg.cols - 1);
+      const fz = ((wz - hg.minZ) / hg.spanZ) * (hg.rows - 1);
+      if (fx >= 0 && fx <= hg.cols - 1 && fz >= 0 && fz <= hg.rows - 1) {
+        const x0 = Math.floor(fx);
+        const z0 = Math.floor(fz);
+        const x1 = Math.min(hg.cols - 1, x0 + 1);
+        const z1 = Math.min(hg.rows - 1, z0 + 1);
+        const tx = fx - x0;
+        const tz = fz - z0;
+        const h00 = hg.data[z0 * hg.cols + x0];
+        const h10 = hg.data[z0 * hg.cols + x1];
+        const h01 = hg.data[z1 * hg.cols + x0];
+        const h11 = hg.data[z1 * hg.cols + x1];
+        const h0 = h00 + (h10 - h00) * tx;
+        const h1 = h01 + (h11 - h01) * tx;
+        return h0 + (h1 - h0) * tz;
+      }
+    }
     if (!this.terrainMeshes.length) return 0;
     this.rayOrigin.set(wx, 50, wz);
     this.raycaster.set(this.rayOrigin, this.downDir);
@@ -1295,6 +1368,7 @@ class Terrain3DController {
       this.terrainMeshes = Array.isArray(modelRoot.userData.terrainMeshes)
         ? modelRoot.userData.terrainMeshes
         : [];
+      this.terrainHeightGrid = modelRoot.userData.heightGrid || null;
 
       this.marker = createLandingMarker(cfg.landerPos || [0, 0.08, 0]);
       wrapper.add(this.marker.group);
@@ -1359,6 +1433,7 @@ class Terrain3DController {
     this.mountToken += 1;
     this.activeSiteId = null;
     this.terrainMeshes = [];
+    this.terrainHeightGrid = null;
     this.penguinActor = null;
     this.machineActor = null;
     this.shipActor = null;

@@ -1742,6 +1742,10 @@
     world3d.penguin = null;
     world3d.walkAnim = null;
     world3d.jumpAnim = null;
+    world3d.domEntityNodes = null;
+    world3d.lastCamSig = '';
+    world3d.lastPenguinSig = '';
+    world3d.forceDomSync = true;
     const t3d = getTerrain3D();
     if (t3d && typeof t3d.setOnFrameCallback === 'function') {
       t3d.setOnFrameCallback(null);
@@ -1899,8 +1903,20 @@
       });
     }
 
-    if (dom.stageEntitiesLayer) {
-      dom.stageEntitiesLayer.querySelectorAll('.stage-entity').forEach((el) => {
+    const cam = t3d.camera;
+    const camSig = cam
+      ? `${cam.position.x.toFixed(3)},${cam.position.y.toFixed(3)},${cam.position.z.toFixed(3)},${cam.quaternion.x.toFixed(4)},${cam.quaternion.y.toFixed(4)},${cam.quaternion.z.toFixed(4)}`
+      : '';
+    const camChanged = world3d.forceDomSync || camSig !== world3d.lastCamSig;
+    if (camChanged) {
+      world3d.lastCamSig = camSig;
+    }
+
+    if (dom.stageEntitiesLayer && camChanged) {
+      if (!world3d.domEntityNodes) {
+        world3d.domEntityNodes = Array.from(dom.stageEntitiesLayer.querySelectorAll('.stage-entity'));
+      }
+      world3d.domEntityNodes.forEach((el) => {
         const kind = el.dataset.entityKind;
         const id = el.dataset.entityId;
         let anchor = null;
@@ -1913,7 +1929,7 @@
         el.style.visibility = proj.visible ? '' : 'hidden';
         el.style.left = `${proj.pctX.toFixed(2)}%`;
         el.style.top = `${proj.pctY.toFixed(2)}%`;
-        el.style.transform = `translate(-50%, -72%) scale(${scale.toFixed(3)})`;
+        el.style.transform = `translate3d(-50%, -72%, 0) scale(${scale.toFixed(3)})`;
         el.style.zIndex = String(Math.max(18, Math.min(89, Math.round(92 - proj.dist * 2.2))));
       });
     }
@@ -1923,19 +1939,24 @@
         t3d.setPenguinPose(world3d.penguin);
       }
       const jh = world3d.penguin.jumpHeight || 0;
-      const pProj = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y + jh, world3d.penguin.z);
-      const pScale = Math.max(0.48, Math.min(1.45, world3d.penguinRefDist / Math.max(2.5, pProj.dist)));
-      dom.penguinActor.style.visibility = pProj.visible ? '' : 'hidden';
-      dom.penguinActor.style.left = `${pProj.pctX.toFixed(2)}%`;
-      dom.penguinActor.style.top = `${pProj.pctY.toFixed(2)}%`;
-      dom.penguinActor.style.transform = `translate(-50%, -80%) scale(${pScale.toFixed(3)})`;
-      dom.penguinActor.style.zIndex = String(Math.max(18, Math.min(90, Math.round(92 - pProj.dist * 2.2))));
-      penguinPos.x = Number(pProj.pctX.toFixed(2));
-      penguinPos.y = Number(pProj.pctY.toFixed(2));
-      if (FX && typeof FX.setPenguinTarget === 'function') {
-        FX.setPenguinTarget(penguinPos);
+      const pSig = `${world3d.penguin.x.toFixed(3)},${world3d.penguin.y.toFixed(3)},${world3d.penguin.z.toFixed(3)},${jh.toFixed(3)}`;
+      if (camChanged || pSig !== world3d.lastPenguinSig) {
+        world3d.lastPenguinSig = pSig;
+        const pProj = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y + jh, world3d.penguin.z);
+        const pScale = Math.max(0.48, Math.min(1.45, world3d.penguinRefDist / Math.max(2.5, pProj.dist)));
+        dom.penguinActor.style.visibility = pProj.visible ? '' : 'hidden';
+        dom.penguinActor.style.left = `${pProj.pctX.toFixed(2)}%`;
+        dom.penguinActor.style.top = `${pProj.pctY.toFixed(2)}%`;
+        dom.penguinActor.style.transform = `translate3d(-50%, -80%, 0) scale(${pScale.toFixed(3)})`;
+        dom.penguinActor.style.zIndex = String(Math.max(18, Math.min(90, Math.round(92 - pProj.dist * 2.2))));
+        penguinPos.x = Number(pProj.pctX.toFixed(2));
+        penguinPos.y = Number(pProj.pctY.toFixed(2));
+        if (FX && typeof FX.setPenguinTarget === 'function') {
+          FX.setPenguinTarget(penguinPos);
+        }
       }
     }
+    world3d.forceDomSync = false;
 
     if (dom.stageActionPrompt && !dom.stageActionPrompt.classList.contains('is-hidden') && activeInteractable) {
       let ax = penguinPos.x;
@@ -2616,6 +2637,8 @@
     });
 
     dom.stageEntitiesLayer.innerHTML = parts.join('');
+    world3d.domEntityNodes = Array.from(dom.stageEntitiesLayer.querySelectorAll('.stage-entity'));
+    world3d.forceDomSync = true;
     updateDepthSorting();
     if (world3d.active) {
       syncDomEntitiesToWorld3d(getTerrain3D());
@@ -2758,6 +2781,10 @@
     isJumping = false;
     world3d.walkAnim = null;
     world3d.jumpAnim = null;
+    world3d.domEntityNodes = null;
+    world3d.lastCamSig = '';
+    world3d.lastPenguinSig = '';
+    world3d.forceDomSync = true;
     if (world3d.penguin) {
       world3d.penguin.isWalking = false;
       world3d.penguin.jumpHeight = 0;

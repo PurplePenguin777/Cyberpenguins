@@ -3,7 +3,7 @@
    Permite instalar la aplicación y jugar sin conexión a internet.
    ========================================================= */
 
-const CACHE_NAME = 'cyberpenguins-v56';
+const CACHE_NAME = 'cyberpenguins-v57';
 const ASSETS = [
   './',
   './index.html',
@@ -24,6 +24,7 @@ const ASSETS = [
   './assets/models/deimos.glb',
   './js/vendor/three/three.module.min.js',
   './js/vendor/three/loaders/GLTFLoader.js',
+  './js/vendor/three/libs/meshopt_decoder.module.js',
   './js/vendor/three/utils/BufferGeometryUtils.js',
   './js/vendor/three/controls/OrbitControls.js',
   './js/data.js',
