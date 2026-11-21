@@ -3221,6 +3221,8 @@ a:focus-visible {
 }
 
 .speech-bubble-text {
+  display: block;
+  width: 100%;
   font-size: 0.94rem;
   line-height: 1.55;
   color: #f8fafc;
@@ -3368,6 +3370,7 @@ a:focus-visible {
 
 .thought-bubble-content {
   position: relative;
+  text-align: center;
   background: radial-gradient(circle at 40% 25%, rgba(22, 34, 64, 0.96), rgba(10, 16, 32, 0.97));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -3417,11 +3420,13 @@ a:focus-visible {
 .thought-bubble-text {
   position: relative;
   z-index: 2;
+  display: block;
+  width: 100%;
   font-size: 0.88rem;
   line-height: 1.48;
   color: #f8fafc;
   font-weight: 500;
-  text-align: left;
+  text-align: center;
   letter-spacing: 0.01em;
 }
 
@@ -3625,6 +3630,8 @@ a:focus-visible {
 }
 
 .thought-bubble-text {
+  display: block;
+  width: 100%;
   text-align: center;
 }
 
