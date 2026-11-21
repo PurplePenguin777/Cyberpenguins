@@ -3548,3 +3548,121 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+/* ==========================================================================
+   Liquid Glass unificado (estilo Apple) — globo de acción, diálogo y pensamiento
+   Todos comparten el mismo cristal y una colita redondeada que señala el origen.
+   ========================================================================== */
+
+.stage-action-prompt,
+.stage-speech-bubble,
+.stage-thought-bubble {
+  --lg-tint: rgba(34, 22, 18, 0.4);
+  --lg-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.09) 100%);
+  --lg-rim: 0.5px solid rgba(255, 255, 255, 0.4);
+  --lg-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 14px 34px rgba(30, 12, 6, 0.3),
+    0 2px 6px rgba(30, 12, 6, 0.18);
+}
+
+/* Un filtro en el contenedor anula el desenfoque del cristal: se usa box-shadow en su lugar */
+.stage-speech-bubble,
+.stage-thought-bubble {
+  filter: none;
+}
+
+.speech-bubble-body,
+.thought-bubble-content {
+  background: var(--lg-sheen), var(--lg-tint);
+  backdrop-filter: blur(26px) saturate(190%);
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
+  border: var(--lg-rim);
+  box-shadow: var(--lg-shadow);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+}
+
+.stage-speech-bubble.speaker-is-penguin .speech-bubble-body,
+.stage-speech-bubble.speaker-is-machine .speech-bubble-body,
+.stage-speech-bubble.speaker-is-ship .speech-bubble-body {
+  border: var(--lg-rim);
+  box-shadow: var(--lg-shadow);
+}
+
+.speech-bubble-body {
+  border-radius: 26px;
+}
+
+.speech-bubble-header {
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.18);
+}
+
+.speech-bubble-text,
+.speech-bubble-name,
+.thought-bubble-text {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+  letter-spacing: -0.012em;
+}
+
+/* Pensamiento: cápsula de cristal (sin lóbulos de cómic) */
+.thought-bubble-content {
+  border-radius: 24px;
+}
+
+.thought-bubble-content::before,
+.thought-bubble-content::after {
+  content: none;
+}
+
+.thought-bubble-text {
+  text-align: center;
+}
+
+/* Rastro de pensamiento: gotas de cristal descendentes hacia la cabeza */
+.thought-bubble-trail .trail-dot {
+  background: var(--lg-sheen), var(--lg-tint);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: var(--lg-rim);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 10px rgba(30, 12, 6, 0.25);
+}
+
+/* Colita de cristal redondeada (misma curva en los tres globos) */
+.speech-bubble-tail,
+.stage-action-btn::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 8px;
+  border: none;
+  background: var(--lg-sheen), var(--lg-tint);
+  backdrop-filter: blur(26px) saturate(190%);
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
+  clip-path: path('M0 0 C5.4 0 7.4 2.6 8.7 5 C9.4 6.3 10.6 6.3 11.3 5 C12.6 2.6 14.6 0 20 0 Z');
+  filter: none;
+}
+
+.speech-bubble-tail {
+  bottom: -7px;
+  left: calc(50% + var(--tail-shift, 0px));
+  transform: translateX(-50%);
+}
+
+.stage-speech-bubble.bubble-flipped .speech-bubble-tail {
+  bottom: auto;
+  top: -7px;
+  border: none;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.stage-action-btn::after {
+  content: '';
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  --lg-tint: rgba(34, 22, 18, 0.34);
+}
+
+.stage-action-prompt.prompt-for-sample .stage-action-btn::after {
+  border: none;
+}

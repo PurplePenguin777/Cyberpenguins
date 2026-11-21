@@ -3680,6 +3680,15 @@
     const isFlipped = y < 30;
     dom.stageSpeechBubble.classList.toggle('bubble-flipped', isFlipped);
     dom.stageSpeechBubble.style.left = `${clampedX}%`;
+    // La colita sigue apuntando al personaje aunque el globo quede acotado dentro de la pantalla
+    const board = dom.stageSpeechBubble.parentElement;
+    const boardW = board ? board.clientWidth : 0;
+    const bubbleW = dom.stageSpeechBubble.offsetWidth || 0;
+    if (boardW && bubbleW) {
+      const shift = ((x - clampedX) / 100) * boardW;
+      const maxShift = Math.max(0, bubbleW / 2 - 30);
+      dom.stageSpeechBubble.style.setProperty('--tail-shift', `${Math.max(-maxShift, Math.min(maxShift, shift)).toFixed(1)}px`);
+    }
     const targetY = isFlipped ? Math.min(78, y + 8) : Math.max(15, y - 8);
     dom.stageSpeechBubble.style.top = `${targetY}%`;
   }
