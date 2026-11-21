@@ -1543,7 +1543,8 @@ a:focus-visible {
   opacity: 0 !important;
 }
 
-.iso-board.has-3d-machine .stage-entity[data-entity-kind="machine"] .entity-svg-wrap {
+.iso-board.has-3d-machine .stage-entity[data-entity-kind="machine"] .entity-svg-wrap,
+.iso-board.has-3d-ship .stage-entity[data-entity-kind="ship"] .entity-svg-wrap {
   opacity: 0 !important;
 }
 

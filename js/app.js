@@ -1748,7 +1748,7 @@
     }
     if (!keepUiClasses) {
       if (dom.isoBoard) {
-        dom.isoBoard.classList.remove('has-3d-terrain', 'has-3d-actor', 'has-3d-machine');
+        dom.isoBoard.classList.remove('has-3d-terrain', 'has-3d-actor', 'has-3d-machine', 'has-3d-ship');
       }
       if (dom.penguinActor) {
         dom.penguinActor.style.transform = '';
@@ -1863,9 +1863,19 @@
 
     const has3dPenguin = Boolean(typeof t3d.hasPenguinActor === 'function' && t3d.hasPenguinActor());
     const has3dMachine = Boolean(typeof t3d.hasMachineActor === 'function' && t3d.hasMachineActor());
+    const has3dShip = Boolean(typeof t3d.hasShipActor === 'function' && t3d.hasShipActor());
     if (dom.isoBoard) {
       dom.isoBoard.classList.toggle('has-3d-actor', has3dPenguin);
       dom.isoBoard.classList.toggle('has-3d-machine', has3dMachine);
+      dom.isoBoard.classList.toggle('has-3d-ship', has3dShip);
+    }
+
+    if (world3d.ship && typeof t3d.setShipPose === 'function') {
+      t3d.setShipPose({
+        x: world3d.ship.x,
+        y: world3d.ship.y,
+        z: world3d.ship.z
+      });
     }
 
     if (world3d.machine && typeof t3d.setMachinePose === 'function') {

@@ -8,8 +8,9 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121n';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121n';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121o';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121o';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121o';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -17,6 +18,9 @@ const SITE_CONFIGS = {
     machineModelUrl: SOJOURNER_MODEL_URL,
     machineScale: 1.18,
     machineDefaultYaw: -0.72,
+    shipModelUrl: SHIP_MODEL_URL,
+    shipScale: 1.05,
+    shipDefaultYaw: 0.62,
     titleEs: 'Ares Vallis · 19.09°N, 33.25°W · ESA/NASA Mars Express HRSC DTM (H3147_0000_DA4)',
     titleEn: 'Ares Vallis · 19.09°N, 33.25°W · ESA/NASA Mars Express HRSC DTM (H3147_0000_DA4)',
     hintEs: 'Arrastra para orbitar · Rueda/pellizco para zoom · Clic derecho para desplazar',
@@ -308,9 +312,20 @@ class Terrain3DController {
     this.loader = new GLTFLoader();
     this.modelCache = new Map();
     this.machineModelCache = new Map();
+    this.shipModelCache = new Map();
     this.penguinModelPromise = null;
     this.penguinActor = null;
     this.machineActor = null;
+    this.shipActor = null;
+    this.shipState = {
+      x: -4.6,
+      y: 0,
+      z: 1.4,
+      yaw: 0.62,
+      pitch: 0,
+      roll: 0,
+      slopeSampled: false
+    };
     this.machineState = {
       x: 2.35,
       y: 0,
@@ -678,6 +693,112 @@ class Terrain3DController {
 
   hasMachineActor() {
     return Boolean(this.machineActor && this.machineActor.group);
+  }
+
+  hasShipActor() {
+    return Boolean(this.shipActor && this.shipActor.group);
+  }
+
+  loadShipActorModel(modelUrl) {
+    if (!modelUrl) return Promise.resolve(null);
+    if (this.shipModelCache.has(modelUrl)) {
+      return this.shipModelCache.get(modelUrl);
+    }
+    const promise = new Promise((resolve, reject) => {
+      this.loader.load(
+        modelUrl,
+        (gltf) => {
+          const modelRoot = gltf.scene || new THREE.Group();
+          modelRoot.traverse((obj) => {
+            if (!obj.isMesh || !obj.material) return;
+            obj.material.side = THREE.FrontSide;
+            if (typeof obj.material.metalness === 'number') {
+              obj.material.metalness = Math.min(obj.material.metalness, 0.22);
+            }
+            if (typeof obj.material.roughness === 'number') {
+              obj.material.roughness = Math.max(obj.material.roughness, 0.16);
+            }
+            obj.material.needsUpdate = true;
+          });
+          resolve(modelRoot);
+        },
+        undefined,
+        (err) => {
+          this.shipModelCache.delete(modelUrl);
+          reject(err);
+        }
+      );
+    });
+    this.shipModelCache.set(modelUrl, promise);
+    return promise;
+  }
+
+  createShipInstance(templateRoot, scale = 1.05) {
+    const root = templateRoot.clone(true);
+    const rigRoot = root.getObjectByName('RangerRoot') || root;
+    rigRoot.scale.setScalar(scale);
+
+    const shadow = createPenguinContactShadow();
+    shadow.scale.set(scale * 2.75, 1, scale * 3.45);
+
+    const group = new THREE.Group();
+    group.name = 'ShipActorGroup';
+    group.add(shadow);
+    group.add(root);
+
+    return {
+      group,
+      rigRoot,
+      shadow,
+      hull: root.getObjectByName('Hull'),
+      canopyGlass: root.getObjectByName('CanopyGlass'),
+      landingGear: root.getObjectByName('LandingGear'),
+      hatchRamp: root.getObjectByName('HatchRamp'),
+      scale
+    };
+  }
+
+  setShipPose(pose = {}) {
+    const sst = this.shipState;
+    let moved = false;
+    if (typeof pose.x === 'number' && Math.abs(pose.x - sst.x) > 1e-4) {
+      sst.x = pose.x;
+      moved = true;
+    }
+    if (typeof pose.y === 'number') sst.y = pose.y;
+    if (typeof pose.z === 'number' && Math.abs(pose.z - sst.z) > 1e-4) {
+      sst.z = pose.z;
+      moved = true;
+    }
+    if (typeof pose.yaw === 'number') sst.yaw = pose.yaw;
+
+    if ((moved || !sst.slopeSampled) && this.terrainMeshes.length > 0) {
+      const d = 0.68;
+      const sinY = Math.sin(sst.yaw);
+      const cosY = Math.cos(sst.yaw);
+      const hFront = this.getGroundHeightAt(sst.x + sinY * d, sst.z + cosY * d);
+      const hBack = this.getGroundHeightAt(sst.x - sinY * d, sst.z - cosY * d);
+      const hLeft = this.getGroundHeightAt(sst.x + cosY * d, sst.z - sinY * d);
+      const hRight = this.getGroundHeightAt(sst.x - cosY * d, sst.z + sinY * d);
+      sst.pitch = clampVal(Math.atan2(hBack - hFront, d * 2) * 0.52, -0.18, 0.18);
+      sst.roll = clampVal(Math.atan2(hRight - hLeft, d * 2) * 0.52, -0.18, 0.18);
+      sst.y = Math.min(sst.y, (hFront + hBack + hLeft + hRight) * 0.25);
+      sst.slopeSampled = true;
+    }
+  }
+
+  animateShipActor(_now) {
+    if (!this.shipActor) return;
+    const actor = this.shipActor;
+    const sst = this.shipState;
+
+    actor.rigRoot.position.set(sst.x, sst.y, sst.z);
+    actor.rigRoot.rotation.set(sst.pitch, sst.yaw, sst.roll);
+
+    if (actor.shadow) {
+      actor.shadow.position.set(sst.x, sst.y + 0.018, sst.z);
+      actor.shadow.rotation.set(0, sst.yaw, 0);
+    }
   }
 
   loadMachineActorModel(modelUrl) {
@@ -1064,10 +1185,11 @@ class Terrain3DController {
     this.updateBaseExploreCamera();
 
     try {
-      const [modelRoot, penguinTemplate, machineTemplate] = await Promise.all([
+      const [modelRoot, penguinTemplate, machineTemplate, shipTemplate] = await Promise.all([
         this.loadSiteModel(siteId),
         this.loadPenguinActorModel().catch(() => null),
-        this.loadMachineActorModel(cfg.machineModelUrl).catch(() => null)
+        this.loadMachineActorModel(cfg.machineModelUrl).catch(() => null),
+        this.loadShipActorModel(cfg.shipModelUrl).catch(() => null)
       ]);
       if (token !== this.mountToken || this.activeSiteId !== siteId) {
         return false;
@@ -1087,6 +1209,16 @@ class Terrain3DController {
 
       this.marker = createLandingMarker(cfg.landerPos || [0, 0.08, 0]);
       wrapper.add(this.marker.group);
+
+      if (shipTemplate) {
+        this.shipState.yaw = typeof cfg.shipDefaultYaw === 'number' ? cfg.shipDefaultYaw : 0.62;
+        this.shipState.slopeSampled = false;
+        this.shipActor = this.createShipInstance(shipTemplate, cfg.shipScale || 1.05);
+        wrapper.add(this.shipActor.group);
+        this.animateShipActor(performance.now());
+      } else {
+        this.shipActor = null;
+      }
 
       if (machineTemplate) {
         this.machineState.yaw = typeof cfg.machineDefaultYaw === 'number' ? cfg.machineDefaultYaw : -0.72;
@@ -1140,6 +1272,7 @@ class Terrain3DController {
     this.terrainMeshes = [];
     this.penguinActor = null;
     this.machineActor = null;
+    this.shipActor = null;
     this.inspectMode = false;
     this.camTransition = null;
     this.stopLoop();
@@ -1310,6 +1443,7 @@ class Terrain3DController {
     }
     this.animatePenguinActor(now);
     this.animateMachineActor(now);
+    this.animateShipActor(now);
 
     this.renderer.render(this.scene, this.camera);
   }

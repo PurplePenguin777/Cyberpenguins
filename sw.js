@@ -3,7 +3,7 @@
    Permite instalar la aplicación y jugar sin conexión a internet.
    ========================================================= */
 
-const CACHE_NAME = 'cyberpenguins-v49';
+const CACHE_NAME = 'cyberpenguins-v50';
 const ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ const ASSETS = [
   './assets/models/ares-vallis-terrain.glb',
   './assets/models/cyberpenguin.glb',
   './assets/models/sojourner.glb',
+  './assets/models/nave-pinguino.glb',
   './js/vendor/three/three.module.min.js',
   './js/vendor/three/loaders/GLTFLoader.js',
   './js/vendor/three/utils/BufferGeometryUtils.js',
