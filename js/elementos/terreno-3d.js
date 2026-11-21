@@ -1155,7 +1155,9 @@ class Terrain3DController {
       return entry._cachedPeak;
     }
     const targetObj = entry.mesh || entry.group;
-    targetObj.updateMatrixWorld(true);
+    // Actualiza también la cadena de padres: si no, la matriz del grupo aún es la identidad
+    // (posición 0,0,0) y todas las balizas se calculan cerca del origen del mundo.
+    targetObj.updateWorldMatrix(true, true);
     const box = new THREE.Box3().setFromObject(targetObj);
     if (!Number.isFinite(box.min.x) || !Number.isFinite(box.max.y)) return null;
     entry._cachedGroupX = entry.group.position.x;
