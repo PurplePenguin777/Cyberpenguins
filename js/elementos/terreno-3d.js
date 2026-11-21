@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121h';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121i';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -703,20 +703,22 @@ class Terrain3DController {
     }
 
     if (actor.head) {
-      // Los pingüinos estabilizan la cabeza compensando parte del balanceo lateral del tronco
-      const idleLookY = Math.sin(now * 0.0011) * 0.075 * (1 - wb);
-      const idleTiltZ = Math.cos(now * 0.0015) * 0.025 * (1 - wb);
+      // Estabilización de cabeza al caminar + ladeo curioso de bebé pingüino (head-tilt kawaii) en reposo
+      const idleLookY = Math.sin(now * 0.0012) * 0.11 * (1 - wb);
+      const curiousWave = Math.sin(now * 0.0017);
+      const idleTiltZ = Math.sign(curiousWave) * Math.pow(Math.abs(curiousWave), 1.6) * 0.095 * (1 - wb);
       actor.head.rotation.z = -sinP * 0.095 * wb + idleTiltZ;
       actor.head.rotation.y = -cosP * 0.04 * wb + idleLookY;
-      actor.head.rotation.x = -0.03 * wb;
+      actor.head.rotation.x = -0.03 * wb + Math.sin(now * 0.0023) * 0.025 * (1 - wb);
       if (actor.helmetGlass) {
         actor.helmetGlass.rotation.copy(actor.head.rotation);
       }
     }
 
-    const jumpFlap = Math.min(0.38, jh * 0.52);
+    const jumpFlutter = jh > 0.02 ? Math.sin(now * 0.032) * 0.14 : 0;
+    const jumpFlap = Math.min(0.42, jh * 0.56) + jumpFlutter;
     if (actor.flipperL) {
-      // Aletas ligeramente abiertas desde el hombro para equilibrar el centro de masa al caminar
+      // Aletas ligeramente abiertas desde el hombro + pequeño aleteo feliz en el aire
       actor.flipperL.rotation.z = 0.04 + 0.09 * wb + Math.max(0, sinP) * 0.075 * wb + jumpFlap;
       actor.flipperL.rotation.x = -sinP * 0.14 * wb;
     }
