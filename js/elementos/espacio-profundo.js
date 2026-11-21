@@ -15,9 +15,14 @@
           <clipPath id="${gid}-clip">
             <circle cx="0" cy="0" r="22" />
           </clipPath>
+          <radialGradient id="${gid}-shade" cx="30%" cy="28%" r="76%">
+            <stop offset="35%" stop-color="#020617" stop-opacity="0" />
+            <stop offset="78%" stop-color="#020617" stop-opacity="0.55" />
+            <stop offset="100%" stop-color="#01030a" stop-opacity="0.88" />
+          </radialGradient>
         </defs>
 
-        <!-- Júpiter lejano (sin anillos tipo Saturno) con bandas atmosféricas y Gran Mancha Roja -->
+        <!-- Júpiter lejano (sobrevuelo de Pioneer 10 en 1973) con textura fotográfica real de la NASA -->
         <g transform="rotate(-8)">
           <!-- 3 Lunas galileanas puntuales alineadas en el plano ecuatorial (Ío, Europa, Ganímedes) -->
           <circle cx="-36" cy="0" r="1.4" fill="#fde68a" opacity="0.92" />
@@ -26,19 +31,10 @@
 
           <circle cx="0" cy="0" r="22" fill="#b45309" />
           <g clip-path="url(#${gid}-clip)">
-            <!-- Bandas zonales y cinturones ecuatoriales low-poly -->
-            <polygon points="-24,-22 24,-22 24,-13 -24,-14" fill="#92400e" />
-            <polygon points="-24,-14 24,-13 24,-6 -24,-7" fill="#fde68a" />
-            <polygon points="-24,-7 24,-6 24,-1 -24,-2" fill="#d97706" />
-            <polygon points="-24,-2 24,-1 24,5 -24,4" fill="#f8fafc" />
-            <polygon points="-24,4 24,5 24,11 -24,10" fill="#b45309" />
-            <polygon points="-24,10 24,11 24,16 -24,15" fill="#fde68a" />
-            <polygon points="-24,15 24,16 24,23 -24,23" fill="#9a3412" />
-            <!-- Gran Mancha Roja en el hemisferio sur -->
-            <polygon points="3,6 10,5 12,8 9,11 2,10 1,8" fill="#dc2626" />
+            <image href="assets/textures/jupiter-4k.jpg" x="-26" y="-23" width="52" height="46" preserveAspectRatio="xMidYMid slice" />
+            <circle cx="0" cy="0" r="22" fill="url(#${gid}-shade)" />
           </g>
-          <!-- Terminador nocturno suave del gigante gaseoso -->
-          <path d="M 6,-22 A 22,22 0 0,1 6,22 A 14,22 0 0,0 6,-22 Z" fill="#040817" opacity="0.54" />
+          <circle cx="0" cy="0" r="22.2" fill="none" stroke="#fed7aa" stroke-opacity="0.2" stroke-width="0.8" />
         </g>
       </g>
     `;
@@ -104,9 +100,8 @@
         <!-- Cosmos interestelar profundo -->
         <rect width="1000" height="594" fill="url(#${id}-cosmos)" />
 
-        <!-- Banda tenue y continua de nuestra Vía Láctea (sin cortes rectangulares ni galaxias externas gigantes) -->
-        <rect width="1000" height="594" fill="url(#${id}-mw-core)" />
-        <path d="M -120,-60 L 220,-60 L 1120,520 L 1120,680 L 760,680 L -120,120 Z" fill="url(#${id}-mw)" />
+        <!-- Vía Láctea fotográfica de alta resolución -->
+        <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="1000" height="594" preserveAspectRatio="xMidYMid slice" opacity="0.45" />
 
         <!-- Júpiter lejano (sobrevuelo de Pioneer 10 en 1973, sin anillos tipo Saturno) -->
         ${distantJupiterGroup(126, 486, 1.0)}

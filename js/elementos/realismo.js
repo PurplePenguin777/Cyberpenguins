@@ -71,6 +71,7 @@
 
   const CFG = {
     moon: {
+      texture: 'assets/textures/luna-4k.jpg',
       ground: ['#a9b0bb', '#8f97a4', '#6b7381', '#484f5d'],
       dunes: ['#7c8594', '#596170', '#3b4352'],
       ridges: [
@@ -83,6 +84,7 @@
       seed: 11
     },
     mars: {
+      texture: 'assets/textures/marte-2k.jpg',
       ground: ['#d99d69', '#c07746', '#9c5731', '#6d3b21'],
       dunes: ['#aa5e37', '#834224', '#592915'],
       ridges: [
@@ -96,6 +98,7 @@
       seed: 23
     },
     eros: {
+      texture: 'assets/textures/eros.jpg',
       ground: ['#b6b6b3', '#98989b', '#717174', '#4c4c50'],
       dunes: ['#88888b', '#626266', '#424246'],
       ridges: [],
@@ -196,6 +199,7 @@
         </linearGradient>
       </defs>
       <rect width="1000" height="594" fill="url(#${id}-sky)" />
+      ${(kind === 'moon' || kind === 'eros') ? `<image href="assets/textures/via-lactea.jpg" x="0" y="0" width="1000" height="320" preserveAspectRatio="xMidYMid slice" opacity="0.28" />` : ''}
       ${starField(CFG[kind].seed, 18, 200)}
       ${planet}
       ${phobos}
@@ -366,6 +370,7 @@
 
         <g clip-path="url(#${id}-cl)">
           <rect x="-10" y="250" width="1020" height="350" fill="url(#${id}-gg)" />
+          ${C.texture ? `<image href="${C.texture}" x="-20" y="240" width="1040" height="360" preserveAspectRatio="xMidYMid slice" opacity="${kind === 'eros' ? 0.42 : 0.28}" />` : ''}
           ${groundDunes(C, C.seed)}
           ${haze}
           ${ponds}
