@@ -1929,6 +1929,7 @@
       if (!segTo) {
         world3d.walkAnim = null;
         if (dom.penguinActor) dom.penguinActor.classList.remove('walking');
+        syncDomEntitiesToWorld3d(t3d);
         const cb = wa.onArrive;
         if (cb) cb();
       } else {
@@ -1951,6 +1952,7 @@
           if (wa.idx >= wa.waypoints.length) {
             world3d.walkAnim = null;
             if (dom.penguinActor) dom.penguinActor.classList.remove('walking');
+            syncDomEntitiesToWorld3d(t3d);
             if (wa.onArrive) wa.onArrive();
           } else {
             const nextPt = wa.waypoints[wa.idx];
@@ -3009,21 +3011,9 @@
 
   function showPendingTasksNotice(chapter, missing) {
     if (!missing || missing.length === 0) return;
-    const isEn = (state.currentLanguage === 'en');
-    const taskText = missing.join(isEn ? ' and ' : ' y ');
-    const speechText = isEn
-      ? `We can't take off yet! We still need to ${taskText}. Complete all mission tasks to explore more places!`
-      : `¡Aún no podemos despegar! Necesitamos ${taskText}. ¡Termina todas las tareas de la misión para explorar más lugares!`;
-
-    openDialogueModal({
-      id: 'mission-checklist',
-      name: 'Cyberpenguin',
-      dialogue: [
-        {
-          speaker: 'Cyberpenguin',
-          text: speechText
-        }
-      ]
+    triggerHaptic('tap');
+    showStageActionPrompt('ship-locked', { missing }, () => {
+      triggerHaptic('tap');
     });
   }
 
@@ -3753,8 +3743,32 @@
     }
   }
 
+  function getMachineDialogueTurns(machine) {
+    if (!machine) return [];
+    const raw = Array.isArray(machine.dialogue) ? machine.dialogue : [];
+    return raw
+      .filter((item) => item && (typeof item === 'string' || typeof item.text === 'string'))
+      .map((item) => {
+        if (typeof item === 'string') {
+          return { speaker: 'machine', text: item, audioUrl: '' };
+        }
+        const rawSpeaker = String(item.speaker || '').toLowerCase();
+        const speaker = (rawSpeaker === 'penguin' || rawSpeaker === 'cyberpenguin')
+          ? 'penguin'
+          : (rawSpeaker === 'ship' || rawSpeaker === 'nave')
+            ? 'ship'
+            : 'machine';
+        return {
+          speaker,
+          text: item.text || '',
+          audioUrl: item.audioUrl || ''
+        };
+      });
+  }
+
   function fallbackLinearDialogue(machine) {
     const turns = getMachineDialogueTurns(machine);
+    const shipLabel = (state.currentLanguage === 'en') ? "Cyberpenguin's Ship" : 'Nave de Cyberpenguin';
     let turnIdx = 0;
 
     const renderTurn = () => {
@@ -3774,7 +3788,7 @@
 
       showSpeechBubbleStep({
         speaker: t.speaker,
-        name: isPenguin ? 'Cyberpenguin' : (isShip ? 'Nave de Cyberpenguin' : machine.name),
+        name: isPenguin ? 'Cyberpenguin' : (isShip ? shipLabel : machine.name),
         avatarSvg: avatar,
         text: t.text,
         audioUrl: t.audioUrl,
@@ -3793,7 +3807,7 @@
     activeDialogueMachine = machine;
     proximityMachineId = machine.id;
 
-    if (machine.id && machine.id !== 'final-scene' && !state.inspectedMachines.includes(machine.id)) {
+    if (machine.id && machine.id !== 'final-scene' && machine.id !== 'mission-checklist' && !state.inspectedMachines.includes(machine.id)) {
       state.inspectedMachines.push(machine.id);
       saveState();
       renderStageEntities(getChapter(state.currentChapterId));

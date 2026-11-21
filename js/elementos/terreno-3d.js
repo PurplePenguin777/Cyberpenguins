@@ -774,8 +774,15 @@ class Terrain3DController {
         this.rafId = null;
         return;
       }
-      this.step(now);
-      this.rafId = requestAnimationFrame(tick);
+      try {
+        this.step(now);
+      } finally {
+        if (!this.isPaused && this.activeSiteId) {
+          this.rafId = requestAnimationFrame(tick);
+        } else {
+          this.rafId = null;
+        }
+      }
     };
     this.rafId = requestAnimationFrame(tick);
   }
@@ -843,7 +850,11 @@ class Terrain3DController {
       this.skyDome.position.copy(this.camera.position);
     }
     if (typeof this.onFrameCallback === 'function') {
-      this.onFrameCallback(now);
+      try {
+        this.onFrameCallback(now);
+      } catch (err) {
+        console.error('[Terrain3D] frame callback error:', err);
+      }
     }
 
     this.renderer.render(this.scene, this.camera);
