@@ -8,8 +8,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121l';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121l';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121n';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121n';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -425,18 +425,18 @@ class Terrain3DController {
         scene.add(createPhobosMesh());
         this.skyDome = skyDome;
 
-        const hemi = new THREE.HemisphereLight(0xd19f8c, 0x5c2d1b, 0.88);
+        const hemi = new THREE.HemisphereLight(0xf6dfd0, 0x7a3e26, 1.05);
         scene.add(hemi);
 
-        const sunLight = new THREE.DirectionalLight(0xffe7cf, 2.3);
+        const sunLight = new THREE.DirectionalLight(0xffe7cf, 2.25);
         sunLight.position.copy(sunDir).multiplyScalar(80);
         scene.add(sunLight);
 
-        const frontFill = new THREE.DirectionalLight(0xfff1e0, 0.85);
-        frontFill.position.set(16, 22, 42);
+        const frontFill = new THREE.DirectionalLight(0xfff5e8, 1.25);
+        frontFill.position.set(12, 26, 44);
         scene.add(frontFill);
 
-        const fillAmb = new THREE.AmbientLight(0x8c5540, 0.26);
+        const fillAmb = new THREE.AmbientLight(0x9e654e, 0.34);
         scene.add(fillAmb);
 
         const camera = new THREE.PerspectiveCamera(37, 1000 / 594, 0.25, 320);
@@ -607,6 +607,9 @@ class Terrain3DController {
             } else {
               // Conservar los materiales PBR, texturas PNG y baseColorFactor del .glb
               obj.material.side = THREE.FrontSide;
+              if (typeof obj.material.metalness === 'number') {
+                obj.material.metalness = Math.min(obj.material.metalness, 0.30);
+              }
               obj.material.needsUpdate = true;
             }
           });
@@ -690,6 +693,12 @@ class Terrain3DController {
           modelRoot.traverse((obj) => {
             if (!obj.isMesh || !obj.material) return;
             obj.material.side = THREE.FrontSide;
+            if (typeof obj.material.metalness === 'number') {
+              obj.material.metalness = Math.min(obj.material.metalness, 0.22);
+            }
+            if (typeof obj.material.roughness === 'number') {
+              obj.material.roughness = Math.max(obj.material.roughness, 0.24);
+            }
             obj.material.needsUpdate = true;
           });
           resolve(modelRoot);

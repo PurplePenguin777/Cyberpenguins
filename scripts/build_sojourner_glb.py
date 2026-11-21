@@ -1135,7 +1135,7 @@ def pack_glb():
     apxs_prims = build_multi_primitive_mesh(apxs_mbs)
     antenna_prims = build_multi_primitive_mesh(antenna_mbs)
 
-    def make_pbr_mat(name, hex_color, roughness=0.38, metalness=0.1, emissive_hex=None):
+    def make_pbr_mat(name, hex_color, roughness=0.34, metallic=0.14, emissive_hex=None):
         r, g, b = hex_lin(hex_color)
         m = {
             "name": name,
@@ -1143,7 +1143,7 @@ def pack_glb():
             "pbrMetallicRoughness": {
                 "baseColorFactor": [round(r, 5), round(g, 5), round(b, 5), 1.0],
                 "roughnessFactor": roughness,
-                "metalnessFactor": metalness,
+                "metallicFactor": metallic,
             },
         }
         if emissive_hex:
@@ -1159,37 +1159,39 @@ def pack_glb():
             "pbrMetallicRoughness": {
                 "baseColorFactor": [1.0, 1.0, 1.0, 1.0],
                 "baseColorTexture": {"index": 0},
-                "roughnessFactor": 0.16,
-                "metalnessFactor": 0.35,
+                "roughnessFactor": 0.24,
+                "metallicFactor": 0.08,
             },
+            "emissiveFactor": [0.03, 0.07, 0.16],
         },
         # 1: MAT_GOLD_KAPTON (24K Gold Kapton thermal blanket on WEB)
         {
             "name": "SojournerGoldKaptonFoil",
             "doubleSided": False,
             "pbrMetallicRoughness": {
-                "baseColorFactor": [1.0, 0.92, 0.55, 1.0],
+                "baseColorFactor": [1.0, 0.95, 0.68, 1.0],
                 "baseColorTexture": {"index": 0},
-                "roughnessFactor": 0.24,
-                "metalnessFactor": 0.86,
+                "roughnessFactor": 0.28,
+                "metallicFactor": 0.18,
             },
+            "emissiveFactor": [0.10, 0.07, 0.01],
         },
         # 2: MAT_ALU_BRIGHT
-        make_pbr_mat("MachinedAluminumStruts", "#e2e8f0", roughness=0.25, metalness=0.82),
+        make_pbr_mat("MachinedAluminumStruts", "#f1f5f9", roughness=0.30, metallic=0.16),
         # 3: MAT_ALU_BRUSHED
-        make_pbr_mat("BrushedAluminumWheels", "#94a3b8", roughness=0.34, metalness=0.78),
+        make_pbr_mat("BrushedAluminumWheels", "#cbd5e1", roughness=0.36, metallic=0.16),
         # 4: MAT_DARK_TITANIUM
-        make_pbr_mat("DarkAnodizedTitanium", "#1e293b", roughness=0.42, metalness=0.62),
+        make_pbr_mat("DarkAnodizedTitanium", "#475569", roughness=0.45, metallic=0.12),
         # 5: MAT_COBALT_NASA
-        make_pbr_mat("NasaCobaltHubCap", "#2563eb", roughness=0.28, metalness=0.58),
+        make_pbr_mat("NasaCobaltHubCap", "#2563eb", roughness=0.28, metallic=0.15),
         # 6: MAT_COPPER_APXS
-        make_pbr_mat("ApxsCopperSpectrometer", "#d97706", roughness=0.26, metalness=0.80),
+        make_pbr_mat("ApxsCopperSpectrometer", "#f97316", roughness=0.30, metallic=0.18, emissive_hex="#431407"),
         # 7: MAT_CYAN_LENS
-        make_pbr_mat("StereoCameraCyanLens", "#38bdf8", roughness=0.10, metalness=0.15, emissive_hex="#0ea5e9"),
+        make_pbr_mat("StereoCameraCyanLens", "#38bdf8", roughness=0.10, metallic=0.05, emissive_hex="#0ea5e9"),
         # 8: MAT_RED_LASER
-        make_pbr_mat("LaserStripeProjectorRed", "#ef4444", roughness=0.12, metalness=0.10, emissive_hex="#dc2626"),
+        make_pbr_mat("LaserStripeProjectorRed", "#ef4444", roughness=0.12, metallic=0.05, emissive_hex="#dc2626"),
         # 9: MAT_AMBER_BEACON
-        make_pbr_mat("UhfAntennaAmberBeacon", "#f59e0b", roughness=0.15, metalness=0.10, emissive_hex="#d97706"),
+        make_pbr_mat("UhfAntennaAmberBeacon", "#f59e0b", roughness=0.15, metallic=0.05, emissive_hex="#d97706"),
     ]
 
     gltf = {
