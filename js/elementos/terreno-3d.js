@@ -1159,8 +1159,9 @@ class Terrain3DController {
     // Actualiza también la cadena de padres: si no, la matriz del grupo aún es la identidad
     // (posición 0,0,0) y todas las balizas se calculan cerca del origen del mundo.
     targetObj.updateWorldMatrix(true, true);
-    // Centro visual real: promedio (x, z) de los vértices de la franja superior de la roca,
-    // para que la marca quede centrada sobre su masa y no sobre una caja envolvente asimétrica.
+    // Centro visual real: promedio (x, z) de los vértices VISIBLES (por encima del terreno) de la
+    // franja superior de la roca. Si parte de la roca queda enterrada en la ladera, el centro de su
+    // malla no coincide con la masa que realmente se ve, y la marca quedaba desplazada.
     const v = new THREE.Vector3();
     const pts = [];
     let minY = Infinity;
@@ -1170,13 +1171,15 @@ class Terrain3DController {
       const pos = o.geometry.attributes.position;
       for (let i = 0; i < pos.count; i += 1) {
         v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+        const ground = this.getGroundHeightAt(v.x, v.z);
+        if (Number.isFinite(ground) && v.y < ground + 0.015) continue; // enterrado
         pts.push(v.x, v.y, v.z);
         if (v.y < minY) minY = v.y;
         if (v.y > maxY) maxY = v.y;
       }
     });
     if (pts.length === 0 || !Number.isFinite(maxY)) return null;
-    const bandY = maxY - (maxY - minY) * 0.4;
+    const bandY = maxY - (maxY - minY) * 0.5;
     let sx = 0;
     let sz = 0;
     let n = 0;
