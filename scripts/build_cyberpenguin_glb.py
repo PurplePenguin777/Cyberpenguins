@@ -529,11 +529,14 @@ class MeshBuilder:
                 acc[i_end] = [sx, sy, sz]
         if close_poles:
             for pole_r in (0, rows):
-                px = sum(acc[pole_r * u_count + c][0] for c in range(cols))
-                py = sum(acc[pole_r * u_count + c][1] for c in range(cols))
-                pz = sum(acc[pole_r * u_count + c][2] for c in range(cols))
-                for c in range(u_count):
-                    acc[pole_r * u_count + c] = [px, py, pz]
+                p_first = pos_list[pole_r * u_count]
+                p_mid = pos_list[pole_r * u_count + (cols // 2)]
+                if v_dot(v_sub(p_first, p_mid), v_sub(p_first, p_mid)) < 1e-5:
+                    px = sum(acc[pole_r * u_count + c][0] for c in range(cols))
+                    py = sum(acc[pole_r * u_count + c][1] for c in range(cols))
+                    pz = sum(acc[pole_r * u_count + c][2] for c in range(cols))
+                    for c in range(u_count):
+                        acc[pole_r * u_count + c] = [px, py, pz]
 
         norms = [v_norm(n) for n in acc]
         self.add_surface(pos_list, fixed_tris, col_list, uv_list=uv_list, custom_normals=norms, interior_ref=None)
@@ -1063,6 +1066,7 @@ def build_head_primitives():
         MAT_HEAD_PLUMAGE: MeshBuilder(),
         MAT_GOLD_VISOR: MeshBuilder(),
         MAT_SUIT_WHITE: MeshBuilder(),
+        MAT_SUIT_SHADE: MeshBuilder(),
         MAT_COBALT_NASA: MeshBuilder(),
         MAT_METAL_ALU: MeshBuilder(),
     }
@@ -1136,7 +1140,7 @@ def build_head_primitives():
         20, 32, eval_cute_beak, wrap_u=True, close_poles=True, interior_ref=(0.0, beak_cy, beak_cz + 0.004)
     )
 
-    # 4. Unified NASA Bubble Helmet Collar & Temple-Hinged Raised LEVA Visor
+    # 4. Unified NASA Bubble Helmet Collar, Closed Rear EVA Protective Shell (LEVA), & Raised Gold Visor
     def eval_helmet_base_ring(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         ang_v = v * math.pi * 2.0
@@ -1154,17 +1158,107 @@ def build_head_primitives():
         ang = math.atan2(c_pt[0], (c_pt[2] - 0.004) / 0.96)
         return (0.168 * math.sin(ang), 0.010 - 0.005 * math.cos(ang), 0.168 * 0.96 * math.cos(ang) + 0.004)
 
-    mbs[MAT_METAL_ALU].add_grid_surface(12, 44, eval_helmet_base_ring, wrap_u=True, close_poles=False, interior_ref=base_ring_interior)
+    mbs[MAT_METAL_ALU].add_grid_surface(12, 48, eval_helmet_base_ring, wrap_u=True, close_poles=False, interior_ref=base_ring_interior)
 
+    # 4b. Closed Rear NASA EVA Protective Helmet Shell (Option A):
+    # Encloses the entire back (-Z), rear sides, and crown (+Y) down to the aluminum neck ring,
+    # while leaving a wide G2-contoured panoramic front window (+Z) so the face, Kawaii eyes,
+    # cheek blushes, and crown feather tuft are clearly visible!
+    phi_neck = 0.305 * math.pi
+    phi_front_brow = 0.708 * math.pi  # ~37.5 deg elevation above HEAD_CY at front center (+Z)
+
+    def eva_shell_phi_rim(theta):
+        abs_deg = math.degrees(abs(theta))
+        brow_drop = smoothstep_g2(0.0, 50.0, abs_deg) * (0.068 * math.pi)
+        pillar_drop = smoothstep_g2(42.0, 82.0, abs_deg) * (phi_front_brow - 0.068 * math.pi - phi_neck)
+        return phi_front_brow - brow_drop - pillar_drop
+
+    def eva_shell_pt(r, u, v):
+        theta = (u - 0.5) * math.pi * 2.0
+        phi_0 = eva_shell_phi_rim(theta)
+        phi = phi_0 + v * (math.pi - phi_0)
+        sn = math.sin(phi)
+        cs = -math.cos(phi)
+        r_horiz_dome = r * sn
+        y_dome = HEAD_CY + r * 1.02 * cs
+
+        # Smooth G2 blend into the elliptical aluminum helmet base ring at phi == phi_neck
+        neck_t = 1.0 - smoothstep_g2(phi_neck, phi_neck + 0.16 * math.pi, phi)
+        r_horiz_ring = 0.168 + (r - 0.215)
+        y_ring = 0.010 - 0.005 * math.cos(theta)
+
+        rx = r_horiz_dome * (1.0 - neck_t) + r_horiz_ring * neck_t
+        rz = (r_horiz_dome * 1.01) * (1.0 - neck_t) + (r_horiz_ring * 0.96) * neck_t
+        py = y_dome * (1.0 - neck_t) + y_ring * neck_t
+        px = rx * math.sin(theta)
+        pz = HEAD_CZ + rz * math.cos(theta)
+        return (px, py, pz)
+
+    r_eva_in = 0.212
+    r_eva_out = 0.218
+    eva_rows = 32
+    eva_cols = 64
+
+    # Outer white protective EVA helmet shell
+    mbs[MAT_SUIT_WHITE].add_grid_surface(
+        eva_rows,
+        eva_cols,
+        lambda u, v: (eva_shell_pt(r_eva_out, u, v), C_WHITE),
+        wrap_u=True,
+        close_poles=True,
+        interior_ref=head_center,
+    )
+
+    # Inner shaded protective liner (so looking inside the helmet through the front glass shows an opaque interior wall)
+    def eva_inner_interior_ref(tri_pts):
+        c_pt = (
+            (tri_pts[0][0] + tri_pts[1][0] + tri_pts[2][0]) / 3.0,
+            (tri_pts[0][1] + tri_pts[1][1] + tri_pts[2][1]) / 3.0,
+            (tri_pts[0][2] + tri_pts[1][2] + tri_pts[2][2]) / 3.0,
+        )
+        d = v_norm(v_sub(c_pt, head_center))
+        return (head_center[0] + d[0] * (r_eva_out + 0.5), head_center[1] + d[1] * (r_eva_out + 0.5), head_center[2] + d[2] * (r_eva_out + 0.5))
+
+    mbs[MAT_SUIT_SHADE].add_grid_surface(
+        eva_rows,
+        eva_cols,
+        lambda u, v: (eva_shell_pt(r_eva_in, u, v), C_WHITE),
+        wrap_u=True,
+        close_poles=True,
+        interior_ref=eva_inner_interior_ref,
+    )
+
+    # Solid panoramic window & base rim strip connecting r_eva_in and r_eva_out at v = 0
+    rim_pos, rim_cols, rim_tris = [], [], []
+    for c in range(eva_cols + 1):
+        u = c / float(eva_cols)
+        rim_pos.append(eva_shell_pt(r_eva_in, u, 0.0))
+        rim_pos.append(eva_shell_pt(r_eva_out, u, 0.0))
+        rim_cols.extend((C_WHITE, C_WHITE))
+    for c in range(eva_cols):
+        b = c * 2
+        rim_tris.append((b, b + 1, b + 3))
+        rim_tris.append((b, b + 3, b + 2))
+
+    def eva_rim_interior_ref(tri_pts):
+        cx_t = (tri_pts[0][0] + tri_pts[1][0] + tri_pts[2][0]) / 3.0
+        cz_t = (tri_pts[0][2] + tri_pts[1][2] + tri_pts[2][2]) / 3.0 - HEAD_CZ
+        theta_t = math.atan2(cx_t, cz_t)
+        u_t = clamp(0.5 + theta_t / (math.pi * 2.0), 0.0, 1.0)
+        return eva_shell_pt((r_eva_in + r_eva_out) * 0.5, u_t, 0.06)
+
+    mbs[MAT_SUIT_WHITE].add_surface(rim_pos, rim_tris, rim_cols, interior_ref=eva_rim_interior_ref)
+
+    # 4c. Raised 24K Gold Solar Visor & Outer Sunshield Hood seated snugly over the closed EVA shell forehead
     mbs[MAT_GOLD_VISOR].add_visor_cap_shell(
         0.0,
         HEAD_CY,
         HEAD_CZ,
-        r_inner=0.212,
-        r_outer=0.218,
-        half_span_x_deg=76.0,
-        arc_start_deg=28.0,
-        arc_end_deg=108.0,
+        r_inner=0.2182,
+        r_outer=0.2225,
+        half_span_x_deg=75.0,
+        arc_start_deg=27.5,
+        arc_end_deg=96.0,
         rows=16,
         cols=34,
         col=C_WHITE,
@@ -1174,11 +1268,11 @@ def build_head_primitives():
         0.0,
         HEAD_CY,
         HEAD_CZ,
-        r_inner=0.218,
-        r_outer=0.226,
-        half_span_x_deg=78.0,
-        arc_start_deg=36.0,
-        arc_end_deg=124.0,
+        r_inner=0.2225,
+        r_outer=0.2285,
+        half_span_x_deg=77.5,
+        arc_start_deg=35.5,
+        arc_end_deg=114.0,
         rows=16,
         cols=34,
         col=C_WHITE,
@@ -1188,21 +1282,21 @@ def build_head_primitives():
         0.0,
         HEAD_CY,
         HEAD_CZ,
-        r_inner=0.224,
-        r_outer=0.228,
+        r_inner=0.2275,
+        r_outer=0.2305,
         half_span_x_deg=44.0,
-        arc_start_deg=36.5,
-        arc_end_deg=43.5,
+        arc_start_deg=36.0,
+        arc_end_deg=43.0,
         rows=4,
         cols=20,
         col=C_WHITE,
     )
 
     for side in (-1.0, 1.0):
-        piv_y = HEAD_CY + 0.025
-        piv_z = HEAD_CZ + 0.020
-        piv_x_in = side * 0.198
-        piv_x_out = side * 0.224
+        piv_y = HEAD_CY + 0.022
+        piv_z = HEAD_CZ + 0.012
+        piv_x_in = side * 0.204
+        piv_x_out = side * 0.228
         mbs[MAT_METAL_ALU].add_cylinder(
             (piv_x_in, piv_y, piv_z),
             (piv_x_out, piv_y, piv_z),
@@ -1229,16 +1323,25 @@ def build_helmet_glass_mesh():
     """Node 7 (`HelmetGlass`), origin at neck pivot (0, 0.365, 0.01) relative to Torso."""
     mb = MeshBuilder()
     r_dome = 0.210
-    phi_min = 0.19 * math.pi
+    phi_min = 0.305 * math.pi
 
     def eval_dome(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         phi = phi_min + v * (math.pi - phi_min)
         sn = math.sin(phi)
         cs = -math.cos(phi)
-        px = r_dome * sn * math.sin(theta)
-        py = HEAD_CY + r_dome * 1.02 * cs
-        pz = HEAD_CZ + r_dome * 1.01 * sn * math.cos(theta)
+        r_horiz_dome = r_dome * sn
+        y_dome = HEAD_CY + r_dome * 1.02 * cs
+
+        neck_t = 1.0 - smoothstep_g2(phi_min, phi_min + 0.16 * math.pi, phi)
+        r_horiz_ring = 0.163
+        y_ring = 0.010 - 0.005 * math.cos(theta)
+
+        rx = r_horiz_dome * (1.0 - neck_t) + r_horiz_ring * neck_t
+        rz = (r_horiz_dome * 1.01) * (1.0 - neck_t) + (r_horiz_ring * 0.96) * neck_t
+        py = y_dome * (1.0 - neck_t) + y_ring * neck_t
+        px = rx * math.sin(theta)
+        pz = HEAD_CZ + rz * math.cos(theta)
         return (px, py, pz), C_WHITE
 
     mb.add_grid_surface(32, 48, eval_dome, wrap_u=True, close_poles=True, interior_ref=(0.0, HEAD_CY, HEAD_CZ))

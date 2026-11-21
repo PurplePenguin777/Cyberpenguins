@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121j';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121k';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
