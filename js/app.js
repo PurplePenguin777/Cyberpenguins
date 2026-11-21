@@ -1696,6 +1696,14 @@
     return chapter.sample ? [chapter.sample] : [];
   }
 
+  // Rocas de gran tamaño (Barnacle Bill, Yogi, Scooby Doo): no caben en una mochila,
+  // así que se «analizan» in situ (como hizo el espectrómetro APXS de Sojourner) y permanecen en su lugar.
+  const IN_PLACE_SAMPLE_IDS = new Set(['sample-mars-4', 'sample-mars-5', 'sample-mars-6']);
+
+  function isInPlaceSample(id) {
+    return IN_PLACE_SAMPLE_IDS.has(id);
+  }
+
   function getSiteSamples(chapter, activeMachine) {
     const allSamples = getChapterSamples(chapter);
     if (!activeMachine || !activeMachine.siteId) return allSamples;
@@ -1820,11 +1828,11 @@
       });
     }
     Object.values(world3d.samples || {}).forEach((s) => {
-      if (!s || state.collectedSamples.includes(s.id)) return;
+      if (!s || (state.collectedSamples.includes(s.id) && !isInPlaceSample(s.id))) return;
       if (s.id === 'sample-mars-5') {
-        obs.push({ id: s.id, cx: s.x, cz: s.z, r: 0.72 }); // Yogi (bloque grande)
+        obs.push({ id: s.id, cx: s.x, cz: s.z, r: 1.08 }); // Yogi (megabloque ~1 m)
       } else if (s.id === 'sample-mars-4') {
-        obs.push({ id: s.id, cx: s.x, cz: s.z, r: 0.52 }); // Barnacle Bill
+        obs.push({ id: s.id, cx: s.x, cz: s.z, r: 0.46 }); // Barnacle Bill (~30 cm)
       }
     });
     return obs;
@@ -1911,7 +1919,8 @@
     }
 
     if (typeof t3d.syncSampleActors === 'function') {
-      t3d.syncSampleActors(world3d.samples, state.collectedSamples);
+      // Las rocas grandes analizadas in situ permanecen visibles en el terreno
+      t3d.syncSampleActors(world3d.samples, state.collectedSamples.filter((sid) => !isInPlaceSample(sid)));
     }
 
     if (world3d.ship && typeof t3d.setShipPose === 'function') {
@@ -1977,7 +1986,10 @@
         let anchor = null;
         if (kind === 'ship') anchor = world3d.ship;
         else if (kind === 'machine') anchor = world3d.machine;
-        else if (kind === 'sample' && id) {
+        if (kind === 'ship' && anchor && typeof t3d.getShipWorldPeak === 'function') {
+          const shipPeak = t3d.getShipWorldPeak();
+          if (shipPeak) anchor = { ...anchor, x: shipPeak.x, y: shipPeak.y, z: shipPeak.z };
+        } else if (kind === 'sample' && id) {
           const orig = world3d.samples[id];
           const peak = typeof t3d.getSampleWorldPeak === 'function' ? t3d.getSampleWorldPeak(id) : null;
           if (peak && orig) {
@@ -2001,7 +2013,7 @@
         el.style.visibility = proj.visible ? '' : 'hidden';
         el.style.left = `${proj.pctX.toFixed(2)}%`;
         el.style.top = `${proj.pctY.toFixed(2)}%`;
-        const is3dSample = kind === 'sample' && has3dSamples;
+        const is3dSample = (kind === 'sample' && has3dSamples) || (kind === 'ship' && has3dShip);
         el.style.transform = is3dSample
           ? `translate3d(-50%, -50%, 0) scale(${scale.toFixed(3)})`
           : `translate3d(-50%, -72%, 0) scale(${scale.toFixed(3)})`;
@@ -2827,7 +2839,7 @@
             const dx = world3d.penguin.x - sW.x;
             const dz = world3d.penguin.z - sW.z;
             const d = Math.hypot(dx, dz) || 1;
-            const standoff = sampleObj.id === 'sample-mars-5' ? 0.78 : (sampleObj.id === 'sample-mars-4' ? 0.58 : 0.46);
+            const standoff = sampleObj.id === 'sample-mars-5' ? 1.3 : (sampleObj.id === 'sample-mars-4' ? 0.52 : 0.62);
             destX = sW.x + (dx / d) * standoff;
             destZ = sW.z + (dz / d) * standoff;
           }
@@ -3204,7 +3216,9 @@
     const isEn = (state.currentLanguage === 'en');
     let label = isEn ? 'Interact' : 'Interactuar';
     if (type === 'sample') {
-      label = isEn ? 'Collect' : 'Recoger';
+      label = isInPlaceSample(target && target.id)
+        ? (isEn ? 'Analyze' : 'Analizar')
+        : (isEn ? 'Collect' : 'Recoger');
     } else if (type === 'machine') {
       label = isEn ? `Talk to ${target.name || 'spacecraft'}` : `Hablar con ${target.name || 'sonda'}`;
     } else if (type === 'ship-travel') {
@@ -3275,11 +3289,20 @@
       const siteSamples = getSiteSamples(chapter, activeMachine);
       const pendingSamples = siteSamples.filter((s) => !state.collectedSamples.includes(s.id));
       if (pendingSamples.length > 0) {
-        missing.push(
-          pendingSamples.length === 1
-            ? (isEn ? 'Collect the pending rock sample' : 'Recoger la roca pendiente')
-            : (isEn ? `Collect all ${pendingSamples.length} pending rock samples` : `Recoger las ${pendingSamples.length} rocas pendientes`)
-        );
+        const allInPlace = pendingSamples.every((s) => isInPlaceSample(s.id));
+        if (allInPlace) {
+          missing.push(
+            pendingSamples.length === 1
+              ? (isEn ? 'Analyze the pending rock' : 'Analizar la roca pendiente')
+              : (isEn ? `Analyze all ${pendingSamples.length} pending rocks` : `Analizar las ${pendingSamples.length} rocas pendientes`)
+          );
+        } else {
+          missing.push(
+            pendingSamples.length === 1
+              ? (isEn ? 'Collect the pending rock sample' : 'Recoger la roca pendiente')
+              : (isEn ? `Collect all ${pendingSamples.length} pending rock samples` : `Recoger las ${pendingSamples.length} rocas pendientes`)
+          );
+        }
       }
     }
 
@@ -4367,11 +4390,16 @@
     if (dom.sampleDiscoveryDesc) {
       dom.sampleDiscoveryDesc.textContent = details.desc;
     }
+    const inPlace = isInPlaceSample(sampleObj.id);
     if (dom.sampleDiscoveryType) {
-      dom.sampleDiscoveryType.textContent = isEn ? 'Rock sample' : 'Muestra de roca';
+      dom.sampleDiscoveryType.textContent = inPlace
+        ? (isEn ? 'Rock analyzed on site' : 'Roca analizada en el sitio')
+        : (isEn ? 'Rock sample' : 'Muestra de roca');
     }
     if (dom.sampleDiscoveryCollectBtn) {
-      dom.sampleDiscoveryCollectBtn.textContent = isEn ? 'Store in backpack' : 'Guardar en la mochila';
+      dom.sampleDiscoveryCollectBtn.textContent = inPlace
+        ? (isEn ? 'Log in passport' : 'Registrar en el pasaporte')
+        : (isEn ? 'Store in backpack' : 'Guardar en la mochila');
     }
     if (dom.sampleDiscoveryCrystal) {
       const variant = typeof sampleObj.variant === 'number' ? sampleObj.variant : 0;

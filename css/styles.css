@@ -1599,10 +1599,36 @@ a:focus-visible {
 }
 
 .iso-board.has-3d-samples .stage-entity[data-entity-kind="sample"] .sample-hotspot::before {
-  top: -24px;
-  left: -24px;
-  right: -24px;
-  bottom: -24px;
+  top: -44px;
+  left: -44px;
+  right: -44px;
+  bottom: -44px;
+}
+
+.iso-board.has-3d-ship .stage-entity[data-entity-kind="ship"] {
+  width: 0;
+  height: 0;
+  overflow: visible;
+}
+
+.iso-board.has-3d-ship .stage-entity[data-entity-kind="ship"] .stage-hotspot {
+  width: 0;
+  height: 0;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iso-board.has-3d-ship .stage-entity[data-entity-kind="ship"] .stage-hotspot::before {
+  content: '';
+  position: absolute;
+  top: -70px;
+  left: -70px;
+  right: -70px;
+  bottom: -70px;
+  border-radius: 50%;
+  pointer-events: auto;
 }
 
 @keyframes sampleBeaconBob3D {
@@ -1616,7 +1642,9 @@ a:focus-visible {
 }
 
 .iso-board.has-3d-ship .ship-beacon {
-  top: -82px;
+  top: 0;
+  left: 0;
+  animation-name: sampleBeaconBob3D;
 }
 
 .iso-board.has-3d-machine .machine-beacon {

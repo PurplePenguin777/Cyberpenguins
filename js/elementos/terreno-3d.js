@@ -28,9 +28,10 @@ const SITE_CONFIGS = {
     shipDefaultYaw: 0.36,
     sampleModelUrl: SAMPLES_MODEL_URL,
     sampleNodeMap: {
-      'sample-mars-4': { node: 'BarnacleBill', scale: 1.35, yaw: 0.45 },
-      'sample-mars-5': { node: 'Yogi', scale: 1.05, yaw: -0.65 },
-      'sample-mars-6': { node: 'ScoobyDoo', scale: 1.35, yaw: 0.25 }
+      // Escalas realistas (1 unidad ≈ 1 m): Barnacle Bill ~30 cm, Yogi ~1 m, Scooby Doo ~60 cm
+      'sample-mars-4': { node: 'BarnacleBill', scale: 0.95, yaw: 0.45 },
+      'sample-mars-5': { node: 'Yogi', scale: 1.9, yaw: -0.65 },
+      'sample-mars-6': { node: 'ScoobyDoo', scale: 1.2, yaw: 0.25 }
     },
     titleEs: 'Ares Vallis',
     titleEn: 'Ares Vallis',
@@ -1158,17 +1159,57 @@ class Terrain3DController {
     // Actualiza también la cadena de padres: si no, la matriz del grupo aún es la identidad
     // (posición 0,0,0) y todas las balizas se calculan cerca del origen del mundo.
     targetObj.updateWorldMatrix(true, true);
-    const box = new THREE.Box3().setFromObject(targetObj);
-    if (!Number.isFinite(box.min.x) || !Number.isFinite(box.max.y)) return null;
+    // Centro visual real: promedio (x, z) de los vértices de la franja superior de la roca,
+    // para que la marca quede centrada sobre su masa y no sobre una caja envolvente asimétrica.
+    const v = new THREE.Vector3();
+    const pts = [];
+    let minY = Infinity;
+    let maxY = -Infinity;
+    targetObj.traverse((o) => {
+      if (!o.isMesh || !o.geometry || !o.geometry.attributes.position) return;
+      const pos = o.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i += 1) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+        pts.push(v.x, v.y, v.z);
+        if (v.y < minY) minY = v.y;
+        if (v.y > maxY) maxY = v.y;
+      }
+    });
+    if (pts.length === 0 || !Number.isFinite(maxY)) return null;
+    const bandY = maxY - (maxY - minY) * 0.4;
+    let sx = 0;
+    let sz = 0;
+    let n = 0;
+    for (let i = 0; i < pts.length; i += 3) {
+      if (pts[i + 1] >= bandY) {
+        sx += pts[i];
+        sz += pts[i + 2];
+        n += 1;
+      }
+    }
+    if (n === 0) return null;
     entry._cachedGroupX = entry.group.position.x;
     entry._cachedGroupY = entry.group.position.y;
     entry._cachedGroupZ = entry.group.position.z;
     entry._cachedPeak = {
-      x: (box.min.x + box.max.x) * 0.5,
-      y: box.max.y + 0.035,
-      z: (box.min.z + box.max.z) * 0.5
+      x: sx / n,
+      y: maxY + 0.035,
+      z: sz / n
     };
     return entry._cachedPeak;
+  }
+
+  getShipWorldPeak() {
+    if (!this.shipActor || !this.shipActor.group || !this.shipActor.group.visible) return null;
+    const g = this.shipActor.group;
+    g.updateWorldMatrix(true, true);
+    const box = new THREE.Box3().setFromObject(g);
+    if (!Number.isFinite(box.min.x) || !Number.isFinite(box.max.y)) return null;
+    return {
+      x: (box.min.x + box.max.x) * 0.5,
+      y: box.max.y + 0.12,
+      z: (box.min.z + box.max.z) * 0.5
+    };
   }
 
   loadShipActorModel(modelUrl) {
