@@ -66,24 +66,29 @@
             <stop offset="100%" stop-color="#060a17" />
           </radialGradient>
           <radialGradient id="${id}-chick-hood" cx="46%" cy="30%" r="65%">
-            <stop offset="0%" stop-color="#272c3a" />
-            <stop offset="55%" stop-color="#151821" />
-            <stop offset="100%" stop-color="#090b10" />
+            <stop offset="0%" stop-color="#52688f" />
+            <stop offset="58%" stop-color="#334466" />
+            <stop offset="100%" stop-color="#1d2840" />
           </radialGradient>
           <radialGradient id="${id}-chick-mask" cx="48%" cy="42%" r="60%">
             <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="68%" stop-color="#f1f5f9" />
-            <stop offset="100%" stop-color="#cbd5e1" />
+            <stop offset="78%" stop-color="#f8fafc" />
+            <stop offset="100%" stop-color="#e2e8f0" />
           </radialGradient>
           <linearGradient id="${id}-chick-down" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#e2e8f0" />
-            <stop offset="55%" stop-color="#b6c0ce" />
-            <stop offset="100%" stop-color="#7c8798" />
+            <stop offset="0%" stop-color="#f1f5f9" />
+            <stop offset="60%" stop-color="#d2daea" />
+            <stop offset="100%" stop-color="#9aa8c2" />
           </linearGradient>
-          <linearGradient id="${id}-chick-beak" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#333947" />
-            <stop offset="55%" stop-color="#181b24" />
-            <stop offset="100%" stop-color="#0d0f14" />
+          <linearGradient id="${id}-chick-beak" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffc46b" />
+            <stop offset="55%" stop-color="#ffa726" />
+            <stop offset="100%" stop-color="#ef6c00" />
+          </linearGradient>
+          <linearGradient id="${id}-kawaii-iris" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1e56a0" />
+            <stop offset="45%" stop-color="#29b6f6" />
+            <stop offset="100%" stop-color="#8be0ff" />
           </linearGradient>
           <radialGradient id="${id}-bubble-glass" cx="38%" cy="28%" r="68%">
             <stop offset="0%" stop-color="rgba(255,255,255,0.45)" />
@@ -187,29 +192,52 @@
             <!-- Máscara facial blanca característica del bebé emperador (mejillas infladas y contorno de ojos) -->
             <path d="M 39.2,34.8 C 38.8,26.8 43.8,22.2 49.8,23.2 C 53.2,23.8 55.2,26.5 56.5,26.5 C 57.8,26.5 59.8,23.8 63.2,23.2 C 69,22.2 73.8,26.8 73.4,34.8 C 73,42.5 66.8,46.8 56.5,46.8 C 45.8,46.8 39.6,42.5 39.2,34.8 Z" fill="url(#${id}-chick-mask)" />
 
-            <!-- Mentón limpio con rubor kawaii suave en las mejillas regordetas -->
-            <ellipse cx="42.5" cy="36.8" rx="4.2" ry="2.6" fill="#ff8da1" opacity="0.45" />
-            <ellipse cx="70.2" cy="36.8" rx="4.2" ry="2.6" fill="#ff8da1" opacity="0.45" />
-            <path d="M 40.5,39.5 C 43,44.2 48.5,46.0 52.5,45.4" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
-            <path d="M 72,39.5 C 69.5,44.2 64.5,46.0 60.5,45.4" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+            <!-- Mentón limpio con rubor kawaii ovalado en las mejillas regordetas -->
+            <ellipse cx="41.8" cy="37.4" rx="4.5" ry="2.4" fill="#ffa3b5" opacity="0.72" />
+            <ellipse cx="70.8" cy="37.4" rx="4.5" ry="2.4" fill="#ffa3b5" opacity="0.72" />
+            <path d="M 40.5,39.8 C 43,44.4 48.5,46.0 52.5,45.4" fill="none" stroke="#cbd5e1" stroke-width="1.1" stroke-linecap="round" />
+            <path d="M 72,39.8 C 69.5,44.4 64.5,46.0 60.5,45.4" fill="none" stroke="#cbd5e1" stroke-width="1.1" stroke-linecap="round" />
 
-            <!-- Grandes ojos Kawaii expresivos con media luna azul zafiro y doble brillo estelar -->
-            <g>
-              <ellipse cx="47.2" cy="32.8" rx="5.4" ry="5.8" fill="#070a12" />
-              <path d="M 43.4,35.2 Q 47.2,38.4 51.0,35.2" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" opacity="0.88" />
-              <circle cx="45.3" cy="30.4" r="2.0" fill="#ffffff" />
-              <circle cx="49.2" cy="35.0" r="0.95" fill="#e0f2fe" />
+            <!-- Estado 1: Grandes ojos azules Kawaii abiertos (con iris celeste, doble brillo y estrellita ✦) -->
+            <g class="cp-eyes-open">
+              <!-- Ojo izquierdo -->
+              <ellipse cx="46.8" cy="32.4" rx="6.1" ry="6.5" fill="#ffffff" stroke="#182036" stroke-width="1.0" />
+              <ellipse cx="46.8" cy="32.5" rx="5.2" ry="5.6" fill="#10172b" />
+              <path d="M 42.4,33.5 C 43.0,37.2 50.6,37.2 51.2,33.5 C 49.8,35.6 43.8,35.6 42.4,33.5 Z" fill="url(#${id}-kawaii-iris)" />
+              <circle cx="44.7" cy="29.9" r="2.1" fill="#ffffff" />
+              <circle cx="49.0" cy="34.5" r="0.98" fill="#ffffff" />
+              <path d="M 48.5,31.2 L 49.0,32.1 L 49.9,32.5 L 49.0,32.9 L 48.5,33.8 L 48.0,32.9 L 47.1,32.5 L 48.0,32.1 Z" fill="#ffffff" />
 
-              <ellipse cx="65.4" cy="32.8" rx="5.2" ry="5.6" fill="#070a12" />
-              <path d="M 61.8,35.2 Q 65.4,38.2 69.0,35.2" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" opacity="0.88" />
-              <circle cx="63.6" cy="30.4" r="1.9" fill="#ffffff" />
-              <circle cx="67.3" cy="35.0" r="0.9" fill="#e0f2fe" />
+              <!-- Ojo derecho -->
+              <ellipse cx="65.8" cy="32.4" rx="5.9" ry="6.3" fill="#ffffff" stroke="#182036" stroke-width="1.0" />
+              <ellipse cx="65.8" cy="32.5" rx="5.0" ry="5.4" fill="#10172b" />
+              <path d="M 61.5,33.5 C 62.1,37.0 69.5,37.0 70.1,33.5 C 68.7,35.5 62.9,35.5 61.5,33.5 Z" fill="url(#${id}-kawaii-iris)" />
+              <circle cx="63.8" cy="29.9" r="2.0" fill="#ffffff" />
+              <circle cx="67.9" cy="34.5" r="0.92" fill="#ffffff" />
+              <path d="M 67.4,31.2 L 67.9,32.1 L 68.8,32.5 L 67.9,32.9 L 67.4,33.8 L 66.9,32.9 L 66.0,32.5 L 66.9,32.1 Z" fill="#ffffff" />
             </g>
 
-            <!-- Piquito corto tipo botón sonriente entre los ojos (gris pizarra oscuro con sonrisa coral suave) -->
-            <path d="M 52.8,35.2 C 53.2,33.2 55.8,32.5 58.5,33.2 C 61.0,33.8 62.6,35.3 62.4,36.8 C 62.1,38.4 59.5,39.5 56.8,39.5 C 54.1,39.5 52.5,37.4 52.8,35.2 Z" fill="url(#${id}-chick-beak)" stroke="#0f172a" stroke-width="0.65" />
-            <path d="M 53.6,37.1 C 55.5,38.5 59.3,38.5 61.4,37.1 C 60.2,39.0 55.2,39.1 53.6,37.1 Z" fill="#ff8a75" opacity="0.92" />
-            <path d="M 54.0,34.7 Q 57.5,33.6 60.8,35.4" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="0.85" stroke-linecap="round" />
+            <!-- Estado 2: Ojos Kawaii entrecerrados (Referencia 2 de parpadeo) -->
+            <g class="cp-eyes-half">
+              <path d="M 41.2,33.6 C 41.2,28.2 52.4,28.2 52.4,33.6 C 49.6,32.0 44.0,32.0 41.2,33.6 Z" fill="#182036" />
+              <circle cx="45.2" cy="30.6" r="1.65" fill="#ffffff" />
+              <circle cx="48.8" cy="32.0" r="0.75" fill="#ffffff" />
+
+              <path d="M 60.4,33.6 C 60.4,28.2 71.2,28.2 71.2,33.6 C 68.5,32.0 63.1,32.0 60.4,33.6 Z" fill="#182036" />
+              <circle cx="64.2" cy="30.6" r="1.6" fill="#ffffff" />
+              <circle cx="67.7" cy="32.0" r="0.72" fill="#ffffff" />
+            </g>
+
+            <!-- Estado 3: Ojos Kawaii cerrados en arquito feliz (^ ^) -->
+            <g class="cp-eyes-closed">
+              <path d="M 42.2,33.6 Q 46.8,28.0 51.4,33.6" fill="none" stroke="#182036" stroke-width="2.3" stroke-linecap="round" />
+              <path d="M 61.3,33.6 Q 65.8,28.0 70.3,33.6" fill="none" stroke="#182036" stroke-width="2.3" stroke-linecap="round" />
+            </g>
+
+            <!-- Piquito romboidal redondeado color albaricoque/naranja cálido con línea de sonrisa (◡) -->
+            <path d="M 51.8,35.6 C 52.2,33.6 54.6,32.3 56.6,32.3 C 58.6,32.3 61.0,33.6 61.4,35.6 C 61.7,37.4 59.2,39.6 56.6,39.6 C 54.0,39.6 51.5,37.4 51.8,35.6 Z" fill="url(#${id}-chick-beak)" stroke="#2b1e16" stroke-width="0.95" stroke-linejoin="round" />
+            <path d="M 53.3,35.7 Q 56.6,37.6 59.9,35.7" fill="none" stroke="#2b1e16" stroke-width="1.05" stroke-linecap="round" />
+            <path d="M 54.0,33.8 Q 56.6,32.9 59.2,33.8" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="0.85" stroke-linecap="round" />
 
             <!-- Cúpula cristalina del casco de burbuja con reflejos curvos -->
             <ellipse cx="55.5" cy="32.5" rx="22.8" ry="22.2" fill="url(#${id}-bubble-glass)" stroke="#bae6fd" stroke-width="1.1" stroke-opacity="0.75" />

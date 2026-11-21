@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121i';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121j';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -612,6 +612,22 @@ class Terrain3DController {
     const rigRoot = root.getObjectByName('PenguinRoot') || root;
     rigRoot.scale.setScalar(scale);
 
+    const eyesOpen = root.getObjectByName('EyesOpen');
+    const eyesHalf = root.getObjectByName('EyesHalf');
+    const eyesClosed = root.getObjectByName('EyesClosed');
+    if (eyesOpen) {
+      eyesOpen.scale.set(1, 1, 1);
+      eyesOpen.visible = true;
+    }
+    if (eyesHalf) {
+      eyesHalf.scale.set(1, 1, 1);
+      eyesHalf.visible = false;
+    }
+    if (eyesClosed) {
+      eyesClosed.scale.set(1, 1, 1);
+      eyesClosed.visible = false;
+    }
+
     const shadow = createPenguinContactShadow();
     shadow.scale.setScalar(scale * 1.15);
 
@@ -627,6 +643,9 @@ class Terrain3DController {
       torso: root.getObjectByName('Torso'),
       head: root.getObjectByName('Head'),
       helmetGlass: root.getObjectByName('HelmetGlass'),
+      eyesOpen,
+      eyesHalf,
+      eyesClosed,
       flipperL: root.getObjectByName('FlipperL'),
       flipperR: root.getObjectByName('FlipperR'),
       footL: root.getObjectByName('FootL'),
@@ -713,6 +732,31 @@ class Terrain3DController {
       if (actor.helmetGlass) {
         actor.helmetGlass.rotation.copy(actor.head.rotation);
       }
+    }
+
+    // Parpadeo Kawaii en 3 estados (Abiertos -> Entrecerrados -> Cerrados ^ ^ -> Entrecerrados -> Abiertos)
+    if (actor.eyesOpen && actor.eyesHalf && actor.eyesClosed) {
+      let eyeMode = 'open';
+      if (jh > 0.03) {
+        // Al saltar en gravedad baja muestra sus ojitos felices cerrados (^ ^)
+        eyeMode = 'closed';
+      } else {
+        // Ciclo natural de parpadeo cada 3.6 s (con parpadeo doble ocasional cada 10.8 s)
+        const cycle = now % 3600;
+        const isDoubleCycle = (now % 10800) > 7200;
+        if (cycle < 52 || (cycle >= 135 && cycle < 190)) {
+          eyeMode = 'half';
+        } else if (cycle >= 52 && cycle < 135) {
+          eyeMode = 'closed';
+        } else if (isDoubleCycle && (cycle >= 250 && cycle < 295 || (cycle >= 365 && cycle < 410))) {
+          eyeMode = 'half';
+        } else if (isDoubleCycle && cycle >= 295 && cycle < 365) {
+          eyeMode = 'closed';
+        }
+      }
+      actor.eyesOpen.visible = eyeMode === 'open';
+      actor.eyesHalf.visible = eyeMode === 'half';
+      actor.eyesClosed.visible = eyeMode === 'closed';
     }
 
     const jumpFlutter = jh > 0.02 ? Math.sin(now * 0.032) * 0.14 : 0;

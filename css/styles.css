@@ -1888,6 +1888,36 @@ a:focus-visible {
   transform-origin: 55px 114px;
 }
 
+/* Parpadeo Kawaii en 3 estados (Abiertos -> Entrecerrados -> Cerrados ^ ^ -> Entrecerrados -> Abiertos) */
+.cp-eyes-open {
+  animation: cpKawaiiBlinkOpen 3.8s infinite;
+}
+
+.cp-eyes-half {
+  opacity: 0;
+  animation: cpKawaiiBlinkHalf 3.8s infinite;
+}
+
+.cp-eyes-closed {
+  opacity: 0;
+  animation: cpKawaiiBlinkClosed 3.8s infinite;
+}
+
+@keyframes cpKawaiiBlinkOpen {
+  0%, 91%, 99%, 100% { opacity: 1; }
+  92%, 98% { opacity: 0; }
+}
+
+@keyframes cpKawaiiBlinkHalf {
+  0%, 91%, 94.5%, 96.5%, 99%, 100% { opacity: 0; }
+  92.5%, 93.5%, 97%, 98% { opacity: 1; }
+}
+
+@keyframes cpKawaiiBlinkClosed {
+  0%, 93.5%, 97%, 100% { opacity: 0; }
+  94.5%, 96.5% { opacity: 1; }
+}
+
 /* Ciclo de caminata: Bamboleo corporal lento de pingüino real (Waddle) + Pasitos cortos + Equilibrio de aletas */
 .penguin-actor.walking .cp-body {
   animation: cpBodyWaddle 0.52s ease-in-out infinite alternate;

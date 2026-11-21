@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Build an irresistibly adorable, Kawaii/Pixar-inspired 3D glTF 2.0 binary (.glb)
-model of Cyberpenguin (Baby Emperor Penguin *Aptenodytes forsteri* chick in a NASA
-Apollo A7L / EMU spacesuit) featuring:
-  - Surface-normal-conforming 3D Kawaii Eyes: the entire glossy black cornea dome sits
-    proudly in front of the curved chubby cheek surface (100% visible, zero submersion!),
-    and the white anime starlight catchlights + sapphire lower iris crescent are
-    parameterized in the exact same eye-dome coordinates (r < 0.72 of the eye radius)
-    so the white and black parts of the eyes match with 100% mathematical precision!
-  - Adorable 3D baby penguin crown feather tuft (copetito) inside the helmet
-  - Chibi/Kawaii baby proportions (big expressive head, chubby mochi cheeks with rosy blush,
-    tiny smiling button beak, sealed overhead torso collar, G2 quintic Bézier & squircle forms)
+"""Build an irresistibly adorable, Kawaii 3D glTF 2.0 binary (.glb) model of
+Cyberpenguin (Baby Emperor Penguin *Aptenodytes forsteri* chick in a NASA Apollo A7L / EMU
+spacesuit) matching the 3 Kawaii reference sheets:
+  1. `EyesOpen` (Reference 3): Big soulful Kawaii blue eyes with crisp white sclera rim,
+     deep navy pupil, glowing sky-blue lower iris crescent (#29b6f6 -> #7dd3fc), large
+     upper-left white highlight, small lower-right white dot, and 4-point star sparkle (✦)!
+  2. `EyesHalf` (Reference 1): Half-closed happy squint eyes with upward-curving lower eyelid
+     and dual white highlights!
+  3. `EyesClosed` (Reference 2): Happy closed arch eyes (^ ^) with rounded ends!
+  4. Warm golden-apricot rounded-diamond baby beak (#ffa726 -> #ffb74d) with a sweet
+     dark smiling mouth line (◡) across the middle!
+  5. Soft slate-blue/grey baby emperor hood (#465775), tall M-arched snow-white face mask,
+     pastel-pink horizontal oval cheek blushes (#ff9eb5), and cute double crown feather tuft!
+  6. All 3 eye states + beak smile + head plumage are baked into an embedded 512x512 PNG
+     texture atlas on surface-normal-conforming 3D cornea domes so the white, blue, and
+     black parts of the eyes are 100% aligned from every angle with zero parallax error!
 
 Uses Python standard library only (zlib, struct, json, math).
 """
@@ -41,7 +46,6 @@ def smoothstep_g2(edge0, edge1, x):
 
 
 def bezier_quintic(t, p0, p1, p2, p3, p4, p5):
-    """Evaluate a 5th-degree (G2-continuous) Bézier curve at t in [0, 1]."""
     u = 1.0 - t
     u2 = u * u
     u3 = u2 * u
@@ -62,7 +66,6 @@ def bezier_quintic(t, p0, p1, p2, p3, p4, p5):
 
 
 def squircle_cs(theta, power=2.35):
-    """Evaluate a G2-smooth squircle unit contour (sin_s, cos_s) for angle theta."""
     s = math.sin(theta)
     c = math.cos(theta)
     exp = 2.0 / float(power)
@@ -152,19 +155,17 @@ def encode_png_rgba(width, height, rgba_bytes):
     )
 
 
-# Shared head geometry constants so 3D eyes conform to the exact head surface!
+# Shared head & eye geometry constants
 HEAD_CY = 0.134
 HEAD_CZ = 0.004
-EYE_THETA_RAD = 0.375  # ±21.5 deg horizontal angle on face
-EYE_Y_NORM = -0.02     # Slightly low baby placement aligned with cute button beak
-EYE_RX_RAD = 0.255     # Generous Kawaii horizontal angular radius (~0.041 m)
-EYE_RY_YNORM = 0.305   # Generous Kawaii vertical normalized radius (~0.045 m)
+EYE_THETA_RAD = 0.365  # Horizontal placement of each big Kawaii eye
+EYE_Y_NORM = 0.01      # Vertical center of the big Kawaii eyes
+EYE_RX_RAD = 0.255     # Angular width of each eye dome
+EYE_RY_YNORM = 0.305   # Vertical radius of each eye dome
 
 
 def chick_head_surface_point(theta, y_norm):
-    """Evaluate the exact 3D point on the chubby "mochi" baby penguin head for any
-    azimuth angle theta in [-pi, pi] (0 = +Z front) and vertical y_norm in [-1, 1].
-    """
+    """Evaluate the exact 3D point on the chubby "mochi" baby penguin head."""
     y_norm = clamp(y_norm, -0.9999, 0.9999)
     phi = math.acos(-y_norm)
     sx, cz = squircle_cs(theta, power=2.15)
@@ -196,74 +197,210 @@ def chick_head_surface_frame(theta, y_norm):
     tu = v_norm(v_sub(p_u1, p_u0))
     tv = v_norm(v_sub(p_v1, p_v0))
     n = v_norm(v_cross(tu, tv))
-    # Verify n points outward away from head center
     if v_dot(n, v_sub(p, (0.0, HEAD_CY, HEAD_CZ))) < 0.0:
         n = (-n[0], -n[1], -n[2])
     return p, n, tu, tv
 
 
-def evaluate_chick_head_srgb(u, v):
-    """Evaluate the Kawaii Baby Emperor Penguin (*Aptenodytes forsteri* chick) head plumage in sRGB."""
-    theta = (u - 0.5) * math.pi * 2.0
-    phi = v * math.pi
+def evaluate_head_plumage_srgb(u_local, v_local):
+    """Evaluate head plumage color for u_local in [0, 1], v_local in [0, 1].
+    Matches the cute plush slate-blue/grey hood & tall M-arched snow-white face mask
+    with pastel-pink horizontal oval cheek blushes from the 3 reference images!
+    """
+    theta = (u_local - 0.5) * math.pi * 2.0
+    phi = v_local * math.pi
     s = math.sin(phi)
     y_norm = -math.cos(phi)
     nx = s * math.sin(theta)
     ny = y_norm
     nz = s * math.cos(theta)
 
-    # Wide, adorable heart-shaped snow-white face mask
-    d_left_lobe = math.sqrt(((nx - 0.34) / 0.50) ** 2 + ((ny - 0.04) / 0.54) ** 2)
-    d_right_lobe = math.sqrt(((nx + 0.34) / 0.50) ** 2 + ((ny - 0.04) / 0.54) ** 2)
-    d_lower_face = math.sqrt((nx / 0.80) ** 2 + ((ny + 0.24) / 0.50) ** 2)
+    # Tall M-arched white eye-patches joining smoothly across the lower cheeks & chin (Reference 1, 2, 3)
+    d_left_lobe = math.sqrt(((nx - 0.34) / 0.46) ** 2 + ((ny - 0.06) / 0.54) ** 2)
+    d_right_lobe = math.sqrt(((nx + 0.34) / 0.46) ** 2 + ((ny - 0.06) / 0.54) ** 2)
+    d_lower_face = math.sqrt((nx / 0.78) ** 2 + ((ny + 0.25) / 0.44) ** 2)
     mask_dist = min(d_left_lobe, d_right_lobe, d_lower_face)
 
-    # Cute gentle widow's-peak curve of the dark emperor-chick hood at the top center of the forehead
-    peak_dip = 0.16 * math.exp(-((nx / 0.24) ** 2)) * smoothstep_g2(0.06, 0.44, ny)
+    # Pronounced cute center M-peak of the slate-blue hood dipping between the eyes toward the top of the beak
+    peak_dip = 0.24 * math.exp(-((nx / 0.20) ** 2)) * smoothstep_g2(-0.04, 0.42, ny)
     mask_dist += peak_dip
 
     face_front = smoothstep_g2(0.02, 0.40, nz)
-    white_mask = (1.0 - smoothstep_g2(0.76, 1.02, mask_dist)) * face_front
+    white_mask = (1.0 - smoothstep_g2(0.78, 0.98, mask_dist)) * face_front
+    outline_band = smoothstep_g2(0.74, 0.88, mask_dist) * (1.0 - smoothstep_g2(0.88, 1.0, mask_dist)) * face_front
 
-    # Warm, prominent Kawaii rosy-pink blush ovals on the chubby cheeks below the big eyes
-    blush_l = math.exp(-(((theta - 0.49) / 0.17) ** 2 + ((y_norm + 0.26) / 0.13) ** 2))
-    blush_r = math.exp(-(((theta + 0.49) / 0.17) ** 2 + ((y_norm + 0.26) / 0.13) ** 2))
-    blush = max(blush_l, blush_r) * white_mask * 0.50
-
-    # Soft dark velvet eye-socket backing at exact eye coordinates so the 3D eye rim blends seamlessly
-    eye_d_l = math.sqrt(((theta - EYE_THETA_RAD) / (EYE_RX_RAD * 1.02)) ** 2 + ((y_norm - EYE_Y_NORM) / (EYE_RY_YNORM * 1.02)) ** 2)
-    eye_d_r = math.sqrt(((theta + EYE_THETA_RAD) / (EYE_RX_RAD * 1.02)) ** 2 + ((y_norm - EYE_Y_NORM) / (EYE_RY_YNORM * 1.02)) ** 2)
-    eye_socket = 1.0 - smoothstep_g2(0.88, 1.04, min(eye_d_l, eye_d_r))
-
-    # Cute subtle arched happy eyebrows above the big Kawaii eyes
-    brow_l = math.exp(-(((theta - 0.37) / 0.13) ** 2 + ((y_norm - (0.35 - 0.18 * (theta - 0.34) ** 2)) / 0.032) ** 2))
-    brow_r = math.exp(-(((theta + 0.37) / 0.13) ** 2 + ((y_norm - (0.35 - 0.18 * (theta + 0.34) ** 2)) / 0.032) ** 2))
-    cute_brow = max(brow_l, brow_r) * white_mask * 0.35
-
-    neck_down = 1.0 - smoothstep_g2(-0.68, -0.32, ny)
+    # Crisp pastel-pink horizontal oval cheek blushes right below the outer corners of the eyes (Reference 1, 2, 3)
+    d_blush_l = math.sqrt(((theta - 0.50) / 0.145) ** 2 + ((y_norm + 0.28) / 0.075) ** 2)
+    d_blush_r = math.sqrt(((theta + 0.50) / 0.145) ** 2 + ((y_norm + 0.28) / 0.075) ** 2)
+    blush = (1.0 - smoothstep_g2(0.70, 1.0, min(d_blush_l, d_blush_r))) * white_mask * 0.72
 
     top_light = 0.5 + 0.5 * ny
-    c_hood = mix_col(hex_srgb("#181e2c"), hex_srgb("#283147"), top_light * 0.48)
-    c_mask = mix_col(hex_srgb("#f8fafc"), hex_srgb("#ffffff"), 0.45 + 0.55 * smoothstep_g2(-0.5, 0.35, ny))
-    c_blush = hex_srgb("#ff809a")
-    c_down = mix_col(hex_srgb("#d2daea"), hex_srgb("#eef2f8"), 0.45 + 0.55 * face_front)
-    c_eye_rim = hex_srgb("#090c15")
+    # Plush slate-blue / periwinkle-charcoal baby penguin hood (warm & friendly like Reference 2 & 3)
+    c_hood = mix_col(hex_srgb("#334466"), hex_srgb("#52688f"), top_light * 0.65)
+    c_hood_outline = hex_srgb("#1d2840")
+    c_mask = hex_srgb("#ffffff")
+    c_blush = hex_srgb("#ffa3b5")
 
     col = mix_col(c_hood, c_mask, white_mask)
+    col = mix_col(col, c_hood_outline, outline_band * 0.45)
     col = mix_col(col, c_blush, blush)
-    col = mix_col(col, c_hood, cute_brow)
-    col = mix_col(col, c_down, neck_down * (1.0 - white_mask * 0.72))
-    col = mix_col(col, c_eye_rim, eye_socket)
     return col
 
 
-def build_head_texture_png(width=512, height=512):
+def evaluate_kawaii_eye_srgb(dx, dy, mode="open"):
+    """Evaluate the exact Kawaii eye artwork at normalized eye coordinates (dx, dy) in [-1.15, +1.15].
+    Note: dx > 0 is toward the center of the face (beak), dx < 0 is toward the outer temple,
+    OR we pass screen-consistent dx where dx < 0 is upper-left (classic anime catchlight side!)
+    and dy > 0 is UP.
+    Modes:
+      - 'open'   (Reference 3: big blue Kawaii eyes with sky-blue lower crescent, big top-left
+                  white highlight, small bottom-right white dot, 4-point star sparkle ✦, and white sclera rim)
+      - 'half'   (Reference 1: happy squinted eyes with upward-curving lower cheek eyelid)
+      - 'closed' (Reference 2: happy upward-curving closed arch ^ ^ on pure white cheek)
+    """
+    c_white = hex_srgb("#ffffff")
+    c_navy_outline = hex_srgb("#182036")
+    c_pupil_dark = hex_srgb("#10172b")
+    c_iris_mid = hex_srgb("#1e56a0")
+    c_iris_cyan = hex_srgb("#29b6f6")
+    c_iris_bright = hex_srgb("#8be0ff")
+
+    if mode == "closed":
+        # Reference 2: Smooth thick upward-curving dark-navy arch (^ ^) on snow-white cheek
+        # Arch curve: y_arch(x) = 0.16 - 0.95 * (dx^2) for |dx| <= 0.68
+        x_clamped = clamp(dx, -0.68, 0.68)
+        y_arch = 0.18 - 0.92 * (x_clamped * x_clamped)
+        dist_arch = math.sqrt((dx - x_clamped) ** 2 + ((dy - y_arch) / 0.90) ** 2)
+        arch_mask = 1.0 - smoothstep_g2(0.11, 0.17, dist_arch)
+        return mix_col(c_white, c_navy_outline, arch_mask)
+
+    # Radial squircle distance from eye center
+    r_oval = math.sqrt((dx / 0.88) ** 2 + (dy / 0.94) ** 2)
+
+    # Outer dark eyelid contour ring (r in 0.88..0.98) + white sclera margin outside
+    outer_dark = 1.0 - smoothstep_g2(0.92, 0.99, r_oval)
+    inner_white_ring = smoothstep_g2(0.80, 0.85, r_oval) * (1.0 - smoothstep_g2(0.89, 0.94, r_oval))
+    iris_disk = 1.0 - smoothstep_g2(0.80, 0.85, r_oval)
+
+    # Base dark navy pupil/iris
+    eye_col = c_pupil_dark
+
+    if mode == "open":
+        # Reference 3: Luminous sky-blue lower iris crescent wrapping the bottom half of the iris
+        # Crescent sits at r_oval in [0.34, 0.78] and dy < 0.08
+        cres_y = dy + 0.14 - 0.22 * (dx * dx)
+        cres_band = (
+            smoothstep_g2(0.30, 0.44, r_oval)
+            * (1.0 - smoothstep_g2(0.73, 0.81, r_oval))
+            * (1.0 - smoothstep_g2(-0.08, 0.22, cres_y))
+        )
+        # Soft mid-blue aura around the crescent
+        aura_band = (
+            smoothstep_g2(0.22, 0.40, r_oval)
+            * (1.0 - smoothstep_g2(0.76, 0.83, r_oval))
+            * (1.0 - smoothstep_g2(0.05, 0.42, cres_y))
+        )
+        eye_col = mix_col(eye_col, c_iris_mid, aura_band * 0.85)
+        eye_col = mix_col(eye_col, c_iris_cyan, cres_band * 0.95)
+        # Brighter cyan core in the bottom center of the crescent
+        core_d = math.sqrt((dx / 0.45) ** 2 + ((dy + 0.48) / 0.20) ** 2)
+        eye_col = mix_col(eye_col, c_iris_bright, (1.0 - smoothstep_g2(0.4, 1.0, core_d)) * cres_band * 0.75)
+
+        # Tiny 4-point star sparkle (✦) at middle-right (cx = +0.16, cy = -0.02)
+        sx_d = abs(dx - 0.16)
+        sy_d = abs(dy + 0.02)
+        star_d = (sx_d ** 0.65 + sy_d ** 0.65) ** (1.0 / 0.65)
+        star_mask = 1.0 - smoothstep_g2(0.055, 0.105, star_d)
+        eye_col = mix_col(eye_col, c_white, star_mask)
+
+    # Big round upper-left white highlight circle (Reference 1 & 3)
+    d_hi_big = math.sqrt(((dx + 0.23) / 0.24) ** 2 + ((dy - 0.24) / 0.25) ** 2)
+    hi_big = 1.0 - smoothstep_g2(0.84, 1.0, d_hi_big)
+    eye_col = mix_col(eye_col, c_white, hi_big)
+
+    # Smaller round lower-right white highlight dot (Reference 1 & 3)
+    small_cx, small_cy = (0.26, -0.20) if mode == "open" else (-0.28, -0.14)
+    d_hi_small = math.sqrt(((dx - small_cx) / 0.115) ** 2 + ((dy - small_cy) / 0.12) ** 2)
+    hi_small = 1.0 - smoothstep_g2(0.80, 1.0, d_hi_small)
+    eye_col = mix_col(eye_col, c_white, hi_small)
+
+    # Combine iris disk + white sclera rim + dark outer eyelid outline
+    col = mix_col(c_white, c_navy_outline, outer_dark)
+    col = mix_col(col, c_white, inner_white_ring * (1.0 - smoothstep_g2(0.15, 0.55, -dy)))
+    col = mix_col(col, eye_col, iris_disk)
+
+    if mode == "half":
+        # Reference 1: Upward-curving happy lower cheek eyelid cuts across the bottom of the eye!
+        # Lower cheek cut curve: y_cut = -0.26 - 0.42 * (dx^2)
+        y_cut = -0.24 - 0.45 * (dx * dx)
+        cheek_cover = 1.0 - smoothstep_g2(y_cut - 0.04, y_cut + 0.05, dy)
+        bottom_lid_line = (
+            smoothstep_g2(y_cut - 0.05, y_cut + 0.01, dy)
+            * (1.0 - smoothstep_g2(y_cut + 0.03, y_cut + 0.09, dy))
+            * outer_dark
+        )
+        col = mix_col(col, c_white, cheek_cover)
+        col = mix_col(col, c_navy_outline, bottom_lid_line)
+
+    return col
+
+
+def evaluate_beak_srgb(dx, dy):
+    """Evaluate the cute golden-apricot diamond baby beak with dark smiling mouth line (◡)
+    from Reference Images 1 & 3!
+    dx in [-1, 1], dy in [-1, 1].
+    """
+    c_beak_top = hex_srgb("#ffb74d")
+    c_beak_bot = hex_srgb("#fb8c00")
+    c_smile = hex_srgb("#2b1e16")
+
+    t_y = clamp((dy + 1.0) * 0.5, 0.0, 1.0)
+    base = mix_col(c_beak_bot, c_beak_top, t_y)
+
+    # Sweet upward-curving smile line across the middle of the beak: y_smile = -0.18 + 0.45 * (dx^2)
+    x_c = clamp(dx, -0.68, 0.68)
+    y_smile = -0.16 + 0.48 * (x_c * x_c)
+    d_smile = math.sqrt((dx - x_c) ** 2 + ((dy - y_smile) / 0.85) ** 2)
+    smile_mask = 1.0 - smoothstep_g2(0.075, 0.135, d_smile)
+    return mix_col(base, c_smile, smile_mask)
+
+
+def build_atlas_texture_png(width=512, height=512):
+    """Bake a single 512x512 PNG texture atlas containing:
+      - Top half (v in [0.00, 0.55]): Head plumage (slate-blue hood, M-arch white mask, pink oval cheek blush)
+      - Bottom-left quadrant  (u in [0.00, 0.33], v in [0.58, 0.98]): `EyesOpen` (Reference 3 blue Kawaii eye)
+      - Bottom-mid quadrant   (u in [0.33, 0.66], v in [0.58, 0.98]): `EyesHalf` (Reference 1 happy squinted eye)
+      - Bottom-right quadrant (u in [0.66, 1.00], v in [0.58, 0.98]): `EyesClosed` (Reference 2 happy ^ ^ arch)
+      - Beak strip            (u in [0.00, 0.30], v in [0.50, 0.58]): Golden-apricot beak with smile line (◡)
+    """
     buf = bytearray(width * height * 4)
     for y in range(height):
         v = y / float(height - 1)
         for x in range(width):
             u = x / float(width - 1)
-            r, g, b = evaluate_chick_head_srgb(u, v)
+            if v <= 0.50:
+                v_loc = v / 0.50
+                r, g, b = evaluate_head_plumage_srgb(u, v_loc)
+            elif v <= 0.58:
+                dx = (u - 0.5) * 2.0
+                dy = (0.54 - v) / 0.04
+                r, g, b = evaluate_beak_srgb(dx, dy)
+            else:
+                v_eye = (v - 0.58) / 0.42  # 0 at top of eye cell, 1 at bottom
+                dy = (0.5 - v_eye) * 2.2   # +1.1 at top, -1.1 at bottom
+                if u < 0.3333:
+                    u_eye = u / 0.3333
+                    dx = (u_eye - 0.5) * 2.2
+                    r, g, b = evaluate_kawaii_eye_srgb(dx, dy, mode="open")
+                elif u < 0.6667:
+                    u_eye = (u - 0.3333) / 0.3334
+                    dx = (u_eye - 0.5) * 2.2
+                    r, g, b = evaluate_kawaii_eye_srgb(dx, dy, mode="half")
+                else:
+                    u_eye = (u - 0.6667) / 0.3333
+                    dx = (u_eye - 0.5) * 2.2
+                    r, g, b = evaluate_kawaii_eye_srgb(dx, dy, mode="closed")
+
             idx = (y * width + x) * 4
             buf[idx] = int(round(clamp(r, 0.0, 1.0) * 255))
             buf[idx + 1] = int(round(clamp(g, 0.0, 1.0) * 255))
@@ -283,7 +420,7 @@ class MeshBuilder:
     def add_surface(self, pos_list, tri_list, col_list, uv_list=None, custom_normals=None, interior_ref=None):
         base = len(self.positions)
         if uv_list is None:
-            uv_list = [(0.5, 0.5)] * len(pos_list)
+            uv_list = [(0.5, 0.25)] * len(pos_list)
 
         fixed_tris = []
         for i0, i1, i2 in tri_list:
@@ -559,21 +696,19 @@ class MeshBuilder:
 
 # Material indices
 MAT_HEAD_PLUMAGE = 0   # 512x512 embedded PNG texture of Kawaii Baby Emperor Penguin plumage
-MAT_SUIT_WHITE = 1     # NASA Beta-cloth warm ivory white (#f5f3ed)
-MAT_SUIT_SHADE = 2     # Soft grey-white pressure fold / O2 tank (#d4dbe5)
-MAT_COBALT_NASA = 3    # Anodized NASA cobalt blue (#1d4ed8)
-MAT_METAL_ALU = 4      # Brushed aluminum neck ring & latches (#9ca3af)
-MAT_METAL_DARK = 5     # Dark titanium soles, flipper tips, belt & controls (#283242)
-MAT_GOLD_VISOR = 6     # 24K gold solar visor (#eab308)
-MAT_VALVE_RED = 7      # Anodized red oxygen valve (#dc2626)
-MAT_VALVE_BLUE = 8     # Anodized blue coolant valve (#2563eb)
-MAT_BEAK_DARK = 9      # Dark warm slate chick bill (#252b3b)
-MAT_BEAK_CORAL = 10    # Warm coral-salmon lower mandible smile (#ff8a75)
-MAT_EYE_OBSIDIAN = 11  # Deep glossy dark eye (#070a12)
-MAT_PURE_WHITE = 12    # Bright white catchlights & patch insignia (#ffffff)
-MAT_CYAN_LED = 13      # Emissive cyan telemetry & Kawaii lower iris glow (#38bdf8)
-MAT_AMBER_LED = 14     # Emissive amber status indicator (#f59e0b)
-MAT_HELMET_GLASS = 15  # Transparent polycarbonate bubble helmet dome
+MAT_KAWAII_EYES = 1    # 512x512 embedded PNG texture on glossy 3D cornea domes (Open / Half / Closed)
+MAT_SUIT_WHITE = 2     # NASA Beta-cloth warm ivory white (#f5f3ed)
+MAT_SUIT_SHADE = 3     # Soft grey-white pressure fold / O2 tank (#d4dbe5)
+MAT_COBALT_NASA = 4    # Anodized NASA cobalt blue (#1d4ed8)
+MAT_METAL_ALU = 5      # Brushed aluminum neck ring & latches (#9ca3af)
+MAT_METAL_DARK = 6     # Dark titanium soles, flipper tips, belt & controls (#283242)
+MAT_GOLD_VISOR = 7     # 24K gold solar visor (#eab308)
+MAT_VALVE_RED = 8      # Anodized red oxygen valve (#dc2626)
+MAT_VALVE_BLUE = 9     # Anodized blue coolant valve (#2563eb)
+MAT_PURE_WHITE = 10    # Bright white patch insignia (#ffffff)
+MAT_CYAN_LED = 11      # Emissive cyan telemetry (#38bdf8)
+MAT_AMBER_LED = 12     # Emissive amber status indicator (#f59e0b)
+MAT_HELMET_GLASS = 13  # Transparent polycarbonate bubble helmet dome
 
 C_WHITE = (1.0, 1.0, 1.0)
 
@@ -882,29 +1017,54 @@ def build_foot_primitives(is_left=True):
     return mbs
 
 
-def build_head_primitives():
-    """Node 6 (`Head`), origin at neck pivot (0, 0.365, 0.01) relative to Torso.
-    CRITICAL FIX FOR KAWAII EYES:
-      Each eye is built by projecting directly onto the exact head surface `chick_head_surface_frame(theta, y_norm)`
-      and displacing OUTWARD along the local head surface normal `n_head`!
-      - The black cornea dome (`MAT_EYE_OBSIDIAN`) bulges +2.5 mm at its rim to +14.5 mm at its center
-        OUTSIDE the cheek surface, so 100% of the big oval black Kawaii eye is visible!
-      - The dual white anime catchlights (`MAT_PURE_WHITE`) and sapphire lower iris crescent (`MAT_CYAN_LED`)
-        are parameterized in the EXACT same normalized eye coordinates `(dx_e, dy_e)` with `r_e < 0.75`
-        and offset +1.2 mm above the black cornea surface, so the white and black parts of the eyes
-        are 100% aligned from every viewing angle!
+def build_eye_state_mesh(u_cell_start, u_cell_width):
+    """Build a pair of smooth 3D cornea domes conforming to the exact cheek surface normal
+    and mapped to the specified eye cell in the 512x512 PNG texture atlas!
     """
+    mb = MeshBuilder()
+
+    for side in (-1.0, 1.0):
+        p_eye_center, n_eye_center, _, _ = chick_head_surface_frame(side * EYE_THETA_RAD, EYE_Y_NORM)
+        eye_interior = v_add(p_eye_center, v_scale(n_eye_center, -0.020))
+
+        def make_cornea_eval(s_dir):
+            def eval_cornea(u, v):
+                # Polar grid over the eye dome: v=0 is center pole (dx=0, dy=0), v=1 is outer rim (r=1)
+                ang = u * math.pi * 2.0
+                r_n = v
+                dx_n = r_n * math.sin(ang)
+                dy_n = r_n * math.cos(ang)
+
+                # Smooth cornea bulge above the exact head surface (+0.8 mm at rim to +6.5 mm at center)
+                dome_h = 0.0008 + 0.0058 * math.cos(r_n * math.pi * 0.5)
+                theta = s_dir * EYE_THETA_RAD + dx_n * EYE_RX_RAD
+                y_n = EYE_Y_NORM + dy_n * EYE_RY_YNORM
+                p_surf, n_surf, _, _ = chick_head_surface_frame(theta, y_n)
+                pt = v_add(p_surf, v_scale(n_surf, dome_h))
+
+                # Map (dx_n, dy_n) to the atlas cell so BOTH eyes have the big white highlight on the
+                # upper-left (+X in character space) and small dot on the lower-right (-X in character space)!
+                # In screen view looking at +Z face: left of screen is +X. So screen_dx = -dx_n!
+                screen_dx = -dx_n
+                u_atlas = u_cell_start + clamp(0.5 + screen_dx / 2.2, 0.01, 0.99) * u_cell_width
+                v_atlas = 0.58 + clamp(0.5 - dy_n / 2.2, 0.01, 0.99) * 0.42
+                return pt, C_WHITE, (u_atlas, v_atlas)
+
+            return eval_cornea
+
+        mb.add_grid_surface(22, 36, make_cornea_eval(side), wrap_u=True, close_poles=True, interior_ref=eye_interior)
+
+    return mb
+
+
+def build_head_primitives():
+    """Node 6 (`Head`), origin at neck pivot (0, 0.365, 0.01) relative to Torso."""
     mbs = {
         MAT_HEAD_PLUMAGE: MeshBuilder(),
-        MAT_BEAK_DARK: MeshBuilder(),
-        MAT_BEAK_CORAL: MeshBuilder(),
-        MAT_EYE_OBSIDIAN: MeshBuilder(),
-        MAT_PURE_WHITE: MeshBuilder(),
         MAT_GOLD_VISOR: MeshBuilder(),
         MAT_SUIT_WHITE: MeshBuilder(),
         MAT_COBALT_NASA: MeshBuilder(),
         MAT_METAL_ALU: MeshBuilder(),
-        MAT_CYAN_LED: MeshBuilder(),
     }
 
     head_center = (0.0, HEAD_CY, HEAD_CZ)
@@ -917,149 +1077,66 @@ def build_head_primitives():
         r = 0.136 - 0.018 * smoothstep_g2(0.0, 1.0, v)
         x = r * sx
         z = HEAD_CZ + (r * 0.94) * cz
-        sr, sg, sb = evaluate_chick_head_srgb(u, 0.08)
-        return (x, y, z), (srgb_to_linear(sr), srgb_to_linear(sg), srgb_to_linear(sb)), (u, 0.08)
+        return (x, y, z), C_WHITE, (u, 0.04)
 
     mbs[MAT_HEAD_PLUMAGE].add_grid_surface(
         10, 48, eval_plush_neck, wrap_u=True, close_poles=False, interior_ref=(0.0, 0.02, HEAD_CZ)
     )
 
-    # 2. Chubby "Mochi" Kawaii Baby Emperor Penguin Head (`MAT_HEAD_PLUMAGE`)
+    # 2. Chubby "Mochi" Kawaii Baby Emperor Penguin Head (`MAT_HEAD_PLUMAGE`, mapped to top half of atlas v in [0, 0.50])
     def eval_chick_head(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         phi = v * math.pi
         y_norm = -math.cos(phi)
         p = chick_head_surface_point(theta, y_norm)
-        sr, sg, sb = evaluate_chick_head_srgb(u, v)
-        lin_col = (srgb_to_linear(sr), srgb_to_linear(sg), srgb_to_linear(sb))
-        return p, lin_col, (u, v)
+        return p, C_WHITE, (u, v * 0.50)
 
     mbs[MAT_HEAD_PLUMAGE].add_grid_surface(52, 64, eval_chick_head, wrap_u=True, close_poles=True, interior_ref=head_center)
 
-    # 2b. Adorable Baby Down Tuft (Copetito de plumón de bebé) at the top crown of the head!
+    # 2b. Cute Double Baby Feather Tuft on the crown (Reference 2 & 3!)
     for (tx, tz, tilt_x, tilt_z, h_tuft, r_tuft) in [
-        (0.0, 0.025, -0.008, 0.012, 0.026, 0.014),
-        (0.013, 0.018, 0.010, 0.008, 0.021, 0.011),
+        (0.0, 0.022, -0.014, 0.010, 0.028, 0.015),
+        (-0.012, 0.016, -0.022, 0.006, 0.022, 0.012),
     ]:
-        p_base = (tx, HEAD_CY + 0.140, HEAD_CZ + tz)
-        p_tip = (tx + tilt_x, HEAD_CY + 0.140 + h_tuft, HEAD_CZ + tz + tilt_z)
-        mbs[MAT_EYE_OBSIDIAN].add_cylinder(p_base, p_tip, r_tuft, 0.003, C_WHITE, radial_segs=14, height_segs=3)
+        p_base = (tx, HEAD_CY + 0.138, HEAD_CZ + tz)
+        p_tip = (tx + tilt_x, HEAD_CY + 0.138 + h_tuft, HEAD_CZ + tz + tilt_z)
+        mbs[MAT_HEAD_PLUMAGE].add_cylinder(
+            p_base,
+            p_tip,
+            r_tuft,
+            0.003,
+            C_WHITE,
+            radial_segs=14,
+            height_segs=3,
+        )
 
-    # 3. Tiny, Adorable, Smiling Kawaii Button Beak (+Z front, seated right between the big eyes)
-    p_beak_surf, n_beak_surf, _, _ = chick_head_surface_frame(0.0, -0.14)
+    # 3. Cute Rounded-Diamond Golden-Apricot Baby Beak with Smiling Mouth Line (◡) (mapped to atlas v in [0.50, 0.58])
+    p_beak_surf, _, _, _ = chick_head_surface_frame(0.0, -0.13)
     beak_cy = p_beak_surf[1]
     beak_cz = p_beak_surf[2] - 0.004
-    beak_len = 0.026  # Cute button bill protruding 2.2 cm from face (stays > 4.6 cm inside the bubble helmet!)
+    beak_len = 0.024
 
     def eval_cute_beak(u, v):
         theta = (u - 0.5) * math.pi * 2.0
-        sx, cy_s = squircle_cs(theta, power=2.25)
+        # Soft rounded-diamond / rhombus squircle contour matching Reference 1 & 3!
+        sx, cy_s = squircle_cs(theta, power=1.75)
         phi = v * (math.pi * 0.5)
-        profile = math.cos(phi) ** 0.78
+        profile = math.cos(phi) ** 0.80
         t = math.sin(phi)
-        rx = 0.025 * profile
-        ry = 0.0155 * profile
-        smile_lift = 0.0035 * (sx ** 2) * (1.0 - t * 0.6)
+        rx = 0.027 * profile
+        ry = 0.0185 * profile
         x = rx * sx
-        y = beak_cy + smile_lift + ry * cy_s
+        y = beak_cy + ry * cy_s
         z = beak_cz + t * beak_len
-        return (x, y, z), C_WHITE
+        u_beak = clamp(0.5 + (x / 0.028) * 0.45, 0.02, 0.98)
+        v_beak = 0.50 + clamp(0.5 - ((y - beak_cy) / 0.019) * 0.45, 0.05, 0.95) * 0.08
+        return (x, y, z), C_WHITE, (u_beak, v_beak)
 
-    mbs[MAT_BEAK_DARK].add_grid_surface(
-        18, 28, eval_cute_beak, wrap_u=True, close_poles=True, interior_ref=(0.0, beak_cy, beak_cz + 0.004)
+    mbs[MAT_HEAD_PLUMAGE].add_grid_surface(
+        20, 32, eval_cute_beak, wrap_u=True, close_poles=True, interior_ref=(0.0, beak_cy, beak_cz + 0.004)
     )
 
-    def eval_coral_smile(u, v):
-        theta = math.pi * (0.56 + u * 0.88)
-        phi = v * (math.pi * 0.42)
-        profile = math.cos(phi) ** 0.76
-        t = math.sin(phi)
-        rx = 0.0258 * profile
-        ry = 0.0165 * profile
-        sx = math.sin(theta)
-        x = rx * sx
-        y = beak_cy + 0.0035 * (sx ** 2) * (1.0 - t * 0.6) + ry * math.cos(theta)
-        z = beak_cz + t * beak_len
-        return (x, y, z), C_WHITE
-
-    mbs[MAT_BEAK_CORAL].add_grid_surface(
-        8, 18, eval_coral_smile, wrap_u=False, close_poles=False, interior_ref=(0.0, beak_cy + 0.003, beak_cz + 0.004)
-    )
-
-    # 4. SURFACE-CONFORMING OVERSIZED KAWAII 3D EYES (100% visible above cheek + 100% aligned catchlights!)
-    def eye_dome_point(side, dx_norm, dy_norm, extra_height=0.0):
-        """Map normalized eye coordinates (dx_norm, dy_norm) in unit disk r <= 1.0
-        directly onto the 3D cheek surface and displace outward along the surface normal!
-        """
-        r2 = min(1.0, dx_norm * dx_norm + dy_norm * dy_norm)
-        dome_h = 0.0022 + 0.0125 * math.sqrt(max(0.0, 1.0 - r2)) + extra_height
-        theta = side * EYE_THETA_RAD + dx_norm * EYE_RX_RAD
-        y_n = EYE_Y_NORM + dy_norm * EYE_RY_YNORM
-        p_surf, n_surf, _, _ = chick_head_surface_frame(theta, y_n)
-        return v_add(p_surf, v_scale(n_surf, dome_h))
-
-    for side in (-1.0, 1.0):
-        p_eye_center, n_eye_center, _, _ = chick_head_surface_frame(side * EYE_THETA_RAD, EYE_Y_NORM)
-        eye_interior = v_add(p_eye_center, v_scale(n_eye_center, -0.020))
-
-        # 4a. Big Glossy Black Kawaii Eye Dome (`MAT_EYE_OBSIDIAN`, r_norm from 1.0 at rim to 0.0 at center)
-        def make_black_eye_eval(s_dir):
-            def eval_black_eye(u, v):
-                ang = (u - 0.5) * math.pi * 2.0
-                # v=0 is outer rim anchored slightly inside cheek (-0.002), v=1 is front cornea pole
-                if v < 0.15:
-                    r_n = 1.0
-                    h_off = -0.003 * (1.0 - v / 0.15)
-                else:
-                    tv = (v - 0.15) / 0.85
-                    r_n = math.cos(tv * math.pi * 0.5)
-                    h_off = 0.0
-                sx, cy_s = squircle_cs(ang, power=2.12)
-                return eye_dome_point(s_dir, r_n * sx, r_n * cy_s, extra_height=h_off), C_WHITE
-            return eval_black_eye
-
-        mbs[MAT_EYE_OBSIDIAN].add_grid_surface(
-            20, 32, make_black_eye_eval(side), wrap_u=True, close_poles=False, interior_ref=eye_interior
-        )
-
-        # 4b. Kawaii Sapphire-Blue Lower Iris Crescent (`MAT_CYAN_LED`, strictly inside r_norm in 0.42..0.76!)
-        def make_iris_eval(s_dir):
-            def eval_iris(u, v):
-                # Lower arc of the eye: angle from -142 deg to -38 deg in the lower half of the eye
-                ang = math.radians(-142.0 + u * 104.0)
-                r_n = 0.44 + v * 0.30
-                dx_n = r_n * math.cos(ang)
-                dy_n = r_n * math.sin(ang)
-                # Arch thickness tapers at ends u=0 and u=1
-                lift = 0.0011 * math.sin(u * math.pi) * math.sin(v * math.pi)
-                return eye_dome_point(s_dir, dx_n, dy_n, extra_height=0.0008 + lift), C_WHITE
-            return eval_iris
-
-        mbs[MAT_CYAN_LED].add_grid_surface(
-            8, 18, make_iris_eval(side), wrap_u=False, close_poles=False, interior_ref=eye_interior
-        )
-
-        # 4c. Dual Kawaii Starlight Catchlights (`MAT_PURE_WHITE`, strictly inside the black eye at r_norm < 0.72!)
-        # Big upper-inner anime highlight + cute lower-outer secondary bead
-        for (cx_n, cy_n, rx_n, ry_n) in [
-            (-0.26 * side, 0.30, 0.25, 0.27),
-            (0.28 * side, -0.24, 0.12, 0.13),
-        ]:
-            def make_catchlight_eval(s_dir, c_x, c_y, r_x, r_y):
-                def eval_catchlight(u, v):
-                    ang = (u - 0.5) * math.pi * 2.0
-                    r_local = math.cos(v * math.pi * 0.5)
-                    dx_n = c_x + r_local * r_x * math.sin(ang)
-                    dy_n = c_y + r_local * r_y * math.cos(ang)
-                    h_bump = 0.0012 + 0.0010 * math.sin(v * math.pi * 0.5)
-                    return eye_dome_point(s_dir, dx_n, dy_n, extra_height=h_bump), C_WHITE
-                return eval_catchlight
-
-            mbs[MAT_PURE_WHITE].add_grid_surface(
-                10, 18, make_catchlight_eval(side, cx_n, cy_n, rx_n, ry_n), wrap_u=True, close_poles=False, interior_ref=eye_interior
-            )
-
-    # 5. Unified NASA Bubble Helmet Collar & Temple-Hinged Raised LEVA Visor
+    # 4. Unified NASA Bubble Helmet Collar & Temple-Hinged Raised LEVA Visor
     def eval_helmet_base_ring(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         ang_v = v * math.pi * 2.0
@@ -1169,7 +1246,7 @@ def build_helmet_glass_mesh():
 
 
 def pack_glb():
-    head_png_bytes = build_head_texture_png(512, 512)
+    atlas_png_bytes = build_atlas_texture_png(512, 512)
 
     torso_mbs = build_torso_primitives()
     flip_l_mbs = build_flipper_primitives(is_left=True)
@@ -1177,6 +1254,9 @@ def pack_glb():
     foot_l_mbs = build_foot_primitives(is_left=True)
     foot_r_mbs = build_foot_primitives(is_left=False)
     head_mbs = build_head_primitives()
+    eyes_open_mb = build_eye_state_mesh(0.0, 0.3333)
+    eyes_half_mb = build_eye_state_mesh(0.3333, 0.3334)
+    eyes_closed_mb = build_eye_state_mesh(0.6667, 0.3333)
     glass_mb = build_helmet_glass_mesh()
 
     bin_chunks = bytearray()
@@ -1190,8 +1270,8 @@ def pack_glb():
 
     align4(bin_chunks)
     png_off = len(bin_chunks)
-    bin_chunks.extend(head_png_bytes)
-    png_len = len(head_png_bytes)
+    bin_chunks.extend(atlas_png_bytes)
+    png_len = len(atlas_png_bytes)
     bv_png = len(buffer_views)
     buffer_views.append({"buffer": 0, "byteOffset": png_off, "byteLength": png_len})
 
@@ -1298,7 +1378,7 @@ def pack_glb():
         prims = []
         for mat_idx, mb in mbs_dict.items():
             if len(mb.positions) > 0:
-                prims.append(append_primitive(mb, mat_idx, include_uv=(mat_idx == MAT_HEAD_PLUMAGE)))
+                prims.append(append_primitive(mb, mat_idx, include_uv=(mat_idx in (MAT_HEAD_PLUMAGE, MAT_KAWAII_EYES))))
         return prims
 
     meshes = [
@@ -1309,9 +1389,14 @@ def pack_glb():
         {"name": "FootRMesh", "primitives": build_primitives_from_dict(foot_r_mbs)},
         {"name": "HeadMesh", "primitives": build_primitives_from_dict(head_mbs)},
         {"name": "HelmetGlassMesh", "primitives": [append_primitive(glass_mb, MAT_HELMET_GLASS)]},
+        {"name": "EyesOpenMesh", "primitives": [append_primitive(eyes_open_mb, MAT_KAWAII_EYES, include_uv=True)]},
+        {"name": "EyesHalfMesh", "primitives": [append_primitive(eyes_half_mb, MAT_KAWAII_EYES, include_uv=True)]},
+        {"name": "EyesClosedMesh", "primitives": [append_primitive(eyes_closed_mb, MAT_KAWAII_EYES, include_uv=True)]},
     ]
 
-    # Slightly larger Chibi head/helmet scale (1.06x) for adorable baby proportions!
+    # Note: EyesOpen (node 8) is active at scale [1,1,1] by default;
+    # EyesHalf (node 9) and EyesClosed (node 10) start at scale [0,0,0] so static viewers
+    # like Finder Quick Look show EyesOpen cleanly, while Three.js toggles them for 3D blinking!
     nodes = [
         {"name": "PenguinRoot", "children": [1, 4, 5]},
         {"name": "Torso", "mesh": 0, "translation": [0.0, 0.20, 0.0], "children": [2, 3, 6, 7]},
@@ -1319,8 +1404,11 @@ def pack_glb():
         {"name": "FlipperR", "mesh": 2, "translation": [-0.158, 0.250, 0.014]},
         {"name": "FootL", "mesh": 3, "translation": [0.095, 0.18, 0.01]},
         {"name": "FootR", "mesh": 4, "translation": [-0.095, 0.18, 0.01]},
-        {"name": "Head", "mesh": 5, "translation": [0.0, 0.365, 0.01], "scale": [1.06, 1.06, 1.06]},
+        {"name": "Head", "mesh": 5, "translation": [0.0, 0.365, 0.01], "scale": [1.06, 1.06, 1.06], "children": [8, 9, 10]},
         {"name": "HelmetGlass", "mesh": 6, "translation": [0.0, 0.365, 0.01], "scale": [1.06, 1.06, 1.06]},
+        {"name": "EyesOpen", "mesh": 7},
+        {"name": "EyesHalf", "mesh": 8, "scale": [0.0, 0.0, 0.0]},
+        {"name": "EyesClosed", "mesh": 9, "scale": [0.0, 0.0, 0.0]},
     ]
 
     def rgba_lin(hex_str, alpha=1.0):
@@ -1334,7 +1422,17 @@ def pack_glb():
                 "baseColorTexture": {"index": 0},
                 "baseColorFactor": [1.0, 1.0, 1.0, 1.0],
                 "metallicFactor": 0.0,
-                "roughnessFactor": 0.94,
+                "roughnessFactor": 0.92,
+            },
+            "doubleSided": False,
+        },
+        {
+            "name": "KawaiiEyesAtlas",
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {"index": 0},
+                "baseColorFactor": [1.0, 1.0, 1.0, 1.0],
+                "metallicFactor": 0.04,
+                "roughnessFactor": 0.12,
             },
             "doubleSided": False,
         },
@@ -1411,40 +1509,12 @@ def pack_glb():
             "doubleSided": False,
         },
         {
-            "name": "ChickBeakDark",
-            "pbrMetallicRoughness": {
-                "baseColorFactor": rgba_lin("#252b3b"),
-                "metallicFactor": 0.05,
-                "roughnessFactor": 0.36,
-            },
-            "doubleSided": False,
-        },
-        {
-            "name": "ChickBeakCoral",
-            "pbrMetallicRoughness": {
-                "baseColorFactor": rgba_lin("#ff8a75"),
-                "metallicFactor": 0.04,
-                "roughnessFactor": 0.40,
-            },
-            "doubleSided": False,
-        },
-        {
-            "name": "ChickEyeObsidian",
-            "pbrMetallicRoughness": {
-                "baseColorFactor": rgba_lin("#060810"),
-                "metallicFactor": 0.10,
-                "roughnessFactor": 0.04,
-            },
-            "doubleSided": False,
-        },
-        {
             "name": "PureWhiteHighlight",
             "pbrMetallicRoughness": {
                 "baseColorFactor": [1.0, 1.0, 1.0, 1.0],
                 "metallicFactor": 0.02,
-                "roughnessFactor": 0.06,
+                "roughnessFactor": 0.08,
             },
-            "emissiveFactor": [0.35, 0.35, 0.38],
             "doubleSided": False,
         },
         {
@@ -1470,7 +1540,7 @@ def pack_glb():
         {
             "name": "HelmetPolycarbonateDome",
             "pbrMetallicRoughness": {
-                "baseColorFactor": [0.88, 0.96, 1.0, 0.16],
+                "baseColorFactor": [0.88, 0.96, 1.0, 0.15],
                 "metallicFactor": 0.02,
                 "roughnessFactor": 0.14,
             },
@@ -1483,7 +1553,7 @@ def pack_glb():
     gltf = {
         "asset": {
             "version": "2.0",
-            "generator": "Cyberpenguins 3D Character Builder v5 (Surface-Conforming Kawaii Eyes + Crown Tuft)",
+            "generator": "Cyberpenguins 3D Character Builder v6 (3-State Kawaii Blue Eyes + Blink Nodes)",
         },
         "scene": 0,
         "scenes": [{"name": "CyberpenguinScene", "nodes": [0]}],
@@ -1491,7 +1561,7 @@ def pack_glb():
         "meshes": meshes,
         "materials": materials,
         "textures": [{"sampler": 0, "source": 0}],
-        "images": [{"bufferView": bv_png, "mimeType": "image/png", "name": "ChickHeadPlumageTex"}],
+        "images": [{"bufferView": bv_png, "mimeType": "image/png", "name": "KawaiiPenguinAtlasTex"}],
         "samplers": [{"magFilter": 9729, "minFilter": 9729, "wrapS": 10497, "wrapT": 33071}],
         "accessors": accessors,
         "bufferViews": buffer_views,
