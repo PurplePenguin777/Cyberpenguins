@@ -10,16 +10,16 @@ import { KTX2Loader } from '../vendor/three/loaders/KTX2Loader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 import { MeshoptDecoder } from '../vendor/three/libs/meshopt_decoder.module.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121x';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121x';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121x';
-const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121x';
-const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121x';
-const SAMPLES_MODEL_URL = 'assets/models/mars-samples.glb?v=20261121x';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121y';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121y';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121y';
+const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121y';
+const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121y';
+const SAMPLES_MODEL_URL = 'assets/models/mars-samples.glb?v=20261121y';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
-    modelUrl: 'assets/models/ares-vallis-terrain.glb?v=20261121x',
+    modelUrl: 'assets/models/ares-vallis-terrain.glb?v=20261121y',
     machineModelUrl: SOJOURNER_MODEL_URL,
     machineScale: 1.18,
     machineDefaultYaw: -0.72,
@@ -28,9 +28,9 @@ const SITE_CONFIGS = {
     shipDefaultYaw: 0.36,
     sampleModelUrl: SAMPLES_MODEL_URL,
     sampleNodeMap: {
-      'sample-mars-2': { node: 'BarnacleBill', scale: 1.25, yaw: 0.45 },
-      'sample-mars-3': { node: 'Yogi', scale: 1.15, yaw: -0.65 },
-      'sample-mars-4': { node: 'ScoobyDoo', scale: 1.25, yaw: 0.25 }
+      'sample-mars-4': { node: 'BarnacleBill', scale: 1.35, yaw: 0.45 },
+      'sample-mars-5': { node: 'Yogi', scale: 1.05, yaw: -0.65 },
+      'sample-mars-6': { node: 'ScoobyDoo', scale: 1.35, yaw: 0.25 }
     },
     titleEs: 'Ares Vallis',
     titleEn: 'Ares Vallis',
@@ -203,34 +203,102 @@ function createMarsSkyDome(sunDir) {
   return new THREE.Mesh(geo, mat);
 }
 
-function createFacetedRockGeometry(detail = 1, seed = 42) {
-  const geo = new THREE.IcosahedronGeometry(1.0, detail);
+function createVolcanicRockTextures(size = 256) {
+  const albCanvas = document.createElement('canvas');
+  albCanvas.width = size;
+  albCanvas.height = size;
+  const albCtx = albCanvas.getContext('2d');
+
+  const bumpCanvas = document.createElement('canvas');
+  bumpCanvas.width = size;
+  bumpCanvas.height = size;
+  const bumpCtx = bumpCanvas.getContext('2d');
+
+  if (!albCtx || !bumpCtx) return { map: null, bumpMap: null };
+
+  const albImg = albCtx.createImageData(size, size);
+  const bumpImg = bumpCtx.createImageData(size, size);
+  const aData = albImg.data;
+  const bData = bumpImg.data;
+  const rand = createSeededRng(19970709);
+
+  for (let y = 0; y < size; y += 1) {
+    const v = y / size;
+    for (let x = 0; x < size; x += 1) {
+      const u = x / size;
+      const strata = 0.5 + 0.5 * Math.sin((v * 10.0 + Math.sin(u * Math.PI * 4.0) * 0.35) * Math.PI);
+      const grain = rand();
+      const pitWave = Math.abs(Math.sin(u * 34.0 + Math.sin(v * 21.0)) * Math.cos(v * 27.0 + Math.cos(u * 17.0)));
+      const pit = pitWave < 0.14 ? (1.0 - pitWave / 0.14) : 0.0;
+      const dustCoat = clampVal((1.0 - v) * 0.55 + strata * 0.25 + (grain - 0.5) * 0.15, 0, 1);
+
+      const baseR = 138 + dustCoat * 58 - pit * 68 + (grain - 0.5) * 24;
+      const baseG = 96 + dustCoat * 38 - pit * 52 + (grain - 0.5) * 18;
+      const baseB = 78 + dustCoat * 24 - pit * 44 + (grain - 0.5) * 14;
+      const hVal = clampVal(0.55 + strata * 0.22 + (grain - 0.5) * 0.26 - pit * 0.48, 0, 1);
+
+      const idx = (y * size + x) * 4;
+      aData[idx] = Math.round(clampVal(baseR, 30, 245));
+      aData[idx + 1] = Math.round(clampVal(baseG, 24, 225));
+      aData[idx + 2] = Math.round(clampVal(baseB, 20, 210));
+      aData[idx + 3] = 255;
+
+      const bv = Math.round(hVal * 255);
+      bData[idx] = bv;
+      bData[idx + 1] = bv;
+      bData[idx + 2] = bv;
+      bData[idx + 3] = 255;
+    }
+  }
+  albCtx.putImageData(albImg, 0, 0);
+  bumpCtx.putImageData(bumpImg, 0, 0);
+
+  const map = new THREE.CanvasTexture(albCanvas);
+  map.colorSpace = THREE.SRGBColorSpace;
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.needsUpdate = true;
+
+  const bumpMap = new THREE.CanvasTexture(bumpCanvas);
+  bumpMap.wrapS = THREE.RepeatWrapping;
+  bumpMap.wrapT = THREE.RepeatWrapping;
+  bumpMap.needsUpdate = true;
+
+  return { map, bumpMap };
+}
+
+function createSmoothMarsRockGeometry(wSegs = 22, hSegs = 16, seed = 42) {
+  // Geometría indexada con normales suaves (cero facetas poligonales planas)
+  const geo = new THREE.SphereGeometry(1.0, wSegs, hSegs);
   const pos = geo.attributes.position;
   for (let i = 0; i < pos.count; i += 1) {
     const vx = pos.getX(i);
     const vy = pos.getY(i);
     const vz = pos.getZ(i);
-    const n1 = Math.sin(vx * 2.7 + seed) * Math.cos(vy * 3.1 - seed * 0.5);
-    const n2 = Math.cos(vz * 4.3 + vx * 2.1 + seed * 0.7);
-    const facet = 0.84 + 0.18 * n1 + 0.08 * n2;
-    const flatBottom = vy < -0.25 ? 0.62 : 1.0;
-    pos.setXYZ(i, vx * 1.18 * facet, vy * 0.74 * facet * flatBottom, vz * 0.96 * facet);
+    const n1 = Math.sin(vx * 2.4 + seed) * Math.cos(vy * 2.8 - seed * 0.5);
+    const n2 = Math.cos(vz * 3.9 + vx * 1.9 + seed * 0.7) * Math.sin(vy * 3.3 + seed * 0.3);
+    const n3 = Math.sin(vx * 6.2 - vz * 5.4 + vy * 4.8);
+    const disp = 0.88 + 0.14 * n1 + 0.07 * n2 + 0.03 * n3;
+    const flatBottom = vy < -0.22 ? 0.58 : 1.0;
+    pos.setXYZ(i, vx * 1.18 * disp, vy * 0.68 * disp * flatBottom, vz * 0.94 * disp);
   }
   geo.computeVertexNormals();
   return geo;
 }
 
-function createInstancedMarsRocks(getHeightFn, regolithTextures) {
+function createInstancedMarsRocks(getHeightFn) {
   const group = new THREE.Group();
   group.name = 'InstancedMarsRockField';
   const rand = createSeededRng(199707042);
+  const rockTex = createVolcanicRockTextures(256);
 
-  // Zonas despejadas: nave Ranger, spawn de Cyberpenguin, Sojourner y zona central de muestras
+  // Zonas despejadas: nave Ranger, spawn de Cyberpenguin, Sojourner y las 3 muestras recolectables
   const clearZones = [
     { x: -4.6, z: 1.4, r: 3.4 },  // Ranger VTOL
-    { x: -2.2, z: 1.8, r: 2.1 },  // Spawn Cyberpenguin
-    { x: 2.35, z: 0.45, r: 2.0 }, // Sojourner
-    { x: 0.0, z: 0.0, r: 1.6 }    // Centro de aterrizaje
+    { x: -2.2, z: 1.8, r: 2.2 },  // Spawn Cyberpenguin
+    { x: 2.35, z: 0.45, r: 2.1 }, // Sojourner
+    { x: -1.15, z: 8.8, r: 4.5 }, // Frente inmediato de la cámara (evita rocas gigantes en primerísimo plano)
+    { x: 0.0, z: 0.0, r: 1.6 }
   ];
   const isClear = (x, z) => {
     for (let i = 0; i < clearZones.length; i += 1) {
@@ -241,41 +309,42 @@ function createInstancedMarsRocks(getHeightFn, regolithTextures) {
   };
 
   const palette = [
-    new THREE.Color('#9c5a3e'), // Oxido de hierro polvoriento
-    new THREE.Color('#6a4e40'), // Basalto marciano oscuro
-    new THREE.Color('#b67350'), // Costra ocre
-    new THREE.Color('#7d6153'), // Andesita gris-marrón
-    new THREE.Color('#543f36')  // Roca volcánica sombreada
+    new THREE.Color('#c99478'), // Polvo ocre sobre andesita
+    new THREE.Color('#a47a66'), // Basalto marciano erosionado
+    new THREE.Color('#d4a285'), // Costra clara de regolito
+    new THREE.Color('#8e6e5e'), // Roca volcánica oscura
+    new THREE.Color('#b8856b')  // Tono medio de Ares Vallis
   ];
 
   const dummy = new THREE.Object3D();
 
-  // Nivel LOD 0 (Primer plano: 180 rocas angulosas detalladas en 1 sola draw call)
-  const nearGeo = createFacetedRockGeometry(2, 11.3);
+  // Nivel LOD 0 (Primer plano: 160 rocas suaves y texturizadas en 1 sola draw call)
+  const nearGeo = createSmoothMarsRockGeometry(24, 16, 11.3);
   const nearMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.93,
-    metalness: 0.04,
-    bumpMap: regolithTextures ? regolithTextures.bumpMap : null,
-    bumpScale: regolithTextures && regolithTextures.bumpMap ? 0.04 : 0
+    map: rockTex.map,
+    bumpMap: rockTex.bumpMap,
+    bumpScale: 0.045,
+    roughness: 0.94,
+    metalness: 0.03
   });
-  const nearCount = 180;
+  const nearCount = 160;
   const nearInst = new THREE.InstancedMesh(nearGeo, nearMat, nearCount);
   let placedNear = 0;
   let attempts = 0;
-  while (placedNear < nearCount && attempts < 1400) {
+  while (placedNear < nearCount && attempts < 1500) {
     attempts += 1;
     const ang = rand() * Math.PI * 2;
-    const dist = 2.4 + Math.pow(rand(), 0.78) * 16.5;
+    const dist = 2.8 + Math.pow(rand(), 0.78) * 16.0;
     const rx = Math.cos(ang) * dist;
     const rz = Math.sin(ang) * dist - 1.5;
     if (!isClear(rx, rz)) continue;
 
-    const s = 0.065 + Math.pow(rand(), 2.4) * 0.34;
+    const s = 0.055 + Math.pow(rand(), 2.6) * 0.22;
     const ry = getHeightFn(rx, rz);
-    dummy.position.set(rx, ry - s * 0.18, rz);
-    dummy.rotation.set((rand() - 0.5) * 0.5, rand() * Math.PI * 2, (rand() - 0.5) * 0.5);
-    dummy.scale.set(s * (0.85 + rand() * 0.45), s * (0.65 + rand() * 0.45), s * (0.85 + rand() * 0.45));
+    dummy.position.set(rx, ry - s * 0.22, rz);
+    dummy.rotation.set((rand() - 0.5) * 0.4, rand() * Math.PI * 2, (rand() - 0.5) * 0.4);
+    dummy.scale.set(s * (0.85 + rand() * 0.45), s * (0.62 + rand() * 0.42), s * (0.85 + rand() * 0.45));
     dummy.updateMatrix();
     nearInst.setMatrixAt(placedNear, dummy.matrix);
     nearInst.setColorAt(placedNear, palette[Math.floor(rand() * palette.length)]);
@@ -287,30 +356,31 @@ function createInstancedMarsRocks(getHeightFn, regolithTextures) {
   nearInst.frustumCulled = true;
   group.add(nearInst);
 
-  // Nivel LOD 1 (Plano medio/lejano: 280 rocas y cantos de la inundación de Ares Vallis en 1 sola draw call)
-  const farGeo = createFacetedRockGeometry(1, 29.7);
+  // Nivel LOD 1 (Plano medio/lejano: 260 rocas de la planicie de Ares Vallis en 1 sola draw call)
+  const farGeo = createSmoothMarsRockGeometry(14, 10, 29.7);
   const farMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
+    map: rockTex.map,
     roughness: 0.96,
     metalness: 0.02
   });
-  const farCount = 280;
+  const farCount = 260;
   const farInst = new THREE.InstancedMesh(farGeo, farMat, farCount);
   let placedFar = 0;
   attempts = 0;
   while (placedFar < farCount && attempts < 1800) {
     attempts += 1;
     const ang = rand() * Math.PI * 2;
-    const dist = 11.5 + Math.pow(rand(), 0.72) * 24.0;
+    const dist = 12.0 + Math.pow(rand(), 0.72) * 23.0;
     const rx = Math.cos(ang) * dist;
     const rz = Math.sin(ang) * dist - 4.0;
     if (!isClear(rx, rz)) continue;
 
-    const s = 0.16 + Math.pow(rand(), 2.1) * 0.68;
+    const s = 0.14 + Math.pow(rand(), 2.2) * 0.48;
     const ry = getHeightFn(rx, rz);
-    dummy.position.set(rx, ry - s * 0.22, rz);
-    dummy.rotation.set((rand() - 0.5) * 0.6, rand() * Math.PI * 2, (rand() - 0.5) * 0.6);
-    dummy.scale.set(s * (0.8 + rand() * 0.55), s * (0.6 + rand() * 0.5), s * (0.8 + rand() * 0.55));
+    dummy.position.set(rx, ry - s * 0.26, rz);
+    dummy.rotation.set((rand() - 0.5) * 0.5, rand() * Math.PI * 2, (rand() - 0.5) * 0.5);
+    dummy.scale.set(s * (0.8 + rand() * 0.5), s * (0.58 + rand() * 0.45), s * (0.8 + rand() * 0.5));
     dummy.updateMatrix();
     farInst.setMatrixAt(placedFar, dummy.matrix);
     farInst.setColorAt(placedFar, palette[Math.floor(rand() * palette.length)]);
