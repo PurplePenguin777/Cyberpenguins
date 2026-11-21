@@ -2045,18 +2045,22 @@
         const stepDist = speed * dt;
 
         const phys = typeof t3d.computeSteeredStep === 'function'
-          ? t3d.computeSteeredStep(curX, curZ, segTo.x, segTo.z, stepDist, 0.21)
+          ? t3d.computeSteeredStep(curX, curZ, segTo.x, segTo.z, stepDist, 0.21, wa.steerDir || null)
           : t3d.resolvePhysicalPosition(curX + ((segTo.x - curX) / Math.max(1e-4, remDist)) * stepDist, curZ + ((segTo.z - curZ) / Math.max(1e-4, remDist)) * stepDist, 0.21);
+
+        if (typeof phys.dirX === 'number' && typeof phys.dirZ === 'number') {
+          wa.steerDir = { x: phys.dirX, z: phys.dirZ };
+        }
 
         const moveDx = phys.x - curX;
         const moveDz = phys.z - curZ;
         const moved = Math.hypot(moveDx, moveDz);
-        const segHeading = moved > 0.0015
+        const segHeading = moved > 0.004
           ? Math.atan2(moveDx, moveDz)
           : world3d.penguin.yaw;
 
-        if (moveDx < -0.002) penguinDir = 'left';
-        else if (moveDx > 0.002) penguinDir = 'right';
+        if (moveDx < -0.003) penguinDir = 'left';
+        else if (moveDx > 0.003) penguinDir = 'right';
 
         world3d.penguin = {
           x: phys.x,
@@ -2076,15 +2080,16 @@
         }
 
         const newRem = Math.hypot(segTo.x - phys.x, segTo.z - phys.z);
-        if (moved < stepDist * 0.15) {
+        if (moved < stepDist * 0.22 || newRem >= remDist - 0.001) {
           wa.stallMs = (wa.stallMs || 0) + dt * 1000;
         } else {
           wa.stallMs = 0;
         }
 
-        if (newRem <= 0.14 || (wa.stallMs || 0) > 380) {
+        if (newRem <= 0.16 || (wa.stallMs || 0) > 160) {
           wa.idx += 1;
           wa.stallMs = 0;
+          wa.steerDir = null;
           if (wa.idx >= wa.waypoints.length) {
             world3d.walkAnim = null;
             world3d.penguin.isWalking = false;

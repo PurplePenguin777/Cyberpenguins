@@ -1691,44 +1691,48 @@ class Terrain3DController {
    * (targetX, targetZ) usando dirección tangencial anticipada (steering) alrededor de
    * obstáculos sólidos, manteniendo velocidad constante sin tirones ni saltos bruscos.
    */
-  computeSteeredStep(curX, curZ, targetX, targetZ, stepDist, penguinRadius = 0.21) {
+  computeSteeredStep(curX, curZ, targetX, targetZ, stepDist, penguinRadius = 0.21, prevDir = null) {
     const toX = targetX - curX;
     const toZ = targetZ - curZ;
     const distToTarget = Math.hypot(toX, toZ);
     if (distToTarget < 1e-4) {
-      return this.resolvePhysicalPosition(curX, curZ, penguinRadius);
+      const p = this.resolvePhysicalPosition(curX, curZ, penguinRadius);
+      return { ...p, dirX: prevDir ? prevDir.x : 0, dirZ: prevDir ? prevDir.z : 1 };
     }
 
     let dirX = toX / distToTarget;
     let dirZ = toZ / distToTarget;
-    const lookHalo = 0.58;
+    const lookHalo = 0.52;
 
     const applyAvoidance = (ox, oz, obsR) => {
+      const safeR = obsR + penguinRadius;
+      // Si el destino está justo al borde de este objeto (p. ej. al ir a recoger la roca o hablar con Sojourner),
+      // NO repeler al pingüino: dejar que se acerque directo y pare suavemente sin vibrar.
+      if (Math.hypot(targetX - ox, targetZ - oz) < safeR + 0.48) return;
+
       const rx = curX - ox;
       const rz = curZ - oz;
       const d = Math.hypot(rx, rz);
-      const safeR = obsR + penguinRadius;
       const outerR = safeR + lookHalo;
       if (d >= outerR || d < 1e-4) return;
 
-      // Sólo rodear si el obstáculo está por delante o al costado de nuestra dirección deseada
       const toObsX = -rx / d;
       const toObsZ = -rz / d;
       const forwardDot = dirX * toObsX + dirZ * toObsZ;
-      if (forwardDot < -0.15) return;
+      if (forwardDot < 0.05) return;
 
-      // Elegir de forma consistente el lado tangencial más natural (izquierda o derecha)
-      const cross = dirX * toObsZ - dirZ * toObsX;
+      // Usar dirección previa (si existe) para mantener histéresis y evitar que oscile izq/der
+      const refX = prevDir ? prevDir.x : dirX;
+      const refZ = prevDir ? prevDir.z : dirZ;
+      const cross = refX * toObsZ - refZ * toObsX;
       const turnSign = cross >= 0 ? 1 : -1;
       const tangX = -toObsZ * turnSign;
       const tangZ = toObsX * turnSign;
 
       const t = clampVal(1.0 - (d - safeR) / lookHalo, 0, 1);
-      const w = t * t * (3 - 2 * t) * 0.92;
-      // Combinar suavemente dirección deseada + tangente + ligera repulsión radial si está muy cerca
-      const pushOut = t > 0.72 ? (t - 0.72) * 1.15 : 0;
-      dirX = dirX * (1 - w) + tangX * w - toObsX * pushOut;
-      dirZ = dirZ * (1 - w) + tangZ * w - toObsZ * pushOut;
+      const w = t * t * (3 - 2 * t) * 0.85;
+      dirX = dirX * (1 - w) + tangX * w;
+      dirZ = dirZ * (1 - w) + tangZ * w;
       const len = Math.hypot(dirX, dirZ) || 1;
       dirX /= len;
       dirZ /= len;
@@ -1736,7 +1740,7 @@ class Terrain3DController {
 
     // 1. Evitación suave alrededor de la nave Ranger
     if (this.shipActor && this.shipState) {
-      applyAvoidance(this.shipState.x, this.shipState.z, 1.38);
+      applyAvoidance(this.shipState.x, this.shipState.z, 1.35);
     }
     // 2. Evitación suave alrededor de Sojourner
     if (this.machineActor && this.machineState) {
@@ -1759,10 +1763,21 @@ class Terrain3DController {
       }
     }
 
+    // Filtro paso-bajo sobre el vector de dirección para eliminar cualquier vibración de giro
+    if (prevDir) {
+      const blend = 0.24;
+      dirX = prevDir.x * (1 - blend) + dirX * blend;
+      dirZ = prevDir.z * (1 - blend) + dirZ * blend;
+      const len = Math.hypot(dirX, dirZ) || 1;
+      dirX /= len;
+      dirZ /= len;
+    }
+
     const moveDist = Math.min(stepDist, distToTarget);
     const nextX = curX + dirX * moveDist;
     const nextZ = curZ + dirZ * moveDist;
-    return this.resolvePhysicalPosition(nextX, nextZ, penguinRadius);
+    const p = this.resolvePhysicalPosition(nextX, nextZ, penguinRadius);
+    return { ...p, dirX, dirZ };
   }
 
   getGroundHeightAt(wx, wz) {
