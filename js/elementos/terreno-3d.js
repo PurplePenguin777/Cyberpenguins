@@ -8,10 +8,11 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121t';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121t';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121t';
-const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121t';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121u';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121u';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121u';
+const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121u';
+const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121u';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -483,16 +484,50 @@ class Terrain3DController {
           }
         );
 
-        // Deimos (la segunda luna de Marte, ~20,060 km de distancia): visible desde Ares Vallis
-        // como un punto estelar brillante (~0.03 deg de diámetro angular) en el cielo alto
-        const deimosGeo = new THREE.SphereGeometry(0.11, 12, 10);
-        const deimosMat = new THREE.MeshBasicMaterial({
-          color: new THREE.Color('#ffeed8'),
-          fog: false
-        });
-        const deimosMesh = new THREE.Mesh(deimosGeo, deimosMat);
-        deimosMesh.position.set(-15.5, 13.8, -58.0);
-        scene.add(deimosMesh);
+        // Deimos (la segunda luna de Marte, ~20,060 km de distancia): modelo 3D oficial de la NASA
+        // (24879_Deimos_1_1000.glb), normalizado a una escala angular mucho más pequeña y lejana que Fobos
+        // y con el mismo tinte de dispersión atmosférica diurna marciana.
+        this.deimosGroup = new THREE.Group();
+        this.deimosGroup.position.set(-15.5, 13.8, -58.0);
+        this.deimosGroup.rotation.set(0.15, 0.55, 0.12);
+        scene.add(this.deimosGroup);
+        this.loader.load(
+          DEIMOS_MODEL_URL,
+          (gltf) => {
+            const dRoot = gltf.scene || new THREE.Group();
+            const box = new THREE.Box3().setFromObject(dRoot);
+            const size = new THREE.Vector3();
+            box.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z, 0.001);
+            // Más pequeño y lejano que Fobos (diámetro ~0.46 u vs 1.56 u de Fobos)
+            dRoot.scale.setScalar(0.46 / maxDim);
+            dRoot.traverse((obj) => {
+              if (!obj.isMesh || !obj.material) return;
+              obj.material.fog = false;
+              obj.material.roughness = 0.96;
+              obj.material.metalness = 0.02;
+              if (obj.material.color) {
+                obj.material.color.set('#f2ddd0');
+              }
+              if (obj.material.emissive) {
+                obj.material.emissive.set('#8f6454');
+                obj.material.emissiveIntensity = 0.52;
+              }
+              obj.material.needsUpdate = true;
+            });
+            this.deimosGroup.clear();
+            this.deimosGroup.add(dRoot);
+          },
+          undefined,
+          () => {
+            const deimosGeo = new THREE.SphereGeometry(0.14, 12, 10);
+            const deimosMat = new THREE.MeshBasicMaterial({
+              color: new THREE.Color('#ffeed8'),
+              fog: false
+            });
+            this.deimosGroup.add(new THREE.Mesh(deimosGeo, deimosMat));
+          }
+        );
 
         const hemi = new THREE.HemisphereLight(0xf6dfd0, 0x7a3e26, 1.05);
         scene.add(hemi);
