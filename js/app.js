@@ -1748,7 +1748,7 @@
     }
     if (!keepUiClasses) {
       if (dom.isoBoard) {
-        dom.isoBoard.classList.remove('has-3d-terrain', 'has-3d-actor');
+        dom.isoBoard.classList.remove('has-3d-terrain', 'has-3d-actor', 'has-3d-machine');
       }
       if (dom.penguinActor) {
         dom.penguinActor.style.transform = '';
@@ -1862,8 +1862,18 @@
     if (!t3d || !world3d.active) return;
 
     const has3dPenguin = Boolean(typeof t3d.hasPenguinActor === 'function' && t3d.hasPenguinActor());
+    const has3dMachine = Boolean(typeof t3d.hasMachineActor === 'function' && t3d.hasMachineActor());
     if (dom.isoBoard) {
       dom.isoBoard.classList.toggle('has-3d-actor', has3dPenguin);
+      dom.isoBoard.classList.toggle('has-3d-machine', has3dMachine);
+    }
+
+    if (world3d.machine && typeof t3d.setMachinePose === 'function') {
+      t3d.setMachinePose({
+        x: world3d.machine.x,
+        y: world3d.machine.y,
+        z: world3d.machine.z
+      });
     }
 
     if (dom.stageEntitiesLayer) {

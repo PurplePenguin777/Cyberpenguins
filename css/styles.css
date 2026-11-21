@@ -1543,6 +1543,10 @@ a:focus-visible {
   opacity: 0 !important;
 }
 
+.iso-board.has-3d-machine .stage-entity[data-entity-kind="machine"] .entity-svg-wrap {
+  opacity: 0 !important;
+}
+
 .iso-board.is-3d-inspect .iso-backdrop {
   pointer-events: auto;
   cursor: grab;
