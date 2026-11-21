@@ -12,7 +12,7 @@ import { MeshoptDecoder } from '../vendor/three/libs/meshopt_decoder.module.js';
 
 const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121y';
 const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121y';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121ac';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121ad';
 const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121y';
 const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121y';
 const SAMPLES_MODEL_URL = 'assets/models/mars-samples.glb?v=20261121y';

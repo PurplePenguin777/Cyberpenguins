@@ -680,21 +680,6 @@ def build_hull_primitives():
             cols=30,
         )
 
-        # Aft Hypersonic Pitch/Roll Body Flap (Elevon) extending from the lower aft chine trailing edge
-        flap_in_le = (side * 0.48, 0.28, -1.12)
-        flap_out_le = (side * 0.82, 0.30, -1.10)
-        add_naca_airfoil_wing(
-            mbs[MAT_TPS_CERAMIC],
-            root_le=flap_in_le,
-            root_chord=0.22,
-            tip_le=flap_out_le,
-            tip_chord=0.18,
-            normal_dir=(0.0, 1.0, 0.08),
-            max_t=0.075,
-            rows=10,
-            cols=24,
-        )
-
     # 3. 100% Flush Conformal Cockpit Window Bezel & Mullion Struts (+1.8 mm conformal offset)
     u_win_min, u_win_max = 0.37, 0.63
     v_win_min, v_win_max = 0.56, 0.80
@@ -796,10 +781,10 @@ def build_hull_primitives():
             height_segs=1,
         )
         mbs[MAT_ENGINE_GLOW].add_cylinder(
-            (nx, ny, -1.32),
-            (nx, ny, -1.355),
+            (nx, ny, -1.348),
+            (nx, ny, -1.365),
             0.118,
-            0.135,
+            0.128,
             C_WHITE,
             radial_segs=24,
             height_segs=1,
@@ -815,10 +800,10 @@ def build_hull_primitives():
         height_segs=2,
     )
     mbs[MAT_ENGINE_GLOW].add_cylinder(
-        (0.0, 0.52, -1.285),
-        (0.0, 0.52, -1.315),
-        0.084,
-        0.096,
+        (0.0, 0.52, -1.310),
+        (0.0, 0.52, -1.325),
+        0.082,
+        0.090,
         C_WHITE,
         radial_segs=20,
         height_segs=1,
