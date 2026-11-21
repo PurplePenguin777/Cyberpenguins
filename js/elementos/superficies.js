@@ -489,13 +489,14 @@
           </radialGradient>
         </defs>
         ${atmoRim}
-        <!-- Base esférica continua y curvada sin líneas radiales en el centro -->
+        <!-- Base esférica continua -->
         <circle r="${n(r)}" fill="url(#sphereLight-${uid})" />
         <g clip-path="url(#clip-${uid})">
-          ${baseConfig.texture ? `<image href="${baseConfig.texture}" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" opacity="0.88" />` : ''}
-          ${featuresSvg}
+          ${baseConfig.texture
+            ? `<image href="${baseConfig.texture}" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" />`
+            : `${featuresSvg}${M.facetShade ? M.facetShade(r, { seed: seed + 7, strength: kind === 'earth' ? 0.12 : 0.18 }) : ''}`
+          }
           <!-- Terminador nocturno y sombreado esférico tridimensional -->
-          ${M.facetShade ? M.facetShade(r, { seed: seed + 7, strength: kind === 'earth' ? 0.12 : 0.18 }) : ''}
           <circle r="${n(r)}" fill="url(#sphereShade-${uid})" />
         </g>
       </g>
