@@ -1264,18 +1264,18 @@
     if (!ctx) return;
 
     const presets = {
-      step: { freqs: [523.25, 659.25], gain: 0.025, stepMs: 35, duration: 0.16, wave: 'sine' },
-      stepMars: { freqs: [174.61, 220.0], gain: 0.026, stepMs: 32, duration: 0.14, wave: 'sine', filterFreq: 820 },
-      jump: { freqs: [440.0, 587.33, 783.99], gain: 0.036, stepMs: 38, duration: 0.24, wave: 'sine' },
-      jumpMars: { freqs: [220.0, 329.63, 440.0], gain: 0.034, stepMs: 32, duration: 0.22, wave: 'sine', filterFreq: 950, noisePuff: true },
-      jumpMoon: { freqs: [523.25, 659.25, 880.0, 1046.5], gain: 0.034, stepMs: 52, duration: 0.36, wave: 'sine' },
-      rcs: { freqs: [880.0, 1174.66], gain: 0.018, stepMs: 28, duration: 0.14, wave: 'triangle', noisePuff: true },
-      sample: { freqs: [523.25, 659.25, 783.99, 1046.5], gain: 0.05, stepMs: 65, duration: 0.55, wave: 'sine' },
-      analyzeSample: { freqs: [392.0, 587.33, 783.99, 1174.66, 1567.98], gain: 0.046, stepMs: 56, duration: 0.5, wave: 'sine', isScan: true },
-      sojournerRadio: { freqs: [1760.0, 2217.46, 1760.0, 2637.02], gain: 0.026, stepMs: 36, duration: 0.08, wave: 'triangle' },
-      sojournerMotor: { freqs: [130.81, 196.0, 164.81], gain: 0.018, stepMs: 45, duration: 0.14, wave: 'sawtooth', filterFreq: 550 },
-      arrival: { freqs: [261.63, 392.0, 493.88, 659.25], gain: 0.038, stepMs: 75, duration: 0.85, wave: 'sine' },
-      launch: { freqs: [65.41, 82.41, 110.0, 146.83, 220.0, 329.63], gain: 0.05, stepMs: 80, duration: 0.9, wave: 'triangle' }
+      step: { freqs: [523.25, 659.25], gain: 0.035, stepMs: 35, duration: 0.16, wave: 'sine' },
+      stepMars: { freqs: [174.61, 220.0], gain: 0.045, stepMs: 32, duration: 0.14, wave: 'sine', filterFreq: 820 },
+      jump: { freqs: [440.0, 587.33, 783.99], gain: 0.046, stepMs: 38, duration: 0.24, wave: 'sine' },
+      jumpMars: { freqs: [220.0, 329.63, 440.0], gain: 0.048, stepMs: 32, duration: 0.22, wave: 'sine', filterFreq: 950, noisePuff: true },
+      jumpMoon: { freqs: [523.25, 659.25, 880.0, 1046.5], gain: 0.038, stepMs: 52, duration: 0.36, wave: 'sine' },
+      rcs: { freqs: [880.0, 1174.66], gain: 0.025, stepMs: 28, duration: 0.14, wave: 'triangle', noisePuff: true },
+      sample: { freqs: [523.25, 659.25, 783.99, 1046.5], gain: 0.06, stepMs: 65, duration: 0.55, wave: 'sine' },
+      analyzeSample: { freqs: [392.0, 587.33, 783.99, 1174.66, 1567.98], gain: 0.055, stepMs: 56, duration: 0.5, wave: 'sine', isScan: true },
+      sojournerRadio: { freqs: [1760.0, 2217.46, 1760.0, 2637.02], gain: 0.038, stepMs: 36, duration: 0.08, wave: 'triangle' },
+      sojournerMotor: { freqs: [130.81, 196.0, 164.81], gain: 0.026, stepMs: 45, duration: 0.14, wave: 'sawtooth', filterFreq: 550 },
+      arrival: { freqs: [261.63, 392.0, 493.88, 659.25], gain: 0.045, stepMs: 75, duration: 0.85, wave: 'sine' },
+      launch: { freqs: [65.41, 82.41, 110.0, 146.83, 220.0, 329.63], gain: 0.06, stepMs: 80, duration: 0.9, wave: 'triangle' }
     };
     const preset = presets[type];
     if (!preset) return;
@@ -1386,7 +1386,7 @@
     for (let i = 0; i < bufferSize; i++) {
       const white = Math.random() * 2 - 1;
       lastOut = (lastOut + 0.02 * white) / 1.02;
-      data[i] = lastOut * 3.5;
+      data[i] = lastOut * 5.2;
     }
     return buffer;
   }
@@ -1404,7 +1404,7 @@
       const master = ctx.createGain();
       const currentVol = (soundEnabled && soundVolume > 0) ? soundVolume : 0;
       master.gain.setValueAtTime(0.0001, now);
-      master.gain.exponentialRampToValueAtTime(Math.max(0.0001, currentVol * 0.18), now + 2.5);
+      master.gain.exponentialRampToValueAtTime(Math.max(0.0001, currentVol * 0.65), now + 1.2);
       master.connect(ctx.destination);
       marsAmbience.masterGain = master;
 
@@ -1428,7 +1428,7 @@
       windLfo.start(now);
 
       const windGain = ctx.createGain();
-      windGain.gain.setValueAtTime(0.35, now);
+      windGain.gain.setValueAtTime(0.55, now);
 
       windSource.connect(windFilter);
       windFilter.connect(windGain);
@@ -1442,7 +1442,7 @@
 
       // 2. MÚSICA AMBIENTAL PROCEDURAL (Acordes etéreos espaciales)
       const musicGain = ctx.createGain();
-      musicGain.gain.setValueAtTime(0.42, now);
+      musicGain.gain.setValueAtTime(0.65, now);
       musicGain.connect(master);
       marsAmbience.musicGain = musicGain;
 
@@ -1480,7 +1480,7 @@
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(fIdx === 0 ? 220 : 680, tNow);
 
-            const voiceGain = (fIdx === 0 ? 0.09 : 0.055) / chord.length;
+            const voiceGain = (fIdx === 0 ? 0.22 : 0.16) / Math.sqrt(chord.length);
             gain.gain.setValueAtTime(0.0001, tNow);
             gain.gain.exponentialRampToValueAtTime(voiceGain, tNow + 2.8);
             gain.gain.setValueAtTime(voiceGain, tNow + chordDuration - 2.8);
@@ -1503,7 +1503,7 @@
             twOsc.type = 'sine';
             twOsc.frequency.setValueAtTime(tf, tNow + 2.0);
             twGain.gain.setValueAtTime(0.0001, tNow + 2.0);
-            twGain.gain.exponentialRampToValueAtTime(0.012, tNow + 2.3);
+            twGain.gain.exponentialRampToValueAtTime(0.065, tNow + 2.3);
             twGain.gain.exponentialRampToValueAtTime(0.0001, tNow + 5.5);
             twOsc.connect(twGain);
             twGain.connect(musicGain);
@@ -1555,10 +1555,31 @@
     if (!ctx) return;
     try {
       const now = ctx.currentTime;
-      const targetVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.18) : 0.0001;
-      marsAmbience.masterGain.gain.setTargetAtTime(targetVol, now, 0.12);
+      const targetVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.65) : 0.0001;
+      marsAmbience.masterGain.gain.setTargetAtTime(targetVol, now, 0.08);
     } catch (_e) { }
   }
+
+  function unlockAudioOnGesture() {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+      ctx.resume().then(() => {
+        if (world3d.active && world3d.siteId === 'ares-vallis') {
+          if (!marsAmbience.active) {
+            startMarsAmbience();
+          } else {
+            updateMarsAmbienceVolume();
+          }
+        }
+      }).catch(() => {});
+    } else if (ctx && world3d.active && world3d.siteId === 'ares-vallis' && !marsAmbience.active) {
+      startMarsAmbience();
+    }
+  }
+
+  ['click', 'pointerdown', 'touchstart', 'keydown'].forEach((evt) => {
+    window.addEventListener(evt, unlockAudioOnGesture, { passive: true });
+  });
 
   function updateSoundUI() {
     if (!dom.soundToggleBtn) return;
@@ -2086,7 +2107,26 @@
   function getWorld3dObstacles() {
     const obs = [];
     if (world3d.ship) {
-      obs.push({ id: 'ship', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.55 });
+      // Casco principal de la nave espacial
+      obs.push({ id: 'ship-hull', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.55 });
+      // Las 4 patas telescópicas y zapatas circulares (footpads)
+      const shipYaw = 0.36;
+      const shipScale = 1.82;
+      const cosY = Math.cos(shipYaw);
+      const sinY = Math.sin(shipYaw);
+      const legs = [
+        { id: 'ship-leg-fl', x: 0.74, z: 0.56 },
+        { id: 'ship-leg-fr', x: -0.74, z: 0.56 },
+        { id: 'ship-leg-rl', x: 0.88, z: -0.74 },
+        { id: 'ship-leg-rr', x: -0.88, z: -0.74 }
+      ];
+      legs.forEach((l) => {
+        const lx = l.x * shipScale;
+        const lz = l.z * shipScale;
+        const wx = world3d.ship.x + (lx * cosY + lz * sinY);
+        const wz = world3d.ship.z + (-lx * sinY + lz * cosY);
+        obs.push({ id: l.id, cx: wx, cz: wz, r: 0.44 });
+      });
     }
     if (world3d.machine) {
       const rMap = { sojourner: 0.64 };
@@ -2111,12 +2151,26 @@
   function resolveWorld3dPoint(wx, wz) {
     const t3d = getTerrain3D();
     if (!t3d) return { x: wx, y: 0, z: wz };
-    const clamped = t3d.clampWalkableWorld(wx, wz);
+    let clamped = t3d.clampWalkableWorld(wx, wz);
     if (typeof t3d.resolvePhysicalPosition === 'function') {
       const phys = t3d.resolvePhysicalPosition(clamped.x, clamped.z, 0.21);
-      return t3d.clampWalkableWorld(phys.x, phys.z);
+      clamped = t3d.clampWalkableWorld(phys.x, phys.z);
     }
-    return clamped;
+    // Clamping estricto fuera de todos los obstáculos (casco y patas de la nave, rocas, máquinas)
+    const obstacles = getWorld3dObstacles();
+    obstacles.forEach((o) => {
+      const d = Math.hypot(clamped.x - o.cx, clamped.z - o.cz);
+      const safeR = o.r + 0.18;
+      if (d < safeR) {
+        if (d > 1e-4) {
+          clamped.x = o.cx + ((clamped.x - o.cx) / d) * safeR;
+          clamped.z = o.cz + ((clamped.z - o.cz) / d) * safeR;
+        } else {
+          clamped.x = o.cx + safeR;
+        }
+      }
+    });
+    return t3d.clampWalkableWorld(clamped.x, clamped.z);
   }
 
   function segHitsCircle2D(ax, az, bx, bz, cx, cz, r) {
@@ -2375,6 +2429,22 @@
         if (typeof phys.dirX === 'number' && typeof phys.dirZ === 'number') {
           wa.steerDir = { x: phys.dirX, z: phys.dirZ };
         }
+
+        // Colisión física en tiempo real contra obstáculos 3D (patas de la nave, casco, rocas)
+        const obstacles = getWorld3dObstacles();
+        obstacles.forEach((o) => {
+          const d = Math.hypot(phys.x - o.cx, phys.z - o.cz);
+          const minD = o.r + 0.16;
+          if (d < minD) {
+            if (d > 1e-4) {
+              phys.x = o.cx + ((phys.x - o.cx) / d) * minD;
+              phys.z = o.cz + ((phys.z - o.cz) / d) * minD;
+            } else {
+              phys.x = o.cx + minD;
+            }
+            phys.y = t3d.getGroundHeightAt(phys.x, phys.z);
+          }
+        });
 
         const moveDx = phys.x - curX;
         const moveDz = phys.z - curZ;
@@ -3462,10 +3532,11 @@
       if (world3d.active && world3d.jumpAnim) {
         const ja = world3d.jumpAnim;
         const t3 = getTerrain3D();
+        const landPt = resolveWorld3dPoint(ja.to.x, ja.to.z);
         world3d.penguin = {
-          x: ja.to.x,
-          y: t3 ? t3.getGroundHeightAt(ja.to.x, ja.to.z) : 0,
-          z: ja.to.z,
+          x: landPt.x,
+          y: t3 ? t3.getGroundHeightAt(landPt.x, landPt.z) : 0,
+          z: landPt.z,
           yaw: ja.yaw || (world3d.penguin ? world3d.penguin.yaw : 0.42),
           isWalking: false,
           jumpHeight: 0
@@ -4151,7 +4222,7 @@
     if (marsAmbience.active && marsAmbience.masterGain) {
       const aCtx = getAudioContext();
       if (aCtx) {
-        const duckVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.07) : 0.0001;
+        const duckVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.22) : 0.0001;
         marsAmbience.masterGain.gain.setTargetAtTime(duckVol, aCtx.currentTime, 0.2);
       }
     }
@@ -4632,7 +4703,7 @@
     if (marsAmbience.active && marsAmbience.masterGain) {
       const aCtx = getAudioContext();
       if (aCtx) {
-        const normVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.18) : 0.0001;
+        const normVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.65) : 0.0001;
         marsAmbience.masterGain.gain.setTargetAtTime(normVol, aCtx.currentTime, 0.4);
       }
     }
