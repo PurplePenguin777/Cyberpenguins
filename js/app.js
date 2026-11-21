@@ -4087,13 +4087,16 @@
     let targetY;
 
     if (world3d.active && activeDialogueMachine) {
-      // En diálogo 3D frente a frente, centrar el globo entre ambos personajes (50%)
-      // dejando los controles de idioma y sonido de la esquina superior derecha 100% despejados
-      posX = 50;
+      // Posicionar directamente sobre el personaje que está hablando (Cyberpenguin a la izquierda o Sojourner a la derecha)
+      // dejando margen lateral para que el globo quede perfectamente dentro de pantalla
+      const halfBubblePct = ((bubbleW / 2) / Math.max(1, boardW)) * 100;
+      const minX = Math.max(22, halfBubblePct + 2.0);
+      const maxX = Math.min(78, 100 - halfBubblePct - 2.0);
+      posX = Math.max(minX, Math.min(maxX, x));
+
       dom.stageSpeechBubble.classList.remove('bubble-flipped');
-      const charTop = getDialogueAnchorY();
-      const desiredBottom = charTop ? (charTop - 2.5) : (y - 8);
-      targetY = Math.max(minSafeBottomPct, Math.min(52, desiredBottom));
+      const desiredBottom = isExactTop ? (y - 2.5) : (y - 7.5);
+      targetY = Math.max(minSafeBottomPct, Math.min(56, desiredBottom));
     } else {
       posX = Math.max(22, Math.min(78, x));
       const isFlipped = y < 28;

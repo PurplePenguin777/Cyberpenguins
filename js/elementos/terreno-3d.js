@@ -1469,17 +1469,16 @@ class Terrain3DController {
         }
       }
 
-      // Distancia de encuadre perfecta para que ambos personajes abarquen
-      // de lado a lado de la pantalla en vista lateral frente a frente
-      const camDist = Math.max(2.55, Math.min(3.2, dist * 2.35));
+      // Distancia de encuadre con zoom moderado (alejado un poco para dar holgura a los globos encima de cada uno)
+      const camDist = Math.max(3.55, Math.min(4.15, dist * 3.1));
       this.dialogueZoom.camPos.set(
         midX + nx * camDist,
-        midY + 0.48,
+        midY + 0.62,
         midZ + nz * camDist
       );
       this.dialogueZoom.targetPos.set(
         midX,
-        midY + 0.36,
+        midY + 0.48,
         midZ
       );
     } else {
@@ -2449,8 +2448,8 @@ class Terrain3DController {
 
       const baseFov = (this.siteConfig && this.siteConfig.exploreFov) || 37;
       if (zp > 0.001) {
-        // Enfoque cinematográfico lateral frente a frente (de lado a lado de la pantalla)
-        const curFov = baseFov - (4.5 * zp);
+        // Enfoque cinematográfico lateral frente a frente con zoom moderado (FOV 34°)
+        const curFov = baseFov - (3.0 * zp);
         if (Math.abs(this.camera.fov - curFov) > 0.01) {
           this.camera.fov = curFov;
           this.camera.updateProjectionMatrix();
