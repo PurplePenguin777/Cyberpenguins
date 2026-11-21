@@ -117,4 +117,6 @@ Las texturas planetarias y el fondo espacial de la Vía Láctea provienen de fue
 - **Mapa de textura de 433 Eros:** Phil Stooke / Askaniy Anpilogov (NASA PDS / Wikimedia Commons CC BY-SA 3.0), basado en datos de la cámara MSI de la misión NEAR Shoemaker.
 - **Mapa de la Tierra:** [NASA Visible Earth (Blue Marble)](https://visibleearth.nasa.gov/collection/1484/blue-marble), NASA Earth Observatory.
 - **Textura de Júpiter y cuerpos del sistema solar:** NASA / JPL-Caltech / Solar System Scope (CC BY 4.0), basada en imágenes de Cassini y Voyager.
+- **Topografía 3D de Ares Vallis (prototipo `.glb`):** ESA / DLR / FU Berlin / NASA PDS Geosciences Node, DTM estéreo Mars Express HRSC (`H3147_0000_DA4`).
+- **Motor WebGL / glTF:** [Three.js](https://threejs.org/) (Licencia MIT).
 - **Modelos y recursos 3D:** [NASA 3D Resources](https://science.nasa.gov/3d-resources/) / [GitHub NASA 3D Resources](https://github.com/nasa/NASA-3D-Resources), NASA / JPL-Caltech.

@@ -1425,6 +1425,130 @@ a:focus-visible {
   will-change: transform;
 }
 
+.iso-backdrop.has-3d-canvas {
+  transform: none;
+}
+
+.terrain-3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  z-index: 2;
+}
+
+.terrain-3d-canvas.is-ready {
+  opacity: 1;
+}
+
+.stage-3d-toggle-btn {
+  position: absolute;
+  bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  left: calc(1rem + env(safe-area-inset-left, 0px));
+  z-index: 96;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.95rem;
+  min-height: 36px;
+  border-radius: 999px;
+  background: rgba(14, 19, 40, 0.58);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(245, 247, 255, 0.9);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.18s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.stage-3d-toggle-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(24, 34, 68, 0.78);
+  border-color: rgba(125, 211, 252, 0.42);
+}
+
+.stage-3d-toggle-btn.is-active {
+  background: rgba(14, 116, 144, 0.72);
+  border-color: rgba(56, 189, 248, 0.65);
+  color: #e0f2fe;
+}
+
+.stage-3d-caption {
+  position: absolute;
+  bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 95;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.12rem;
+  max-width: min(560px, calc(100vw - 14rem));
+  padding: 0.48rem 1rem;
+  border-radius: 18px;
+  background: rgba(14, 19, 40, 0.62);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+}
+
+.stage-3d-caption-title {
+  color: #e0f2fe;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+}
+
+.stage-3d-caption-hint {
+  color: rgba(226, 232, 240, 0.76);
+  font-size: 0.62rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.iso-board.is-3d-inspect .iso-backdrop {
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.iso-board.is-3d-inspect .iso-backdrop:active {
+  cursor: grabbing;
+}
+
+.iso-board.is-3d-inspect #stage-entities-layer,
+.iso-board.is-3d-inspect #penguin-actor,
+.iso-board.is-3d-inspect #stage-action-prompt,
+.iso-board.is-3d-inspect .stage-fx-canvas,
+.iso-board.is-3d-inspect .stage-lighting-overlay,
+.iso-board.is-3d-inspect .stage-jump-btn {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.35s ease;
+}
+
+@media (max-width: 768px) {
+  .stage-3d-caption {
+    bottom: calc(4.15rem + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 2rem);
+    padding: 0.4rem 0.75rem;
+  }
+}
+
 /* Lienzo 2.5D de partículas físicas (polvo, estrellas y chorros RCS) */
 .stage-fx-canvas {
   position: absolute;

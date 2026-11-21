@@ -208,8 +208,6 @@
 
   function ridgeLayers(C, site, id) {
     let out = '';
-    const rgId = M.uid('rgcl');
-    let clipPaths = '';
 
     C.ridges.forEach((rg) => {
       const rand = rng(rg.seed + site.ridgeSeed);
@@ -218,35 +216,16 @@
         pts.push([-20 + (1040 * i) / rg.steps, rg.y0 - rand() * rg.amp]);
       }
       const d = smoothOpen(pts);
-      clipPaths += `<path d="${d} L 1020,300 L -20,300 Z" />`;
       out += `<path d="${d} L 1020,300 L -20,300 Z" fill="${rg.fill}" />`;
       out += `<path d="${d}" fill="none" stroke="${rg.edge}" stroke-opacity="0.55" stroke-width="1.3" />`;
     });
 
-    if (C.texture && clipPaths) {
-      out += `
-        <defs><clipPath id="${rgId}">${clipPaths}</clipPath></defs>
-        <g clip-path="url(#${rgId})">
-          <image href="${C.texture}" x="-20" y="200" width="1040" height="110" preserveAspectRatio="xMidYMid slice" opacity="0.32" />
-        </g>
-      `;
-    }
-
     if (site.twinPeaks) {
-      const tpId = M.uid('tp');
       const north = smoothOpen([[430, 280], [500, 248], [570, 208], [640, 242], [704, 280]]);
       const south = smoothOpen([[660, 282], [740, 228], [800, 176], [872, 224], [960, 282]]);
       out += `
-        <defs>
-          <clipPath id="${tpId}">
-            <path d="${north} L 704,300 L 430,300 Z ${south} L 960,300 L 660,300 Z" />
-          </clipPath>
-        </defs>
         <path d="${north} L 704,300 L 430,300 Z" fill="url(#${id}-pk)" />
         <path d="${south} L 960,300 L 660,300 Z" fill="url(#${id}-pk)" />
-        <g clip-path="url(#${tpId})">
-          <image href="${C.texture}" x="430" y="170" width="540" height="140" preserveAspectRatio="xMidYMid slice" opacity="0.45" />
-        </g>
         <path d="${north}" fill="none" stroke="#f0b894" stroke-opacity="0.55" stroke-width="1.3" />
         <path d="${south}" fill="none" stroke="#f0b894" stroke-opacity="0.55" stroke-width="1.3" />
       `;
@@ -394,7 +373,7 @@
 
         <g clip-path="url(#${id}-cl)">
           <rect x="-10" y="250" width="1020" height="350" fill="url(#${id}-gg)" />
-          ${C.texture ? `<image href="${C.texture}" x="-20" y="240" width="1040" height="360" preserveAspectRatio="xMidYMid slice" opacity="${kind === 'eros' ? 0.42 : 0.28}" />` : ''}
+          ${C.texture && kind !== 'mars' ? `<image href="${C.texture}" x="-20" y="240" width="1040" height="360" preserveAspectRatio="xMidYMid slice" opacity="${kind === 'eros' ? 0.42 : 0.14}" />` : ''}
           ${groundDunes(C, C.seed)}
           ${haze}
           ${ponds}

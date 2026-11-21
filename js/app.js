@@ -11,6 +11,7 @@
   const MODELS = global.CYBERPENGUINS_MODELS;
   const TTS = global.CYBERPENGUINS_TTS;
   const FX = global.CYBERPENGUINS_FX;
+  const getTerrain3D = () => global.CYBERPENGUINS_TERRAIN_3D || null;
 
   const DEFAULT_STATE = {
     launched: false,
@@ -61,6 +62,8 @@
   let previousVolume = 0.8;
   let quizSubmitted = false;
   let audioCtx = null;
+  let is3dInspectMode = false;
+  let currentActiveSiteId = '';
 
   // Datos gravitacionales reales por cuerpo celeste
   const GRAVITY_PROFILES = {
@@ -348,6 +351,7 @@
       if (dom.stageJumpBtn) {
         dom.stageJumpBtn.setAttribute('aria-label', isEn ? 'Jump according to gravity' : 'Saltar según la gravedad');
       }
+      sync3dLabels(currentActiveSiteId);
 
       // Si hay un globo de diálogo abierto, actualizar al nuevo idioma
       if (activeBranchState && activeBranchState.machine) {
@@ -511,6 +515,11 @@
     dom.stageActionLabel = document.getElementById('stage-action-label');
     dom.stageJumpBtn = document.getElementById('stage-jump-btn');
     dom.stageJumpLabel = document.getElementById('stage-jump-label');
+    dom.stage3dToggleBtn = document.getElementById('stage-3d-toggle-btn');
+    dom.stage3dToggleLabel = document.getElementById('stage-3d-toggle-label');
+    dom.stage3dCaption = document.getElementById('stage-3d-caption');
+    dom.stage3dCaptionTitle = document.getElementById('stage-3d-caption-title');
+    dom.stage3dCaptionHint = document.getElementById('stage-3d-caption-hint');
 
     dom.sampleDiscoveryModal = document.getElementById('sample-discovery-modal');
     dom.sampleDiscoveryCrystal = document.getElementById('sample-discovery-crystal');
@@ -818,17 +827,40 @@
 
     // Paralaje sutil 2.5D con movimiento del cursor sobre el escenario
     dom.isoBoard.addEventListener('mousemove', (event) => {
-      if (!FX || typeof FX.setCameraParallax !== 'function') return;
       const rect = dom.isoBoard.getBoundingClientRect();
       if (!rect || !rect.width || !rect.height) return;
       const nx = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
       const ny = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
-      FX.setCameraParallax(nx, ny);
+      if (FX && typeof FX.setCameraParallax === 'function') {
+        FX.setCameraParallax(nx, ny);
+      }
+      const t3d = getTerrain3D();
+      if (t3d && typeof t3d.setParallax === 'function') {
+        t3d.setParallax(nx, ny);
+      }
     });
 
     dom.isoBoard.addEventListener('mouseleave', () => {
       if (FX && typeof FX.setCameraParallax === 'function') {
         FX.setCameraParallax(0, 0);
+      }
+      const t3d = getTerrain3D();
+      if (t3d && typeof t3d.setParallax === 'function') {
+        t3d.setParallax(0, 0);
+      }
+    });
+
+    if (dom.stage3dToggleBtn) {
+      dom.stage3dToggleBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        triggerHaptic('tap');
+        set3dInspectMode(!is3dInspectMode);
+      });
+    }
+
+    global.addEventListener('cyberpenguins:terrain3d-ready', () => {
+      if (currentActiveSiteId) {
+        syncStage3dMount(currentActiveSiteId);
       }
     });
 
@@ -866,6 +898,7 @@
     let suppressBoardClickUntil = 0;
 
     dom.isoBoard.addEventListener('touchstart', (event) => {
+      if (is3dInspectMode) return;
       if (event.touches && event.touches.length === 1) {
         const touch = event.touches[0];
         touchStartX = touch.clientX;
@@ -875,6 +908,7 @@
     }, { passive: true });
 
     dom.isoBoard.addEventListener('touchend', (event) => {
+      if (is3dInspectMode) return;
       if (event.changedTouches && event.changedTouches.length === 1) {
         const touch = event.changedTouches[0];
         const deltaX = touch.clientX - touchStartX;
@@ -903,13 +937,14 @@
 
     // Clic / toque en el escenario para caminar sobre la superficie o flotar en caminata EVA
     dom.isoBoard.addEventListener('click', (event) => {
-      if (Date.now() < suppressBoardClickUntil) {
+      if (is3dInspectMode || Date.now() < suppressBoardClickUntil) {
         return;
       }
       if (
         event.target.closest('.stage-hotspot') ||
         event.target.closest('#penguin-actor') ||
         event.target.closest('#stage-jump-btn') ||
+        event.target.closest('#stage-3d-toggle-btn') ||
         event.target.closest('.back-home-btn') ||
         event.target.closest('.sound-control-group') ||
         event.target.closest('.stage-lang-selector') ||
@@ -936,13 +971,15 @@
       if (event.key === 'Escape') {
         if (isBlockingModalOpen()) {
           closeAllModals();
+        } else if (is3dInspectMode) {
+          set3dInspectMode(false);
         } else if (!dom.gameScreen.classList.contains('is-hidden')) {
           showHomeScreen();
         }
         return;
       }
 
-      if (isBlockingModalOpen() || dom.gameScreen.classList.contains('is-hidden')) {
+      if (is3dInspectMode || isBlockingModalOpen() || dom.gameScreen.classList.contains('is-hidden')) {
         return;
       }
 
@@ -1091,9 +1128,14 @@
     closeAllModals();
     clearWalkTimers();
     clearTitleCardTimers();
+    set3dInspectMode(false);
     TTS.stop();
     if (FX && typeof FX.pause === 'function') {
       FX.pause();
+    }
+    const t3d = getTerrain3D();
+    if (t3d && typeof t3d.pause === 'function') {
+      t3d.pause();
     }
     saveState();
     dom.gameScreen.classList.add('is-hidden');
@@ -1114,6 +1156,10 @@
       FX.resume();
     }
     loadChapterScene(targetId, true);
+    const t3d = getTerrain3D();
+    if (t3d && typeof t3d.resume === 'function') {
+      t3d.resume();
+    }
     if (dom.isoBoard && typeof dom.isoBoard.focus === 'function') {
       dom.isoBoard.focus({ preventScroll: true });
     }
@@ -1615,6 +1661,90 @@
     dom.stageLocationPill.textContent = activeMachine ? activeMachine.name : chapter.name;
   }
 
+  function sync3dLabels(siteId) {
+    const isEn = (state.currentLanguage === 'en');
+    const t3d = getTerrain3D();
+    const meta = (t3d && typeof t3d.getSiteMeta === 'function') ? t3d.getSiteMeta(siteId || currentActiveSiteId) : null;
+    if (dom.stage3dToggleLabel) {
+      dom.stage3dToggleLabel.textContent = is3dInspectMode
+        ? (isEn ? 'Back to explore' : 'Volver a explorar')
+        : (isEn ? '3D View' : 'Vista 3D');
+    }
+    if (dom.stage3dToggleBtn) {
+      dom.stage3dToggleBtn.setAttribute('aria-pressed', is3dInspectMode ? 'true' : 'false');
+      dom.stage3dToggleBtn.setAttribute(
+        'aria-label',
+        is3dInspectMode
+          ? (isEn ? 'Return to surface exploration' : 'Volver a explorar la superficie')
+          : (isEn ? 'Inspect real 3D NASA terrain' : 'Inspeccionar terreno 3D real de la NASA')
+      );
+      dom.stage3dToggleBtn.classList.toggle('is-active', is3dInspectMode);
+    }
+    if (meta && dom.stage3dCaptionTitle && dom.stage3dCaptionHint) {
+      dom.stage3dCaptionTitle.textContent = isEn ? meta.titleEn : meta.titleEs;
+      dom.stage3dCaptionHint.textContent = isEn ? meta.hintEn : meta.hintEs;
+    }
+  }
+
+  function set3dInspectMode(enabled) {
+    const t3d = getTerrain3D();
+    const canInspect = Boolean(enabled) && Boolean(t3d && currentActiveSiteId && t3d.hasSite(currentActiveSiteId));
+    is3dInspectMode = canInspect;
+
+    if (dom.isoBoard) {
+      dom.isoBoard.classList.toggle('is-3d-inspect', canInspect);
+    }
+    if (canInspect) {
+      clearWalkTimers();
+      closeDialogueModal();
+      hideStageActionPrompt();
+      hideThoughtBubble();
+    }
+    if (t3d && typeof t3d.setInspectMode === 'function') {
+      t3d.setInspectMode(canInspect);
+    }
+    if (dom.stage3dCaption) {
+      dom.stage3dCaption.classList.toggle('is-hidden', !canInspect);
+    }
+    sync3dLabels(currentActiveSiteId);
+  }
+
+  function syncStage3dMount(siteId) {
+    const t3d = getTerrain3D();
+    const has3d = Boolean(t3d && siteId && t3d.hasSite(siteId));
+
+    if (dom.stage3dToggleBtn) {
+      dom.stage3dToggleBtn.classList.toggle('is-hidden', !has3d);
+    }
+    if (!has3d) {
+      set3dInspectMode(false);
+      if (t3d && typeof t3d.unmount === 'function') {
+        t3d.unmount();
+      }
+      return;
+    }
+
+    sync3dLabels(siteId);
+    t3d.mount(dom.stageBackdropLayer, siteId, {
+      onReady: () => {
+        if (currentActiveSiteId !== siteId) return;
+        sync3dLabels(siteId);
+        if (dom.gameScreen && dom.gameScreen.classList.contains('is-hidden')) {
+          t3d.pause();
+        }
+      },
+      onError: () => {
+        if (dom.stage3dToggleBtn) {
+          dom.stage3dToggleBtn.classList.add('is-hidden');
+        }
+        set3dInspectMode(false);
+      }
+    });
+    if (dom.gameScreen && dom.gameScreen.classList.contains('is-hidden')) {
+      t3d.pause();
+    }
+  }
+
   function loadChapterScene(chapterId, animateDescend) {
     const chapter = getChapter(chapterId);
     const { activeMachine } = getActiveSite(chapter);
@@ -1622,6 +1752,8 @@
     const profile = getGravityProfile(chapter.id, siteId);
     clearWalkTimers();
     clearTitleCardTimers();
+    currentActiveSiteId = siteId;
+    set3dInspectMode(false);
     state.currentChapterId = chapter.id;
     hatchOpen = true;
     leftShipArea = false;
@@ -1635,6 +1767,7 @@
     updateLocationPill(chapter, activeMachine);
 
     dom.stageBackdropLayer.innerHTML = MODELS.stageBackdrop(chapter.id, siteId || undefined);
+    syncStage3dMount(siteId);
     if (FX && typeof FX.setScene === 'function') {
       FX.setScene(chapter.id, siteId);
       if (dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden') && typeof FX.resume === 'function') {
