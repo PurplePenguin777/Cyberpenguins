@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121f';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -574,36 +574,25 @@ class Terrain3DController {
         (gltf) => {
           const modelRoot = gltf.scene || new THREE.Group();
           modelRoot.traverse((obj) => {
-            if (!obj.isMesh) return;
-            const matName = (obj.material && obj.material.name) || '';
-            const hasCol = Boolean(obj.geometry && obj.geometry.attributes && obj.geometry.attributes.color);
+            if (!obj.isMesh || !obj.material) return;
+            const matName = obj.material.name || '';
             if (matName === 'HelmetPolycarbonateDome' || obj.name.includes('HelmetGlass')) {
               obj.material = new THREE.MeshPhysicalMaterial({
                 color: new THREE.Color('#dff4ff'),
                 transparent: true,
-                opacity: 0.24,
+                opacity: 0.22,
                 roughness: 0.05,
                 metalness: 0.04,
                 clearcoat: 1.0,
                 clearcoatRoughness: 0.04,
-                depthWrite: false
+                depthWrite: false,
+                side: THREE.FrontSide
               });
               obj.renderOrder = 3;
-            } else if (matName === 'PenguinEyesAndGoldVisor') {
-              obj.material = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                vertexColors: hasCol,
-                roughness: 0.13,
-                metalness: 0.45,
-                side: THREE.DoubleSide
-              });
             } else {
-              obj.material = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                vertexColors: hasCol,
-                roughness: 0.66,
-                metalness: 0.07
-              });
+              // Conservar los materiales PBR, texturas PNG y baseColorFactor del .glb
+              obj.material.side = THREE.FrontSide;
+              obj.material.needsUpdate = true;
             }
           });
           resolve(modelRoot);
