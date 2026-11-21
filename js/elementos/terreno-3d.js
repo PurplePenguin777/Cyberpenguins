@@ -330,6 +330,7 @@ function createInstancedMarsRocks(getHeightFn) {
   });
   const nearCount = 160;
   const nearInst = new THREE.InstancedMesh(nearGeo, nearMat, nearCount);
+  const rockColliders = [];
   let placedNear = 0;
   let attempts = 0;
   while (placedNear < nearCount && attempts < 1500) {
@@ -342,12 +343,22 @@ function createInstancedMarsRocks(getHeightFn) {
 
     const s = 0.055 + Math.pow(rand(), 2.6) * 0.22;
     const ry = getHeightFn(rx, rz);
+    const sx = s * (0.85 + rand() * 0.45);
+    const sy = s * (0.62 + rand() * 0.42);
+    const sz = s * (0.85 + rand() * 0.45);
     dummy.position.set(rx, ry - s * 0.22, rz);
     dummy.rotation.set((rand() - 0.5) * 0.4, rand() * Math.PI * 2, (rand() - 0.5) * 0.4);
-    dummy.scale.set(s * (0.85 + rand() * 0.45), s * (0.62 + rand() * 0.42), s * (0.85 + rand() * 0.45));
+    dummy.scale.set(sx, sy, sz);
     dummy.updateMatrix();
     nearInst.setMatrixAt(placedNear, dummy.matrix);
     nearInst.setColorAt(placedNear, palette[Math.floor(rand() * palette.length)]);
+
+    // Registrar colisionador físico real de cada roca cercana (radio y altura sobre el suelo)
+    const physR = Math.max(sx, sz) * 0.92;
+    const physH = Math.max(0.03, sy * 0.72 - s * 0.14);
+    if (physR >= 0.07) {
+      rockColliders.push({ x: rx, z: rz, r: physR, h: physH, baseY: ry });
+    }
     placedNear += 1;
   }
   nearInst.count = placedNear;
@@ -392,7 +403,7 @@ function createInstancedMarsRocks(getHeightFn) {
   farInst.frustumCulled = true;
   group.add(farInst);
 
-  return { group, totalRocks: placedNear + placedFar };
+  return { group, totalRocks: placedNear + placedFar, rockColliders };
 }
 
 function createPhobosMesh() {
@@ -520,6 +531,7 @@ class Terrain3DController {
     this.shipModelCache = new Map();
     this.sampleModelCache = new Map();
     this.sampleActors = new Map();
+    this.rockColliders = [];
     this.terrainHeightGrid = null;
     this.perfState = {
       currentPixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
@@ -1479,6 +1491,173 @@ class Terrain3DController {
     return { cols, rows, minX, maxX, minZ, maxZ, spanX, spanZ, data };
   }
 
+  getPhysicalSampleMeta(sampleId) {
+    const entry = this.sampleActors && this.sampleActors.get(sampleId);
+    if (!entry || !entry.group.visible) return null;
+    const node = entry.spec && entry.spec.node;
+    const sc = (entry.spec && entry.spec.scale) || 1.2;
+    if (node === 'Yogi') {
+      return { x: entry.group.position.x, z: entry.group.position.z, r: 0.48 * sc, h: 0.72 * sc, walkable: false };
+    }
+    if (node === 'BarnacleBill') {
+      return { x: entry.group.position.x, z: entry.group.position.z, r: 0.24 * sc, h: 0.34 * sc, walkable: false };
+    }
+    // Scooby Doo es una losa plana baja (~18 cm): Cyberpenguin puede subirse encima o rodearla
+    return { x: entry.group.position.x, z: entry.group.position.z, r: 0.28 * sc, h: 0.14 * sc, walkable: true };
+  }
+
+  /**
+   * Resuelve la posición física real (x, y, z) de Cyberpenguin frente a todos los volúmenes 3D:
+   * - Nave Ranger VTOL: caja orientada (OBB) ajustada al casco real (sin cerca gigante invisible)
+   * - Sojourner Rover: volumen ajustado a sus 6 ruedas (r = 0.38 u + radio corporal del pingüino)
+   * - Rocas altas (Yogi, Barnacle Bill, rocas grandes): deslizamiento tangencial exacto sin atravesarlas
+   * - Rocas bajas/planas (Scooby Doo y cantos bajos <= 0.18 u): Cyberpenguin sube físicamente sobre ellas
+   */
+  resolvePhysicalPosition(wx, wz, penguinRadius = 0.21) {
+    let x = wx;
+    let z = wz;
+    const pr = penguinRadius;
+
+    for (let pass = 0; pass < 2; pass += 1) {
+      // 1. Caja orientada (OBB) ajustada al fuselaje real del Ranger VTOL
+      if (this.shipActor && this.shipState) {
+        const sx = this.shipState.x;
+        const sz = this.shipState.z;
+        const yaw = this.shipState.yaw || 0.36;
+        const sc = this.shipActor.scale || 1.82;
+        const dx = x - sx;
+        const dz = z - sz;
+        const cosY = Math.cos(-yaw);
+        const sinY = Math.sin(-yaw);
+        // Transformar al espacio local del Ranger (+Z nariz, +X costado de la rampa)
+        const lx = dx * cosY + dz * sinY;
+        const lz = -dx * sinY + dz * cosY;
+        const halfW = 0.78 * sc;
+        const halfL = 1.08 * sc;
+        const cx = clampVal(lx, -halfW, halfW);
+        const cz = clampVal(lz, -halfL, halfL);
+        const ex = lx - cx;
+        const ez = lz - cz;
+        const dist = Math.hypot(ex, ez);
+        if (dist < pr) {
+          let nlx = lx;
+          let nlz = lz;
+          if (dist > 1e-4) {
+            nlx = cx + (ex / dist) * pr;
+            nlz = cz + (ez / dist) * pr;
+          } else {
+            // Dentro del OBB: empujar hacia la cara más cercana
+            const penX = halfW - Math.abs(lx);
+            const penZ = halfL - Math.abs(lz);
+            if (penX < penZ) {
+              nlx = (lx >= 0 ? 1 : -1) * (halfW + pr);
+            } else {
+              nlz = (lz >= 0 ? 1 : -1) * (halfL + pr);
+            }
+          }
+          const cosF = Math.cos(yaw);
+          const sinF = Math.sin(yaw);
+          x = sx + nlx * cosF + nlz * sinF;
+          z = sz - nlx * sinF + nlz * cosF;
+        }
+      }
+
+      // 2. Sojourner Rover (volumen compacto real de sus 6 ruedas: r = 0.38 * scale)
+      if (this.machineActor && this.machineState) {
+        const mx = this.machineState.x;
+        const mz = this.machineState.z;
+        const mr = 0.36 * (this.machineActor.scale || 1.18) + pr;
+        const dx = x - mx;
+        const dz = z - mz;
+        const d = Math.hypot(dx, dz);
+        if (d < mr) {
+          if (d < 1e-4) {
+            x = mx - mr;
+          } else {
+            x = mx + (dx / d) * mr;
+            z = mz + (dz / d) * mr;
+          }
+        }
+      }
+
+      // 3. Rocas recolectables altas (Yogi, Barnacle Bill)
+      if (this.sampleActors && this.sampleActors.size > 0) {
+        this.sampleActors.forEach((_entry, sampleId) => {
+          const meta = this.getPhysicalSampleMeta(sampleId);
+          if (!meta || meta.walkable) return;
+          const minD = meta.r + pr;
+          const dx = x - meta.x;
+          const dz = z - meta.z;
+          const d = Math.hypot(dx, dz);
+          if (d < minD) {
+            if (d < 1e-4) {
+              z = meta.z + minD;
+            } else {
+              x = meta.x + (dx / d) * minD;
+              z = meta.z + (dz / d) * minD;
+            }
+          }
+        });
+      }
+
+      // 4. Rocas ambientales altas del canal de Ares Vallis (h > 0.16 u -> rodear; <= 0.16 u -> pisar encima)
+      if (this.rockColliders && this.rockColliders.length > 0) {
+        for (let i = 0; i < this.rockColliders.length; i += 1) {
+          const rk = this.rockColliders[i];
+          if (rk.h <= 0.16) continue;
+          const minD = rk.r + pr * 0.85;
+          const dx = x - rk.x;
+          const dz = z - rk.z;
+          const dSq = dx * dx + dz * dz;
+          if (dSq < minD * minD) {
+            const d = Math.sqrt(dSq);
+            if (d < 1e-4) {
+              z = rk.z + minD;
+            } else {
+              x = rk.x + (dx / d) * minD;
+              z = rk.z + (dz / d) * minD;
+            }
+          }
+        }
+      }
+    }
+
+    // Calcular altura física de apoyo: terreno + subida suave sobre rocas bajas/planas (como Scooby Doo)
+    let y = this.getGroundHeightAt(x, z);
+
+    if (this.sampleActors && this.sampleActors.size > 0) {
+      this.sampleActors.forEach((_entry, sampleId) => {
+        const meta = this.getPhysicalSampleMeta(sampleId);
+        if (!meta || !meta.walkable) return;
+        const d = Math.hypot(x - meta.x, z - meta.z);
+        const outerR = meta.r + pr * 0.65;
+        if (d < outerR) {
+          const t = clampVal(1.0 - d / outerR, 0, 1);
+          const smoothStep = t * t * (3 - 2 * t);
+          y = Math.max(y, this.getGroundHeightAt(meta.x, meta.z) + meta.h * smoothStep);
+        }
+      });
+    }
+
+    if (this.rockColliders && this.rockColliders.length > 0) {
+      for (let i = 0; i < this.rockColliders.length; i += 1) {
+        const rk = this.rockColliders[i];
+        if (rk.h > 0.16) continue;
+        const outerR = rk.r + pr * 0.55;
+        const dx = x - rk.x;
+        const dz = z - rk.z;
+        const dSq = dx * dx + dz * dz;
+        if (dSq < outerR * outerR) {
+          const t = clampVal(1.0 - Math.sqrt(dSq) / outerR, 0, 1);
+          const smoothStep = t * t * (3 - 2 * t);
+          y = Math.max(y, rk.baseY + rk.h * smoothStep);
+        }
+      }
+    }
+
+    return { x, y, z };
+  }
+
   getGroundHeightAt(wx, wz) {
     const hg = this.terrainHeightGrid;
     if (hg) {
@@ -1657,13 +1836,13 @@ class Terrain3DController {
         : [];
       this.terrainHeightGrid = modelRoot.userData.heightGrid || null;
 
-      // Campo de ~460 rocas marcianas 3D reales en Ares Vallis mediante GPU Instancing (2 draw calls)
+      // Campo de ~420 rocas marcianas 3D reales en Ares Vallis mediante GPU Instancing (2 draw calls)
       const rockField = createInstancedMarsRocks(
-        (rx, rz) => this.getGroundHeightAt(rx, rz),
-        this.regolithTextures
+        (rx, rz) => this.getGroundHeightAt(rx, rz)
       );
       wrapper.add(rockField.group);
       this.instancedRockCount = rockField.totalRocks;
+      this.rockColliders = rockField.rockColliders || [];
 
       this.sampleActors = this.createSampleActors(sampleTemplate, cfg.sampleNodeMap);
       this.sampleActors.forEach((entry) => wrapper.add(entry.group));
@@ -1736,6 +1915,7 @@ class Terrain3DController {
     this.machineActor = null;
     this.shipActor = null;
     this.sampleActors = new Map();
+    this.rockColliders = [];
     this.inspectMode = false;
     this.camTransition = null;
     this.stopLoop();

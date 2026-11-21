@@ -1805,41 +1805,37 @@
   function getWorld3dObstacles() {
     const obs = [];
     if (world3d.ship) {
-      obs.push({ id: 'ship', cx: world3d.ship.x, cz: world3d.ship.z, r: 2.02 });
+      obs.push({ id: 'ship', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.55 });
     }
     if (world3d.machine) {
-      const rMap = { sojourner: 0.90 };
+      const rMap = { sojourner: 0.64 };
       obs.push({
         id: world3d.machine.id,
         cx: world3d.machine.x,
         cz: world3d.machine.z,
-        r: rMap[world3d.machine.id] || 1.4
+        r: rMap[world3d.machine.id] || 1.15
       });
     }
+    Object.values(world3d.samples || {}).forEach((s) => {
+      if (!s || state.collectedSamples.includes(s.id)) return;
+      if (s.id === 'sample-mars-5') {
+        obs.push({ id: s.id, cx: s.x, cz: s.z, r: 0.72 }); // Yogi (bloque grande)
+      } else if (s.id === 'sample-mars-4') {
+        obs.push({ id: s.id, cx: s.x, cz: s.z, r: 0.52 }); // Barnacle Bill
+      }
+    });
     return obs;
   }
 
   function resolveWorld3dPoint(wx, wz) {
     const t3d = getTerrain3D();
     if (!t3d) return { x: wx, y: 0, z: wz };
-    let pt = t3d.clampWalkableWorld(wx, wz);
-    const obsList = getWorld3dObstacles();
-    for (let pass = 0; pass < 2; pass += 1) {
-      obsList.forEach((o) => {
-        const dx = pt.x - o.cx;
-        const dz = pt.z - o.cz;
-        const d = Math.hypot(dx, dz);
-        if (d < o.r) {
-          if (d < 0.04) {
-            pt = t3d.clampWalkableWorld(o.cx + 1.2, o.cz + o.r + 0.4);
-          } else {
-            const s = (o.r * 1.08) / d;
-            pt = t3d.clampWalkableWorld(o.cx + dx * s, o.cz + dz * s);
-          }
-        }
-      });
+    const clamped = t3d.clampWalkableWorld(wx, wz);
+    if (typeof t3d.resolvePhysicalPosition === 'function') {
+      const phys = t3d.resolvePhysicalPosition(clamped.x, clamped.z, 0.21);
+      return t3d.clampWalkableWorld(phys.x, phys.z);
     }
-    return pt;
+    return clamped;
   }
 
   function segHitsCircle2D(ax, az, bx, bz, cx, cz, r) {
@@ -2041,11 +2037,18 @@
         const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
         const nx = segFrom.x + (segTo.x - segFrom.x) * ease;
         const nz = segFrom.z + (segTo.z - segFrom.z) * ease;
-        const segHeading = Math.atan2(segTo.x - segFrom.x, segTo.z - segFrom.z);
+        const phys = typeof t3d.resolvePhysicalPosition === 'function'
+          ? t3d.resolvePhysicalPosition(nx, nz, 0.21)
+          : { x: nx, y: t3d.getGroundHeightAt(nx, nz), z: nz };
+        const moveDx = phys.x - world3d.penguin.x;
+        const moveDz = phys.z - world3d.penguin.z;
+        const segHeading = Math.hypot(moveDx, moveDz) > 0.002
+          ? Math.atan2(moveDx, moveDz)
+          : Math.atan2(segTo.x - segFrom.x, segTo.z - segFrom.z);
         world3d.penguin = {
-          x: nx,
-          y: t3d.getGroundHeightAt(nx, nz),
-          z: nz,
+          x: phys.x,
+          y: phys.y,
+          z: phys.z,
           yaw: segHeading,
           isWalking: true,
           jumpHeight: 0
@@ -2708,10 +2711,10 @@
         if (!machine) return;
         if (world3d.active && world3d.machine && world3d.penguin) {
           const sideSign = world3d.penguin.x < world3d.machine.x ? -1 : 1;
-          const destW = resolveWorld3dPoint(world3d.machine.x + sideSign * 1.25, world3d.machine.z + 0.75);
+          const destW = resolveWorld3dPoint(world3d.machine.x + sideSign * 0.72, world3d.machine.z + 0.42);
           walkPenguin3dTo(destW.x, destW.z, () => {
             if (world3d.penguin && world3d.machine) {
-              world3d.penguin.yaw = Math.atan2(world3d.machine.x - world3d.penguin.x, 0.65);
+              world3d.penguin.yaw = Math.atan2(world3d.machine.x - world3d.penguin.x, world3d.machine.z - world3d.penguin.z);
             }
             openDialogueModal(machine);
           });
@@ -2739,8 +2742,22 @@
         if (!sampleObj) return;
         if (world3d.active && world3d.samples[sampleObj.id]) {
           const sW = world3d.samples[sampleObj.id];
-          const destW = resolveWorld3dPoint(sW.x, sW.z);
+          let destX = sW.x;
+          let destZ = sW.z;
+          // Detenerse justo al borde físico de la roca (en vez de caminar dentro de ella)
+          if (world3d.penguin) {
+            const dx = world3d.penguin.x - sW.x;
+            const dz = world3d.penguin.z - sW.z;
+            const d = Math.hypot(dx, dz) || 1;
+            const standoff = sampleObj.id === 'sample-mars-5' ? 0.78 : (sampleObj.id === 'sample-mars-4' ? 0.58 : 0.46);
+            destX = sW.x + (dx / d) * standoff;
+            destZ = sW.z + (dz / d) * standoff;
+          }
+          const destW = resolveWorld3dPoint(destX, destZ);
           walkPenguin3dTo(destW.x, destW.z, () => {
+            if (world3d.penguin) {
+              world3d.penguin.yaw = Math.atan2(sW.x - world3d.penguin.x, sW.z - world3d.penguin.z);
+            }
             openSampleDiscoveryModal(chapter, sampleObj);
           });
           return;
