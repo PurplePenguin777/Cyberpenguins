@@ -342,11 +342,18 @@ function createInstancedMarsRocks(getHeightFn) {
     if (!isClear(rx, rz)) continue;
 
     const s = 0.055 + Math.pow(rand(), 2.6) * 0.22;
-    const ry = getHeightFn(rx, rz);
     const sx = s * (0.85 + rand() * 0.45);
     const sy = s * (0.62 + rand() * 0.42);
     const sz = s * (0.85 + rand() * 0.45);
-    dummy.position.set(rx, ry - s * 0.22, rz);
+    const rFoot = Math.max(sx, sz) * 0.8;
+    const ry = Math.min(
+      getHeightFn(rx, rz),
+      getHeightFn(rx + rFoot, rz),
+      getHeightFn(rx - rFoot, rz),
+      getHeightFn(rx, rz + rFoot),
+      getHeightFn(rx, rz - rFoot)
+    );
+    dummy.position.set(rx, ry - sy * 0.28, rz);
     dummy.rotation.set((rand() - 0.5) * 0.4, rand() * Math.PI * 2, (rand() - 0.5) * 0.4);
     dummy.scale.set(sx, sy, sz);
     dummy.updateMatrix();
@@ -388,8 +395,15 @@ function createInstancedMarsRocks(getHeightFn) {
     if (!isClear(rx, rz)) continue;
 
     const s = 0.14 + Math.pow(rand(), 2.2) * 0.48;
-    const ry = getHeightFn(rx, rz);
-    dummy.position.set(rx, ry - s * 0.26, rz);
+    const rFoot = s * 0.85;
+    const ry = Math.min(
+      getHeightFn(rx, rz),
+      getHeightFn(rx + rFoot, rz),
+      getHeightFn(rx - rFoot, rz),
+      getHeightFn(rx, rz + rFoot),
+      getHeightFn(rx, rz - rFoot)
+    );
+    dummy.position.set(rx, ry - s * 0.36, rz);
     dummy.rotation.set((rand() - 0.5) * 0.5, rand() * Math.PI * 2, (rand() - 0.5) * 0.5);
     dummy.scale.set(s * (0.8 + rand() * 0.5), s * (0.58 + rand() * 0.45), s * (0.8 + rand() * 0.5));
     dummy.updateMatrix();
@@ -1061,11 +1075,17 @@ class Terrain3DController {
       meshClone.position.set(0, 0, 0);
       meshClone.scale.setScalar(spec.scale || 1.2);
       meshClone.rotation.set(0, spec.yaw || 0, 0);
+      // Normalizar la base exacta de cada roca a y = 0 para que jamás flote sobre el suelo
+      meshClone.updateMatrixWorld(true);
+      const localBox = new THREE.Box3().setFromObject(meshClone);
+      if (Number.isFinite(localBox.min.y)) {
+        meshClone.position.y -= localBox.min.y;
+      }
 
       const shadow = createPenguinContactShadow();
       const sRad = (spec.scale || 1.2) * (spec.node === 'Yogi' ? 1.55 : 0.95);
       shadow.scale.set(sRad, 1, sRad);
-      shadow.position.set(0, 0.015, 0);
+      shadow.position.set(0, 0.025, 0);
 
       const group = new THREE.Group();
       group.name = `SampleActor_${sampleId}`;
@@ -1086,8 +1106,16 @@ class Terrain3DController {
         entry.group.visible = false;
         return;
       }
-      const gy = this.getGroundHeightAt(anchor.x, anchor.z);
-      entry.group.position.set(anchor.x, gy - 0.03, anchor.z);
+      const sc = (entry.spec && entry.spec.scale) || 1.2;
+      const rEdge = (entry.spec && entry.spec.node === 'Yogi' ? 0.45 : 0.24) * sc;
+      const minY = Math.min(
+        this.getGroundHeightAt(anchor.x, anchor.z),
+        this.getGroundHeightAt(anchor.x + rEdge, anchor.z),
+        this.getGroundHeightAt(anchor.x - rEdge, anchor.z),
+        this.getGroundHeightAt(anchor.x, anchor.z + rEdge),
+        this.getGroundHeightAt(anchor.x, anchor.z - rEdge)
+      );
+      entry.group.position.set(anchor.x, minY - 0.045, anchor.z);
       entry.group.visible = true;
     });
   }
@@ -1656,6 +1684,85 @@ class Terrain3DController {
     }
 
     return { x, y, z };
+  }
+
+  /**
+   * Avanza a Cyberpenguin un paso suave de longitud `stepDist` desde (curX, curZ) hacia
+   * (targetX, targetZ) usando dirección tangencial anticipada (steering) alrededor de
+   * obstáculos sólidos, manteniendo velocidad constante sin tirones ni saltos bruscos.
+   */
+  computeSteeredStep(curX, curZ, targetX, targetZ, stepDist, penguinRadius = 0.21) {
+    const toX = targetX - curX;
+    const toZ = targetZ - curZ;
+    const distToTarget = Math.hypot(toX, toZ);
+    if (distToTarget < 1e-4) {
+      return this.resolvePhysicalPosition(curX, curZ, penguinRadius);
+    }
+
+    let dirX = toX / distToTarget;
+    let dirZ = toZ / distToTarget;
+    const lookHalo = 0.58;
+
+    const applyAvoidance = (ox, oz, obsR) => {
+      const rx = curX - ox;
+      const rz = curZ - oz;
+      const d = Math.hypot(rx, rz);
+      const safeR = obsR + penguinRadius;
+      const outerR = safeR + lookHalo;
+      if (d >= outerR || d < 1e-4) return;
+
+      // Sólo rodear si el obstáculo está por delante o al costado de nuestra dirección deseada
+      const toObsX = -rx / d;
+      const toObsZ = -rz / d;
+      const forwardDot = dirX * toObsX + dirZ * toObsZ;
+      if (forwardDot < -0.15) return;
+
+      // Elegir de forma consistente el lado tangencial más natural (izquierda o derecha)
+      const cross = dirX * toObsZ - dirZ * toObsX;
+      const turnSign = cross >= 0 ? 1 : -1;
+      const tangX = -toObsZ * turnSign;
+      const tangZ = toObsX * turnSign;
+
+      const t = clampVal(1.0 - (d - safeR) / lookHalo, 0, 1);
+      const w = t * t * (3 - 2 * t) * 0.92;
+      // Combinar suavemente dirección deseada + tangente + ligera repulsión radial si está muy cerca
+      const pushOut = t > 0.72 ? (t - 0.72) * 1.15 : 0;
+      dirX = dirX * (1 - w) + tangX * w - toObsX * pushOut;
+      dirZ = dirZ * (1 - w) + tangZ * w - toObsZ * pushOut;
+      const len = Math.hypot(dirX, dirZ) || 1;
+      dirX /= len;
+      dirZ /= len;
+    };
+
+    // 1. Evitación suave alrededor de la nave Ranger
+    if (this.shipActor && this.shipState) {
+      applyAvoidance(this.shipState.x, this.shipState.z, 1.38);
+    }
+    // 2. Evitación suave alrededor de Sojourner
+    if (this.machineActor && this.machineState) {
+      applyAvoidance(this.machineState.x, this.machineState.z, 0.36 * (this.machineActor.scale || 1.18));
+    }
+    // 3. Evitación suave alrededor de Yogi y Barnacle Bill
+    if (this.sampleActors && this.sampleActors.size > 0) {
+      this.sampleActors.forEach((_entry, sampleId) => {
+        const meta = this.getPhysicalSampleMeta(sampleId);
+        if (!meta || meta.walkable) return;
+        applyAvoidance(meta.x, meta.z, meta.r);
+      });
+    }
+    // 4. Evitación suave alrededor de rocas ambientales altas
+    if (this.rockColliders && this.rockColliders.length > 0) {
+      for (let i = 0; i < this.rockColliders.length; i += 1) {
+        const rk = this.rockColliders[i];
+        if (rk.h <= 0.16) continue;
+        applyAvoidance(rk.x, rk.z, rk.r);
+      }
+    }
+
+    const moveDist = Math.min(stepDist, distToTarget);
+    const nextX = curX + dirX * moveDist;
+    const nextZ = curZ + dirZ * moveDist;
+    return this.resolvePhysicalPosition(nextX, nextZ, penguinRadius);
   }
 
   getGroundHeightAt(wx, wz) {

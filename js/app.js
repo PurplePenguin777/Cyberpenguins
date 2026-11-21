@@ -2022,7 +2022,6 @@
 
     if (world3d.walkAnim && world3d.penguin) {
       const wa = world3d.walkAnim;
-      const segFrom = wa.from;
       const segTo = wa.waypoints[wa.idx];
       if (!segTo) {
         world3d.walkAnim = null;
@@ -2032,19 +2031,33 @@
         const cb = wa.onArrive;
         if (cb) cb();
       } else {
-        const t = Math.min(1, Math.max(0, (now - wa.startTime) / Math.max(1, wa.durationMs)));
-        // Suavizado natural (aceleración y frenado suaves de caminata de pingüino)
-        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-        const nx = segFrom.x + (segTo.x - segFrom.x) * ease;
-        const nz = segFrom.z + (segTo.z - segFrom.z) * ease;
-        const phys = typeof t3d.resolvePhysicalPosition === 'function'
-          ? t3d.resolvePhysicalPosition(nx, nz, 0.21)
-          : { x: nx, y: t3d.getGroundHeightAt(nx, nz), z: nz };
-        const moveDx = phys.x - world3d.penguin.x;
-        const moveDz = phys.z - world3d.penguin.z;
-        const segHeading = Math.hypot(moveDx, moveDz) > 0.002
+        const dt = wa.lastFrameAt ? Math.min(0.05, Math.max(0.004, (now - wa.lastFrameAt) * 0.001)) : 0.016;
+        wa.lastFrameAt = now;
+
+        const curX = world3d.penguin.x;
+        const curZ = world3d.penguin.z;
+        const remDist = Math.hypot(segTo.x - curX, segTo.z - curZ);
+
+        // Aceleración y frenado suaves manteniendo velocidad pausada y constante al rodear obstáculos
+        const accelFactor = Math.min(1, (now - wa.startTime) / 240);
+        const decelFactor = wa.idx === wa.waypoints.length - 1 ? Math.min(1, Math.max(0.32, remDist / 0.65)) : 1;
+        const speed = 2.05 * (0.35 + 0.65 * accelFactor) * decelFactor;
+        const stepDist = speed * dt;
+
+        const phys = typeof t3d.computeSteeredStep === 'function'
+          ? t3d.computeSteeredStep(curX, curZ, segTo.x, segTo.z, stepDist, 0.21)
+          : t3d.resolvePhysicalPosition(curX + ((segTo.x - curX) / Math.max(1e-4, remDist)) * stepDist, curZ + ((segTo.z - curZ) / Math.max(1e-4, remDist)) * stepDist, 0.21);
+
+        const moveDx = phys.x - curX;
+        const moveDz = phys.z - curZ;
+        const moved = Math.hypot(moveDx, moveDz);
+        const segHeading = moved > 0.0015
           ? Math.atan2(moveDx, moveDz)
-          : Math.atan2(segTo.x - segFrom.x, segTo.z - segFrom.z);
+          : world3d.penguin.yaw;
+
+        if (moveDx < -0.002) penguinDir = 'left';
+        else if (moveDx > 0.002) penguinDir = 'right';
+
         world3d.penguin = {
           x: phys.x,
           y: phys.y,
@@ -2062,12 +2075,19 @@
           }
         }
 
-        if (t >= 1) {
+        const newRem = Math.hypot(segTo.x - phys.x, segTo.z - phys.z);
+        if (moved < stepDist * 0.15) {
+          wa.stallMs = (wa.stallMs || 0) + dt * 1000;
+        } else {
+          wa.stallMs = 0;
+        }
+
+        if (newRem <= 0.14 || (wa.stallMs || 0) > 380) {
           wa.idx += 1;
+          wa.stallMs = 0;
           if (wa.idx >= wa.waypoints.length) {
             world3d.walkAnim = null;
             world3d.penguin.isWalking = false;
-            // Al detenerse, girar levemente hacia un ángulo 3/4 frontal para mostrar el casco y rostro
             const restSign = Math.sin(world3d.penguin.yaw) >= 0 ? 1 : -1;
             if (Math.cos(world3d.penguin.yaw) < -0.25) {
               world3d.penguin.yaw = restSign * 0.65;
@@ -2077,13 +2097,9 @@
             if (wa.onArrive) wa.onArrive();
           } else {
             const nextPt = wa.waypoints[wa.idx];
-            wa.from = { ...world3d.penguin };
-            wa.startTime = now;
-            wa.durationMs = computeWalkDuration3d(wa.from, nextPt);
-            world3d.penguin.yaw = Math.atan2(nextPt.x - wa.from.x, nextPt.z - wa.from.z);
-            if (nextPt.x < wa.from.x - 0.15) penguinDir = 'left';
-            else if (nextPt.x > wa.from.x + 0.15) penguinDir = 'right';
-            if (penguinDir !== lastRenderedDir) {
+            if (nextPt.x < phys.x - 0.15) penguinDir = 'left';
+            else if (nextPt.x > phys.x + 0.15) penguinDir = 'right';
+            if (penguinDir !== lastRenderedDir && dom.penguinSprite) {
               dom.penguinSprite.innerHTML = MODELS.cyberpenguin(penguinDir);
               lastRenderedDir = penguinDir;
             }
