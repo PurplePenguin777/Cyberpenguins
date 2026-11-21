@@ -822,16 +822,20 @@ def build_hull_primitives():
         height_segs=1,
     )
 
-    # 6. Side-Forward EVA Airlock Threshold (+X side chine bay at z = -0.04, between the +X landing legs,
-    # keeping the hypersonic stagnation nose cap 100% solid and uninterrupted!)
-    mbs[MAT_DARK_TITANIUM].add_squircle_box(
-        0.58, 0.42, -0.04, 0.14, 0.20, 0.30, power=3.0, col=C_WHITE, rows=10, cols=18
-    )
+    # 6. Side-Forward EVA Airlock Portal & Open Gull-Wing Hatch Door (+X side chine bay at z = -0.04,
+    # sized so Cyberpenguin fits comfortably through the doorway into the pressurized cabin!)
     mbs[MAT_ALU_STRUT].add_squircle_box(
-        0.56, 0.42, -0.04, 0.12, 0.23, 0.34, power=3.2, col=C_WHITE, rows=10, cols=18
+        0.54, 0.48, -0.04, 0.16, 0.46, 0.44, power=3.2, col=C_WHITE, rows=12, cols=20
+    )
+    mbs[MAT_DARK_TITANIUM].add_squircle_box(
+        0.57, 0.48, -0.04, 0.14, 0.41, 0.38, power=3.0, col=C_WHITE, rows=10, cols=18
+    )
+    # Open upward-hinged gull-wing airlock canopy door above the portal
+    mbs[MAT_ALU_STRUT].add_squircle_box(
+        0.70, 0.76, -0.04, 0.26, 0.045, 0.40, power=3.0, col=C_WHITE, rows=8, cols=16
     )
     mbs[MAT_CYAN_GLOW].add_squircle_box(
-        0.64, 0.51, -0.04, 0.03, 0.020, 0.24, power=2.6, col=C_WHITE, rows=6, cols=12
+        0.63, 0.68, -0.04, 0.035, 0.024, 0.34, power=2.6, col=C_WHITE, rows=6, cols=12
     )
 
     return mbs
@@ -944,10 +948,10 @@ def build_landing_gear_primitives():
 
 
 def build_hatch_ramp_primitives():
-    """Node 4 (`HatchRamp`): Solid side-forward deployable EVA boarding ramp extending from
-    the +X mid-forward airlock threshold (x = 0.62, y = 0.31, z = -0.04) between the front
-    and rear +X landing legs down to the ground (x = 1.18, y = 0.010, z = -0.04), leaving
-    the hypersonic nose cone 100% solid and unbroken!
+    """Node 4 (`HatchRamp`): Wide, solid side-forward deployable EVA boarding ramp extending from
+    the +X mid-forward airlock threshold (x = 0.60, y = 0.30, z = -0.04) between the front
+    and rear +X landing legs down to the ground (x = 1.18, y = 0.012, z = -0.04), wide enough
+    (0.36 m local -> 0.68 units scaled) for Cyberpenguin (0.39 units wide) to walk up comfortably!
     """
     mbs = {
         MAT_ALU_STRUT: MeshBuilder(),
@@ -956,7 +960,7 @@ def build_hatch_ramp_primitives():
     }
 
     steps = 6
-    p_top = (0.62, 0.31, -0.04)
+    p_top = (0.60, 0.30, -0.04)
     p_bot = (1.18, 0.012, -0.04)
     z_center = -0.04
 
@@ -967,38 +971,38 @@ def build_hatch_ramp_primitives():
         sx = p_top[0] + (p_bot[0] - p_top[0]) * t
         sy = p_top[1] + (p_bot[1] - p_top[1]) * t - 0.012
         mbs[MAT_DARK_TITANIUM].add_squircle_box(
-            sx, max(0.008, sy), z_center, 0.068, 0.018, 0.26, power=3.0, col=C_WHITE, rows=6, cols=12
+            sx, max(0.008, sy), z_center, 0.072, 0.020, 0.36, power=3.0, col=C_WHITE, rows=6, cols=12
         )
 
     # Side stringer rails & glowing cyan guide strips along the +X boarding ramp
     for side in (-1.0, 1.0):
-        rz = z_center + side * 0.135
+        rz = z_center + side * 0.185
         mbs[MAT_ALU_STRUT].add_cylinder(
             (p_top[0], p_top[1], rz),
             (p_bot[0], p_bot[1], rz),
-            0.017,
-            0.015,
+            0.019,
+            0.016,
             C_WHITE,
             radial_segs=14,
             height_segs=2,
         )
         mbs[MAT_CYAN_GLOW].add_cylinder(
-            (p_top[0], p_top[1] + 0.012, z_center + side * 0.142),
-            (p_bot[0], p_bot[1] + 0.012, z_center + side * 0.142),
-            0.0055,
-            0.0055,
+            (p_top[0], p_top[1] + 0.014, z_center + side * 0.192),
+            (p_bot[0], p_bot[1] + 0.014, z_center + side * 0.192),
+            0.0065,
+            0.0065,
             C_WHITE,
             radial_segs=10,
             height_segs=1,
         )
 
-    # Horizontal non-slip boarding steps descending along +X
+    # Wide horizontal non-slip boarding steps descending along +X
     for i in range(steps):
         t = i / float(steps - 1)
         sx = p_top[0] + (p_bot[0] - p_top[0]) * t
         sy = p_top[1] + (p_bot[1] - p_top[1]) * t
         mbs[MAT_ALU_STRUT].add_squircle_box(
-            sx, sy + 0.006, z_center, 0.062, 0.016, 0.25, power=2.8, col=C_WHITE, rows=6, cols=14
+            sx, sy + 0.006, z_center, 0.066, 0.016, 0.35, power=2.8, col=C_WHITE, rows=6, cols=14
         )
 
     return mbs

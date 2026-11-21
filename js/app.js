@@ -1766,8 +1766,9 @@
   function getWorld3dShipRampFoot() {
     if (!world3d.ship) return { x: 0, z: 0, shipYaw: 0.36 };
     const shipYaw = 0.36;
-    const rampLocalX = 1.45;
-    const rampLocalZ = -0.04;
+    const shipScale = 1.82;
+    const rampLocalX = 1.24 * shipScale;
+    const rampLocalZ = -0.04 * shipScale;
     return {
       x: world3d.ship.x + rampLocalX * Math.cos(shipYaw) + rampLocalZ * Math.sin(shipYaw),
       z: world3d.ship.z - rampLocalX * Math.sin(shipYaw) + rampLocalZ * Math.cos(shipYaw),
@@ -1778,7 +1779,7 @@
   function getWorld3dObstacles() {
     const obs = [];
     if (world3d.ship) {
-      obs.push({ id: 'ship', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.26 });
+      obs.push({ id: 'ship', cx: world3d.ship.x, cz: world3d.ship.z, r: 2.02 });
     }
     if (world3d.machine) {
       const rMap = { sojourner: 0.90 };
