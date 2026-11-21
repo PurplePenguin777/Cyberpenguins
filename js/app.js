@@ -4071,39 +4071,47 @@
 
   function positionSpeechBubble(x, y, isExactTop = false) {
     if (!dom.stageSpeechBubble) return;
-    const clampedX = Math.max(22, Math.min(78, x));
-    const isFlipped = y < 28;
-    dom.stageSpeechBubble.classList.toggle('bubble-flipped', isFlipped);
-    dom.stageSpeechBubble.style.left = `${clampedX}%`;
-    // La colita sigue apuntando al personaje aunque el globo quede acotado dentro de la pantalla
+
     const board = dom.stageSpeechBubble.parentElement;
-    const boardW = board ? board.clientWidth : 0;
-    const bubbleW = dom.stageSpeechBubble.offsetWidth || 0;
-    if (boardW && bubbleW) {
-      const shift = ((x - clampedX) / 100) * boardW;
-      const maxShift = Math.max(0, bubbleW / 2 - 30);
-      dom.stageSpeechBubble.style.setProperty('--tail-shift', `${Math.max(-maxShift, Math.min(maxShift, shift)).toFixed(1)}px`);
-    }
-
+    const boardW = board ? board.clientWidth : (window.innerWidth || 1024);
     const boardH = board ? board.clientHeight : (window.innerHeight || 600);
+    const bubbleW = dom.stageSpeechBubble.offsetWidth || 0;
     const bubbleH = dom.stageSpeechBubble.offsetHeight || 220;
-    const bubbleHPct = (bubbleH / Math.max(1, boardH)) * 100;
-    // Margen superior absoluto: el borde superior del globo NUNCA puede cortarse con la parte superior
-    const minSafeBottomPct = Math.min(58, bubbleHPct + 6.0);
 
+    // Regla de barra superior: los controles de audio (top: 1rem, h: 42px) e idioma ocupan ~60px
+    // El borde superior del globo debe comenzar con margen holgado debajo de la barra superior (>= 72px)
+    const topBarClearancePx = 74;
+    const minSafeBottomPct = ((topBarClearancePx + bubbleH) / Math.max(1, boardH)) * 100;
+
+    let posX;
     let targetY;
+
     if (world3d.active && activeDialogueMachine) {
-      // Regla UX: anclar el globo por encima de los personajes para que, por muy largo
-      // que sea el texto, crezca hacia el cielo sin tapar a Cyberpenguin ni a Sojourner
+      // En diálogo 3D frente a frente, centrar el globo entre ambos personajes (50%)
+      // dejando los controles de idioma y sonido de la esquina superior derecha 100% despejados
+      posX = 50;
+      dom.stageSpeechBubble.classList.remove('bubble-flipped');
       const charTop = getDialogueAnchorY();
       const desiredBottom = charTop ? (charTop - 2.5) : (y - 8);
-      targetY = Math.max(minSafeBottomPct, Math.min(62, desiredBottom));
+      targetY = Math.max(minSafeBottomPct, Math.min(52, desiredBottom));
     } else {
+      posX = Math.max(22, Math.min(78, x));
+      const isFlipped = y < 28;
+      dom.stageSpeechBubble.classList.toggle('bubble-flipped', isFlipped);
       targetY = isExactTop
         ? (isFlipped ? Math.min(78, y + 6) : Math.max(minSafeBottomPct, y - 1.5))
         : (isFlipped ? Math.min(78, y + 8) : Math.max(minSafeBottomPct, y - 8));
     }
+
+    dom.stageSpeechBubble.style.left = `${posX}%`;
     dom.stageSpeechBubble.style.top = `${targetY}%`;
+
+    // La colita apunta dinámicamente hacia el personaje que está hablando
+    if (boardW && bubbleW) {
+      const shift = ((x - posX) / 100) * boardW;
+      const maxShift = Math.max(0, bubbleW / 2 - 32);
+      dom.stageSpeechBubble.style.setProperty('--tail-shift', `${Math.max(-maxShift, Math.min(maxShift, shift)).toFixed(1)}px`);
+    }
   }
 
   function setActiveSpeakerVisual(speaker) {
@@ -4120,6 +4128,7 @@
 
   function hideSpeechBubble() {
     setActiveSpeakerVisual(null);
+    if (dom.isoBoard) dom.isoBoard.classList.remove('has-active-dialogue');
     if (dom.stageSpeechBubble) {
       dom.stageSpeechBubble.classList.remove('is-tracking-3d');
       dom.stageSpeechBubble.classList.add('is-hidden');
@@ -4251,6 +4260,7 @@
 
   function showSpeechBubbleStep({ speaker, name, avatarSvg, text, audioUrl, anchorPos, choices, onNext, onChoice }) {
     if (!dom.stageSpeechBubble) return;
+    if (dom.isoBoard) dom.isoBoard.classList.add('has-active-dialogue');
     hideThoughtBubble();
     hideStageActionPrompt();
     const turnToken = ++activeDialogueToken;
