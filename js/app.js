@@ -3181,12 +3181,7 @@
     const isEn = (state.currentLanguage === 'en');
     let label = isEn ? 'Interact' : 'Interactuar';
     if (type === 'sample') {
-      const rawLabel = target && target.label ? target.label : '';
-      const rockMatch = rawLabel.match(/«([^»]+)»/);
-      const rockName = rockMatch ? rockMatch[1] : rawLabel;
-      label = isEn
-        ? (rockName ? `Collect «${rockName}»` : 'Store in backpack')
-        : (rockName ? `Recoger «${rockName}»` : 'Guardar en la mochila');
+      label = isEn ? 'Collect' : 'Recoger';
     } else if (type === 'machine') {
       label = isEn ? `Talk to ${target.name || 'spacecraft'}` : `Hablar con ${target.name || 'sonda'}`;
     } else if (type === 'ship-travel') {
