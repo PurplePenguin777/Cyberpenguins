@@ -2318,6 +2318,9 @@
         if (kind === 'ship' && anchor && typeof t3d.getShipWorldPeak === 'function') {
           const shipPeak = t3d.getShipWorldPeak();
           if (shipPeak) anchor = { ...anchor, x: shipPeak.x, y: shipPeak.y, z: shipPeak.z };
+        } else if (kind === 'machine' && anchor && typeof t3d.getMachineWorldPeak === 'function') {
+          const machinePeak = t3d.getMachineWorldPeak();
+          if (machinePeak) anchor = { ...anchor, x: machinePeak.x, y: machinePeak.y, z: machinePeak.z };
         } else if (kind === 'sample' && id) {
           const orig = world3d.samples[id];
           const peak = typeof t3d.getSampleWorldPeak === 'function' ? t3d.getSampleWorldPeak(id) : null;
@@ -2341,6 +2344,9 @@
         } else if (kind === 'ship' && world3d.ship) {
           world3d.ship.screenX = proj.pctX;
           world3d.ship.screenY = proj.pctY;
+        } else if (kind === 'machine' && world3d.machine) {
+          world3d.machine.screenX = proj.pctX;
+          world3d.machine.screenY = proj.pctY;
         }
         el.style.visibility = proj.visible ? '' : 'hidden';
         el.style.left = `${proj.pctX.toFixed(2)}%`;
@@ -2385,8 +2391,13 @@
       dom.stageSpeechBubble.classList.add('is-tracking-3d');
       if (activeSpeechAnchorKind === 'ship' && world3d.ship) {
         positionSpeechBubble(world3d.ship.screenX, world3d.ship.screenY, true);
-      } else if (activeSpeechAnchorKind === 'machine' && world3d.machine) {
-        positionSpeechBubble(world3d.machine.screenX, world3d.machine.screenY, false);
+      } else if (activeSpeechAnchorKind === 'machine') {
+        const mPeak = getMachinePeakPct();
+        if (mPeak) {
+          positionSpeechBubble(mPeak.x, mPeak.y, true);
+        } else if (world3d.machine) {
+          positionSpeechBubble(world3d.machine.screenX, world3d.machine.screenY, false);
+        }
       } else {
         const head = getPenguinHeadPct();
         positionSpeechBubble(head ? head.x : penguinPos.x, head ? head.y : penguinPos.y, Boolean(head));
@@ -3570,6 +3581,21 @@
     return { x: proj.pctX, y: proj.pctY };
   }
 
+  function getMachinePeakPct() {
+    const t3d = getTerrain3D();
+    if (!world3d.active || !world3d.machine || !t3d || typeof t3d.projectWorldToScreen !== 'function') return null;
+    if (typeof t3d.getMachineWorldPeak === 'function') {
+      const peak = t3d.getMachineWorldPeak();
+      if (peak) {
+        const proj = t3d.projectWorldToScreen(peak.x, peak.y, peak.z);
+        return { x: proj.pctX, y: proj.pctY };
+      }
+    }
+    const m = world3d.machine;
+    const proj = t3d.projectWorldToScreen(m.x, m.y + 0.70, m.z);
+    return { x: proj.pctX, y: proj.pctY };
+  }
+
   function showStageActionPrompt(type, target, onAction) {
     if (!dom.stageActionPrompt || !dom.stageActionBtn) return;
     if (isSpeechBubbleOpen()) {
@@ -4063,7 +4089,10 @@
     if (head && typeof head.y === 'number') {
       topY = Math.min(topY, head.y);
     }
-    if (world3d.active && world3d.machine && typeof world3d.machine.screenY === 'number') {
+    const mPeak = getMachinePeakPct();
+    if (mPeak && typeof mPeak.y === 'number') {
+      topY = Math.min(topY, mPeak.y);
+    } else if (world3d.active && world3d.machine && typeof world3d.machine.screenY === 'number') {
       topY = Math.min(topY, world3d.machine.screenY - 14);
     }
     return topY < 90 ? topY : null;
@@ -4095,8 +4124,12 @@
       posX = Math.max(minX, Math.min(maxX, x));
 
       dom.stageSpeechBubble.classList.remove('bubble-flipped');
-      const desiredBottom = isExactTop ? (y - 2.5) : (y - 7.5);
-      targetY = Math.max(minSafeBottomPct, Math.min(56, desiredBottom));
+      // Para Sojourner, elevar el globo con holgura para que la antena UHF ("colita")
+      // y su bola ámbar se aprecien oscilando libremente al hablar
+      const isMachine = activeSpeechAnchorKind === 'machine';
+      const clearance = isMachine ? 5.2 : 2.5;
+      const desiredBottom = isExactTop ? (y - clearance) : (y - 8.5);
+      targetY = Math.max(minSafeBottomPct, Math.min(54, desiredBottom));
     } else {
       posX = Math.max(22, Math.min(78, x));
       const isFlipped = y < 28;
@@ -4333,7 +4366,13 @@
         resolvedAnchor = { x: world3d.ship.screenX, y: world3d.ship.screenY };
         isExactTop = true;
       } else if (world3d.machine) {
-        resolvedAnchor = { x: world3d.machine.screenX, y: world3d.machine.screenY };
+        const mPeak = getMachinePeakPct();
+        if (mPeak) {
+          resolvedAnchor = mPeak;
+          isExactTop = true;
+        } else {
+          resolvedAnchor = { x: world3d.machine.screenX, y: world3d.machine.screenY };
+        }
       }
     } else {
       dom.stageSpeechBubble.classList.remove('is-tracking-3d');
