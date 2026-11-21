@@ -8,9 +8,9 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121p';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121p';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121p';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121q';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121q';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121q';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -20,7 +20,7 @@ const SITE_CONFIGS = {
     machineDefaultYaw: -0.72,
     shipModelUrl: SHIP_MODEL_URL,
     shipScale: 1.05,
-    shipDefaultYaw: 0.62,
+    shipDefaultYaw: 0.36,
     titleEs: 'Ares Vallis · 19.09°N, 33.25°W · ESA/NASA Mars Express HRSC DTM (H3147_0000_DA4)',
     titleEn: 'Ares Vallis · 19.09°N, 33.25°W · ESA/NASA Mars Express HRSC DTM (H3147_0000_DA4)',
     hintEs: 'Arrastra para orbitar · Rueda/pellizco para zoom · Clic derecho para desplazar',

@@ -1763,10 +1763,22 @@
     }
   }
 
+  function getWorld3dShipRampFoot() {
+    if (!world3d.ship) return { x: 0, z: 0, shipYaw: 0.36 };
+    const shipYaw = 0.36;
+    const rampLocalX = 1.45;
+    const rampLocalZ = -0.04;
+    return {
+      x: world3d.ship.x + rampLocalX * Math.cos(shipYaw) + rampLocalZ * Math.sin(shipYaw),
+      z: world3d.ship.z - rampLocalX * Math.sin(shipYaw) + rampLocalZ * Math.cos(shipYaw),
+      shipYaw
+    };
+  }
+
   function getWorld3dObstacles() {
     const obs = [];
     if (world3d.ship) {
-      obs.push({ id: 'ship', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.65 });
+      obs.push({ id: 'ship', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.26 });
     }
     if (world3d.machine) {
       const rMap = { sojourner: 0.90 };
@@ -2623,10 +2635,12 @@
           }
         };
         if (world3d.active && world3d.ship) {
-          const destW = resolveWorld3dPoint(world3d.ship.x + 1.55, world3d.ship.z + 1.15);
+          const rampFoot = getWorld3dShipRampFoot();
+          const destW = resolveWorld3dPoint(rampFoot.x, rampFoot.z);
           walkPenguin3dTo(destW.x, destW.z, () => {
             if (world3d.penguin && world3d.ship) {
-              world3d.penguin.yaw = Math.atan2(world3d.ship.x - world3d.penguin.x, 0.65);
+              // Mirar directamente hacia arriba por la escalera/esclusa lateral de la nave
+              world3d.penguin.yaw = rampFoot.shipYaw - Math.PI * 0.5;
             }
             finishHatch();
           });
@@ -3202,8 +3216,9 @@
 
     // 3. Escotilla de la nave espacial (solo permite despegar si se completaron las tareas)
     const hatchPoint = getHatchAnchor(chapter);
-    const distToShip = (world3d.active && world3d.penguin && world3d.ship)
-      ? Math.hypot(world3d.penguin.x - (world3d.ship.x + 1.45), world3d.penguin.z - (world3d.ship.z + 1.0)) * 5.5
+    const rampFoot3d = (world3d.active && world3d.ship) ? getWorld3dShipRampFoot() : null;
+    const distToShip = (world3d.active && world3d.penguin && rampFoot3d)
+      ? Math.hypot(world3d.penguin.x - rampFoot3d.x, world3d.penguin.z - rampFoot3d.z) * 5.5
       : getDist(penguinPos, hatchPoint);
     if (distToShip <= 13.0) {
       const reqs = checkSiteRequirements(chapter);

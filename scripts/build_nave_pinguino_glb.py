@@ -512,28 +512,39 @@ def ranger_hull_section(t_z):
 
     # Taut Delta-Wedge Planform (~68 deg leading-edge sweep) with Fay-Riddell blunt stagnation nose
     # and truncated Kammback aft base:
-    if t_z < 0.03:
-        s_cap = math.sin((t_z / 0.03) * math.pi * 0.5) ** 0.25
-    elif t_z > 0.94:
+    if t_z < 0.04:
+        s_cap = math.sin((t_z / 0.04) * math.pi * 0.5) ** 0.32
+    elif t_z > 0.92:
         # Blunt parabolic stagnation nose cap (Fay-Riddell hypersonic heat transfer law)
-        s_cap = math.sin(((1.0 - t_z) / 0.06) * math.pi * 0.5) ** 0.45
+        s_cap = math.sin(((1.0 - t_z) / 0.08) * math.pi * 0.5) ** 0.48
     else:
         s_cap = 1.0
 
-    # Linear/G2 taut delta expansion from nose (0.18 m) to aft delta wing shoulders (0.94 m)
-    half_w = bezier_quintic(t_z, 0.84, 0.96, 0.90, 0.68, 0.42, 0.16) * s_cap
+    # Chine centerline height y_chine runs smoothly from aft bulkhead (0.42 m) to nose tip (0.36 m)
+    y_chine = bezier_quintic(t_z, 0.42, 0.40, 0.39, 0.38, 0.37, 0.36)
 
-    # Windward TPS belly height y_bot: flat-convex lifting surface with +3.8 deg trim incidence
-    y_bot = bezier_quintic(t_z, 0.27, 0.23, 0.23, 0.25, 0.29, 0.35)
+    # Half-width, dorsal height above chine, and belly depth below chine ALL scale by s_cap
+    # so the nose tip (t_z = 1) and aft bulkhead (t_z = 0) close into true 3D watertight poles!
+    half_w = bezier_quintic(t_z, 0.84, 0.96, 0.90, 0.68, 0.42, 0.18) * s_cap
+    h_up = bezier_quintic(t_z, 0.32, 0.48, 0.63, 0.58, 0.25, 0.08) * s_cap
+    h_dn = bezier_quintic(t_z, 0.15, 0.17, 0.16, 0.13, 0.08, 0.04) * s_cap
 
-    # Leeward dorsal spine height y_top: taut wedge rising from nose (0.35 m) along the 21 deg
-    # flush windshield slope up to the cabin crown (0.96 m) and tapering to the aft deck (0.72 m)
-    y_top = bezier_quintic(t_z, 0.72, 0.88, 1.02, 0.96, 0.60, 0.35)
-
-    # Sharp lateral chine height y_chine (separates high-pressure windward belly from upper leeward body)
-    y_chine = y_bot + (y_top - y_bot) * bezier_quintic(t_z, 0.26, 0.22, 0.20, 0.22, 0.28, 0.46)
+    y_top = y_chine + h_up
+    y_bot = y_chine - h_dn
 
     return z, half_w, y_bot, y_top, y_chine
+
+
+def hull_centerline_interior_ref(tri_pts):
+    """Exact interior centerline reference point guaranteed to lie strictly inside the
+    local cross-section (between y_bot and y_top, and clamped inside the Z poles) so
+    100% of hull triangles orient outward with zero inverted normals on the nose!
+    """
+    cz = (tri_pts[0][2] + tri_pts[1][2] + tri_pts[2][2]) / 3.0
+    t_z = clamp((cz - (-1.18)) / 2.42, 0.05, 0.91)
+    z_in, _, y_bot, y_top, y_chine = ranger_hull_section(t_z)
+    y_in = y_chine + 0.22 * (y_top - y_bot)
+    return (0.0, y_in, z_in)
 
 
 def eval_ranger_hull_point(u, v):
@@ -547,9 +558,8 @@ def eval_ranger_hull_point(u, v):
     theta = (u - 0.5) * math.pi * 2.0  # 0 at top dorsal, +-pi/2 at chines, +-pi at belly
     z, half_w, y_bot, y_top, y_chine = ranger_hull_section(v)
 
-    if v <= 0.0008 or v >= 0.9992:
-        y_pole = 0.50 if v <= 0.0008 else 0.35
-        return (0.0, y_pole, z), C_WHITE, (0.5, v * 0.56)
+    if v <= 0.0005 or v >= 0.9995:
+        return (0.0, y_chine, z), C_WHITE, (0.5, v * 0.56)
 
     st = math.sin(theta)
     ct = math.cos(theta)  # +1 at top dorsal, 0 at chines, -1 at bottom belly
@@ -559,16 +569,15 @@ def eval_ranger_hull_point(u, v):
 
     if ct >= 0.0:
         # Upper hull: faceted-smooth G2 trapezoidal/delta lifting body cross-section
-        # Flatten the upper cabin roof slightly across the center for flush windshield panes
         roof_flat = (ct ** 0.62) * (1.0 - 0.12 * (abs(st) ** 1.8) * smoothstep_g2(0.15, 0.82, v))
         y = y_chine + (y_top - y_chine) * roof_flat
-        u_tex = clamp(0.5 + (x / max(0.08, half_w)) * 0.48, 0.01, 0.99)
+        u_tex = clamp(0.5 + (x / max(0.04, half_w)) * 0.48, 0.01, 0.99)
         v_tex = clamp(v, 0.01, 0.99) * 0.56
     else:
         # Lower hull: taut flat-convex windward TPS heat shield (high hypersonic L/D)
         belly_flat = abs(ct) ** 1.85
         y = y_chine - (y_chine - y_bot) * belly_flat
-        u_tex = clamp(0.5 + (x / max(0.08, half_w)) * 0.48, 0.01, 0.99)
+        u_tex = clamp(0.5 + (x / max(0.04, half_w)) * 0.48, 0.01, 0.99)
         v_tex = 0.60 + clamp(v, 0.01, 0.99) * 0.38
 
     return (x, y, z), C_WHITE, (u_tex, v_tex)
@@ -641,14 +650,14 @@ def build_hull_primitives():
         MAT_GOLD_FOIL: MeshBuilder(),
     }
 
-    # 1. Main G2 Delta-Wedge Lifting-Body Fuselage (zero protruding boxes on the forward mold line)
+    # 1. Main G2 Delta-Wedge Lifting-Body Fuselage (100% watertight nose & tail poles)
     mbs[MAT_HULL_ATLAS].add_grid_surface(
         60,
         68,
         eval_ranger_hull_point,
         wrap_u=True,
         close_poles=True,
-        interior_ref=lambda pts: (0.0, 0.48, (pts[0][2] + pts[1][2] + pts[2][2]) / 3.0),
+        interior_ref=hull_centerline_interior_ref,
     )
 
     # 2. Twin Canted V-Tail Stabilizer Fins & Aft Body Flaps with true NACA 0008 Airfoil Sections
@@ -813,12 +822,16 @@ def build_hull_primitives():
         height_segs=1,
     )
 
-    # 6. Recessed Ventral-Forward EVA Airlock Threshold (flush under the lower nose chine)
+    # 6. Side-Forward EVA Airlock Threshold (+X side chine bay at z = -0.04, between the +X landing legs,
+    # keeping the hypersonic stagnation nose cap 100% solid and uninterrupted!)
     mbs[MAT_DARK_TITANIUM].add_squircle_box(
-        0.0, 0.31, 0.82, 0.28, 0.08, 0.14, power=3.0, col=C_WHITE, rows=8, cols=16
+        0.58, 0.42, -0.04, 0.14, 0.20, 0.30, power=3.0, col=C_WHITE, rows=10, cols=18
+    )
+    mbs[MAT_ALU_STRUT].add_squircle_box(
+        0.56, 0.42, -0.04, 0.12, 0.23, 0.34, power=3.2, col=C_WHITE, rows=10, cols=18
     )
     mbs[MAT_CYAN_GLOW].add_squircle_box(
-        0.0, 0.34, 0.88, 0.20, 0.016, 0.03, power=2.6, col=C_WHITE, rows=6, cols=12
+        0.64, 0.51, -0.04, 0.03, 0.020, 0.24, power=2.6, col=C_WHITE, rows=6, cols=12
     )
 
     return mbs
@@ -931,9 +944,10 @@ def build_landing_gear_primitives():
 
 
 def build_hatch_ramp_primitives():
-    """Node 4 (`HatchRamp`): Ventral-forward hinged boarding ramp (doubles as the flush
-    lower nose heat-shield door when retracted in flight, and hinges down to y = 0.010
-    when landed on a planetary surface).
+    """Node 4 (`HatchRamp`): Solid side-forward deployable EVA boarding ramp extending from
+    the +X mid-forward airlock threshold (x = 0.62, y = 0.31, z = -0.04) between the front
+    and rear +X landing legs down to the ground (x = 1.18, y = 0.010, z = -0.04), leaving
+    the hypersonic nose cone 100% solid and unbroken!
     """
     mbs = {
         MAT_ALU_STRUT: MeshBuilder(),
@@ -941,24 +955,36 @@ def build_hatch_ramp_primitives():
         MAT_CYAN_GLOW: MeshBuilder(),
     }
 
-    steps = 7
-    p_top = (0.0, 0.27, 0.82)
-    p_bot = (0.0, 0.010, 1.28)
+    steps = 6
+    p_top = (0.62, 0.31, -0.04)
+    p_bot = (1.18, 0.012, -0.04)
+    z_center = -0.04
 
+    # Solid structural ramp backplate / slab under the steps (so the ramp is never hollow)
+    slab_segs = 12
+    for i in range(slab_segs):
+        t = i / float(slab_segs - 1)
+        sx = p_top[0] + (p_bot[0] - p_top[0]) * t
+        sy = p_top[1] + (p_bot[1] - p_top[1]) * t - 0.012
+        mbs[MAT_DARK_TITANIUM].add_squircle_box(
+            sx, max(0.008, sy), z_center, 0.068, 0.018, 0.26, power=3.0, col=C_WHITE, rows=6, cols=12
+        )
+
+    # Side stringer rails & glowing cyan guide strips along the +X boarding ramp
     for side in (-1.0, 1.0):
-        rx = side * 0.135
+        rz = z_center + side * 0.135
         mbs[MAT_ALU_STRUT].add_cylinder(
-            (rx, p_top[1], p_top[2]),
-            (rx, p_bot[1], p_bot[2]),
-            0.016,
-            0.014,
+            (p_top[0], p_top[1], rz),
+            (p_bot[0], p_bot[1], rz),
+            0.017,
+            0.015,
             C_WHITE,
             radial_segs=14,
             height_segs=2,
         )
         mbs[MAT_CYAN_GLOW].add_cylinder(
-            (side * 0.142, p_top[1] + 0.010, p_top[2]),
-            (side * 0.142, p_bot[1] + 0.010, p_bot[2]),
+            (p_top[0], p_top[1] + 0.012, z_center + side * 0.142),
+            (p_bot[0], p_bot[1] + 0.012, z_center + side * 0.142),
             0.0055,
             0.0055,
             C_WHITE,
@@ -966,12 +992,13 @@ def build_hatch_ramp_primitives():
             height_segs=1,
         )
 
+    # Horizontal non-slip boarding steps descending along +X
     for i in range(steps):
         t = i / float(steps - 1)
+        sx = p_top[0] + (p_bot[0] - p_top[0]) * t
         sy = p_top[1] + (p_bot[1] - p_top[1]) * t
-        sz = p_top[2] + (p_bot[2] - p_top[2]) * t
-        mbs[MAT_DARK_TITANIUM].add_squircle_box(
-            0.0, sy, sz, 0.25, 0.016, 0.054, power=2.8, col=C_WHITE, rows=6, cols=14
+        mbs[MAT_ALU_STRUT].add_squircle_box(
+            sx, sy + 0.006, z_center, 0.062, 0.016, 0.25, power=2.8, col=C_WHITE, rows=6, cols=14
         )
 
     return mbs
