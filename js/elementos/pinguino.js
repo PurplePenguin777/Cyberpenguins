@@ -187,30 +187,29 @@
             <!-- Máscara facial blanca característica del bebé emperador (mejillas infladas y contorno de ojos) -->
             <path d="M 39.2,34.8 C 38.8,26.8 43.8,22.2 49.8,23.2 C 53.2,23.8 55.2,26.5 56.5,26.5 C 57.8,26.5 59.8,23.8 63.2,23.2 C 69,22.2 73.8,26.8 73.4,34.8 C 73,42.5 66.8,46.8 56.5,46.8 C 45.8,46.8 39.6,42.5 39.2,34.8 Z" fill="url(#${id}-chick-mask)" />
 
-            <!-- Mentón/babero oscuro bajo el pico (rasgo auténtico del polluelo emperador) -->
-            <path d="M 51.5,39.5 C 53.5,37.8 59.5,37.8 61.5,39.5 C 62.5,43 60,46.5 56.5,46.5 C 53,46.5 50.5,43 51.5,39.5 Z" fill="url(#${id}-chick-hood)" />
-            <!-- Sombra suave de plumón en las mejillas -->
-            <path d="M 40.5,38.5 C 43,43.8 48.5,45.8 52.5,45.2" fill="none" stroke="#cbd5e1" stroke-width="1.3" stroke-linecap="round" />
-            <path d="M 72,38.5 C 69.5,43.8 64.5,45.8 60.5,45.2" fill="none" stroke="#cbd5e1" stroke-width="1.3" stroke-linecap="round" />
+            <!-- Mentón limpio con rubor kawaii suave en las mejillas regordetas -->
+            <ellipse cx="42.5" cy="36.8" rx="4.2" ry="2.6" fill="#ff8da1" opacity="0.45" />
+            <ellipse cx="70.2" cy="36.8" rx="4.2" ry="2.6" fill="#ff8da1" opacity="0.45" />
+            <path d="M 40.5,39.5 C 43,44.2 48.5,46.0 52.5,45.4" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+            <path d="M 72,39.5 C 69.5,44.2 64.5,46.0 60.5,45.4" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
 
-            <!-- Ojos grandes oscuros y brillantes con iris cálido y doble reflejo especular -->
+            <!-- Grandes ojos Kawaii expresivos con media luna azul zafiro y doble brillo estelar -->
             <g>
-              <ellipse cx="48.2" cy="32.2" rx="4.3" ry="4.6" fill="#070a12" />
-              <ellipse cx="48.2" cy="32.2" rx="3.4" ry="3.7" fill="none" stroke="#3b2618" stroke-width="0.85" opacity="0.8" />
-              <circle cx="46.8" cy="30.5" r="1.45" fill="#ffffff" />
-              <circle cx="49.7" cy="33.9" r="0.68" fill="#e0f2fe" />
+              <ellipse cx="47.2" cy="32.8" rx="5.4" ry="5.8" fill="#070a12" />
+              <path d="M 43.4,35.2 Q 47.2,38.4 51.0,35.2" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" opacity="0.88" />
+              <circle cx="45.3" cy="30.4" r="2.0" fill="#ffffff" />
+              <circle cx="49.2" cy="35.0" r="0.95" fill="#e0f2fe" />
 
-              <ellipse cx="64.6" cy="32.2" rx="4.1" ry="4.4" fill="#070a12" />
-              <ellipse cx="64.6" cy="32.2" rx="3.2" ry="3.5" fill="none" stroke="#3b2618" stroke-width="0.85" opacity="0.8" />
-              <circle cx="63.3" cy="30.5" r="1.38" fill="#ffffff" />
-              <circle cx="66.0" cy="33.9" r="0.62" fill="#e0f2fe" />
+              <ellipse cx="65.4" cy="32.8" rx="5.2" ry="5.6" fill="#070a12" />
+              <path d="M 61.8,35.2 Q 65.4,38.2 69.0,35.2" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" opacity="0.88" />
+              <circle cx="63.6" cy="30.4" r="1.9" fill="#ffffff" />
+              <circle cx="67.3" cy="35.0" r="0.9" fill="#e0f2fe" />
             </g>
 
-            <!-- Pico corto y cónico de polluelo emperador (gris pizarra oscuro con base coral suave) -->
-            <path d="M 52.2,35.8 C 52.5,33.6 55.8,32.8 58.8,33.6 C 61.8,34.4 63.8,36.2 63.6,37.8 C 63.3,39.5 60.2,40.8 56.8,40.8 C 53.8,40.8 52.0,38.2 52.2,35.8 Z" fill="url(#${id}-chick-beak)" stroke="#0f172a" stroke-width="0.7" />
-            <!-- Matiz rosado/coral en la base de la mandíbula inferior del polluelo -->
-            <path d="M 53.3,38.0 C 55.5,39.4 59.8,39.4 62.2,38.0 C 60.8,40.1 55.2,40.2 53.3,38.0 Z" fill="#e07a5f" opacity="0.85" />
-            <path d="M 53.6,35.3 Q 57.5,34.1 61.5,36.2" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.9" stroke-linecap="round" />
+            <!-- Piquito corto tipo botón sonriente entre los ojos (gris pizarra oscuro con sonrisa coral suave) -->
+            <path d="M 52.8,35.2 C 53.2,33.2 55.8,32.5 58.5,33.2 C 61.0,33.8 62.6,35.3 62.4,36.8 C 62.1,38.4 59.5,39.5 56.8,39.5 C 54.1,39.5 52.5,37.4 52.8,35.2 Z" fill="url(#${id}-chick-beak)" stroke="#0f172a" stroke-width="0.65" />
+            <path d="M 53.6,37.1 C 55.5,38.5 59.3,38.5 61.4,37.1 C 60.2,39.0 55.2,39.1 53.6,37.1 Z" fill="#ff8a75" opacity="0.92" />
+            <path d="M 54.0,34.7 Q 57.5,33.6 60.8,35.4" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="0.85" stroke-linecap="round" />
 
             <!-- Cúpula cristalina del casco de burbuja con reflejos curvos -->
             <ellipse cx="55.5" cy="32.5" rx="22.8" ry="22.2" fill="url(#${id}-bubble-glass)" stroke="#bae6fd" stroke-width="1.1" stroke-opacity="0.75" />

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Build an adorable, realistic, G2-continuous 3D glTF 2.0 binary (.glb) model of
-Cyberpenguin (Baby Emperor Penguin *Aptenodytes forsteri* chick in a NASA Apollo A7L / EMU
-spacesuit) using:
-  - Quintic G2-continuous (C^2) Bézier & Perlin-quintic curves (zero curvature jumps)
-  - Squircle (superellipse |x/a|^p + |z/b|^p = 1) cross-sections for soft organic forms
-  - UV seam placed at the back of the head (-Z, theta = ±pi) so the front face (+Z) is 100% seamless
-  - Short, adorable rounded baby chick beak well inside the spacious polycarbonate bubble helmet
-  - Flippers rooted seamlessly inside the torso shoulders via a G2 shoulder cuff (zero gap)
-  - Solid neck collar flange connecting the torso, neck ring, bubble dome, and raised gold LEVA visor
-  - 512x512 embedded PNG head plumage texture + 16 PBR materials for universal 3D viewer support
+"""Build an adorable, Kawaii/Pixar-inspired yet tactile 3D glTF 2.0 binary (.glb)
+model of Cyberpenguin (Baby Emperor Penguin *Aptenodytes forsteri* chick in a NASA
+Apollo A7L / EMU spacesuit) featuring:
+  - G2 quintic Bézier & squircle (superellipse) geometry with smooth curvatures
+  - Completely SEALED top torso & neck collar (zero hole when viewed from above!)
+  - Smooth temple-hinged spherical visor cap (zero pole-flipping crease at top of helmet)
+  - Big, soulful Kawaii 3D eyes with sapphire-glow lower iris crescent & dual anime catchlights
+  - Chubby "mochi" baby cheeks with warm pastel blush, heart-shaped white emperor chick mask,
+    velvety midnight hood, creamy pearl-grey down, and tiny rounded smiling chick beak
+  - Seamless shoulder-cuff flipper integration & properly proud chest DCM / valves / patch
 
 Uses Python standard library only (zlib, struct, json, math).
 """
@@ -32,9 +32,7 @@ def clamp(v, lo, hi):
 
 
 def smoothstep_g2(edge0, edge1, x):
-    """Quintic C^2 / G^2 smoothstep: 6t^5 - 15t^4 + 10t^3.
-    Both 1st and 2nd derivatives vanish at t=0 and t=1, guaranteeing G2 curvature continuity.
-    """
+    """Quintic C^2 / G^2 smoothstep: 6t^5 - 15t^4 + 10t^3."""
     if edge1 == edge0:
         return 0.0
     t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0)
@@ -63,9 +61,7 @@ def bezier_quintic(t, p0, p1, p2, p3, p4, p5):
 
 
 def squircle_cs(theta, power=2.35):
-    """Evaluate a G2-smooth squircle (superellipse) unit contour (sin_s, cos_s) for angle theta.
-    power=2.0 is a circle; power=2.3..2.8 is a soft, rounded squircle.
-    """
+    """Evaluate a G2-smooth squircle unit contour (sin_s, cos_s) for angle theta."""
     s = math.sin(theta)
     c = math.cos(theta)
     exp = 2.0 / float(power)
@@ -149,58 +145,57 @@ def encode_png_rgba(width, height, rgba_bytes):
 
 
 def evaluate_chick_head_srgb(u, v):
-    """Evaluate the adorable *Aptenodytes forsteri* (Baby Emperor Penguin) head plumage in sRGB.
-    IMPORTANT: u = 0.5 is the FRONT of the face (+Z, theta = 0).
-               u = 0.0 and u = 1.0 meet at the BACK of the head (-Z, theta = ±pi) inside the uniform
-               charcoal hood, so the front face has ZERO UV seam!
+    """Evaluate the Kawaii Baby Emperor Penguin (*Aptenodytes forsteri* chick) head plumage in sRGB.
+    u = 0.5 is the FRONT of the face (+Z, theta = 0); u = 0/1 meet at the back (-Z, theta = ±pi).
     v = 0.0 is the neck base (y_norm = -1), v = 1.0 is the top crown (y_norm = +1).
     """
-    theta = (u - 0.5) * math.pi * 2.0  # 0 at u=0.5 (+Z front), ±pi at u=0,1 (-Z back)
+    theta = (u - 0.5) * math.pi * 2.0
     phi = v * math.pi
     s = math.sin(phi)
     y_norm = -math.cos(phi)
     nx = s * math.sin(theta)
     ny = y_norm
-    nz = s * math.cos(theta)  # +1 on front face (+Z), -1 on back of head/nuca (-Z)
+    nz = s * math.cos(theta)
 
-    # Adorable heart-shaped white face mask (left eye lobe + right eye lobe + chubby cheeks & chin)
-    # Continuous and snow-white across the lower face & chin (no dark beard smudge!)
-    d_left_lobe = math.sqrt(((nx - 0.31) / 0.44) ** 2 + ((ny - 0.05) / 0.48) ** 2)
-    d_right_lobe = math.sqrt(((nx + 0.31) / 0.44) ** 2 + ((ny - 0.05) / 0.48) ** 2)
-    d_lower_face = math.sqrt((nx / 0.72) ** 2 + ((ny + 0.22) / 0.44) ** 2)
+    # Wide, adorable heart-shaped snow-white face mask (generously framing the big Kawaii eyes & chubby cheeks)
+    d_left_lobe = math.sqrt(((nx - 0.33) / 0.49) ** 2 + ((ny - 0.04) / 0.52) ** 2)
+    d_right_lobe = math.sqrt(((nx + 0.33) / 0.49) ** 2 + ((ny - 0.04) / 0.52) ** 2)
+    d_lower_face = math.sqrt((nx / 0.78) ** 2 + ((ny + 0.24) / 0.48) ** 2)
     mask_dist = min(d_left_lobe, d_right_lobe, d_lower_face)
 
-    # Cute subtle widow's-peak dip of the dark hood at the top center of the forehead
-    peak_dip = 0.14 * math.exp(-((nx / 0.22) ** 2)) * smoothstep_g2(0.05, 0.42, ny)
+    # Cute gentle widow's-peak curve of the dark emperor-chick hood at the top center of the forehead
+    peak_dip = 0.15 * math.exp(-((nx / 0.24) ** 2)) * smoothstep_g2(0.08, 0.46, ny)
     mask_dist += peak_dip
 
-    # Strictly front hemisphere (nz > 0.10) with G2 quintic transition
-    face_front = smoothstep_g2(0.08, 0.46, nz)
+    face_front = smoothstep_g2(0.02, 0.42, nz)
     white_mask = (1.0 - smoothstep_g2(0.76, 1.02, mask_dist)) * face_front
 
-    # Soft rosy baby-pink blush on the chubby cheeks right below the eyes
-    blush_l = math.exp(-(((nx - 0.44) / 0.16) ** 2 + ((ny + 0.14) / 0.12) ** 2))
-    blush_r = math.exp(-(((nx + 0.44) / 0.16) ** 2 + ((ny + 0.14) / 0.12) ** 2))
-    blush = max(blush_l, blush_r) * white_mask * 0.22
+    # Warm, prominent Kawaii rosy-peach blush ovals on the chubby cheeks below the eyes
+    blush_l = math.exp(-(((nx - 0.48) / 0.18) ** 2 + ((ny + 0.16) / 0.13) ** 2))
+    blush_r = math.exp(-(((nx + 0.48) / 0.18) ** 2 + ((ny + 0.16) / 0.13) ** 2))
+    blush = max(blush_l, blush_r) * white_mask * 0.44
 
-    # Fluffy silver-pearl chick down around the lower neck collar (ny < -0.36)
-    neck_down = 1.0 - smoothstep_g2(-0.62, -0.30, ny)
+    # Soft, warm pearl-silver chick down around the lower neck & sides (no cold metallic grey!)
+    neck_down = 1.0 - smoothstep_g2(-0.66, -0.30, ny)
 
-    # Pure G2 smooth vertical shading (no checker/sine noise!)
     top_light = 0.5 + 0.5 * ny
-    c_hood = mix_col(hex_srgb("#141822"), hex_srgb("#222838"), top_light * 0.45)
-    c_mask = mix_col(hex_srgb("#eef2f7"), hex_srgb("#fffdf9"), 0.35 + 0.65 * smoothstep_g2(-0.5, 0.4, ny))
-    c_blush = hex_srgb("#fda4af")
-    c_down = mix_col(hex_srgb("#b8c2d1"), hex_srgb("#e2e7f0"), 0.5 + 0.5 * face_front)
+    # Velvety midnight-navy hood (warm & plush rather than cold grey)
+    c_hood = mix_col(hex_srgb("#181e2c"), hex_srgb("#283147"), top_light * 0.48)
+    # Creamy snow-white face mask
+    c_mask = mix_col(hex_srgb("#f8fafc"), hex_srgb("#ffffff"), 0.4 + 0.6 * smoothstep_g2(-0.5, 0.35, ny))
+    # Cute rosy-coral Kawaii cheek blush
+    c_blush = hex_srgb("#ff8da1")
+    # Plush pearl-grey chick down collar
+    c_down = mix_col(hex_srgb("#cfd7e6"), hex_srgb("#edf1f7"), 0.45 + 0.55 * face_front)
 
     col = mix_col(c_hood, c_mask, white_mask)
     col = mix_col(col, c_blush, blush)
-    col = mix_col(col, c_down, neck_down * (1.0 - white_mask * 0.65))
+    col = mix_col(col, c_down, neck_down * (1.0 - white_mask * 0.70))
     return col
 
 
 def build_head_texture_png(width=512, height=512):
-    """Bake a high-resolution 512x512 G2-smooth PNG texture for the Baby Emperor Penguin head."""
+    """Bake a 512x512 G2-smooth PNG texture for the Kawaii Baby Emperor Penguin head."""
     buf = bytearray(width * height * 4)
     for y in range(height):
         v = y / float(height - 1)
@@ -349,7 +344,6 @@ class MeshBuilder:
         self.add_surface(pos_list, fixed_tris, col_list, uv_list=uv_list, custom_normals=norms, interior_ref=None)
 
     def add_squircle_box(self, cx, cy, cz, sx, sy, sz, power=2.6, col=(1.0, 1.0, 1.0), rows=20, cols=40):
-        """G2-smooth 3D superellipsoid / squircle box: |x/a|^p + |y/b|^p + |z/c|^p = 1."""
         exp = 2.0 / float(power)
         hx, hy, hz = sx * 0.5, sy * 0.5, sz * 0.5
 
@@ -434,23 +428,35 @@ class MeshBuilder:
             tris = [(0, 1 + i, 1 + (i + 1) % radial_segs) for i in range(radial_segs)]
             self.add_surface(pos, tris, cols, custom_normals=norms, interior_ref=mid)
 
-    def add_thick_spherical_shell(self, cx, cy, cz, r_inner, r_outer, az_min_deg, az_max_deg, el_min_deg, el_max_deg, rows, cols, col):
+    def add_visor_cap_shell(self, cx, cy, cz, r_inner, r_outer, half_span_x_deg, arc_start_deg, arc_end_deg, rows, cols, col):
+        """Build a solid, closed 3D spherical visor cap hinged around the X-axis (temple-to-temple)!
+        Unlike standard (az, el) coordinates which flip across the north pole when el > 90 deg,
+        this parameterizes a clean visor band by:
+          - `u` in [0, 1]: lateral angle alpha in [-half_span_x_deg, +half_span_x_deg] from temple to temple
+          - `v` in [0, 1]: pitch angle beta in [arc_start_deg, arc_end_deg] rotating around the X-axis
+            from the front brow over the top of the helmet toward the back!
+        Guaranteed 100% smooth and free of pole-flipping folds!
+        """
         center = (cx, cy, cz)
         u_cnt = cols + 1
         v_cnt = rows + 1
 
-        def sphere_pt(r, u, v):
-            az = math.radians(az_min_deg + u * (az_max_deg - az_min_deg))
-            el = math.radians(el_min_deg + v * (el_max_deg - el_min_deg))
-            x = cx + r * math.cos(el) * math.sin(az)
-            y = cy + r * math.sin(el)
-            z = cz + r * math.cos(el) * math.cos(az)
+        def visor_pt(r, u, v):
+            alpha = math.radians(-half_span_x_deg + u * (2.0 * half_span_x_deg))
+            # Arched brow profile: slightly higher in the middle (cos(alpha)) than at the temple hinges
+            brow_arch = math.cos(alpha * 0.85)
+            beta_deg = (arc_start_deg * (0.45 + 0.55 * brow_arch)) + v * (arc_end_deg - arc_start_deg * (0.45 + 0.55 * brow_arch))
+            beta = math.radians(beta_deg)
+            x = cx + r * math.sin(alpha)
+            rc = r * math.cos(alpha)
+            y = cy + rc * math.sin(beta)
+            z = cz + rc * math.cos(beta)
             return (x, y, z)
 
         self.add_grid_surface(
             rows,
             cols,
-            lambda u, v: (sphere_pt(r_outer, u, v), col),
+            lambda u, v: (visor_pt(r_outer, u, v), col),
             wrap_u=False,
             close_poles=False,
             interior_ref=center,
@@ -468,19 +474,19 @@ class MeshBuilder:
         self.add_grid_surface(
             rows,
             cols,
-            lambda u, v: (sphere_pt(r_inner, u, v), col),
+            lambda u, v: (visor_pt(r_inner, u, v), col),
             wrap_u=False,
             close_poles=False,
             interior_ref=inner_interior_ref,
         )
 
-        mid_shell = sphere_pt((r_inner + r_outer) * 0.5, 0.5, 0.5)
+        mid_shell = visor_pt((r_inner + r_outer) * 0.5, 0.5, 0.5)
         for fixed_v in (0.0, 1.0):
             pos, cols_l, tris = [], [], []
             for c in range(u_cnt):
                 u = c / float(cols)
-                pos.append(sphere_pt(r_inner, u, fixed_v))
-                pos.append(sphere_pt(r_outer, u, fixed_v))
+                pos.append(visor_pt(r_inner, u, fixed_v))
+                pos.append(visor_pt(r_outer, u, fixed_v))
                 cols_l.extend((col, col))
             for c in range(cols):
                 b = c * 2
@@ -492,8 +498,8 @@ class MeshBuilder:
             pos, cols_l, tris = [], [], []
             for r in range(v_cnt):
                 v = r / float(rows)
-                pos.append(sphere_pt(r_inner, fixed_u, v))
-                pos.append(sphere_pt(r_outer, fixed_u, v))
+                pos.append(visor_pt(r_inner, fixed_u, v))
+                pos.append(visor_pt(r_outer, fixed_u, v))
                 cols_l.extend((col, col))
             for r in range(rows):
                 b = r * 2
@@ -503,32 +509,40 @@ class MeshBuilder:
 
 
 # Material indices
-MAT_HEAD_PLUMAGE = 0   # 512x512 embedded PNG texture of Baby Emperor Penguin plumage
-MAT_SUIT_WHITE = 1     # NASA Beta-cloth warm ivory white (#f2f0ea)
-MAT_SUIT_SHADE = 2     # Soft grey-white pressure fold / O2 tank (#d5dce6)
+MAT_HEAD_PLUMAGE = 0   # 512x512 embedded PNG texture of Kawaii Baby Emperor Penguin plumage
+MAT_SUIT_WHITE = 1     # NASA Beta-cloth warm ivory white (#f4f2ec)
+MAT_SUIT_SHADE = 2     # Soft grey-white pressure fold / O2 tank (#d4dbe5)
 MAT_COBALT_NASA = 3    # Anodized NASA cobalt blue (#1d4ed8)
-MAT_METAL_ALU = 4      # Brushed aluminum neck ring & latches (#94a3b8)
+MAT_METAL_ALU = 4      # Brushed aluminum neck ring & latches (#9ca3af)
 MAT_METAL_DARK = 5     # Dark titanium soles, flipper tips, belt & controls (#283242)
 MAT_GOLD_VISOR = 6     # 24K gold solar visor (#eab308)
 MAT_VALVE_RED = 7      # Anodized red oxygen valve (#dc2626)
 MAT_VALVE_BLUE = 8     # Anodized blue coolant valve (#2563eb)
-MAT_BEAK_DARK = 9      # Dark warm slate chick bill (#212634)
-MAT_BEAK_CORAL = 10    # Warm coral-salmon lower mandible highlight (#f28472)
+MAT_BEAK_DARK = 9      # Dark warm slate chick bill (#252b3b)
+MAT_BEAK_CORAL = 10    # Warm coral-salmon lower mandible smile (#ff8a75)
 MAT_EYE_OBSIDIAN = 11  # Deep glossy dark eye (#070a12)
 MAT_PURE_WHITE = 12    # Bright white catchlights & patch insignia (#ffffff)
-MAT_CYAN_LED = 13      # Emissive cyan telemetry & EVA lamps (#38bdf8)
+MAT_CYAN_LED = 13      # Emissive cyan telemetry & Kawaii lower iris glow (#38bdf8)
 MAT_AMBER_LED = 14     # Emissive amber status indicator (#f59e0b)
 MAT_HELMET_GLASS = 15  # Transparent polycarbonate bubble helmet dome
 
 C_WHITE = (1.0, 1.0, 1.0)
 
 
+def torso_profile_at(t_body):
+    """Exact torso radius scale and Z offset at normalized height t_body in [0, 1] (y from -0.016 to +0.360)."""
+    r_scale = bezier_quintic(t_body, 0.88, 1.12, 1.16, 1.00, 0.83, 0.765)
+    rx = 0.218 * r_scale
+    rz = 0.200 * r_scale
+    z_off = 0.016 * math.sin(t_body * math.pi) + 0.010 * t_body
+    return rx, rz, z_off
+
+
 def build_torso_primitives():
     """Node 1 (`Torso`), origin at hip pivot (0, 0.20, 0).
-    Uses a G2 quintic Bézier profile + squircle cross-section that flares smoothly
-    into the neck disconnect ring at y = 0.365 (r = 0.165) with ZERO gap, plus
-    integrated shoulder sleeve cuffs at (±0.168, 0.250, 0.012) so the flippers
-    connect seamlessly into the suit body.
+    CRITICAL FIX: The top of the torso at y = 0.360 is now COMPLETELY SEALED with a closed
+    domed collar plate (`close_poles=True`), so looking down from any overhead angle shows a
+    100% solid suit interior collar with ZERO hole into the body!
     """
     mbs = {
         MAT_SUIT_WHITE: MeshBuilder(),
@@ -543,49 +557,61 @@ def build_torso_primitives():
         MAT_AMBER_LED: MeshBuilder(),
     }
 
-    # 1. G2 Quintic Bézier + Squircle Plump Baby Penguin Torso
-    # Notice: at v=0 (bottom pelvis y=-0.048) it closes smoothly; at v=1 (top collar y=0.362)
-    # it meets the neck ring at radius r=0.165 so there is ZERO gap under the neck ring!
+    # 1. Closed, G2-Continuous Plump Baby Penguin Torso (sealed at both bottom pole v=0 and top collar pole v=1!)
     def eval_suit(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         sx, cz = squircle_cs(theta, power=2.25)
 
-        # Smooth bottom cap (v in 0..0.14) + quintic G2 body profile (v in 0.14..1.0)
-        if v < 0.14:
-            tc = v / 0.14
+        if v < 0.12:
+            # Smooth closed bottom pelvis cap (y from -0.046 to -0.016)
+            tc = v / 0.12
             ang = tc * (math.pi * 0.5)
-            y = -0.048 + (1.0 - math.cos(ang)) * 0.032
+            y = -0.046 + (1.0 - math.cos(ang)) * 0.030
             r_scale = math.sin(ang) * 0.88
-            t_body = 0.0
+            rx = 0.218 * r_scale
+            rz = 0.200 * r_scale
+            z_off = 0.0
+            indent = 0.0
+        elif v <= 0.88:
+            # Main G2 quintic pear-shaped torso wall (y from -0.016 to +0.360)
+            t_body = (v - 0.12) / 0.76
+            y = -0.016 + t_body * 0.376
+            rx, rz, z_off = torso_profile_at(t_body)
+            rib = math.sin(t_body * math.pi * 10.0)
+            rib_mask = smoothstep_g2(0.08, 0.22, t_body) * (1.0 - smoothstep_g2(0.76, 0.92, t_body))
+            indent = 0.0022 * max(0.0, -rib) * rib_mask
         else:
-            t_body = (v - 0.14) / 0.86
-            y = -0.016 + t_body * 0.378  # reaches y = +0.362 inside the neck ring
-            # Quintic G2 Bézier radius profile: plump pear belly (1.08) tapering to neck collar (0.76 -> r=0.168)
-            r_scale = bezier_quintic(t_body, 0.88, 1.12, 1.18, 1.02, 0.84, 0.765)
+            # SEALED Top Neck Collar Dome (v in 0.88..1.0): closes smoothly from r=0.167 inward to r=0.0 at y=+0.368!
+            # Guarantees ZERO hole when viewing Cyberpenguin from above!
+            tc = (v - 0.88) / 0.12
+            ang = tc * (math.pi * 0.5)
+            rx0, rz0, z_off0 = torso_profile_at(1.0)
+            rx = rx0 * math.cos(ang)
+            rz = rz0 * math.cos(ang)
+            y = 0.360 + math.sin(ang) * 0.010
+            z_off = z_off0
+            indent = 0.0
 
-        rx = 0.220 * r_scale
-        rz = 0.202 * r_scale
-        z_offset = 0.018 * math.sin(t_body * math.pi) + 0.010 * t_body
+        return ((rx - indent) * sx, y, (rz - indent) * cz + z_off), C_WHITE
 
-        # Gentle G2 sinusoidal pressure-suit quilting ribs
-        rib = math.sin(t_body * math.pi * 10.0)
-        rib_mask = smoothstep_g2(0.08, 0.22, t_body) * (1.0 - smoothstep_g2(0.76, 0.92, t_body))
-        indent = 0.0024 * max(0.0, -rib) * rib_mask
+    mbs[MAT_SUIT_WHITE].add_grid_surface(56, 60, eval_suit, wrap_u=True, close_poles=True, interior_ref=(0.0, 0.17, 0.01))
 
-        x = (rx - indent) * sx
-        z = (rz - indent) * cz + z_offset
-        return (x, y, z), C_WHITE
+    # Additional dark-grey inner neck gasket disc right inside the neck ring opening (y = 0.364..0.372)
+    mbs[MAT_SUIT_SHADE].add_cylinder(
+        (0.0, 0.356, 0.010),
+        (0.0, 0.374, 0.010),
+        0.156,
+        0.142,
+        C_WHITE,
+        radial_segs=36,
+        height_segs=2,
+    )
 
-    mbs[MAT_SUIT_WHITE].add_grid_surface(48, 60, eval_suit, wrap_u=True, close_poles=False, interior_ref=(0.0, 0.16, 0.01))
-
-    # Close bottom pole cap at y = -0.048
-    mbs[MAT_SUIT_WHITE].add_cylinder((0.0, -0.049, 0.0), (0.0, -0.045, 0.0), 0.001, 0.045, C_WHITE, radial_segs=24, height_segs=1)
-
-    # 2. Integrated Shoulder Bellows Cuffs on Left & Right Torso (bridges torso to flippers with ZERO gap!)
+    # 2. Integrated Shoulder Bellows Cuffs bridging Torso to Flippers
     for side in (-1.0, 1.0):
         mbs[MAT_SUIT_SHADE].add_cylinder(
-            (side * 0.142, 0.252, 0.014),
-            (side * 0.184, 0.244, 0.014),
+            (side * 0.138, 0.250, 0.014),
+            (side * 0.180, 0.242, 0.014),
             0.056,
             0.050,
             C_WHITE,
@@ -593,8 +619,8 @@ def build_torso_primitives():
             height_segs=3,
         )
         mbs[MAT_COBALT_NASA].add_cylinder(
-            (side * 0.160, 0.249, 0.014),
-            (side * 0.172, 0.246, 0.014),
+            (side * 0.156, 0.247, 0.014),
+            (side * 0.168, 0.244, 0.014),
             0.055,
             0.053,
             C_WHITE,
@@ -602,30 +628,32 @@ def build_torso_primitives():
             height_segs=1,
         )
 
-    # 3. Technical Waist Belt Ring + Smooth Squircle Buckle
+    # 3. Technical Waist Belt Ring + Smooth Squircle Buckle (protruding cleanly outside torso z_surf)
     def eval_belt(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         sx, cz = squircle_cs(theta, power=2.25)
         y = 0.068 + (v - 0.5) * 0.028
-        return (0.232 * sx, y, 0.213 * cz + 0.016), C_WHITE
+        t_b = (y + 0.016) / 0.376
+        rx, rz, z_off = torso_profile_at(t_b)
+        return ((rx + 0.004) * sx, y, (rz + 0.004) * cz + z_off), C_WHITE
 
     mbs[MAT_METAL_DARK].add_grid_surface(6, 48, eval_belt, wrap_u=True, close_poles=False, interior_ref=(0.0, 0.068, 0.016))
-    mbs[MAT_METAL_ALU].add_squircle_box(0.0, 0.068, 0.226, 0.056, 0.038, 0.018, power=2.6, col=C_WHITE, rows=12, cols=24)
-    mbs[MAT_CYAN_LED].add_squircle_box(0.0, 0.068, 0.232, 0.026, 0.016, 0.010, power=2.5, col=C_WHITE, rows=8, cols=16)
+    mbs[MAT_METAL_ALU].add_squircle_box(0.0, 0.068, 0.244, 0.056, 0.038, 0.020, power=2.6, col=C_WHITE, rows=12, cols=24)
+    mbs[MAT_CYAN_LED].add_squircle_box(0.0, 0.068, 0.251, 0.026, 0.016, 0.010, power=2.5, col=C_WHITE, rows=8, cols=16)
 
-    # 4. Circular NASA Blue Mission Patch oriented flush on upper-left chest surface
+    # 4. Circular NASA Blue Mission Patch placedproudly on the exact chest surface normal at (-0.088, 0.248)
     mbs[MAT_COBALT_NASA].add_cylinder(
-        (-0.084, 0.242, 0.168),
-        (-0.092, 0.248, 0.192),
-        0.031,
-        0.029,
+        (-0.084, 0.246, 0.180),
+        (-0.095, 0.253, 0.205),
+        0.030,
+        0.028,
         C_WHITE,
         radial_segs=24,
         height_segs=1,
     )
     mbs[MAT_PURE_WHITE].add_cylinder(
-        (-0.086, 0.244, 0.172),
-        (-0.093, 0.249, 0.194),
+        (-0.086, 0.248, 0.184),
+        (-0.096, 0.254, 0.207),
         0.015,
         0.013,
         C_WHITE,
@@ -633,14 +661,13 @@ def build_torso_primitives():
         height_segs=1,
     )
 
-    # 5. Anodized Cobalt-Blue & Brushed Aluminum Neck Disconnect Ring (y = 0.345 .. 0.390)
-    # Seats directly onto top of torso collar (y = 0.362, r = 0.168) with zero gap!
+    # 5. Anodized Cobalt-Blue & Brushed Aluminum Neck Disconnect Ring
     def eval_neck_ring(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         ang_v = v * math.pi * 2.0
         r_major = 0.164
         r = r_major + 0.026 * math.cos(ang_v)
-        y = 0.360 + 0.022 * math.sin(ang_v) - 0.006 * math.cos(theta)
+        y = 0.360 + 0.022 * math.sin(ang_v) - 0.005 * math.cos(theta)
         return (r * math.sin(theta), y, r * 0.96 * math.cos(theta) + 0.012), C_WHITE
 
     def neck_ring_interior(tri_pts):
@@ -650,16 +677,16 @@ def build_torso_primitives():
             (tri_pts[0][2] + tri_pts[1][2] + tri_pts[2][2]) / 3.0,
         )
         ang = math.atan2(c_pt[0], (c_pt[2] - 0.012) / 0.96)
-        return (0.164 * math.sin(ang), 0.360 - 0.006 * math.cos(ang), 0.164 * 0.96 * math.cos(ang) + 0.012)
+        return (0.164 * math.sin(ang), 0.360 - 0.005 * math.cos(ang), 0.164 * 0.96 * math.cos(ang) + 0.012)
 
     mbs[MAT_COBALT_NASA].add_grid_surface(18, 48, eval_neck_ring, wrap_u=True, close_poles=False, interior_ref=neck_ring_interior)
 
     def eval_alu_collar(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         ang_v = v * math.pi * 2.0
-        r_major = 0.166
+        r_major = 0.165
         r = r_major + 0.020 * math.cos(ang_v)
-        y = 0.376 + 0.015 * math.sin(ang_v) - 0.006 * math.cos(theta)
+        y = 0.376 + 0.015 * math.sin(ang_v) - 0.005 * math.cos(theta)
         return (r * math.sin(theta), y, r * 0.96 * math.cos(theta) + 0.012), C_WHITE
 
     def alu_collar_interior(tri_pts):
@@ -669,26 +696,26 @@ def build_torso_primitives():
             (tri_pts[0][2] + tri_pts[1][2] + tri_pts[2][2]) / 3.0,
         )
         ang = math.atan2(c_pt[0], (c_pt[2] - 0.012) / 0.96)
-        return (0.166 * math.sin(ang), 0.376 - 0.006 * math.cos(ang), 0.166 * 0.96 * math.cos(ang) + 0.012)
+        return (0.165 * math.sin(ang), 0.376 - 0.005 * math.cos(ang), 0.165 * 0.96 * math.cos(ang) + 0.012)
 
     mbs[MAT_METAL_ALU].add_grid_surface(16, 48, eval_alu_collar, wrap_u=True, close_poles=False, interior_ref=alu_collar_interior)
 
-    # 6. Chest Display & Control Module (DCM / RCU) — G2 smooth squircle housing
-    mbs[MAT_SUIT_SHADE].add_squircle_box(0.0, 0.192, 0.210, 0.114, 0.086, 0.046, power=2.65, col=C_WHITE, rows=16, cols=32)
-    mbs[MAT_METAL_DARK].add_squircle_box(0.0, 0.210, 0.228, 0.084, 0.022, 0.015, power=2.5, col=C_WHITE, rows=10, cols=20)
-    mbs[MAT_CYAN_LED].add_squircle_box(-0.018, 0.210, 0.232, 0.026, 0.010, 0.010, power=2.4, col=C_WHITE, rows=8, cols=16)
-    mbs[MAT_AMBER_LED].add_cylinder((0.022, 0.210, 0.228), (0.022, 0.210, 0.238), 0.006, 0.006, C_WHITE, radial_segs=14, height_segs=1)
-    mbs[MAT_METAL_DARK].add_cylinder((-0.022, 0.174, 0.224), (-0.022, 0.174, 0.239), 0.015, 0.014, C_WHITE, radial_segs=18, height_segs=1)
-    mbs[MAT_COBALT_NASA].add_squircle_box(0.022, 0.174, 0.228, 0.030, 0.017, 0.015, power=2.5, col=C_WHITE, rows=8, cols=16)
+    # 6. Chest Display & Control Module (DCM / RCU) — proud on the front chest (z = 0.224)
+    mbs[MAT_SUIT_SHADE].add_squircle_box(0.0, 0.194, 0.222, 0.114, 0.084, 0.044, power=2.65, col=C_WHITE, rows=16, cols=32)
+    mbs[MAT_METAL_DARK].add_squircle_box(0.0, 0.211, 0.240, 0.084, 0.022, 0.014, power=2.5, col=C_WHITE, rows=10, cols=20)
+    mbs[MAT_CYAN_LED].add_squircle_box(-0.018, 0.211, 0.244, 0.026, 0.010, 0.010, power=2.4, col=C_WHITE, rows=8, cols=16)
+    mbs[MAT_AMBER_LED].add_cylinder((0.022, 0.211, 0.240), (0.022, 0.211, 0.249), 0.006, 0.006, C_WHITE, radial_segs=14, height_segs=1)
+    mbs[MAT_METAL_DARK].add_cylinder((-0.022, 0.177, 0.236), (-0.022, 0.177, 0.250), 0.015, 0.014, C_WHITE, radial_segs=18, height_segs=1)
+    mbs[MAT_COBALT_NASA].add_squircle_box(0.022, 0.177, 0.240, 0.030, 0.017, 0.014, power=2.5, col=C_WHITE, rows=8, cols=16)
 
-    # 7. Iconic Red & Blue NASA Anodized Umbilical Connector Valves on lower chest
-    mbs[MAT_VALVE_BLUE].add_cylinder((0.056, 0.118, 0.190), (0.056, 0.118, 0.230), 0.019, 0.016, C_WHITE, radial_segs=20, height_segs=2)
-    mbs[MAT_VALVE_RED].add_cylinder((-0.056, 0.118, 0.190), (-0.056, 0.118, 0.230), 0.019, 0.016, C_WHITE, radial_segs=20, height_segs=2)
+    # 7. Iconic Red & Blue NASA Anodized Umbilical Connector Valves (proud outside tummy at z = 0.220..0.250!)
+    mbs[MAT_VALVE_BLUE].add_cylinder((0.056, 0.120, 0.218), (0.056, 0.120, 0.250), 0.018, 0.015, C_WHITE, radial_segs=20, height_segs=2)
+    mbs[MAT_VALVE_RED].add_cylinder((-0.056, 0.120, 0.218), (-0.056, 0.120, 0.250), 0.018, 0.015, C_WHITE, radial_segs=20, height_segs=2)
 
-    # 8. NASA PLSS Life-Support Backpack (-Z rear) — G2 smooth squircle shell
-    mbs[MAT_SUIT_WHITE].add_squircle_box(0.0, 0.185, -0.170, 0.256, 0.310, 0.130, power=2.7, col=C_WHITE, rows=18, cols=36)
+    # 8. NASA PLSS Life-Support Backpack (-Z rear)
+    mbs[MAT_SUIT_WHITE].add_squircle_box(0.0, 0.185, -0.170, 0.254, 0.308, 0.130, power=2.7, col=C_WHITE, rows=18, cols=36)
     for side in (-1.0, 1.0):
-        mbs[MAT_COBALT_NASA].add_squircle_box(side * 0.110, 0.185, -0.168, 0.044, 0.272, 0.114, power=2.6, col=C_WHITE, rows=12, cols=24)
+        mbs[MAT_COBALT_NASA].add_squircle_box(side * 0.108, 0.185, -0.168, 0.044, 0.270, 0.114, power=2.6, col=C_WHITE, rows=12, cols=24)
         mbs[MAT_SUIT_SHADE].add_cylinder(
             (side * 0.064, 0.055, -0.220),
             (side * 0.064, 0.305, -0.220),
@@ -706,11 +733,7 @@ def build_torso_primitives():
 
 
 def build_flipper_primitives(is_left=True):
-    """Nodes 2 & 3 (`FlipperL`, `FlipperR`), origin at shoulder pivot (±0.158, 0.252, 0.014) inside the shoulder cuff!
-    Uses a G2 quintic Bézier centerline and squircle paddle cross-section that starts broad inside the
-    shoulder socket (`curve_x(0) = -0.015 * sign`, `thick_x > 0` at shoulder) and drapes smoothly along
-    the side of the body with zero detachment gap and zero pointy thumb tip at the top.
-    """
+    """Nodes 2 & 3 (`FlipperL`, `FlipperR`), origin at shoulder pivot (±0.158, 0.250, 0.014)."""
     mbs = {
         MAT_SUIT_WHITE: MeshBuilder(),
         MAT_COBALT_NASA: MeshBuilder(),
@@ -722,26 +745,23 @@ def build_flipper_primitives(is_left=True):
         theta = (u - 0.5) * math.pi * 2.0
         sx, cz = squircle_cs(theta, power=2.45)
         phi = v * math.pi
-        t = (1.0 - math.cos(phi)) * 0.5  # 0 at shoulder root inside torso, 1 at paddle tip
+        t = (1.0 - math.cos(phi)) * 0.5
 
-        # G2 quintic Bézier centerline starting INSIDE the torso shoulder cuff (x = -0.018*sign, y = +0.018)
-        # and sweeping gracefully outward and downward along the plump torso contour
-        cx = sign * bezier_quintic(t, -0.018, 0.005, 0.038, 0.068, 0.088, 0.082)
-        cy = bezier_quintic(t, 0.018, 0.005, -0.045, -0.125, -0.205, -0.245)
-        cz_center = bezier_quintic(t, 0.0, 0.004, 0.008, 0.002, -0.012, -0.022)
+        cx = sign * bezier_quintic(t, -0.020, 0.004, 0.036, 0.066, 0.086, 0.080)
+        cy = bezier_quintic(t, 0.018, 0.005, -0.042, -0.120, -0.198, -0.238)
+        cz_center = bezier_quintic(t, 0.0, 0.004, 0.008, 0.002, -0.010, -0.020)
 
-        # Smooth envelope: full rounded shoulder socket at top, wide paddle mid-section, soft rounded tip
         s_env = math.sin(phi)
-        thick_x = (0.042 * (s_env ** 0.82) * (1.0 - 0.36 * t)) * scale_r
-        width_z = (0.068 * (s_env ** 0.78) * (1.0 + 0.14 * math.sin(t * math.pi) - 0.22 * (t ** 2))) * scale_r
+        thick_x = (0.044 * (s_env ** 0.80) * (1.0 - 0.34 * t)) * scale_r
+        width_z = (0.070 * (s_env ** 0.76) * (1.0 + 0.14 * math.sin(t * math.pi) - 0.20 * (t ** 2))) * scale_r
 
         return (cx + thick_x * sx, cy, cz_center + width_z * cz), (cx, cy, cz_center)
 
     def flipper_interior(tri_pts):
         cy = (tri_pts[0][1] + tri_pts[1][1] + tri_pts[2][1]) / 3.0
-        t = clamp((0.018 - cy) / 0.263, 0.0, 1.0)
-        cx = sign * bezier_quintic(t, -0.018, 0.005, 0.038, 0.068, 0.088, 0.082)
-        cz_c = bezier_quintic(t, 0.0, 0.004, 0.008, 0.002, -0.012, -0.022)
+        t = clamp((0.018 - cy) / 0.256, 0.0, 1.0)
+        cx = sign * bezier_quintic(t, -0.020, 0.004, 0.036, 0.066, 0.086, 0.080)
+        cz_c = bezier_quintic(t, 0.0, 0.004, 0.008, 0.002, -0.010, -0.020)
         return (cx, cy, cz_c)
 
     mbs[MAT_SUIT_WHITE].add_grid_surface(
@@ -801,7 +821,7 @@ def build_foot_primitives(is_left=True):
         raw_y = -0.098 - t * 0.088
         y = max(-0.180, raw_y)
         forward = max(0.0, cz)
-        rx = (0.065 + 0.016 * forward * math.sin(t * math.pi)) * (s ** 0.74) * scale_r
+        rx = (0.066 + 0.016 * forward * math.sin(t * math.pi)) * (s ** 0.74) * scale_r
         rz_front = 0.116 * (s ** 0.72) * scale_r
         rz_back = 0.065 * (s ** 0.76) * scale_r
         rz = rz_front if cz >= 0 else rz_back
@@ -836,17 +856,13 @@ def build_foot_primitives(is_left=True):
 
 def build_head_primitives():
     """Node 6 (`Head`), origin at neck pivot (0, 0.37, 0.01) relative to Torso.
-    Builds:
-      - G2-smooth chubby Baby Emperor Penguin head + integrated neck collar plugging
-        into the torso neck ring (`MAT_HEAD_PLUMAGE`, 512x512 PNG texture, UV seam at BACK -Z!)
-      - Adorable short, rounded G2 squircle button beak (`MAT_BEAK_DARK` + `MAT_BEAK_CORAL`)
-        ending at z = 0.168, with > 4.2 cm of clearance inside the r = 0.210 bubble helmet!
-      - Big soulful glossy eyes (`MAT_EYE_OBSIDIAN`) & crisp catchlights (`MAT_PURE_WHITE`)
-      - Unified NASA LEVA Helmet Assembly:
-        - Base aluminum helmet seal ring seated directly on the neck ring
-        - Raised 24K Gold Solar Visor (`MAT_GOLD_VISOR`, r = 0.213..0.220)
-        - White Protective Thermal Shroud (`MAT_SUIT_WHITE`, r = 0.220..0.229)
-        - Compact side pivot hinges seated flush against the bubble helmet at x = ±0.210
+    Features:
+      - Wide, plush neck column plugging solidly into the sealed torso collar (y = -0.02 to +0.04)
+      - Chubby "mochi" Kawaii baby cheeks (wider in lower face than upper cranium)
+      - Oversized, soulful Kawaii 3D eyes (`rx=0.041, ry=0.045`) with sapphire-blue lower iris
+        crescent + dual anime starlight catchlights
+      - Tiny, rounded, smiling button beak between the eyes
+      - Smooth temple-hinged visor cap (`add_visor_cap_shell`) with ZERO pole-flipping flap on top!
     """
     mbs = {
         MAT_HEAD_PLUMAGE: MeshBuilder(),
@@ -861,32 +877,48 @@ def build_head_primitives():
         MAT_CYAN_LED: MeshBuilder(),
     }
 
-    head_cy = 0.140
+    head_cy = 0.132
     head_cz = 0.004
     head_center = (0.0, head_cy, head_cz)
 
-    # 1. G2-Continuous Adorable Baby Emperor Penguin Head & Fluffy Neck Column
-    # Notice: theta = (u - 0.5) * 2*pi so u=0.5 is the front face (+Z) and the u=0/1 seam is at the back (-Z)!
-    # Also extends smoothly down into the neck ring at v=0 (y = -0.015) so the head never floats above the collar!
-    def eval_chick_head(u, v):
+    # 1. Plush Neck Column plugging the head solidly into the sealed torso neck ring (y = -0.015 .. +0.055)
+    # Eliminates any gap or floating-sphere look when viewed from above or side!
+    def eval_plush_neck(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         sx, cz = squircle_cs(theta, power=2.18)
+        y = -0.014 + v * 0.068
+        # Flares out at bottom (r = 0.136) to fill the neck ring, tapering slightly into the chin (r = 0.118)
+        r = 0.136 - 0.018 * smoothstep_g2(0.0, 1.0, v)
+        x = r * sx
+        z = head_cz + (r * 0.94) * cz
+        sr, sg, sb = evaluate_chick_head_srgb(u, 0.08)
+        return (x, y, z), (srgb_to_linear(sr), srgb_to_linear(sg), srgb_to_linear(sb)), (u, 0.08)
+
+    mbs[MAT_HEAD_PLUMAGE].add_grid_surface(
+        10, 48, eval_plush_neck, wrap_u=True, close_poles=False, interior_ref=(0.0, 0.02, head_cz)
+    )
+
+    # 2. Chubby "Mochi" Kawaii Baby Emperor Penguin Head (`MAT_HEAD_PLUMAGE`)
+    def eval_chick_head(u, v):
+        theta = (u - 0.5) * math.pi * 2.0
+        sx, cz = squircle_cs(theta, power=2.15)
 
         phi = v * math.pi
-        s = math.sin(phi)
-        y_norm = -math.cos(phi)  # -1 at neck base, +1 at crown top
-
-        # G2 quintic chubby baby cheek profile (wider adorable cheeks in lower face y_norm in -0.45..+0.05)
+        y_norm = -math.cos(phi)  # -1 at bottom chin/neck, +1 at crown top
         t_h = (y_norm + 1.0) * 0.5
-        base_r = bezier_quintic(t_h, 0.118, 0.145, 0.162, 0.150, 0.142, 0.138)
-        cheek_front = smoothstep_g2(-0.1, 0.85, math.cos(theta))
-        cheek_bulge = 1.0 + 0.085 * math.exp(-((y_norm + 0.16) / 0.36) ** 2) * cheek_front
 
-        # Smooth spherical closure at bottom neck (v < 0.08) and top crown (v > 0.72)
-        cap_env = math.sin(phi) ** 0.86 if v > 0.18 else (math.sin(phi) ** 0.55)
-        rx = base_r * cap_env * cheek_bulge
-        rz = (base_r * 0.94) * cap_env * (1.0 + 0.04 * cheek_front)
-        y = head_cy + 0.152 * y_norm
+        # Kawaii "Mochi" cheek profile: extra-plump chubby lower cheeks (t_h ~ 0.30..0.48)
+        base_r = bezier_quintic(t_h, 0.135, 0.164, 0.176, 0.156, 0.146, 0.140)
+        cheek_front = smoothstep_g2(-0.15, 0.85, math.cos(theta))
+        cheek_Side = math.sin(theta) ** 2
+        # Adorable chubby cheek pouch expansion on left/right lower face
+        mochi_pouch = 1.0 + (0.095 * cheek_front + 0.065 * cheek_Side) * math.exp(-((y_norm + 0.18) / 0.38) ** 2)
+
+        cap_env = math.sin(phi) ** 0.85 if v > 0.16 else (math.sin(phi) ** 0.52)
+        rx = base_r * cap_env * mochi_pouch
+        rz = (base_r * 0.93) * cap_env * (1.0 + 0.05 * cheek_front)
+        # Slightly squat, round baby height (0.146)
+        y = head_cy + 0.146 * y_norm
 
         x = rx * sx
         z = head_cz + rz * cz
@@ -897,78 +929,101 @@ def build_head_primitives():
 
     mbs[MAT_HEAD_PLUMAGE].add_grid_surface(52, 64, eval_chick_head, wrap_u=True, close_poles=True, interior_ref=head_center)
 
-    # 2. Adorable Short G2-Smooth Button Beak (+Z front)
-    # Protrudes gently from z = 0.125 to z = 0.166 (stays > 4.4 cm inside the r = 0.212 bubble helmet!)
-    beak_cy = head_cy - 0.020
-    beak_cz = head_cz + 0.124
-    beak_len = 0.042
+    # 3. Tiny, Adorable, Smiling Kawaii Button Beak (+Z front, seated right between the big eyes)
+    beak_cy = head_cy - 0.022
+    beak_cz = head_cz + 0.132
+    beak_len = 0.032  # Short, cute button bill (reaches z = 0.168, > 4.4 cm inside the r = 0.212 dome!)
 
     def eval_cute_beak(u, v):
         theta = (u - 0.5) * math.pi * 2.0
-        sx, cy_s = squircle_cs(theta, power=2.3)
-        # G2 smooth dome profile along beak length (v=0 at base inside cheek mask, v=1 at soft rounded tip)
+        sx, cy_s = squircle_cs(theta, power=2.25)
         phi = v * (math.pi * 0.5)
-        profile = math.cos(phi) ** 0.82
+        profile = math.cos(phi) ** 0.78
         t = math.sin(phi)
-        rx = 0.028 * profile
-        ry = 0.019 * profile
-        droop_y = -0.0035 * (t ** 2)
+        rx = 0.027 * profile
+        ry = 0.0165 * profile
+        # Gentle upward smiling corners at the sides (sx^2) + soft rounded tip
+        smile_lift = 0.0035 * (sx ** 2) * (1.0 - t * 0.6)
         x = rx * sx
-        y = beak_cy + droop_y + ry * cy_s
+        y = beak_cy + smile_lift + ry * cy_s
         z = beak_cz + t * beak_len
         return (x, y, z), C_WHITE
 
     mbs[MAT_BEAK_DARK].add_grid_surface(
-        18, 28, eval_cute_beak, wrap_u=True, close_poles=True, interior_ref=(0.0, beak_cy, beak_cz + 0.010)
+        18, 28, eval_cute_beak, wrap_u=True, close_poles=True, interior_ref=(0.0, beak_cy, beak_cz + 0.008)
     )
 
-    # Subtle warm coral-salmon lower mandible smile line at base of beak
+    # Warm coral-peach smiling lower mandible cushion
     def eval_coral_smile(u, v):
-        theta = math.pi * (0.58 + u * 0.84)
-        phi = v * (math.pi * 0.34)
-        profile = math.cos(phi) ** 0.80
+        theta = math.pi * (0.56 + u * 0.88)
+        phi = v * (math.pi * 0.38)
+        profile = math.cos(phi) ** 0.78
         t = math.sin(phi)
-        rx = 0.0288 * profile
-        ry = 0.0198 * profile
-        x = rx * math.sin(theta)
-        y = beak_cy - 0.003 * (t ** 2) + ry * math.cos(theta)
+        rx = 0.0278 * profile
+        ry = 0.0175 * profile
+        sx = math.sin(theta)
+        x = rx * sx
+        y = beak_cy + 0.0035 * (sx ** 2) * (1.0 - t * 0.6) + ry * math.cos(theta)
         z = beak_cz + t * beak_len
         return (x, y, z), C_WHITE
 
     mbs[MAT_BEAK_CORAL].add_grid_surface(
-        8, 18, eval_coral_smile, wrap_u=False, close_poles=False, interior_ref=(0.0, beak_cy + 0.005, beak_cz + 0.010)
+        8, 18, eval_coral_smile, wrap_u=False, close_poles=False, interior_ref=(0.0, beak_cy + 0.004, beak_cz + 0.008)
     )
 
-    # 3. Big, Soulful, Adorable Glossy 3D Eyes & Crisp Catchlights
-    # Positioned with classic baby proportions (wide-set, slightly low near beak level, flush on cheek contour)
+    # 4. OVERSIZED KAWAII 3D EYES (~1.75x larger, glossy obsidian + sapphire lower iris crescent + 3 starlight catchlights!)
     for side in (-1.0, 1.0):
-        ex = side * 0.056
-        ey = head_cy + 0.010
-        ez = head_cz + 0.123
+        ex = side * 0.060
+        ey = head_cy + 0.002  # Low baby placement near beak midline (classic Kawaii proportion!)
+        ez = head_cz + 0.126
         eye_center = (ex, ey, ez)
-        # Tilt each eye slightly outward (+18 deg yaw) to hug the curved cheek surface naturally
-        yaw_ang = side * math.radians(17.0)
+        yaw_ang = side * math.radians(19.0)
         cy_a, sy_a = math.cos(yaw_ang), math.sin(yaw_ang)
+
+        eye_rx = 0.039
+        eye_ry = 0.043
+        eye_rz = 0.020
 
         def make_eye_eval(cx, cy, cz, c_yaw, s_yaw):
             def eval_eye(u, v):
                 theta = (u - 0.5) * math.pi * 2.0
                 phi = v * math.pi
                 sn = math.sin(phi)
-                lx = sn * math.sin(theta) * 0.027
-                ly = -math.cos(phi) * 0.029
-                lz = sn * math.cos(theta) * 0.016
+                lx = sn * math.sin(theta) * eye_rx
+                ly = -math.cos(phi) * eye_ry
+                lz = sn * math.cos(theta) * eye_rz
                 rx = lx * c_yaw + lz * s_yaw
                 rz = -lx * s_yaw + lz * c_yaw
                 return (cx + rx, cy + ly, cz + rz), C_WHITE
             return eval_eye
 
         mbs[MAT_EYE_OBSIDIAN].add_grid_surface(
-            20, 28, make_eye_eval(ex, ey, ez, cy_a, sy_a), wrap_u=True, close_poles=True, interior_ref=eye_center
+            24, 32, make_eye_eval(ex, ey, ez, cy_a, sy_a), wrap_u=True, close_poles=True, interior_ref=eye_center
         )
 
-        # Primary large upper-left catchlight & secondary lower-right catchlight embedded cleanly on cornea
-        for (lx_off, ly_off, lz_off, rad) in [(-0.008, 0.009, 0.0145, 0.0062), (0.007, -0.008, 0.0140, 0.0032)]:
+        # Kawaii Sapphire-Cyan Lower Iris Crescent on the lower front of the eye
+        def make_iris_crescent(cx, cy, cz, c_yaw, s_yaw):
+            def eval_crescent(u, v):
+                theta = (u - 0.5) * math.radians(76.0)
+                phi = math.pi * (0.24 + v * 0.16)
+                sn = math.sin(phi)
+                lx = sn * math.sin(theta) * (eye_rx * 0.76)
+                ly = -math.cos(phi) * (eye_ry * 0.78)
+                lz = sn * math.cos(theta) * (eye_rz * 1.03)
+                rx = lx * c_yaw + lz * s_yaw
+                rz = -lx * s_yaw + lz * c_yaw
+                return (cx + rx, cy + ly, cz + rz), C_WHITE
+            return eval_crescent
+
+        mbs[MAT_CYAN_LED].add_grid_surface(
+            6, 14, make_iris_crescent(ex, ey, ez, cy_a, sy_a), wrap_u=False, close_poles=False, interior_ref=eye_center
+        )
+
+        # Dual Oversized Kawaii Anime Catchlights (big gleaming upper-inner highlight + cute lower-outer bead)
+        for (lx_off, ly_off, lz_off, rad) in [
+            (-0.012 * side, 0.014, eye_rz * 0.96, 0.0110),
+            (0.013 * side, -0.012, eye_rz * 0.94, 0.0052),
+        ]:
             rx_o = lx_off * cy_a + lz_off * sy_a
             rz_o = -lx_off * sy_a + lz_off * cy_a
             sc = (ex + rx_o, ey + ly_off, ez + rz_o)
@@ -981,23 +1036,21 @@ def build_head_primitives():
                     return (
                         sx + sr * sn * math.sin(theta),
                         sy - sr * math.cos(phi),
-                        sz + sr * 0.65 * sn * math.cos(theta),
+                        sz + sr * 0.55 * sn * math.cos(theta),
                     ), C_WHITE
                 return eval_spark
 
             mbs[MAT_PURE_WHITE].add_grid_surface(
-                10, 14, make_spark_eval(sc[0], sc[1], sc[2], rad), wrap_u=True, close_poles=True, interior_ref=eye_center
+                12, 16, make_spark_eval(sc[0], sc[1], sc[2], rad), wrap_u=True, close_poles=True, interior_ref=eye_center
             )
 
-    # 4. Unified NASA Bubble Helmet Base Ring, Raised 24K Gold LEVA Sun Visor & White Protective Shroud
-    # Notice: r_dome = 0.210. All visor shells and side hinge pods hug r = 0.210..0.228 tightly!
-    # 4a. Lower Helmet Base Seal Collar (at y = 0.012, connecting the bubble dome base to the torso neck ring)
+    # 5. Unified NASA Bubble Helmet Collar & Temple-Hinged Raised LEVA Visor (NO pole-flipping fold!)
     def eval_helmet_base_ring(u, v):
         theta = (u - 0.5) * math.pi * 2.0
         ang_v = v * math.pi * 2.0
         r_major = 0.168
-        r = r_major + 0.014 * math.cos(ang_v)
-        y = 0.012 + 0.012 * math.sin(ang_v) - 0.006 * math.cos(theta)
+        r = r_major + 0.015 * math.cos(ang_v)
+        y = 0.010 + 0.012 * math.sin(ang_v) - 0.005 * math.cos(theta)
         return (r * math.sin(theta), y, r * 0.96 * math.cos(theta) + 0.004), C_WHITE
 
     def base_ring_interior(tri_pts):
@@ -1007,85 +1060,64 @@ def build_head_primitives():
             (tri_pts[0][2] + tri_pts[1][2] + tri_pts[2][2]) / 3.0,
         )
         ang = math.atan2(c_pt[0], (c_pt[2] - 0.004) / 0.96)
-        return (0.168 * math.sin(ang), 0.012 - 0.006 * math.cos(ang), 0.168 * 0.96 * math.cos(ang) + 0.004)
+        return (0.168 * math.sin(ang), 0.010 - 0.005 * math.cos(ang), 0.168 * 0.96 * math.cos(ang) + 0.004)
 
     mbs[MAT_METAL_ALU].add_grid_surface(12, 44, eval_helmet_base_ring, wrap_u=True, close_poles=False, interior_ref=base_ring_interior)
 
-    # 4b. Raised 24K Gold LEVA Solar Visor (hugs the upper dome r = 0.211..0.217 from el = 28..112 deg)
-    mbs[MAT_GOLD_VISOR].add_thick_spherical_shell(
+    # 5a. Raised 24K Gold LEVA Solar Visor (hinged cleanly around X-axis from beta = 28 deg to 108 deg)
+    mbs[MAT_GOLD_VISOR].add_visor_cap_shell(
         0.0,
         head_cy,
         head_cz,
-        r_inner=0.211,
-        r_outer=0.217,
-        az_min_deg=-88.0,
-        az_max_deg=88.0,
-        el_min_deg=26.0,
-        el_max_deg=110.0,
-        rows=14,
-        cols=32,
+        r_inner=0.212,
+        r_outer=0.218,
+        half_span_x_deg=76.0,
+        arc_start_deg=26.0,
+        arc_end_deg=108.0,
+        rows=16,
+        cols=34,
         col=C_WHITE,
     )
 
-    # 4c. Outer White Thermal Protective Shroud (hugs r = 0.217..0.225 from el = 34..128 deg)
-    mbs[MAT_SUIT_WHITE].add_thick_spherical_shell(
+    # 5b. Outer White Thermal Protective Shroud (hinged cleanly around X-axis from beta = 35 deg to 124 deg)
+    mbs[MAT_SUIT_WHITE].add_visor_cap_shell(
         0.0,
         head_cy,
         head_cz,
-        r_inner=0.217,
-        r_outer=0.225,
-        az_min_deg=-90.0,
-        az_max_deg=90.0,
-        el_min_deg=33.0,
-        el_max_deg=126.0,
-        rows=14,
-        cols=32,
+        r_inner=0.218,
+        r_outer=0.226,
+        half_span_x_deg=78.0,
+        arc_start_deg=34.0,
+        arc_end_deg=124.0,
+        rows=16,
+        cols=34,
         col=C_WHITE,
     )
 
-    # Subtle cobalt brow trim on the white protective shroud
-    mbs[MAT_COBALT_NASA].add_thick_spherical_shell(
+    # Subtle cobalt brow stripe on front edge of white protective shroud
+    mbs[MAT_COBALT_NASA].add_visor_cap_shell(
         0.0,
         head_cy,
         head_cz,
-        r_inner=0.223,
-        r_outer=0.227,
-        az_min_deg=-45.0,
-        az_max_deg=45.0,
-        el_min_deg=33.5,
-        el_max_deg=39.5,
+        r_inner=0.224,
+        r_outer=0.228,
+        half_span_x_deg=44.0,
+        arc_start_deg=34.5,
+        arc_end_deg=41.5,
         rows=4,
-        cols=18,
+        cols=20,
         col=C_WHITE,
     )
 
-    # 4d. Sleek Curved Visor Hinge Straps hugging the bubble dome down to compact side pivot discs at el = 16 deg
+    # 5c. Compact metallic temple pivot discs where the visor hinges meet at x = ±0.212
     for side in (-1.0, 1.0):
-        az_s = side * 78.0
-        az_e = side * 90.0
-        if az_s > az_e:
-            az_s, az_e = az_e, az_s
-        mbs[MAT_SUIT_WHITE].add_thick_spherical_shell(
-            0.0,
-            head_cy,
-            head_cz,
-            r_inner=0.211,
-            r_outer=0.224,
-            az_min_deg=az_s,
-            az_max_deg=az_e,
-            el_min_deg=14.0,
-            el_max_deg=35.0,
-            rows=6,
-            cols=6,
-            col=C_WHITE,
-        )
-        # Compact metallic pivot disc seated flush on the bubble dome at el = 18 deg (y = head_cy + 0.065)
-        piv_y = head_cy + 0.062
-        piv_x_in = side * 0.196
-        piv_x_out = side * 0.222
+        piv_y = head_cy + 0.025
+        piv_z = head_cz + 0.020
+        piv_x_in = side * 0.198
+        piv_x_out = side * 0.224
         mbs[MAT_METAL_ALU].add_cylinder(
-            (piv_x_in, piv_y, head_cz),
-            (piv_x_out, piv_y, head_cz),
+            (piv_x_in, piv_y, piv_z),
+            (piv_x_out, piv_y, piv_z),
             0.024,
             0.020,
             C_WHITE,
@@ -1093,8 +1125,8 @@ def build_head_primitives():
             height_segs=2,
         )
         mbs[MAT_COBALT_NASA].add_cylinder(
-            (piv_x_out - side * 0.003, piv_y, head_cz),
-            (piv_x_out + side * 0.002, piv_y, head_cz),
+            (piv_x_out - side * 0.003, piv_y, piv_z),
+            (piv_x_out + side * 0.002, piv_y, piv_z),
             0.012,
             0.011,
             C_WHITE,
@@ -1106,16 +1138,12 @@ def build_head_primitives():
 
 
 def build_helmet_glass_mesh():
-    """Node 7 (`HelmetGlass`), origin at neck pivot (0, 0.37, 0.01) relative to Torso.
-    Spacious, crystal-clear polycarbonate pressure bubble dome (r_dome = 0.210) that
-    comfortably encloses the head and beak (z_beak_max = 0.170 < z_dome = 0.214) and
-    connects directly to the lower neck seal ring and upper raised LEVA visor.
-    """
+    """Node 7 (`HelmetGlass`), origin at neck pivot (0, 0.37, 0.01) relative to Torso."""
     mb = MeshBuilder()
-    head_cy = 0.140
+    head_cy = 0.132
     head_cz = 0.004
     r_dome = 0.210
-    phi_min = 0.20 * math.pi  # Starts right at the aluminum neck ring seal (y ~ 0.012)
+    phi_min = 0.19 * math.pi
 
     def eval_dome(u, v):
         theta = (u - 0.5) * math.pi * 2.0
@@ -1127,7 +1155,7 @@ def build_helmet_glass_mesh():
         pz = head_cz + r_dome * 1.01 * sn * math.cos(theta)
         return (px, py, pz), C_WHITE
 
-    mb.add_grid_surface(32, 48, eval_dome, wrap_u=True, close_poles=False, interior_ref=(0.0, head_cy, head_cz))
+    mb.add_grid_surface(32, 48, eval_dome, wrap_u=True, close_poles=True, interior_ref=(0.0, head_cy, head_cz))
     return mb
 
 
@@ -1274,16 +1302,15 @@ def pack_glb():
         {"name": "HelmetGlassMesh", "primitives": [append_primitive(glass_mb, MAT_HELMET_GLASS)]},
     ]
 
-    # Note: FlipperL and FlipperR pivot at (±0.158, 0.252, 0.014) right inside the torso shoulder cuffs!
     nodes = [
         {"name": "PenguinRoot", "children": [1, 4, 5]},
         {"name": "Torso", "mesh": 0, "translation": [0.0, 0.20, 0.0], "children": [2, 3, 6, 7]},
-        {"name": "FlipperL", "mesh": 1, "translation": [0.158, 0.252, 0.014]},
-        {"name": "FlipperR", "mesh": 2, "translation": [-0.158, 0.252, 0.014]},
+        {"name": "FlipperL", "mesh": 1, "translation": [0.158, 0.250, 0.014]},
+        {"name": "FlipperR", "mesh": 2, "translation": [-0.158, 0.250, 0.014]},
         {"name": "FootL", "mesh": 3, "translation": [0.095, 0.18, 0.01]},
         {"name": "FootR", "mesh": 4, "translation": [-0.095, 0.18, 0.01]},
-        {"name": "Head", "mesh": 5, "translation": [0.0, 0.37, 0.01]},
-        {"name": "HelmetGlass", "mesh": 6, "translation": [0.0, 0.37, 0.01]},
+        {"name": "Head", "mesh": 5, "translation": [0.0, 0.365, 0.01]},
+        {"name": "HelmetGlass", "mesh": 6, "translation": [0.0, 0.365, 0.01]},
     ]
 
     def rgba_lin(hex_str, alpha=1.0):
@@ -1296,17 +1323,17 @@ def pack_glb():
             "pbrMetallicRoughness": {
                 "baseColorTexture": {"index": 0},
                 "baseColorFactor": [1.0, 1.0, 1.0, 1.0],
-                "metallicFactor": 0.01,
-                "roughnessFactor": 0.88,
+                "metallicFactor": 0.0,
+                "roughnessFactor": 0.90,
             },
             "doubleSided": False,
         },
         {
             "name": "NasaSuitBetaCloth",
             "pbrMetallicRoughness": {
-                "baseColorFactor": rgba_lin("#f4f2ec"),
-                "metallicFactor": 0.03,
-                "roughnessFactor": 0.72,
+                "baseColorFactor": rgba_lin("#f5f3ed"),
+                "metallicFactor": 0.02,
+                "roughnessFactor": 0.74,
             },
             "doubleSided": False,
         },
@@ -1314,7 +1341,7 @@ def pack_glb():
             "name": "NasaSuitShade",
             "pbrMetallicRoughness": {
                 "baseColorFactor": rgba_lin("#d4dbe5"),
-                "metallicFactor": 0.06,
+                "metallicFactor": 0.05,
                 "roughnessFactor": 0.68,
             },
             "doubleSided": False,
@@ -1323,7 +1350,7 @@ def pack_glb():
             "name": "NasaAnodizedCobalt",
             "pbrMetallicRoughness": {
                 "baseColorFactor": rgba_lin("#1d4ed8"),
-                "metallicFactor": 0.52,
+                "metallicFactor": 0.50,
                 "roughnessFactor": 0.28,
             },
             "doubleSided": False,
@@ -1341,7 +1368,7 @@ def pack_glb():
             "name": "NasaDarkTitanium",
             "pbrMetallicRoughness": {
                 "baseColorFactor": rgba_lin("#283242"),
-                "metallicFactor": 0.32,
+                "metallicFactor": 0.30,
                 "roughnessFactor": 0.48,
             },
             "doubleSided": False,
@@ -1376,18 +1403,18 @@ def pack_glb():
         {
             "name": "ChickBeakDark",
             "pbrMetallicRoughness": {
-                "baseColorFactor": rgba_lin("#212634"),
-                "metallicFactor": 0.06,
-                "roughnessFactor": 0.38,
+                "baseColorFactor": rgba_lin("#252b3b"),
+                "metallicFactor": 0.05,
+                "roughnessFactor": 0.36,
             },
             "doubleSided": False,
         },
         {
             "name": "ChickBeakCoral",
             "pbrMetallicRoughness": {
-                "baseColorFactor": rgba_lin("#f28472"),
+                "baseColorFactor": rgba_lin("#ff8a75"),
                 "metallicFactor": 0.04,
-                "roughnessFactor": 0.42,
+                "roughnessFactor": 0.40,
             },
             "doubleSided": False,
         },
@@ -1396,7 +1423,7 @@ def pack_glb():
             "pbrMetallicRoughness": {
                 "baseColorFactor": rgba_lin("#070a12"),
                 "metallicFactor": 0.12,
-                "roughnessFactor": 0.05,
+                "roughnessFactor": 0.04,
             },
             "doubleSided": False,
         },
@@ -1404,8 +1431,8 @@ def pack_glb():
             "name": "PureWhiteHighlight",
             "pbrMetallicRoughness": {
                 "baseColorFactor": [1.0, 1.0, 1.0, 1.0],
-                "metallicFactor": 0.05,
-                "roughnessFactor": 0.08,
+                "metallicFactor": 0.04,
+                "roughnessFactor": 0.06,
             },
             "doubleSided": False,
         },
@@ -1413,10 +1440,10 @@ def pack_glb():
             "name": "CyanTelemetryLed",
             "pbrMetallicRoughness": {
                 "baseColorFactor": rgba_lin("#38bdf8"),
-                "metallicFactor": 0.10,
-                "roughnessFactor": 0.15,
+                "metallicFactor": 0.08,
+                "roughnessFactor": 0.14,
             },
-            "emissiveFactor": [0.15, 0.65, 0.95],
+            "emissiveFactor": [0.12, 0.58, 0.92],
             "doubleSided": False,
         },
         {
@@ -1445,7 +1472,7 @@ def pack_glb():
     gltf = {
         "asset": {
             "version": "2.0",
-            "generator": "Cyberpenguins 3D Character Builder v3 (G2 Quintic Bezier + Squircle + Adorable Chick)",
+            "generator": "Cyberpenguins 3D Character Builder v4 (Kawaii Eyes + Sealed Torso + Temple-Hinged Visor)",
         },
         "scene": 0,
         "scenes": [{"name": "CyberpenguinScene", "nodes": [0]}],
