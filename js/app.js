@@ -530,6 +530,8 @@
     dom.stageJumpLabel = document.getElementById('stage-jump-label');
     dom.stage3dToggleBtn = document.getElementById('stage-3d-toggle-btn');
     dom.stage3dToggleLabel = document.getElementById('stage-3d-toggle-label');
+    dom.stageResetSiteBtn = document.getElementById('stage-reset-site-btn');
+    dom.stageResetSiteLabel = document.getElementById('stage-reset-site-label');
     dom.stage3dCaption = document.getElementById('stage-3d-caption');
     dom.stage3dCaptionTitle = document.getElementById('stage-3d-caption-title');
     dom.stage3dCaptionHint = document.getElementById('stage-3d-caption-hint');
@@ -959,6 +961,7 @@
         event.target.closest('#penguin-actor') ||
         event.target.closest('#stage-jump-btn') ||
         event.target.closest('#stage-3d-toggle-btn') ||
+        event.target.closest('#stage-reset-site-btn') ||
         event.target.closest('.back-home-btn') ||
         event.target.closest('.sound-control-group') ||
         event.target.closest('.stage-lang-selector') ||
@@ -989,6 +992,25 @@
       spawnRipple(safeTarget.x, safeTarget.y);
       routeAndMove(safeTarget.x, safeTarget.y, checkSurfaceProximity);
     });
+
+    if (dom.stageResetSiteBtn) {
+      dom.stageResetSiteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerHaptic('tap');
+        const chapter = getChapter(state.currentChapterId);
+        if (!chapter) return;
+        const { activeMachine } = getActiveSite(chapter);
+        const siteSamples = getSiteSamples(chapter, activeMachine);
+        const sampleIds = new Set(siteSamples.map((s) => s.id));
+        state.collectedSamples = state.collectedSamples.filter((id) => !sampleIds.has(id));
+        if (activeMachine) {
+          state.inspectedMachines = state.inspectedMachines.filter((id) => id !== activeMachine.id);
+        }
+        saveState();
+        updateHUD();
+        loadChapterScene(chapter.id, false);
+      });
+    }
 
     // Teclado (Flechas / WASD para mover, Espacio para saltar, Escape para volver o cerrar modales)
     document.addEventListener('keydown', (event) => {
@@ -1752,7 +1774,7 @@
     }
     if (!keepUiClasses) {
       if (dom.isoBoard) {
-        dom.isoBoard.classList.remove('has-3d-terrain', 'has-3d-actor', 'has-3d-machine', 'has-3d-ship');
+        dom.isoBoard.classList.remove('has-3d-terrain', 'has-3d-actor', 'has-3d-machine', 'has-3d-ship', 'has-3d-samples');
       }
       if (dom.penguinActor) {
         dom.penguinActor.style.transform = '';
@@ -1881,10 +1903,16 @@
     const has3dPenguin = Boolean(typeof t3d.hasPenguinActor === 'function' && t3d.hasPenguinActor());
     const has3dMachine = Boolean(typeof t3d.hasMachineActor === 'function' && t3d.hasMachineActor());
     const has3dShip = Boolean(typeof t3d.hasShipActor === 'function' && t3d.hasShipActor());
+    const has3dSamples = Boolean(typeof t3d.hasSampleActors === 'function' && t3d.hasSampleActors());
     if (dom.isoBoard) {
       dom.isoBoard.classList.toggle('has-3d-actor', has3dPenguin);
       dom.isoBoard.classList.toggle('has-3d-machine', has3dMachine);
       dom.isoBoard.classList.toggle('has-3d-ship', has3dShip);
+      dom.isoBoard.classList.toggle('has-3d-samples', has3dSamples);
+    }
+
+    if (typeof t3d.syncSampleActors === 'function') {
+      t3d.syncSampleActors(world3d.samples, state.collectedSamples);
     }
 
     if (world3d.ship && typeof t3d.setShipPose === 'function') {

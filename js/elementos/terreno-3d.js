@@ -10,21 +10,28 @@ import { KTX2Loader } from '../vendor/three/loaders/KTX2Loader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 import { MeshoptDecoder } from '../vendor/three/libs/meshopt_decoder.module.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121w';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121w';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121w';
-const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121w';
-const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121w';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121x';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121x';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121x';
+const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121x';
+const DEIMOS_MODEL_URL = 'assets/models/deimos.glb?v=20261121x';
+const SAMPLES_MODEL_URL = 'assets/models/mars-samples.glb?v=20261121x';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
-    modelUrl: 'assets/models/ares-vallis-terrain.glb',
+    modelUrl: 'assets/models/ares-vallis-terrain.glb?v=20261121x',
     machineModelUrl: SOJOURNER_MODEL_URL,
     machineScale: 1.18,
     machineDefaultYaw: -0.72,
     shipModelUrl: SHIP_MODEL_URL,
     shipScale: 1.82,
     shipDefaultYaw: 0.36,
+    sampleModelUrl: SAMPLES_MODEL_URL,
+    sampleNodeMap: {
+      'sample-mars-2': { node: 'BarnacleBill', scale: 1.25, yaw: 0.45 },
+      'sample-mars-3': { node: 'Yogi', scale: 1.15, yaw: -0.65 },
+      'sample-mars-4': { node: 'ScoobyDoo', scale: 1.25, yaw: 0.25 }
+    },
     titleEs: 'Ares Vallis',
     titleEn: 'Ares Vallis',
     exploreFov: 37,
@@ -441,6 +448,8 @@ class Terrain3DController {
     this.modelCache = new Map();
     this.machineModelCache = new Map();
     this.shipModelCache = new Map();
+    this.sampleModelCache = new Map();
+    this.sampleActors = new Map();
     this.terrainHeightGrid = null;
     this.perfState = {
       currentPixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
@@ -923,6 +932,82 @@ class Terrain3DController {
 
   hasShipActor() {
     return Boolean(this.shipActor && this.shipActor.group);
+  }
+
+  hasSampleActors() {
+    return Boolean(this.sampleActors && this.sampleActors.size > 0);
+  }
+
+  loadSamplesModel(modelUrl) {
+    if (!modelUrl) return Promise.resolve(null);
+    if (this.sampleModelCache.has(modelUrl)) {
+      return this.sampleModelCache.get(modelUrl);
+    }
+    const promise = new Promise((resolve, reject) => {
+      this.loader.load(
+        modelUrl,
+        (gltf) => {
+          const root = gltf.scene || new THREE.Group();
+          root.traverse((obj) => {
+            if (!obj.isMesh || !obj.material) return;
+            obj.material.side = THREE.FrontSide;
+            if (typeof obj.material.metalness === 'number') {
+              obj.material.metalness = Math.min(obj.material.metalness, 0.08);
+            }
+            obj.material.needsUpdate = true;
+          });
+          resolve(root);
+        },
+        undefined,
+        (err) => {
+          this.sampleModelCache.delete(modelUrl);
+          reject(err);
+        }
+      );
+    });
+    this.sampleModelCache.set(modelUrl, promise);
+    return promise;
+  }
+
+  createSampleActors(templateRoot, sampleNodeMap) {
+    const map = new Map();
+    if (!templateRoot || !sampleNodeMap) return map;
+    Object.entries(sampleNodeMap).forEach(([sampleId, spec]) => {
+      const srcNode = templateRoot.getObjectByName(spec.node);
+      if (!srcNode) return;
+      const meshClone = srcNode.clone(true);
+      meshClone.position.set(0, 0, 0);
+      meshClone.scale.setScalar(spec.scale || 1.2);
+      meshClone.rotation.set(0, spec.yaw || 0, 0);
+
+      const shadow = createPenguinContactShadow();
+      const sRad = (spec.scale || 1.2) * (spec.node === 'Yogi' ? 1.55 : 0.95);
+      shadow.scale.set(sRad, 1, sRad);
+      shadow.position.set(0, 0.015, 0);
+
+      const group = new THREE.Group();
+      group.name = `SampleActor_${sampleId}`;
+      group.add(shadow);
+      group.add(meshClone);
+      group.visible = false;
+      map.set(sampleId, { group, mesh: meshClone, shadow, spec });
+    });
+    return map;
+  }
+
+  syncSampleActors(sampleAnchors = {}, collectedIds = []) {
+    if (!this.sampleActors || this.sampleActors.size === 0) return;
+    const collectedSet = new Set(Array.isArray(collectedIds) ? collectedIds : []);
+    this.sampleActors.forEach((entry, sampleId) => {
+      const anchor = sampleAnchors[sampleId];
+      if (!anchor || collectedSet.has(sampleId)) {
+        entry.group.visible = false;
+        return;
+      }
+      const gy = this.getGroundHeightAt(anchor.x, anchor.z);
+      entry.group.position.set(anchor.x, gy - 0.03, anchor.z);
+      entry.group.visible = true;
+    });
   }
 
   loadShipActorModel(modelUrl) {
@@ -1478,11 +1563,12 @@ class Terrain3DController {
     this.updateBaseExploreCamera();
 
     try {
-      const [modelRoot, penguinTemplate, machineTemplate, shipTemplate] = await Promise.all([
+      const [modelRoot, penguinTemplate, machineTemplate, shipTemplate, sampleTemplate] = await Promise.all([
         this.loadSiteModel(siteId),
         this.loadPenguinActorModel().catch(() => null),
         this.loadMachineActorModel(cfg.machineModelUrl).catch(() => null),
-        this.loadShipActorModel(cfg.shipModelUrl).catch(() => null)
+        this.loadShipActorModel(cfg.shipModelUrl).catch(() => null),
+        this.loadSamplesModel(cfg.sampleModelUrl).catch(() => null)
       ]);
       if (token !== this.mountToken || this.activeSiteId !== siteId) {
         return false;
@@ -1508,6 +1594,9 @@ class Terrain3DController {
       );
       wrapper.add(rockField.group);
       this.instancedRockCount = rockField.totalRocks;
+
+      this.sampleActors = this.createSampleActors(sampleTemplate, cfg.sampleNodeMap);
+      this.sampleActors.forEach((entry) => wrapper.add(entry.group));
 
       this.marker = createLandingMarker(cfg.landerPos || [0, 0.08, 0]);
       wrapper.add(this.marker.group);
@@ -1576,6 +1665,7 @@ class Terrain3DController {
     this.penguinActor = null;
     this.machineActor = null;
     this.shipActor = null;
+    this.sampleActors = new Map();
     this.inspectMode = false;
     this.camTransition = null;
     this.stopLoop();
