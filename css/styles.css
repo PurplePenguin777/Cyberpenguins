@@ -1521,6 +1521,24 @@ a:focus-visible {
   line-height: 1.2;
 }
 
+.iso-board.has-3d-terrain #stage-entities-layer {
+  transform: none !important;
+  transition: none !important;
+}
+
+.iso-board.has-3d-terrain .stage-fx-canvas {
+  transform: none !important;
+}
+
+.iso-board.has-3d-terrain .stage-entity {
+  transition: filter 0.25s ease;
+}
+
+.iso-board.has-3d-terrain .penguin-actor {
+  transform: translate(-50%, -80%);
+  transition: opacity 0.3s ease !important;
+}
+
 .iso-board.is-3d-inspect .iso-backdrop {
   pointer-events: auto;
   cursor: grab;
@@ -1531,14 +1549,19 @@ a:focus-visible {
 }
 
 .iso-board.is-3d-inspect #stage-entities-layer,
+.iso-board.is-3d-inspect #stage-entities-layer *,
+.iso-board.is-3d-inspect #stage-entities-layer *::before,
 .iso-board.is-3d-inspect #penguin-actor,
+.iso-board.is-3d-inspect #penguin-actor::before,
 .iso-board.is-3d-inspect #stage-action-prompt,
+.iso-board.is-3d-inspect #stage-action-prompt *,
 .iso-board.is-3d-inspect .stage-fx-canvas,
 .iso-board.is-3d-inspect .stage-lighting-overlay,
 .iso-board.is-3d-inspect .stage-jump-btn {
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.35s ease;
+  visibility: hidden !important;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 @media (max-width: 768px) {

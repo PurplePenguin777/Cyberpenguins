@@ -1,7 +1,8 @@
 /**
  * Motor 3D de terrenos reales (Three.js + glTF 2.0 / .glb)
  * Renderiza topografía planetaria auténtica extraída de DTMs de la NASA/ESA
- * dentro de #stage-backdrop-layer, manteniendo el fallback SVG debajo.
+ * dentro de #stage-backdrop-layer, exponiendo Raycasting y proyección 3D->pantalla
+ * para anclar y mover Cyberpenguin y las entidades sobre el relieve real.
  */
 import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
@@ -16,11 +17,16 @@ const SITE_CONFIGS = {
     hintEn: 'Drag to orbit · Scroll/pinch to zoom · Right-drag to pan',
     exploreCamPos: [-1.5, 2.55, 11.5],
     exploreCamTarget: [1.5, 0.45, -12.0],
-    inspectCamPos: [18.5, 16.5, 23.0],
-    inspectCamTarget: [2.5, -0.5, 2.0],
-    landerPos: [0, 0.08, 0]
+    inspectCamPos: [21.0, 18.0, 28.5],
+    inspectCamTarget: [2.5, -0.8, 4.0],
+    landerPos: [0, 0.08, 0],
+    walkBounds: { minZ: -9.5, maxZ: 6.8, maxRadius: 22.0 }
   }
 };
+
+function clampVal(v, lo, hi) {
+  return v < lo ? lo : v > hi ? hi : v;
+}
 
 function createSeededRng(seed) {
   let s = seed >>> 0;
@@ -30,18 +36,25 @@ function createSeededRng(seed) {
   };
 }
 
-function createRegolithBumpTexture(size = 256) {
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
+function createRegolithTextures(size = 256) {
+  const bumpCanvas = document.createElement('canvas');
+  bumpCanvas.width = size;
+  bumpCanvas.height = size;
+  const bumpCtx = bumpCanvas.getContext('2d');
 
-  const img = ctx.createImageData(size, size);
-  const data = img.data;
+  const albedoCanvas = document.createElement('canvas');
+  albedoCanvas.width = size;
+  albedoCanvas.height = size;
+  const albedoCtx = albedoCanvas.getContext('2d');
+
+  if (!bumpCtx || !albedoCtx) return { bumpMap: null, albedoMap: null };
+
+  const bumpImg = bumpCtx.createImageData(size, size);
+  const albImg = albedoCtx.createImageData(size, size);
+  const bData = bumpImg.data;
+  const aData = albImg.data;
   const rand = createSeededRng(19970704);
 
-  // Tileable base noise grid (32x32 bilinear + fine grain + pebbles)
   const gN = 32;
   const coarse = new Float32Array(gN * gN);
   for (let i = 0; i < coarse.length; i += 1) coarse[i] = rand();
@@ -72,22 +85,44 @@ function createRegolithBumpTexture(size = 256) {
       const n2 = sampleCoarse((u * 3) % 1, (v * 3) % 1);
       const ripple = 0.5 + 0.5 * Math.sin((u * 6 + v * 2 + n1 * 0.4) * Math.PI * 2);
       const fine = rand();
-      const val = Math.round((n1 * 0.42 + n2 * 0.25 + ripple * 0.13 + fine * 0.20) * 255);
+      const speck = fine > 0.965 ? 1.0 : 0.0;
+      const darkPebble = fine < 0.04 ? 1.0 : 0.0;
+
+      const bumpNorm = clampVal(n1 * 0.40 + n2 * 0.24 + ripple * 0.14 + fine * 0.22 + speck * 0.15, 0, 1);
+      const bVal = Math.round(bumpNorm * 255);
+
+      const tone = n1 * 0.45 + n2 * 0.30 + fine * 0.25;
+      const mul = clampVal(0.88 + tone * 0.14 - darkPebble * 0.08 + speck * 0.03, 0.80, 1.0);
       const idx = (y * size + x) * 4;
-      data[idx] = val;
-      data[idx + 1] = val;
-      data[idx + 2] = val;
-      data[idx + 3] = 255;
+
+      bData[idx] = bVal;
+      bData[idx + 1] = bVal;
+      bData[idx + 2] = bVal;
+      bData[idx + 3] = 255;
+
+      aData[idx] = Math.round(clampVal(mul * 255, 0, 255));
+      aData[idx + 1] = Math.round(clampVal(mul * 251, 0, 255));
+      aData[idx + 2] = Math.round(clampVal(mul * 246, 0, 255));
+      aData[idx + 3] = 255;
     }
   }
-  ctx.putImageData(img, 0, 0);
+  bumpCtx.putImageData(bumpImg, 0, 0);
+  albedoCtx.putImageData(albImg, 0, 0);
 
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(34, 34);
-  tex.needsUpdate = true;
-  return tex;
+  const bumpMap = new THREE.CanvasTexture(bumpCanvas);
+  bumpMap.wrapS = THREE.RepeatWrapping;
+  bumpMap.wrapT = THREE.RepeatWrapping;
+  bumpMap.repeat.set(36, 36);
+  bumpMap.needsUpdate = true;
+
+  const albedoMap = new THREE.CanvasTexture(albedoCanvas);
+  albedoMap.colorSpace = THREE.SRGBColorSpace;
+  albedoMap.wrapS = THREE.RepeatWrapping;
+  albedoMap.wrapT = THREE.RepeatWrapping;
+  albedoMap.repeat.set(36, 36);
+  albedoMap.needsUpdate = true;
+
+  return { bumpMap, albedoMap };
 }
 
 function createMarsSkyDome(sunDir) {
@@ -99,9 +134,9 @@ function createMarsSkyDome(sunDir) {
     uniforms: {
       uSunDir: { value: sunDir.clone().normalize() },
       uZenith: { value: new THREE.Color('#3b2e3f') },
-      uMid: { value: new THREE.Color('#8e6056') },
-      uHorizon: { value: new THREE.Color('#dca67e') },
-      uGround: { value: new THREE.Color('#6f3a24') },
+      uMid: { value: new THREE.Color('#956358') },
+      uHorizon: { value: new THREE.Color('#d69d76') },
+      uGround: { value: new THREE.Color('#d69d76') },
       uSunColor: { value: new THREE.Color('#fff1dc') }
     },
     vertexShader: `
@@ -131,13 +166,15 @@ function createMarsSkyDome(sunDir) {
           sky = mix(uHorizon, uMid, t1);
           sky = mix(sky, uZenith, t2);
         } else {
-          sky = mix(uHorizon, uGround, smoothstep(0.0, -0.25, h));
+          sky = mix(uHorizon, uGround, smoothstep(0.0, -0.35, h));
         }
         float sunCos = max(dot(dir, normalize(uSunDir)), 0.0);
-        float halo = pow(sunCos, 16.0) * 0.24 + pow(sunCos, 96.0) * 0.35;
-        float disc = smoothstep(0.9988, 0.9994, sunCos) * 0.85;
-        vec3 col = sky + uSunColor * (halo + disc);
+        float halo = pow(sunCos, 16.0) * 0.22 + pow(sunCos, 96.0) * 0.30;
+        float disc = smoothstep(0.9988, 0.9994, sunCos) * 0.80;
+        float horizonMask = smoothstep(-0.08, 0.06, h);
+        vec3 col = sky + uSunColor * (halo + disc) * horizonMask;
         gl_FragColor = vec4(col, 1.0);
+        #include <colorspace_fragment>
       }
     `
   });
@@ -159,12 +196,14 @@ function createPhobosMesh() {
   }
   geo.computeVertexNormals();
   const mat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#9e958e'),
-    roughness: 0.95,
-    metalness: 0.05
+    color: new THREE.Color('#a69d96'),
+    roughness: 0.94,
+    metalness: 0.05,
+    fog: false
   });
   const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(24, 24, -46);
+  mesh.position.set(17.5, 11.5, -50.0);
+  mesh.scale.setScalar(0.95);
   mesh.rotation.set(0.3, 0.6, -0.25);
   return mesh;
 }
@@ -224,6 +263,7 @@ class Terrain3DController {
     this.renderer = null;
     this.scene = null;
     this.camera = null;
+    this.baseCamera = null;
     this.controls = null;
     this.skyDome = null;
     this.marker = null;
@@ -231,14 +271,16 @@ class Terrain3DController {
     this.boundWindowResize = null;
     this.loader = new GLTFLoader();
     this.modelCache = new Map();
-    this.bumpTexture = null;
+    this.regolithTextures = null;
 
     this.activeSiteId = null;
     this.siteGroup = null;
+    this.terrainMeshes = [];
     this.inspectMode = false;
     this.isPaused = false;
     this.rafId = null;
     this.webglFailed = false;
+    this.onFrameCallback = null;
 
     this.targetParallax = { x: 0, y: 0 };
     this.currentParallax = { x: 0, y: 0 };
@@ -248,6 +290,12 @@ class Terrain3DController {
     this.baseExploreTarget = new THREE.Vector3();
     this.baseInspectPos = new THREE.Vector3();
     this.baseInspectTarget = new THREE.Vector3();
+
+    this.raycaster = new THREE.Raycaster();
+    this.downDir = new THREE.Vector3(0, -1, 0);
+    this.rayOrigin = new THREE.Vector3();
+    this.horizPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    this.tmpVec = new THREE.Vector3();
     this.mountToken = 0;
   }
 
@@ -261,6 +309,22 @@ class Terrain3DController {
 
   isInspectMode() {
     return this.inspectMode;
+  }
+
+  setOnFrameCallback(fn) {
+    this.onFrameCallback = typeof fn === 'function' ? fn : null;
+  }
+
+  updateBaseExploreCamera() {
+    if (!this.camera || !this.baseCamera) return;
+    this.baseCamera.fov = this.camera.fov;
+    this.baseCamera.aspect = this.camera.aspect;
+    this.baseCamera.near = this.camera.near;
+    this.baseCamera.far = this.camera.far;
+    this.baseCamera.updateProjectionMatrix();
+    this.baseCamera.position.copy(this.baseExplorePos);
+    this.baseCamera.lookAt(this.baseExploreTarget);
+    this.baseCamera.updateMatrixWorld(true);
   }
 
   ensureRenderer(container) {
@@ -287,10 +351,10 @@ class Terrain3DController {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.06;
+        renderer.toneMappingExposure = 1.05;
 
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0xd69d76, 0.0165);
+        scene.fog = new THREE.FogExp2(0xd69d76, 0.0175);
 
         const sunDir = new THREE.Vector3(-0.56, 0.36, -0.74).normalize();
         const skyDome = createMarsSkyDome(sunDir);
@@ -309,6 +373,7 @@ class Terrain3DController {
         scene.add(fillAmb);
 
         const camera = new THREE.PerspectiveCamera(44, 1000 / 594, 0.25, 320);
+        const baseCamera = new THREE.PerspectiveCamera(44, 1000 / 594, 0.25, 320);
 
         const controls = new OrbitControls(camera, canvas);
         controls.enableDamping = true;
@@ -324,6 +389,7 @@ class Terrain3DController {
         this.renderer = renderer;
         this.scene = scene;
         this.camera = camera;
+        this.baseCamera = baseCamera;
         this.controls = controls;
       } catch (_err) {
         this.webglFailed = true;
@@ -364,6 +430,12 @@ class Terrain3DController {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h, false);
+    this.updateBaseExploreCamera();
+    if (this.activeSiteId && typeof this.onFrameCallback === 'function') {
+      this.camera.updateMatrixWorld();
+      this.onFrameCallback(performance.now());
+      this.renderOnce();
+    }
   }
 
   loadSiteModel(siteId) {
@@ -373,31 +445,59 @@ class Terrain3DController {
       return this.modelCache.get(siteId);
     }
 
-    if (!this.bumpTexture) {
-      this.bumpTexture = createRegolithBumpTexture(256);
+    if (!this.regolithTextures) {
+      this.regolithTextures = createRegolithTextures(256);
     }
+    const { bumpMap, albedoMap } = this.regolithTextures;
 
     const promise = new Promise((resolve, reject) => {
       this.loader.load(
         cfg.modelUrl,
         (gltf) => {
           const root = gltf.scene || new THREE.Group();
+          const meshes = [];
           root.traverse((obj) => {
             if (obj.isMesh && obj.material) {
               const oldMat = obj.material;
-              obj.material = new THREE.MeshStandardMaterial({
+              const mat = new THREE.MeshStandardMaterial({
                 color: 0xffffff,
+                map: albedoMap || null,
                 vertexColors: Boolean(obj.geometry && obj.geometry.attributes && obj.geometry.attributes.color),
                 roughness: 0.95,
                 metalness: oldMat.metalness !== undefined ? oldMat.metalness : 0.02,
-                bumpMap: this.bumpTexture || null,
-                bumpScale: this.bumpTexture ? 0.055 : 0
+                bumpMap: bumpMap || null,
+                bumpScale: bumpMap ? 0.095 : 0
               });
+              // Disolver suavemente el borde exterior del parche 9x9 km hacia el color exacto de niebla
+              mat.onBeforeCompile = (shader) => {
+                shader.vertexShader = shader.vertexShader
+                  .replace(
+                    '#include <common>',
+                    '#include <common>\nvarying vec2 vTerrainXZ;'
+                  )
+                  .replace(
+                    '#include <begin_vertex>',
+                    'vTerrainXZ = position.xz;\n#include <begin_vertex>'
+                  );
+                shader.fragmentShader = shader.fragmentShader
+                  .replace(
+                    '#include <common>',
+                    '#include <common>\nvarying vec2 vTerrainXZ;'
+                  )
+                  .replace(
+                    '#include <fog_fragment>',
+                    '#include <fog_fragment>\n#ifdef USE_FOG\nfloat edgeR = length(vTerrainXZ) / 43.5;\nfloat edgeBlend = smoothstep(0.74, 0.97, edgeR);\ngl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, edgeBlend);\n#endif'
+                  );
+              };
+              mat.customProgramCacheKey = () => 'ares-radial-fog-v1';
+              obj.material = mat;
+              meshes.push(obj);
               if (oldMat && typeof oldMat.dispose === 'function') {
                 oldMat.dispose();
               }
             }
           });
+          root.userData.terrainMeshes = meshes;
           resolve(root);
         },
         undefined,
@@ -410,6 +510,103 @@ class Terrain3DController {
 
     this.modelCache.set(siteId, promise);
     return promise;
+  }
+
+  getGroundHeightAt(wx, wz) {
+    if (!this.terrainMeshes.length) return 0;
+    this.rayOrigin.set(wx, 50, wz);
+    this.raycaster.set(this.rayOrigin, this.downDir);
+    const hits = this.raycaster.intersectObjects(this.terrainMeshes, false);
+    if (hits.length > 0) {
+      return hits[0].point.y;
+    }
+    return 0;
+  }
+
+  clampWalkableWorld(wx, wz) {
+    const cfg = SITE_CONFIGS[this.activeSiteId];
+    const bounds = (cfg && cfg.walkBounds) || { minZ: -9.5, maxZ: 6.8, maxRadius: 22.0 };
+    const z = clampVal(wz, bounds.minZ, bounds.maxZ);
+
+    const bPos = this.baseExplorePos;
+    const bTgt = this.baseExploreTarget;
+    const zSpan = bPos.z - bTgt.z || 23.5;
+    const tZ = (bPos.z - z) / zSpan;
+    const axisX = bPos.x + (bTgt.x - bPos.x) * tZ;
+    const distZ = Math.max(2.5, bPos.z - z);
+    const aspect = this.baseCamera ? this.baseCamera.aspect : 1000 / 594;
+    const tanHalf = Math.tan(THREE.MathUtils.degToRad((this.baseCamera ? this.baseCamera.fov : 44) * 0.5));
+    const halfW = distZ * tanHalf * aspect * 0.86;
+    let x = clampVal(wx, axisX - halfW, axisX + halfW);
+
+    const rad = Math.hypot(x, z);
+    if (bounds.maxRadius && rad > bounds.maxRadius) {
+      const s = bounds.maxRadius / rad;
+      x *= s;
+    }
+
+    return { x, y: this.getGroundHeightAt(x, z), z };
+  }
+
+  screenPctToWorld(pctX, pctY, opts = {}) {
+    const useBase = Boolean(opts.useBaseExploreCamera);
+    const cam = useBase && this.baseCamera ? this.baseCamera : this.camera;
+    if (!cam) return { x: 0, y: 0, z: 0, hit: false };
+
+    if (useBase) {
+      this.updateBaseExploreCamera();
+    } else {
+      cam.updateMatrixWorld(true);
+    }
+
+    const tryScreenPct = (sx, sy) => {
+      const ndc = { x: (sx / 100) * 2 - 1, y: -(sy / 100) * 2 + 1 };
+      this.raycaster.setFromCamera(ndc, cam);
+      if (this.terrainMeshes.length > 0) {
+        const hits = this.raycaster.intersectObjects(this.terrainMeshes, false);
+        if (hits.length > 0) return { pt: hits[0].point, hit: true };
+      }
+      const planePt = new THREE.Vector3();
+      if (this.raycaster.ray.intersectPlane(this.horizPlane, planePt)) {
+        return { pt: planePt, hit: false };
+      }
+      return null;
+    };
+
+    const cfg = SITE_CONFIGS[this.activeSiteId];
+    const bounds = (cfg && cfg.walkBounds) || { minZ: -9.5, maxZ: 6.8 };
+    let res = tryScreenPct(pctX, pctY);
+
+    if (opts.clampWalkable && (!res || !res.hit || res.pt.z < bounds.minZ)) {
+      const lowerRes = tryScreenPct(pctX, Math.max(49, pctY));
+      if (lowerRes) res = lowerRes;
+    }
+
+    if (!res) return { x: 0, y: this.getGroundHeightAt(0, 0), z: 0, hit: false };
+
+    if (opts.clampWalkable) {
+      const clamped = this.clampWalkableWorld(res.pt.x, res.pt.z);
+      return { x: clamped.x, y: clamped.y, z: clamped.z, hit: res.hit };
+    }
+    return { x: res.pt.x, y: res.pt.y, z: res.pt.z, hit: res.hit };
+  }
+
+  projectWorldToScreen(wx, wy, wz) {
+    if (!this.camera) return { pctX: 50, pctY: 70, dist: 12, visible: true };
+    this.tmpVec.set(wx, wy, wz);
+    const dist = this.camera.position.distanceTo(this.tmpVec);
+    this.tmpVec.project(this.camera);
+    return {
+      pctX: (this.tmpVec.x * 0.5 + 0.5) * 100,
+      pctY: (-this.tmpVec.y * 0.5 + 0.5) * 100,
+      dist,
+      visible: this.tmpVec.z >= -1 && this.tmpVec.z <= 1
+    };
+  }
+
+  getBaseExploreDistance(wx, wy, wz) {
+    this.tmpVec.set(wx, wy, wz);
+    return this.baseExplorePos.distanceTo(this.tmpVec);
   }
 
   async mount(containerEl, siteId, callbacks = {}) {
@@ -439,6 +636,8 @@ class Terrain3DController {
     this.camera.position.copy(this.baseExplorePos);
     this.controls.target.copy(this.baseExploreTarget);
     this.camera.lookAt(this.baseExploreTarget);
+    this.camera.updateMatrixWorld(true);
+    this.updateBaseExploreCamera();
 
     try {
       const modelRoot = await this.loadSiteModel(siteId);
@@ -454,10 +653,15 @@ class Terrain3DController {
       const wrapper = new THREE.Group();
       wrapper.add(modelRoot);
 
+      this.terrainMeshes = Array.isArray(modelRoot.userData.terrainMeshes)
+        ? modelRoot.userData.terrainMeshes
+        : [];
+
       this.marker = createLandingMarker(cfg.landerPos || [0, 0.08, 0]);
       wrapper.add(this.marker.group);
 
       this.scene.add(wrapper);
+      wrapper.updateMatrixWorld(true);
       this.siteGroup = wrapper;
 
       containerEl.classList.add('has-3d-canvas');
@@ -466,12 +670,14 @@ class Terrain3DController {
       }
 
       this.isPaused = false;
-      this.renderOnce();
-      this.startLoop();
-
       if (typeof callbacks.onReady === 'function') {
         callbacks.onReady(this.getSiteMeta(siteId));
       }
+      if (typeof this.onFrameCallback === 'function') {
+        this.onFrameCallback(performance.now());
+      }
+      this.renderOnce();
+      this.startLoop();
       return true;
     } catch (_err) {
       if (typeof callbacks.onError === 'function') {
@@ -485,6 +691,7 @@ class Terrain3DController {
   unmount() {
     this.mountToken += 1;
     this.activeSiteId = null;
+    this.terrainMeshes = [];
     this.inspectMode = false;
     this.camTransition = null;
     this.stopLoop();
@@ -545,6 +752,8 @@ class Terrain3DController {
       this.controls.enabled = false;
     } else {
       this.controls.enabled = false;
+      this.currentParallax.x = 0;
+      this.currentParallax.y = 0;
       this.camTransition = {
         startTime: performance.now(),
         duration: 620,
@@ -629,8 +838,12 @@ class Terrain3DController {
       this.camera.lookAt(this.controls.target);
     }
 
+    this.camera.updateMatrixWorld();
     if (this.skyDome) {
       this.skyDome.position.copy(this.camera.position);
+    }
+    if (typeof this.onFrameCallback === 'function') {
+      this.onFrameCallback(now);
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -642,6 +855,7 @@ class Terrain3DController {
       inspectMode: this.inspectMode,
       isPaused: this.isPaused,
       hasCanvas: Boolean(this.canvas && this.container && this.container.contains(this.canvas)),
+      meshCount: this.terrainMeshes.length,
       webglFailed: this.webglFailed
     };
   }

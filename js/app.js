@@ -64,6 +64,18 @@
   let audioCtx = null;
   let is3dInspectMode = false;
   let currentActiveSiteId = '';
+  const world3d = {
+    active: false,
+    siteId: '',
+    penguinRefDist: 11.5,
+    ship: null,
+    machine: null,
+    samples: {},
+    penguin: null,
+    walkAnim: null,
+    jumpAnim: null
+  };
+  let activeSpeechAnchorKind = 'penguin';
 
   // Datos gravitacionales reales por cuerpo celeste
   const GRAVITY_PROFILES = {
@@ -136,6 +148,7 @@
 
   function triggerHaptic(type) {
     if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return;
+    if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
     try {
       if (type === 'tap') {
         navigator.vibrate(15);
@@ -879,6 +892,7 @@
     // Clic / toque directo sobre Cyberpenguin para saltar según la gravedad del entorno
     if (dom.penguinActor) {
       const handlePenguinJump = (event) => {
+        if (is3dInspectMode) return;
         event.stopPropagation();
         suppressBoardClickUntil = Date.now() + 450;
         triggerGravityJump();
@@ -959,6 +973,16 @@
       const rect = dom.isoBoard.getBoundingClientRect();
       const pctX = ((event.clientX - rect.left) / rect.width) * 100;
       const pctY = ((event.clientY - rect.top) / rect.height) * 100;
+      const t3d = getTerrain3D();
+      if (world3d.active && t3d) {
+        const rawW = t3d.screenPctToWorld(pctX, pctY, { clampWalkable: true });
+        const safeW = resolveWorld3dPoint(rawW.x, rawW.z);
+        const proj = t3d.projectWorldToScreen(safeW.x, safeW.y, safeW.z);
+        triggerHaptic('tap');
+        spawnRipple(proj.pctX, proj.pctY);
+        walkPenguin3dTo(safeW.x, safeW.z, checkSurfaceProximity);
+        return;
+      }
       const chapter = getChapter(state.currentChapterId);
       const safeTarget = resolveSurfacePoint(pctX, pctY, chapter, penguinPos);
       triggerHaptic('tap');
@@ -1709,6 +1733,355 @@
     sync3dLabels(currentActiveSiteId);
   }
 
+  function resetWorld3d(keepUiClasses) {
+    world3d.active = false;
+    world3d.siteId = '';
+    world3d.ship = null;
+    world3d.machine = null;
+    world3d.samples = {};
+    world3d.penguin = null;
+    world3d.walkAnim = null;
+    world3d.jumpAnim = null;
+    const t3d = getTerrain3D();
+    if (t3d && typeof t3d.setOnFrameCallback === 'function') {
+      t3d.setOnFrameCallback(null);
+    }
+    if (!keepUiClasses) {
+      if (dom.isoBoard) dom.isoBoard.classList.remove('has-3d-terrain');
+      if (dom.penguinActor) {
+        dom.penguinActor.style.transform = '';
+        dom.penguinActor.style.visibility = '';
+      }
+      if (dom.stageEntitiesLayer) {
+        dom.stageEntitiesLayer.querySelectorAll('.stage-entity').forEach((el) => {
+          el.style.transform = '';
+          el.style.visibility = '';
+        });
+      }
+    }
+  }
+
+  function getWorld3dObstacles() {
+    const obs = [];
+    if (world3d.ship) {
+      obs.push({ id: 'ship', cx: world3d.ship.x, cz: world3d.ship.z, r: 1.65 });
+    }
+    if (world3d.machine) {
+      const rMap = { sojourner: 0.90 };
+      obs.push({
+        id: world3d.machine.id,
+        cx: world3d.machine.x,
+        cz: world3d.machine.z,
+        r: rMap[world3d.machine.id] || 1.4
+      });
+    }
+    return obs;
+  }
+
+  function resolveWorld3dPoint(wx, wz) {
+    const t3d = getTerrain3D();
+    if (!t3d) return { x: wx, y: 0, z: wz };
+    let pt = t3d.clampWalkableWorld(wx, wz);
+    const obsList = getWorld3dObstacles();
+    for (let pass = 0; pass < 2; pass += 1) {
+      obsList.forEach((o) => {
+        const dx = pt.x - o.cx;
+        const dz = pt.z - o.cz;
+        const d = Math.hypot(dx, dz);
+        if (d < o.r) {
+          if (d < 0.04) {
+            pt = t3d.clampWalkableWorld(o.cx + 1.2, o.cz + o.r + 0.4);
+          } else {
+            const s = (o.r * 1.08) / d;
+            pt = t3d.clampWalkableWorld(o.cx + dx * s, o.cz + dz * s);
+          }
+        }
+      });
+    }
+    return pt;
+  }
+
+  function segHitsCircle2D(ax, az, bx, bz, cx, cz, r) {
+    const dx = bx - ax;
+    const dz = bz - az;
+    const lenSq = dx * dx + dz * dz;
+    if (lenSq < 1e-6) return false;
+    const t = Math.max(0, Math.min(1, ((cx - ax) * dx + (cz - az) * dz) / lenSq));
+    const px = ax + t * dx;
+    const pz = az + t * dz;
+    return Math.hypot(px - cx, pz - cz) < r * 0.96;
+  }
+
+  function buildWorld3dRoute(fromW, toW) {
+    const t3d = getTerrain3D();
+    const target = resolveWorld3dPoint(toW.x, toW.z);
+    if (!t3d) return [target];
+    const obsList = getWorld3dObstacles().sort(
+      (a, b) => Math.hypot(fromW.x - a.cx, fromW.z - a.cz) - Math.hypot(fromW.x - b.cx, fromW.z - b.cz)
+    );
+    const waypoints = [];
+    let cur = { x: fromW.x, z: fromW.z };
+    obsList.forEach((o) => {
+      if (!segHitsCircle2D(cur.x, cur.z, target.x, target.z, o.cx, o.cz, o.r)) return;
+      const front = resolveWorld3dPoint(o.cx, o.cz + o.r * 1.35);
+      const back = resolveWorld3dPoint(o.cx, o.cz - o.r * 1.35);
+      const avgZ = (cur.z + target.z) * 0.5;
+      const detour = (avgZ < o.cz - 0.3 && Math.hypot(back.x - o.cx, back.z - o.cz) >= o.r * 1.02)
+        ? back
+        : front;
+      if (Math.hypot(detour.x - cur.x, detour.z - cur.z) > 0.45 && Math.hypot(detour.x - target.x, detour.z - target.z) > 0.45) {
+        waypoints.push(detour);
+        cur = detour;
+      }
+    });
+    waypoints.push(target);
+    return waypoints;
+  }
+
+  function projectAnchorScreen(anchor, t3d, minScale, maxScale) {
+    const proj = t3d.projectWorldToScreen(anchor.x, anchor.y, anchor.z);
+    const refDist = anchor.initDist || 12.0;
+    const scale = Math.max(minScale, Math.min(maxScale, refDist / Math.max(2.5, proj.dist)));
+    anchor.screenX = proj.pctX;
+    anchor.screenY = proj.pctY;
+    return { proj, scale };
+  }
+
+  function syncDomEntitiesToWorld3d(t3d) {
+    if (!t3d || !world3d.active) return;
+
+    if (dom.stageEntitiesLayer) {
+      dom.stageEntitiesLayer.querySelectorAll('.stage-entity').forEach((el) => {
+        const kind = el.dataset.entityKind;
+        const id = el.dataset.entityId;
+        let anchor = null;
+        if (kind === 'ship') anchor = world3d.ship;
+        else if (kind === 'machine') anchor = world3d.machine;
+        else if (kind === 'sample' && id) anchor = world3d.samples[id];
+        if (!anchor) return;
+
+        const { proj, scale } = projectAnchorScreen(anchor, t3d, 0.55, 1.42);
+        el.style.visibility = proj.visible ? '' : 'hidden';
+        el.style.left = `${proj.pctX.toFixed(2)}%`;
+        el.style.top = `${proj.pctY.toFixed(2)}%`;
+        el.style.transform = `translate(-50%, -72%) scale(${scale.toFixed(3)})`;
+        el.style.zIndex = String(Math.max(18, Math.min(89, Math.round(92 - proj.dist * 2.2))));
+      });
+    }
+
+    if (world3d.penguin && dom.penguinActor) {
+      const pProj = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y, world3d.penguin.z);
+      const pScale = Math.max(0.52, Math.min(1.48, world3d.penguinRefDist / Math.max(2.5, pProj.dist)));
+      dom.penguinActor.style.visibility = pProj.visible ? '' : 'hidden';
+      dom.penguinActor.style.left = `${pProj.pctX.toFixed(2)}%`;
+      dom.penguinActor.style.top = `${pProj.pctY.toFixed(2)}%`;
+      dom.penguinActor.style.transform = `translate(-50%, -80%) scale(${pScale.toFixed(3)})`;
+      dom.penguinActor.style.zIndex = String(Math.max(18, Math.min(90, Math.round(92 - pProj.dist * 2.2))));
+      penguinPos.x = Number(pProj.pctX.toFixed(2));
+      penguinPos.y = Number(pProj.pctY.toFixed(2));
+      if (FX && typeof FX.setPenguinTarget === 'function') {
+        FX.setPenguinTarget(penguinPos);
+      }
+    }
+
+    if (dom.stageActionPrompt && !dom.stageActionPrompt.classList.contains('is-hidden') && activeInteractable) {
+      let ax = penguinPos.x;
+      let ay = penguinPos.y;
+      let offsetY = -10;
+      if (activeInteractable.type === 'sample' && activeInteractable.target && world3d.samples[activeInteractable.target.id]) {
+        const sA = world3d.samples[activeInteractable.target.id];
+        ax = sA.screenX;
+        ay = sA.screenY;
+        offsetY = -2.5;
+      } else if (activeInteractable.type === 'machine' && world3d.machine) {
+        ax = world3d.machine.screenX;
+        ay = world3d.machine.screenY;
+        offsetY = -12;
+      } else if (activeInteractable.type.startsWith('ship') && world3d.ship) {
+        ax = world3d.ship.screenX;
+        ay = world3d.ship.screenY;
+        offsetY = -12;
+      }
+      dom.stageActionPrompt.style.left = `${Math.max(8, Math.min(92, ax)).toFixed(2)}%`;
+      dom.stageActionPrompt.style.top = `${Math.max(10, Math.min(88, ay + offsetY)).toFixed(2)}%`;
+    }
+
+    if (dom.stageSpeechBubble && !dom.stageSpeechBubble.classList.contains('is-hidden')) {
+      if (activeSpeechAnchorKind === 'ship' && world3d.ship) {
+        positionSpeechBubble(world3d.ship.screenX, world3d.ship.screenY);
+      } else if (activeSpeechAnchorKind === 'machine' && world3d.machine) {
+        positionSpeechBubble(world3d.machine.screenX, world3d.machine.screenY);
+      } else {
+        positionSpeechBubble(penguinPos.x, penguinPos.y);
+      }
+    }
+  }
+
+  function stepWorld3dFrame(now) {
+    if (!world3d.active) return;
+    const t3d = getTerrain3D();
+    if (!t3d) return;
+
+    if (world3d.walkAnim && world3d.penguin) {
+      const wa = world3d.walkAnim;
+      const segFrom = wa.from;
+      const segTo = wa.waypoints[wa.idx];
+      if (!segTo) {
+        world3d.walkAnim = null;
+        if (dom.penguinActor) dom.penguinActor.classList.remove('walking');
+        const cb = wa.onArrive;
+        if (cb) cb();
+      } else {
+        const t = Math.min(1, Math.max(0, (now - wa.startTime) / Math.max(1, wa.durationMs)));
+        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const nx = segFrom.x + (segTo.x - segFrom.x) * ease;
+        const nz = segFrom.z + (segTo.z - segFrom.z) * ease;
+        world3d.penguin = { x: nx, y: t3d.getGroundHeightAt(nx, nz), z: nz };
+
+        if (now - wa.lastDustAt >= 260) {
+          wa.lastDustAt = now;
+          const pNow = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y, world3d.penguin.z);
+          if (FX && typeof FX.emitBurst === 'function') {
+            FX.emitBurst({ x: pNow.pctX, y: pNow.pctY }, 'step', state.currentChapterId, world3d.siteId);
+          }
+        }
+
+        if (t >= 1) {
+          wa.idx += 1;
+          if (wa.idx >= wa.waypoints.length) {
+            world3d.walkAnim = null;
+            if (dom.penguinActor) dom.penguinActor.classList.remove('walking');
+            if (wa.onArrive) wa.onArrive();
+          } else {
+            const nextPt = wa.waypoints[wa.idx];
+            wa.from = { ...world3d.penguin };
+            wa.startTime = now;
+            const segDist = Math.hypot(nextPt.x - wa.from.x, nextPt.z - wa.from.z);
+            wa.durationMs = Math.max(220, Math.min(1300, Math.round((segDist / 7.5) * 850)));
+            if (nextPt.x < wa.from.x - 0.15) penguinDir = 'left';
+            else if (nextPt.x > wa.from.x + 0.15) penguinDir = 'right';
+            if (penguinDir !== lastRenderedDir) {
+              dom.penguinSprite.innerHTML = MODELS.cyberpenguin(penguinDir);
+              lastRenderedDir = penguinDir;
+            }
+            playHarmony('step');
+          }
+        }
+      }
+    } else if (world3d.jumpAnim && world3d.penguin) {
+      const ja = world3d.jumpAnim;
+      const t = Math.min(1, Math.max(0, (now - ja.startTime) / Math.max(1, ja.durationMs)));
+      const nx = ja.from.x + (ja.to.x - ja.from.x) * t;
+      const nz = ja.from.z + (ja.to.z - ja.from.z) * t;
+      world3d.penguin = { x: nx, y: t3d.getGroundHeightAt(nx, nz), z: nz };
+      if (t >= 1) {
+        world3d.jumpAnim = null;
+      }
+    }
+
+    syncDomEntitiesToWorld3d(t3d);
+  }
+
+  function walkPenguin3dTo(destX, destZ, onArrive) {
+    if (isJumping || !world3d.active || !world3d.penguin) return;
+    clearWalkTimers();
+    const route = buildWorld3dRoute(world3d.penguin, { x: destX, z: destZ });
+    const firstPt = route[0];
+    if (!firstPt) return;
+
+    const segDist = Math.hypot(firstPt.x - world3d.penguin.x, firstPt.z - world3d.penguin.z);
+    if (segDist < 0.08 && route.length === 1) {
+      if (onArrive) onArrive();
+      return;
+    }
+
+    if (firstPt.x < world3d.penguin.x - 0.15) penguinDir = 'left';
+    else if (firstPt.x > world3d.penguin.x + 0.15) penguinDir = 'right';
+    if (penguinDir !== lastRenderedDir && dom.penguinSprite) {
+      dom.penguinSprite.innerHTML = MODELS.cyberpenguin(penguinDir);
+      lastRenderedDir = penguinDir;
+    }
+
+    const dur = Math.max(220, Math.min(1300, Math.round((segDist / 7.5) * 850)));
+    world3d.walkAnim = {
+      waypoints: route,
+      idx: 0,
+      from: { ...world3d.penguin },
+      startTime: performance.now(),
+      durationMs: dur,
+      onArrive,
+      lastDustAt: performance.now() - 260
+    };
+    if (dom.penguinActor) {
+      dom.penguinActor.classList.add('walking');
+    }
+    playHarmony('step');
+  }
+
+  function initWorld3dAnchors(chapter, siteId) {
+    const t3d = getTerrain3D();
+    if (!t3d || !chapter || !siteId || !t3d.hasSite(siteId)) return;
+
+    const { activeMachine } = getActiveSite(chapter);
+    const shipPos = (activeMachine && activeMachine.shipPos) || chapter.shipPos;
+    const preservePenguin = world3d.active && world3d.siteId === siteId && world3d.penguin;
+
+    const shipHit = t3d.screenPctToWorld(shipPos.x, shipPos.y, { useBaseExploreCamera: true });
+    world3d.ship = {
+      x: shipHit.x,
+      y: shipHit.y,
+      z: shipHit.z,
+      initDist: t3d.getBaseExploreDistance(shipHit.x, shipHit.y, shipHit.z),
+      screenX: shipPos.x,
+      screenY: shipPos.y
+    };
+
+    if (activeMachine) {
+      const mHit = t3d.screenPctToWorld(activeMachine.pos.x, activeMachine.pos.y, { useBaseExploreCamera: true });
+      world3d.machine = {
+        id: activeMachine.id,
+        x: mHit.x,
+        y: mHit.y,
+        z: mHit.z,
+        initDist: t3d.getBaseExploreDistance(mHit.x, mHit.y, mHit.z),
+        screenX: activeMachine.pos.x,
+        screenY: activeMachine.pos.y
+      };
+    } else {
+      world3d.machine = null;
+    }
+
+    world3d.samples = {};
+    const siteSamples = getSiteSamples(chapter, activeMachine);
+    siteSamples.forEach((sampleObj) => {
+      const sHit = t3d.screenPctToWorld(sampleObj.pos.x, sampleObj.pos.y, { useBaseExploreCamera: true });
+      world3d.samples[sampleObj.id] = {
+        id: sampleObj.id,
+        x: sHit.x,
+        y: sHit.y,
+        z: sHit.z,
+        initDist: t3d.getBaseExploreDistance(sHit.x, sHit.y, sHit.z),
+        screenX: sampleObj.pos.x,
+        screenY: sampleObj.pos.y
+      };
+    });
+
+    if (!preservePenguin) {
+      const spawn = (activeMachine && activeMachine.spawnPos) || chapter.spawnPos;
+      const pRaw = t3d.screenPctToWorld(spawn.x, spawn.y, { useBaseExploreCamera: true, clampWalkable: true });
+      world3d.penguin = resolveWorld3dPoint(pRaw.x, pRaw.z);
+      world3d.penguinRefDist = t3d.getBaseExploreDistance(world3d.penguin.x, world3d.penguin.y, world3d.penguin.z);
+    }
+
+    world3d.active = true;
+    world3d.siteId = siteId;
+    if (dom.isoBoard) {
+      dom.isoBoard.classList.add('has-3d-terrain');
+    }
+    t3d.setOnFrameCallback(stepWorld3dFrame);
+    syncDomEntitiesToWorld3d(t3d);
+  }
+
   function syncStage3dMount(siteId) {
     const t3d = getTerrain3D();
     const has3d = Boolean(t3d && siteId && t3d.hasSite(siteId));
@@ -1717,6 +2090,7 @@
       dom.stage3dToggleBtn.classList.toggle('is-hidden', !has3d);
     }
     if (!has3d) {
+      resetWorld3d();
       set3dInspectMode(false);
       if (t3d && typeof t3d.unmount === 'function') {
         t3d.unmount();
@@ -1728,12 +2102,14 @@
     t3d.mount(dom.stageBackdropLayer, siteId, {
       onReady: () => {
         if (currentActiveSiteId !== siteId) return;
+        initWorld3dAnchors(getChapter(state.currentChapterId), siteId);
         sync3dLabels(siteId);
         if (dom.gameScreen && dom.gameScreen.classList.contains('is-hidden')) {
           t3d.pause();
         }
       },
       onError: () => {
+        resetWorld3d();
         if (dom.stage3dToggleBtn) {
           dom.stage3dToggleBtn.classList.add('is-hidden');
         }
@@ -1752,6 +2128,7 @@
     const profile = getGravityProfile(chapter.id, siteId);
     clearWalkTimers();
     clearTitleCardTimers();
+    resetWorld3d();
     currentActiveSiteId = siteId;
     set3dInspectMode(false);
     state.currentChapterId = chapter.id;
@@ -1925,6 +2302,7 @@
   }
 
   function updateDepthSorting() {
+    if (world3d.active) return;
     if (dom.stageEntitiesLayer) {
       dom.stageEntitiesLayer.querySelectorAll('.stage-entity').forEach((el) => {
         const rawTop = el.style && el.style.top ? String(el.style.top).replace('%', '') : '';
@@ -2077,7 +2455,7 @@
 
     // 1. Nave de Cyberpenguin (con escotilla lista cuando se completan las tareas)
     parts.push(`
-      <div class="stage-entity ${inSpace ? 'space-float' : ''}" data-sort-y="${shipPos.y}" style="left: ${shipPos.x}%; top: ${shipPos.y}%;">
+      <div class="stage-entity ${inSpace ? 'space-float' : ''}" data-entity-kind="ship" data-sort-y="${shipPos.y}" style="left: ${shipPos.x}%; top: ${shipPos.y}%;">
         <button id="ship-hatch-btn" type="button" class="stage-hotspot ship-hotspot" aria-label="${hatchAriaLabel}">
           <div class="sample-beacon ship-beacon ${reqs.canLeave ? 'ready' : ''}" aria-hidden="true">
             <span class="sample-beacon-star">✦</span>
@@ -2101,7 +2479,7 @@
       const modelSvg = MODELS[activeMachine.modelKey] ? MODELS[activeMachine.modelKey]() : '';
       const floatClass = activeMachine.id === 'pioneer-10' ? 'space-float' : '';
       parts.push(`
-        <div class="stage-entity ${floatClass}" data-sort-y="${activeMachine.pos.y}" style="left: ${activeMachine.pos.x}%; top: ${activeMachine.pos.y}%;">
+        <div class="stage-entity ${floatClass}" data-entity-kind="machine" data-entity-id="${activeMachine.id}" data-sort-y="${activeMachine.pos.y}" style="left: ${activeMachine.pos.x}%; top: ${activeMachine.pos.y}%;">
           <button type="button" class="stage-hotspot machine-hotspot" data-machine-id="${activeMachine.id}" aria-label="${activeMachine.name}">
             ${!inspected ? `
               <div class="sample-beacon machine-beacon" aria-hidden="true">
@@ -2121,7 +2499,7 @@
     pendingSamples.forEach((sampleObj, idx) => {
       const btnIdAttr = idx === 0 ? 'id="stage-sample-btn" ' : '';
       parts.push(`
-        <div class="stage-entity" data-sort-y="${sampleObj.pos.y}" style="left: ${sampleObj.pos.x}%; top: ${sampleObj.pos.y}%;">
+        <div class="stage-entity" data-entity-kind="sample" data-entity-id="${sampleObj.id}" data-sort-y="${sampleObj.pos.y}" style="left: ${sampleObj.pos.x}%; top: ${sampleObj.pos.y}%;">
           <button ${btnIdAttr}type="button" class="stage-hotspot sample-hotspot" data-sample-id="${sampleObj.id}" aria-label="${sampleObj.label}">
             <div class="sample-beacon" aria-hidden="true">
               <span class="sample-beacon-star">✦</span>
@@ -2135,26 +2513,45 @@
 
     dom.stageEntitiesLayer.innerHTML = parts.join('');
     updateDepthSorting();
+    if (world3d.active) {
+      syncDomEntitiesToWorld3d(getTerrain3D());
+    }
 
     // Listeners de entidades recién creadas
     const hatchBtn = document.getElementById('ship-hatch-btn');
     if (hatchBtn) {
       hatchBtn.addEventListener('click', () => {
-        const boardingPoint = resolveSurfacePoint(shipPos.x + 9.5, shipPos.y + 4.8, chapter);
-        routeAndMove(boardingPoint.x, boardingPoint.y, () => {
+        if (is3dInspectMode) return;
+        const finishHatch = () => {
           checkSurfaceProximity();
           const r = checkSiteRequirements(chapter);
           if (!r.canLeave) {
             showPendingTasksNotice(chapter, r.missing);
           }
-        });
+        };
+        if (world3d.active && world3d.ship) {
+          const destW = resolveWorld3dPoint(world3d.ship.x + 1.55, world3d.ship.z + 1.15);
+          walkPenguin3dTo(destW.x, destW.z, finishHatch);
+          return;
+        }
+        const boardingPoint = resolveSurfacePoint(shipPos.x + 9.5, shipPos.y + 4.8, chapter);
+        routeAndMove(boardingPoint.x, boardingPoint.y, finishHatch);
       });
     }
 
     document.querySelectorAll('.machine-hotspot').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (is3dInspectMode) return;
         const machine = chapter.machines.find((m) => m.id === btn.dataset.machineId);
         if (!machine) return;
+        if (world3d.active && world3d.machine && world3d.penguin) {
+          const sideSign = world3d.penguin.x < world3d.machine.x ? -1 : 1;
+          const destW = resolveWorld3dPoint(world3d.machine.x + sideSign * 1.25, world3d.machine.z + 0.75);
+          walkPenguin3dTo(destW.x, destW.z, () => {
+            openDialogueModal(machine);
+          });
+          return;
+        }
         const approachOffsets = {
           'apollo-11-eagle': { x: 12.5, y: 6.0 },
           'sojourner':       { x: 6.2,  y: 4.2 },
@@ -2172,8 +2569,17 @@
 
     document.querySelectorAll('.sample-hotspot').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (is3dInspectMode) return;
         const sampleObj = siteSamples.find((s) => s.id === btn.dataset.sampleId);
         if (!sampleObj) return;
+        if (world3d.active && world3d.samples[sampleObj.id]) {
+          const sW = world3d.samples[sampleObj.id];
+          const destW = resolveWorld3dPoint(sW.x, sW.z);
+          walkPenguin3dTo(destW.x, destW.z, () => {
+            openSampleDiscoveryModal(chapter, sampleObj);
+          });
+          return;
+        }
         const sampleTarget = resolveSurfacePoint(sampleObj.pos.x, sampleObj.pos.y, chapter);
         routeAndMove(sampleTarget.x, sampleTarget.y, () => {
           openSampleDiscoveryModal(chapter, sampleObj);
@@ -2236,6 +2642,8 @@
     clearTimeout(descendTimer);
     descendTimer = null;
     isJumping = false;
+    world3d.walkAnim = null;
+    world3d.jumpAnim = null;
     walkSequenceTimers.forEach((id) => clearTimeout(id));
     walkSequenceTimers = [];
     stopEvaTetherLoop();
@@ -2348,6 +2756,19 @@
 
   function stepPenguin(dir) {
     if (isJumping) return;
+    if (world3d.active && world3d.penguin) {
+      const dMap = {
+        up: { dx: 0, dz: -1.35 },
+        down: { dx: 0, dz: 1.35 },
+        left: { dx: -1.35, dz: 0 },
+        right: { dx: 1.35, dz: 0 }
+      };
+      const delta = dMap[dir];
+      if (!delta) return;
+      const destW = resolveWorld3dPoint(world3d.penguin.x + delta.dx, world3d.penguin.z + delta.dz);
+      walkPenguin3dTo(destW.x, destW.z, checkSurfaceProximity);
+      return;
+    }
     const chapter = getChapter(state.currentChapterId);
     const stepSize = chapter.hasSurface ? 6 : 7;
     const deltas = {
@@ -2378,25 +2799,51 @@
     clearTimeout(jumpTimer);
 
     const dirSign = penguinDir === 'left' ? -1 : 1;
-    let hopTarget = resolveSurfacePoint(
-      penguinPos.x + dirSign * (profile.jumpAdvanceDist || 5),
-      penguinPos.y + (chapter.hasSurface ? 0 : -1.5),
-      chapter,
-      penguinPos
-    );
-    if (getDist(hopTarget, penguinPos) < 1.2) {
-      hopTarget = resolveSurfacePoint(
-        penguinPos.x - dirSign * (profile.jumpAdvanceDist || 5),
-        penguinPos.y + (chapter.hasSurface ? 0 : 1.5),
+    let jumpOrigin = { x: penguinPos.x, y: penguinPos.y };
+    let jumpTarget = { x: penguinPos.x, y: penguinPos.y };
+
+    const t3d = getTerrain3D();
+    if (world3d.active && world3d.penguin && t3d) {
+      const orig = { ...world3d.penguin };
+      let destW = resolveWorld3dPoint(orig.x + dirSign * 1.65, orig.z);
+      if (Math.hypot(destW.x - orig.x, destW.z - orig.z) < 0.4) {
+        destW = resolveWorld3dPoint(orig.x - dirSign * 1.65, orig.z);
+        if (destW.x < orig.x - 0.15) penguinDir = 'left';
+        if (destW.x > orig.x + 0.15) penguinDir = 'right';
+      }
+      const pOrig = t3d.projectWorldToScreen(orig.x, orig.y, orig.z);
+      const pTgt = t3d.projectWorldToScreen(destW.x, destW.y, destW.z);
+      jumpOrigin = { x: pOrig.pctX, y: pOrig.pctY };
+      jumpTarget = { x: pTgt.pctX, y: pTgt.pctY };
+      world3d.jumpAnim = {
+        from: { x: orig.x, z: orig.z },
+        to: { x: destW.x, z: destW.z },
+        startTime: performance.now(),
+        durationMs: profile.jumpDurationMs
+      };
+    } else {
+      let hopTarget = resolveSurfacePoint(
+        penguinPos.x + dirSign * (profile.jumpAdvanceDist || 5),
+        penguinPos.y + (chapter.hasSurface ? 0 : -1.5),
         chapter,
         penguinPos
       );
-      if (hopTarget.x < penguinPos.x - 0.5) penguinDir = 'left';
-      if (hopTarget.x > penguinPos.x + 0.5) penguinDir = 'right';
+      if (getDist(hopTarget, penguinPos) < 1.2) {
+        hopTarget = resolveSurfacePoint(
+          penguinPos.x - dirSign * (profile.jumpAdvanceDist || 5),
+          penguinPos.y + (chapter.hasSurface ? 0 : 1.5),
+          chapter,
+          penguinPos
+        );
+        if (hopTarget.x < penguinPos.x - 0.5) penguinDir = 'left';
+        if (hopTarget.x > penguinPos.x + 0.5) penguinDir = 'right';
+      }
+      jumpOrigin = { x: penguinPos.x, y: penguinPos.y };
+      jumpTarget = { x: hopTarget.x, y: hopTarget.y };
+      penguinPos = { x: hopTarget.x, y: hopTarget.y };
+      dom.penguinActor.style.left = `${penguinPos.x}%`;
+      dom.penguinActor.style.top = `${penguinPos.y}%`;
     }
-
-    const jumpOrigin = { x: penguinPos.x, y: penguinPos.y };
-    const jumpTarget = { x: hopTarget.x, y: hopTarget.y };
 
     dom.penguinActor.classList.remove('jumping-moon', 'jumping-mars', 'jumping-eros', 'jumping-deep');
     void dom.penguinActor.offsetWidth;
@@ -2407,10 +2854,8 @@
     evaAnimStart = Date.now();
     evaAnimDuration = profile.jumpDurationMs;
 
-    penguinPos = { x: hopTarget.x, y: hopTarget.y };
-    dom.penguinActor.style.left = `${penguinPos.x}%`;
-    dom.penguinActor.style.top = `${penguinPos.y}%`;
     dom.penguinSprite.innerHTML = MODELS.cyberpenguin(penguinDir);
+    lastRenderedDir = penguinDir;
     updateDepthSorting();
     if (FX && typeof FX.setPenguinTarget === 'function') {
       FX.setPenguinTarget(penguinPos);
@@ -2450,6 +2895,13 @@
       if (dom.penguinActor) {
         dom.penguinActor.classList.remove(profile.jumpClass);
         dom.penguinActor.style.transitionDuration = `${profile.stepDurationMs}ms`;
+      }
+      if (world3d.active && world3d.jumpAnim) {
+        const ja = world3d.jumpAnim;
+        const t3 = getTerrain3D();
+        world3d.penguin = { x: ja.to.x, y: t3 ? t3.getGroundHeightAt(ja.to.x, ja.to.z) : 0, z: ja.to.z };
+        world3d.jumpAnim = null;
+        syncDomEntitiesToWorld3d(t3);
       }
       if (profile.dustOnJump) {
         spawnDustPuff(penguinPos.x, penguinPos.y);
@@ -2492,19 +2944,21 @@
     let offsetY = -10;
 
     if (type === 'sample' && target && target.pos) {
-      objX = target.pos.x;
-      objY = target.pos.y;
+      const sA = world3d.active && world3d.samples[target.id];
+      objX = sA ? sA.screenX : target.pos.x;
+      objY = sA ? sA.screenY : target.pos.y;
       offsetY = -2.5; // Directamente encima de la roca (cerca de la roca, no sobre el pingüino)
     } else if (type === 'machine' && target && target.pos) {
-      objX = target.pos.x;
-      objY = target.pos.y;
+      const mA = world3d.active && world3d.machine;
+      objX = mA ? mA.screenX : target.pos.x;
+      objY = mA ? mA.screenY : target.pos.y;
       offsetY = -12;
     } else if (type.startsWith('ship')) {
       const chapter = getChapter(state.currentChapterId);
       const { activeMachine } = getActiveSite(chapter);
       const shipPos = activeMachine && activeMachine.shipPos ? activeMachine.shipPos : (chapter ? chapter.shipPos : penguinPos);
-      objX = shipPos.x;
-      objY = shipPos.y;
+      objX = (world3d.active && world3d.ship) ? world3d.ship.screenX : shipPos.x;
+      objY = (world3d.active && world3d.ship) ? world3d.ship.screenY : shipPos.y;
       offsetY = -12;
     }
 
@@ -2587,8 +3041,11 @@
 
     // Si nos alejamos de la máquina activa mientras habla, cerrar diálogo
     if (activeMachine) {
-      const distToMachine = getDist(penguinPos, activeMachine.pos);
-      if (distToMachine > 18.5 && activeDialogueMachine && activeDialogueMachine.id === activeMachine.id) {
+      const distToMachine = (world3d.active && world3d.penguin && world3d.machine)
+        ? Math.hypot(world3d.penguin.x - world3d.machine.x, world3d.penguin.z - world3d.machine.z)
+        : getDist(penguinPos, activeMachine.pos);
+      const closeLimit = (world3d.active && world3d.machine) ? 3.6 : 18.5;
+      if (distToMachine > closeLimit && activeDialogueMachine && activeDialogueMachine.id === activeMachine.id) {
         closeDialogueModal();
       }
     }
@@ -2601,7 +3058,10 @@
       const siteSamples = getSiteSamples(chapter, activeMachine);
       siteSamples.forEach((sampleObj) => {
         if (!state.collectedSamples.includes(sampleObj.id)) {
-          const dist = getDist(penguinPos, sampleObj.pos);
+          const sA = world3d.active && world3d.penguin && world3d.samples[sampleObj.id];
+          const dist = sA
+            ? Math.hypot(world3d.penguin.x - sA.x, world3d.penguin.z - sA.z) * 6.0
+            : getDist(penguinPos, sampleObj.pos);
           if (dist <= 13.5) {
             candidates.push({
               type: 'sample',
@@ -2622,7 +3082,9 @@
         'near-shoemaker':  16.5
       };
       const thresh = machineThresholds[activeMachine.id] || 15.5;
-      const dist = getDist(penguinPos, activeMachine.pos);
+      const dist = (world3d.active && world3d.penguin && world3d.machine)
+        ? Math.hypot(world3d.penguin.x - world3d.machine.x, world3d.penguin.z - world3d.machine.z) * 5.2
+        : getDist(penguinPos, activeMachine.pos);
       if (dist <= thresh) {
         candidates.push({
           type: 'machine',
@@ -2635,7 +3097,9 @@
 
     // 3. Escotilla de la nave espacial (solo permite despegar si se completaron las tareas)
     const hatchPoint = getHatchAnchor(chapter);
-    const distToShip = getDist(penguinPos, hatchPoint);
+    const distToShip = (world3d.active && world3d.penguin && world3d.ship)
+      ? Math.hypot(world3d.penguin.x - (world3d.ship.x + 1.45), world3d.penguin.z - (world3d.ship.z + 1.0)) * 5.5
+      : getDist(penguinPos, hatchPoint);
     if (distToShip <= 13.0) {
       const reqs = checkSiteRequirements(chapter);
       if (reqs.canLeave) {
@@ -2994,8 +3458,11 @@
       if (t < 1) {
         thoughtTrackingRaf = global.requestAnimationFrame(tick);
       } else {
+        const finalTarget = thoughtJumpParams.target;
         stopThoughtTracking();
-        applyThoughtBubblePosition(thoughtJumpParams.target.x, thoughtJumpParams.target.y);
+        if (finalTarget) {
+          applyThoughtBubblePosition(finalTarget.x, finalTarget.y);
+        }
       }
     };
 
@@ -3061,8 +3528,14 @@
     }
 
     // Ubicar el globo justo encima del personaje que habla
-    const anchor = anchorPos || (isPenguin ? penguinPos : { x: 50, y: 50 });
-    positionSpeechBubble(anchor.x, anchor.y);
+    activeSpeechAnchorKind = isPenguin ? 'penguin' : isShip ? 'ship' : 'machine';
+    let resolvedAnchor = anchorPos || (isPenguin ? penguinPos : { x: 50, y: 50 });
+    if (world3d.active) {
+      if (isPenguin) resolvedAnchor = penguinPos;
+      else if (isShip && world3d.ship) resolvedAnchor = { x: world3d.ship.screenX, y: world3d.ship.screenY };
+      else if (world3d.machine) resolvedAnchor = { x: world3d.machine.screenX, y: world3d.machine.screenY };
+    }
+    positionSpeechBubble(resolvedAnchor.x, resolvedAnchor.y);
 
     // Renderizar opciones interactivas de respuesta estilo Animal Crossing
     if (dom.speechBubbleOptions) {
@@ -3634,7 +4107,9 @@
       }
       checkSurfaceProximity();
       if (FX && typeof FX.emitBurst === 'function') {
-        FX.emitBurst(targetSample.pos, 'sample', chapter.id);
+        const sA = world3d.active && world3d.samples[targetSample.id];
+        const burstPos = sA ? { x: sA.screenX, y: sA.screenY } : targetSample.pos;
+        FX.emitBurst(burstPos, 'sample', chapter.id);
       }
     }
   }
