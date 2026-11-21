@@ -8,10 +8,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121s';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121s';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121s';
-const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121s';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121t';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121t';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121t';
+const PHOBOS_MODEL_URL = 'assets/models/phobos.glb?v=20261121t';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
@@ -440,22 +440,35 @@ class Terrain3DController {
         scene.add(skyDome);
         this.skyDome = skyDome;
 
-        // Luna marciana Fobos en el cielo: cargar el modelo 3D de alta resolución (phobos.glb)
-        // con el cráter Stickney y surcos reales; respaldo temporal mientras carga
+        // Luna marciana Fobos en el cielo: modelo 3D oficial de la NASA (Phobos_1_1000.glb, 1 u = 1 km)
+        // Normalizado a un tamaño angular natural y teñido con dispersión atmosférica diurna de Marte
+        // para que su lado en sombra se funda con el cielo ocre en lugar de verse negro espacial.
         this.phobosGroup = new THREE.Group();
-        this.phobosGroup.position.set(16.8, 10.0, -48.0);
-        this.phobosGroup.scale.setScalar(1.38);
-        this.phobosGroup.rotation.set(0.18, -0.35, -0.14);
+        this.phobosGroup.position.set(18.5, 11.4, -52.0);
+        this.phobosGroup.rotation.set(0.22, -0.45, -0.16);
         scene.add(this.phobosGroup);
         this.loader.load(
           PHOBOS_MODEL_URL,
           (gltf) => {
             const pRoot = gltf.scene || new THREE.Group();
+            // Normalizar el radio nativo (~13 km en Phobos_1_1000.glb) a ~0.78 u en el cielo
+            const box = new THREE.Box3().setFromObject(pRoot);
+            const size = new THREE.Vector3();
+            box.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z, 0.001);
+            pRoot.scale.setScalar(1.56 / maxDim);
             pRoot.traverse((obj) => {
               if (!obj.isMesh || !obj.material) return;
               obj.material.fog = false;
-              obj.material.roughness = 0.92;
-              obj.material.metalness = 0.03;
+              obj.material.roughness = 0.96;
+              obj.material.metalness = 0.02;
+              if (obj.material.color) {
+                obj.material.color.set('#e8cfc0');
+              }
+              if (obj.material.emissive) {
+                obj.material.emissive.set('#7a5346');
+                obj.material.emissiveIntensity = 0.42;
+              }
               obj.material.needsUpdate = true;
             });
             this.phobosGroup.clear();
@@ -465,9 +478,21 @@ class Terrain3DController {
           () => {
             const fallback = createPhobosMesh();
             fallback.position.set(0, 0, 0);
+            fallback.scale.setScalar(0.65);
             this.phobosGroup.add(fallback);
           }
         );
+
+        // Deimos (la segunda luna de Marte, ~20,060 km de distancia): visible desde Ares Vallis
+        // como un punto estelar brillante (~0.03 deg de diámetro angular) en el cielo alto
+        const deimosGeo = new THREE.SphereGeometry(0.11, 12, 10);
+        const deimosMat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color('#ffeed8'),
+          fog: false
+        });
+        const deimosMesh = new THREE.Mesh(deimosGeo, deimosMat);
+        deimosMesh.position.set(-15.5, 13.8, -58.0);
+        scene.add(deimosMesh);
 
         const hemi = new THREE.HemisphereLight(0xf6dfd0, 0x7a3e26, 1.05);
         scene.add(hemi);
