@@ -1936,7 +1936,35 @@
       world3d.lastCamSig = camSig;
     }
 
-    if (dom.stageEntitiesLayer && camChanged) {
+    let penguinMoved = false;
+    let pProj = null;
+    if (world3d.penguin && dom.penguinActor) {
+      if (typeof t3d.setPenguinPose === 'function') {
+        t3d.setPenguinPose(world3d.penguin);
+      }
+      const jh = world3d.penguin.jumpHeight || 0;
+      const pSig = `${world3d.penguin.x.toFixed(3)},${world3d.penguin.y.toFixed(3)},${world3d.penguin.z.toFixed(3)},${jh.toFixed(3)}`;
+      penguinMoved = camChanged || pSig !== world3d.lastPenguinSig;
+      if (penguinMoved) {
+        world3d.lastPenguinSig = pSig;
+        pProj = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y + jh, world3d.penguin.z);
+        const pScale = Math.max(0.48, Math.min(1.45, world3d.penguinRefDist / Math.max(2.5, pProj.dist)));
+        dom.penguinActor.style.visibility = pProj.visible ? '' : 'hidden';
+        dom.penguinActor.style.left = `${pProj.pctX.toFixed(2)}%`;
+        dom.penguinActor.style.top = `${pProj.pctY.toFixed(2)}%`;
+        dom.penguinActor.style.transform = `translate3d(-50%, -80%, 0) scale(${pScale.toFixed(3)})`;
+        dom.penguinActor.style.zIndex = String(Math.max(18, Math.min(90, Math.round(92 - pProj.dist * 2.2))));
+        penguinPos.x = Number(pProj.pctX.toFixed(2));
+        penguinPos.y = Number(pProj.pctY.toFixed(2));
+        if (FX && typeof FX.setPenguinTarget === 'function') {
+          FX.setPenguinTarget(penguinPos);
+        }
+      } else if (world3d.penguin && t3d.camera) {
+        pProj = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y + jh, world3d.penguin.z);
+      }
+    }
+
+    if (dom.stageEntitiesLayer && (camChanged || penguinMoved)) {
       if (!world3d.domEntityNodes) {
         world3d.domEntityNodes = Array.from(dom.stageEntitiesLayer.querySelectorAll('.stage-entity'));
       }
@@ -1955,30 +1983,26 @@
         el.style.top = `${proj.pctY.toFixed(2)}%`;
         el.style.transform = `translate3d(-50%, -72%, 0) scale(${scale.toFixed(3)})`;
         el.style.zIndex = String(Math.max(18, Math.min(89, Math.round(92 - proj.dist * 2.2))));
-      });
-    }
 
-    if (world3d.penguin && dom.penguinActor) {
-      if (typeof t3d.setPenguinPose === 'function') {
-        t3d.setPenguinPose(world3d.penguin);
-      }
-      const jh = world3d.penguin.jumpHeight || 0;
-      const pSig = `${world3d.penguin.x.toFixed(3)},${world3d.penguin.y.toFixed(3)},${world3d.penguin.z.toFixed(3)},${jh.toFixed(3)}`;
-      if (camChanged || pSig !== world3d.lastPenguinSig) {
-        world3d.lastPenguinSig = pSig;
-        const pProj = t3d.projectWorldToScreen(world3d.penguin.x, world3d.penguin.y + jh, world3d.penguin.z);
-        const pScale = Math.max(0.48, Math.min(1.45, world3d.penguinRefDist / Math.max(2.5, pProj.dist)));
-        dom.penguinActor.style.visibility = pProj.visible ? '' : 'hidden';
-        dom.penguinActor.style.left = `${pProj.pctX.toFixed(2)}%`;
-        dom.penguinActor.style.top = `${pProj.pctY.toFixed(2)}%`;
-        dom.penguinActor.style.transform = `translate3d(-50%, -80%, 0) scale(${pScale.toFixed(3)})`;
-        dom.penguinActor.style.zIndex = String(Math.max(18, Math.min(90, Math.round(92 - pProj.dist * 2.2))));
-        penguinPos.x = Number(pProj.pctX.toFixed(2));
-        penguinPos.y = Number(pProj.pctY.toFixed(2));
-        if (FX && typeof FX.setPenguinTarget === 'function') {
-          FX.setPenguinTarget(penguinPos);
+        // Oclusión / atenuación dinámica de la baliza:
+        // Se desactiva cuando el pingüino está cerca para interactuar, cuando pasa por delante
+        // (la roca queda detrás del pingüino y se solapan en pantalla) o cuando el prompt está activo
+        const beacon = el.querySelector('.sample-beacon');
+        if (beacon) {
+          if (world3d.penguin && pProj) {
+            const dist3d = Math.hypot(world3d.penguin.x - anchor.x, world3d.penguin.z - anchor.z);
+            const screenDx = Math.abs(proj.pctX - pProj.pctX);
+            const screenDy = Math.abs(proj.pctY - pProj.pctY);
+            const nearThresh = kind === 'ship' ? 3.6 : (kind === 'machine' ? 2.6 : 2.25);
+            const isNear = dist3d <= nearThresh;
+            const isPenguinInFront = (proj.dist > pProj.dist - 0.25) && (screenDx < 8.5 && screenDy < 14.5);
+            const isPromptTarget = Boolean(activeInteractable && activeInteractable.target && (activeInteractable.target.id === id || activeInteractable.type === kind));
+            beacon.classList.toggle('is-occluded', isNear || isPenguinInFront || isPromptTarget);
+          } else {
+            beacon.classList.remove('is-occluded');
+          }
         }
-      }
+      });
     }
     world3d.forceDomSync = false;
 
@@ -2079,6 +2103,12 @@
           }
         }
 
+        // Evaluar proximidad continuamente para activar el texto al acercarse y desactivarlo al alejarse
+        if (!world3d.lastProxCheckAt || now - world3d.lastProxCheckAt >= 50) {
+          world3d.lastProxCheckAt = now;
+          checkSurfaceProximity();
+        }
+
         const newRem = Math.hypot(segTo.x - phys.x, segTo.z - phys.z);
         if (moved < stepDist * 0.22 || newRem >= remDist - 0.001) {
           wa.stallMs = (wa.stallMs || 0) + dt * 1000;
@@ -2129,6 +2159,10 @@
       if (t >= 1) {
         world3d.penguin.jumpHeight = 0;
         world3d.jumpAnim = null;
+      }
+      if (!world3d.lastProxCheckAt || now - world3d.lastProxCheckAt >= 50) {
+        world3d.lastProxCheckAt = now;
+        checkSurfaceProximity();
       }
     }
 
@@ -2912,6 +2946,7 @@
         dom.penguinActor.classList.add('walking');
       }
       renderPenguin(false);
+      checkSurfaceProximity();
       playHarmony(chapter.hasSurface ? 'step' : 'rcs');
       if (FX && typeof FX.emitBurst === 'function') {
         FX.emitBurst(penguinPos, chapter.hasSurface ? 'step' : 'rcs', chapter.id);
@@ -2948,6 +2983,7 @@
       dom.penguinActor.classList.add('walking');
     }
     renderPenguin(false);
+    checkSurfaceProximity();
     playHarmony(chapter.hasSurface ? 'step' : 'rcs');
     if (FX && typeof FX.emitBurst === 'function') {
       FX.emitBurst(penguinPos, chapter.hasSurface ? 'step' : 'rcs', chapter.id);
@@ -3145,7 +3181,12 @@
     const isEn = (state.currentLanguage === 'en');
     let label = isEn ? 'Interact' : 'Interactuar';
     if (type === 'sample') {
-      label = isEn ? 'Store in backpack' : 'Guardar en la mochila';
+      const rawLabel = target && target.label ? target.label : '';
+      const rockMatch = rawLabel.match(/«([^»]+)»/);
+      const rockName = rockMatch ? rockMatch[1] : rawLabel;
+      label = isEn
+        ? (rockName ? `Collect «${rockName}»` : 'Store in backpack')
+        : (rockName ? `Recoger «${rockName}»` : 'Guardar en la mochila');
     } else if (type === 'machine') {
       label = isEn ? `Talk to ${target.name || 'spacecraft'}` : `Hablar con ${target.name || 'sonda'}`;
     } else if (type === 'ship-travel') {
