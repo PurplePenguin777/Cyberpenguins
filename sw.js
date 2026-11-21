@@ -3,7 +3,7 @@
    Permite instalar la aplicación y jugar sin conexión a internet.
    ========================================================= */
 
-const CACHE_NAME = 'cyberpenguins-v32';
+const CACHE_NAME = 'cyberpenguins-v33';
 const ASSETS = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const ASSETS = [
   './assets/textures/tierra-4k.jpg',
   './assets/textures/luna-4k.jpg',
   './assets/textures/marte-2k.jpg',
+  './assets/textures/eros.jpg',
   './js/data.js',
   './js/elementos/pinguino.js',
   './js/elementos/nave-pinguino.js',

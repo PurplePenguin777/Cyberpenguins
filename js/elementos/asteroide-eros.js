@@ -84,6 +84,7 @@
 
         <!-- Superficie de regolito -->
         <g clip-path="url(#${id}-surf)">
+          <image href="assets/textures/eros.jpg" x="-60" y="270" width="1120" height="340" preserveAspectRatio="xMidYMid slice" opacity="0.4" />
           ${mesh}
           <!-- Depósitos planos de polvo ("ponds") -->
           <ellipse cx="610" cy="439" rx="70" ry="11" fill="#aab4c2" opacity="0.35" />

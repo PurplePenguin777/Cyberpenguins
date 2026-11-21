@@ -146,7 +146,8 @@
       pal,
       craters = [],
       saddle = false,
-      boulders = false
+      boulders = false,
+      texture = null
     } = spec;
     const uid = spec.uid || M.uid('ast');
     const rand = rng(seed);
@@ -253,7 +254,11 @@
     return `
       <g>
         <defs><clipPath id="clip-${uid}"><polygon points="${polyStr(boundary)}" /></clipPath></defs>
-        <g clip-path="url(#clip-${uid})">${faces}${extras}</g>
+        <g clip-path="url(#clip-${uid})">
+          ${texture ? `<image href="${texture}" x="${-a * 1.05}" y="${-b * 1.5}" width="${2.1 * a}" height="${3 * b}" preserveAspectRatio="xMidYMid slice" />` : ''}
+          <g opacity="${texture ? '0.35' : '1'}">${faces}</g>
+          ${extras}
+        </g>
         <polygon points="${polyStr(boundary)}" fill="none" stroke="#0b1220" stroke-opacity="0.45" stroke-width="0.7" stroke-linejoin="round" />
       </g>
     `;
@@ -275,7 +280,8 @@
       pal: EROS_PAL,
       saddle: !small,
       craters: small ? [] : EROS_CRATERS,
-      boulders: r >= 24
+      boulders: r >= 24,
+      texture: 'assets/textures/eros.jpg'
     });
   }
 
