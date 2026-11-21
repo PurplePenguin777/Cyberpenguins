@@ -563,7 +563,12 @@ class Terrain3DController {
     this.currentFocus = { x: 0, z: 0 };
 
     this.camTransition = null;
-    this.dialogueZoom = { active: false, progress: 0, midX: 0, midY: 0, midZ: 0 };
+    this.dialogueZoom = {
+      active: false,
+      progress: 0,
+      camPos: new THREE.Vector3(),
+      targetPos: new THREE.Vector3()
+    };
     this.baseExplorePos = new THREE.Vector3();
     this.baseExploreTarget = new THREE.Vector3();
     this.baseInspectPos = new THREE.Vector3();
@@ -1438,8 +1443,48 @@ class Terrain3DController {
     this.speakingActor = (speaker === 'penguin' || speaker === 'machine' || speaker === 'ship') ? speaker : null;
   }
 
-  setDialogueZoom(active) {
-    this.dialogueZoom.active = Boolean(active);
+  setDialogueZoom(active, charA, charB) {
+    if (active && charA && charB) {
+      this.dialogueZoom.active = true;
+      const midX = (charA.x + charB.x) * 0.5;
+      const midY = ((charA.y || 0) + (charB.y || 0)) * 0.5;
+      const midZ = (charA.z + charB.z) * 0.5;
+
+      const dx = charB.x - charA.x;
+      const dz = charB.z - charA.z;
+      const dist = Math.hypot(dx, dz) || 1.15;
+      const ux = dx / dist;
+      const uz = dz / dist;
+
+      // Normal perpendicular orientada hacia el frente (+Z hacia la cámara)
+      // para que Cyberpenguin quede a la izquierda y la máquina a la derecha (cara a cara)
+      let nx = -uz;
+      let nz = ux;
+      if (nz < 0.25) {
+        nx = uz;
+        nz = -ux;
+        if (nz < 0.25) {
+          nx = 0;
+          nz = 1;
+        }
+      }
+
+      // Distancia de encuadre perfecta para que ambos personajes abarquen
+      // de lado a lado de la pantalla en vista lateral frente a frente
+      const camDist = Math.max(2.55, Math.min(3.2, dist * 2.35));
+      this.dialogueZoom.camPos.set(
+        midX + nx * camDist,
+        midY + 0.48,
+        midZ + nz * camDist
+      );
+      this.dialogueZoom.targetPos.set(
+        midX,
+        midY + 0.36,
+        midZ
+      );
+    } else {
+      this.dialogueZoom.active = Boolean(active);
+    }
   }
 
   animateMachineActor(now) {
@@ -2404,20 +2449,23 @@ class Terrain3DController {
 
       const baseFov = (this.siteConfig && this.siteConfig.exploreFov) || 37;
       if (zp > 0.001) {
-        // Enfoque y zoom estilo Animal Crossing: acercamiento suave (~18%) y compresión focal manteniendo la perspectiva isométrica auténtica
-        const curFov = baseFov - (5.5 * zp);
+        // Enfoque cinematográfico lateral frente a frente (de lado a lado de la pantalla)
+        const curFov = baseFov - (4.5 * zp);
         if (Math.abs(this.camera.fov - curFov) > 0.01) {
           this.camera.fov = curFov;
           this.camera.updateProjectionMatrix();
         }
 
-        const zoomScale = 1.0 - (0.18 * zp);
         this.camera.position.set(
-          normTgtX + (normCamX - normTgtX) * zoomScale,
-          normTgtY + (normCamY - normTgtY) * zoomScale,
-          normTgtZ + (normCamZ - normTgtZ) * zoomScale
+          normCamX + (this.dialogueZoom.camPos.x - normCamX) * zp,
+          normCamY + (this.dialogueZoom.camPos.y - normCamY) * zp,
+          normCamZ + (this.dialogueZoom.camPos.z - normCamZ) * zp
         );
-        this.controls.target.set(normTgtX, normTgtY, normTgtZ);
+        this.controls.target.set(
+          normTgtX + (this.dialogueZoom.targetPos.x - normTgtX) * zp,
+          normTgtY + (this.dialogueZoom.targetPos.y - normTgtY) * zp,
+          normTgtZ + (this.dialogueZoom.targetPos.z - normTgtZ) * zp
+        );
       } else {
         if (Math.abs(this.camera.fov - baseFov) > 0.01) {
           this.camera.fov = baseFov;

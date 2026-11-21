@@ -3149,8 +3149,7 @@
         const machine = chapter.machines.find((m) => m.id === btn.dataset.machineId);
         if (!machine) return;
         if (world3d.active && world3d.machine && world3d.penguin) {
-          const sideSign = world3d.penguin.x < world3d.machine.x ? -1 : 1;
-          const destW = resolveWorld3dPoint(world3d.machine.x + sideSign * 0.72, world3d.machine.z + 0.42);
+          const destW = resolveWorld3dPoint(world3d.machine.x - 1.15, world3d.machine.z);
           walkPenguin3dTo(destW.x, destW.z, () => {
             if (world3d.penguin && world3d.machine) {
               world3d.penguin.yaw = Math.atan2(world3d.machine.x - world3d.penguin.x, world3d.machine.z - world3d.penguin.z);
@@ -4412,12 +4411,18 @@
     }
     hideStageActionPrompt();
 
-    // Orientación recíproca frente a frente y zoom conversacional estilo Animal Crossing
+    // Orientación recíproca frente a frente y cámara conversacional lateral
     if (world3d.active && world3d.penguin && machine) {
       const t3d = getTerrain3D();
       const p = world3d.penguin;
       const m = world3d.machine || (machine.pos ? { x: 1.8, y: 0.4, z: 0.5 } : null);
       if (m) {
+        if (Math.hypot(m.x - p.x, m.z - p.z) > 1.6 || p.x >= m.x - 0.4) {
+          const destW = resolveWorld3dPoint(m.x - 1.15, m.z);
+          p.x = destW.x;
+          p.z = destW.z;
+          if (t3d) p.y = t3d.getGroundHeightAt(p.x, p.z);
+        }
         const dx = m.x - p.x;
         const dz = m.z - p.z;
         const pYaw = Math.atan2(dx, dz);
@@ -4426,10 +4431,10 @@
         p.targetYaw = pYaw;
         penguinDir = dx >= 0 ? 'right' : 'left';
         if (t3d) {
-          if (typeof t3d.setPenguinPose === 'function') t3d.setPenguinPose({ yaw: pYaw });
+          if (typeof t3d.setPenguinPose === 'function') t3d.setPenguinPose({ x: p.x, y: p.y, z: p.z, yaw: pYaw });
           if (typeof t3d.setMachinePose === 'function') t3d.setMachinePose({ yaw: mYaw });
           if (typeof t3d.setDialogueZoom === 'function') {
-            t3d.setDialogueZoom(true);
+            t3d.setDialogueZoom(true, { x: p.x, y: p.y, z: p.z }, { x: m.x, y: m.y || p.y, z: m.z });
           }
         }
       }
@@ -4625,6 +4630,12 @@
       const p = world3d.penguin;
       const m = world3d.machine || (machine.pos ? { x: 1.8, y: 0.4, z: 0.5 } : null);
       if (m) {
+        if (Math.hypot(m.x - p.x, m.z - p.z) > 1.6 || p.x >= m.x - 0.4) {
+          const destW = resolveWorld3dPoint(m.x - 1.15, m.z);
+          p.x = destW.x;
+          p.z = destW.z;
+          if (t3d) p.y = t3d.getGroundHeightAt(p.x, p.z);
+        }
         const dx = m.x - p.x;
         const dz = m.z - p.z;
         const pYaw = Math.atan2(dx, dz);
@@ -4633,10 +4644,10 @@
         p.targetYaw = pYaw;
         penguinDir = dx >= 0 ? 'right' : 'left';
         if (t3d) {
-          if (typeof t3d.setPenguinPose === 'function') t3d.setPenguinPose({ yaw: pYaw });
+          if (typeof t3d.setPenguinPose === 'function') t3d.setPenguinPose({ x: p.x, y: p.y, z: p.z, yaw: pYaw });
           if (typeof t3d.setMachinePose === 'function') t3d.setMachinePose({ yaw: mYaw });
           if (typeof t3d.setDialogueZoom === 'function') {
-            t3d.setDialogueZoom(true);
+            t3d.setDialogueZoom(true, { x: p.x, y: p.y, z: p.z }, { x: m.x, y: m.y || p.y, z: m.z });
           }
         }
       }
