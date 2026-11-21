@@ -1228,25 +1228,27 @@ class Terrain3DController {
   getMachineWorldPeak() {
     if (!this.machineActor || !this.machineActor.group || !this.machineActor.group.visible) return null;
     const actor = this.machineActor;
-    if (actor.antenna) {
-      actor.antenna.updateWorldMatrix(true, false);
-      const box = new THREE.Box3().setFromObject(actor.antenna);
-      if (Number.isFinite(box.max.y) && box.max.y > -900) {
-        return {
-          x: (box.min.x + box.max.x) * 0.5,
-          y: box.max.y,
-          z: (box.min.z + box.max.z) * 0.5
-        };
-      }
-    }
-    const g = actor.group;
-    g.updateWorldMatrix(true, true);
-    const box = new THREE.Box3().setFromObject(g);
-    if (!Number.isFinite(box.min.x) || !Number.isFinite(box.max.y)) return null;
+    const mst = this.machineState;
+    // Cúspide estática de la antena de Sojourner en reposo (independiente de la vibración dinámica de la antena)
+    // para que el globo de diálogo permanezca 100% inmóvil y estable mientras la antena oscila libremente debajo
+    const scale = actor.scale || 1.18;
     return {
-      x: (box.min.x + box.max.x) * 0.5,
-      y: box.max.y,
-      z: (box.min.z + box.max.z) * 0.5
+      x: mst.x,
+      y: mst.y + (0.60 * scale),
+      z: mst.z
+    };
+  }
+
+  getPenguinWorldPeak() {
+    if (!this.penguinActor || !this.penguinActor.group || !this.penguinActor.group.visible) return null;
+    const actor = this.penguinActor;
+    const st = this.penguinState;
+    const scale = actor.scale || 0.82;
+    // Cúspide estática de la parte superior del casco de Cyberpenguin en reposo
+    return {
+      x: st.x,
+      y: st.y + (st.jumpHeight || 0) + (1.24 * scale),
+      z: st.z
     };
   }
 
@@ -1495,15 +1497,15 @@ class Terrain3DController {
       }
 
       // Distancia de encuadre con zoom moderado (alejado un poco para dar holgura a los globos encima de cada uno)
-      const camDist = Math.max(3.6, Math.min(4.2, dist * 3.15));
+      const camDist = Math.max(3.85, Math.min(4.45, dist * 3.35));
       this.dialogueZoom.camPos.set(
         midX + nx * camDist,
-        midY + 0.66,
+        midY + 0.74,
         midZ + nz * camDist
       );
       this.dialogueZoom.targetPos.set(
         midX,
-        midY + 0.52,
+        midY + 0.58,
         midZ
       );
     } else {

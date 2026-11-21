@@ -3576,8 +3576,15 @@
   function getPenguinHeadPct() {
     const t3d = getTerrain3D();
     if (!world3d.active || !world3d.penguin || !t3d || typeof t3d.projectWorldToScreen !== 'function') return null;
+    if (typeof t3d.getPenguinWorldPeak === 'function') {
+      const peak = t3d.getPenguinWorldPeak();
+      if (peak) {
+        const proj = t3d.projectWorldToScreen(peak.x, peak.y, peak.z);
+        return { x: proj.pctX, y: proj.pctY };
+      }
+    }
     const p = world3d.penguin;
-    const proj = t3d.projectWorldToScreen(p.x, p.y + (p.jumpHeight || 0) + 0.86, p.z);
+    const proj = t3d.projectWorldToScreen(p.x, p.y + (p.jumpHeight || 0) + 1.02, p.z);
     return { x: proj.pctX, y: proj.pctY };
   }
 
@@ -4124,12 +4131,17 @@
       posX = Math.max(minX, Math.min(maxX, x));
 
       dom.stageSpeechBubble.classList.remove('bubble-flipped');
-      // Para Sojourner, elevar el globo con holgura para que la antena UHF ("colita")
-      // y su bola ámbar se aprecien oscilando libremente al hablar
       const isMachine = activeSpeechAnchorKind === 'machine';
-      const clearance = isMachine ? 5.2 : 2.5;
+      // Holgura vertical limpia para que ni la antena de Sojourner ni el casco de Cyberpenguin sean tocados
+      const clearance = isMachine ? 5.2 : 4.8;
       const desiredBottom = isExactTop ? (y - clearance) : (y - 8.5);
-      targetY = Math.max(minSafeBottomPct, Math.min(54, desiredBottom));
+
+      // Límites de seguridad:
+      // Sojourner (derecha) respeta la barra superior de audio/idioma (72px)
+      // Cyberpenguin (izquierda) tiene toda la zona superior despejada (margen mínimo 22px)
+      const topBarClearancePx = isMachine ? 72 : 22;
+      const minSafeBottomPct = ((topBarClearancePx + bubbleH) / Math.max(1, boardH)) * 100;
+      targetY = Math.max(minSafeBottomPct, Math.min(isMachine ? 50 : 47, desiredBottom));
     } else {
       posX = Math.max(22, Math.min(78, x));
       const isFlipped = y < 28;
