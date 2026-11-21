@@ -251,15 +251,34 @@
       }
     }
 
+    const smoothBoundary = [];
+    const bSeg = texture ? 48 : seg;
+    for (let i = 0; i < bSeg; i += 1) {
+      const t = (i / bSeg) * Math.PI * 2;
+      smoothBoundary.push(outline(t));
+    }
+    const finalBoundary = texture ? smoothBoundary : boundary;
+
     return `
       <g>
-        <defs><clipPath id="clip-${uid}"><polygon points="${polyStr(boundary)}" /></clipPath></defs>
+        <defs>
+          <clipPath id="clip-${uid}"><polygon points="${polyStr(finalBoundary)}" /></clipPath>
+          ${texture ? `
+          <radialGradient id="erosShade-${uid}" cx="34%" cy="28%" r="76%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08" />
+            <stop offset="38%" stop-color="#020617" stop-opacity="0" />
+            <stop offset="76%" stop-color="#020617" stop-opacity="0.55" />
+            <stop offset="100%" stop-color="#01040f" stop-opacity="0.88" />
+          </radialGradient>` : ''}
+        </defs>
         <g clip-path="url(#clip-${uid})">
-          ${texture ? `<image href="${texture}" x="${-a * 1.05}" y="${-b * 1.5}" width="${2.1 * a}" height="${3 * b}" preserveAspectRatio="xMidYMid slice" />` : ''}
-          <g opacity="${texture ? '0.35' : '1'}">${faces}</g>
-          ${extras}
+          ${texture
+            ? `<image href="${texture}" x="${-a * 1.05}" y="${-b * 1.5}" width="${2.1 * a}" height="${3 * b}" preserveAspectRatio="xMidYMid slice" />
+               <rect x="${-a * 1.2}" y="${-b * 1.8}" width="${2.4 * a}" height="${3.6 * b}" fill="url(#erosShade-${uid})" />`
+            : `<g>${faces}</g>${extras}`
+          }
         </g>
-        <polygon points="${polyStr(boundary)}" fill="none" stroke="#0b1220" stroke-opacity="0.45" stroke-width="0.7" stroke-linejoin="round" />
+        <polygon points="${polyStr(finalBoundary)}" fill="none" stroke="#0b1220" stroke-opacity="0.45" stroke-width="0.7" stroke-linejoin="round" />
       </g>
     `;
   }
@@ -272,9 +291,9 @@
       b: r * 0.72,
       seed: opts.seed || 303,
       uid: opts.uid,
-      bend: 0.28,
-      taper: 0.12,
-      lumps: 0.07,
+      bend: 0.20,
+      taper: 0.10,
+      lumps: 0.06,
       rings: small ? 3 : 5,
       seg: small ? 14 : 22,
       pal: EROS_PAL,
