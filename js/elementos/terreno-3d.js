@@ -34,12 +34,14 @@ const SITE_CONFIGS = {
     },
     titleEs: 'Ares Vallis',
     titleEn: 'Ares Vallis',
+    hintEs: 'Doble clic para enfocar cualquier punto · Clic derecho para desplazar · Rueda para zoom',
+    hintEn: 'Double-click to focus any point · Right-click to pan · Scroll to zoom',
     exploreFov: 37,
-    inspectFov: 44,
+    inspectFov: 42,
     exploreCamPos: [-1.15, 1.96, 10.6],
     exploreCamTarget: [1.35, 0.72, -12.0],
-    inspectCamPos: [21.0, 18.0, 28.5],
-    inspectCamTarget: [2.5, 0.35, 4.0],
+    inspectCamPos: [8.5, 6.5, 11.5],
+    inspectCamTarget: [0.0, 0.45, -0.5],
     landerPos: [0, 0.08, 0],
     penguinScale: 0.82,
     walkBounds: { minZ: -8.8, maxZ: 6.4, maxRadius: 21.0 }
@@ -790,12 +792,79 @@ class Terrain3DController {
         const controls = new OrbitControls(camera, canvas);
         controls.enableDamping = true;
         controls.dampingFactor = 0.07;
-        controls.maxPolarAngle = Math.PI * 0.445;
-        controls.minPolarAngle = 0.14;
-        controls.minDistance = 4.5;
+        controls.maxPolarAngle = Math.PI * 0.465;
+        controls.minPolarAngle = 0.08;
+        controls.minDistance = 0.85;
         controls.maxDistance = 58;
         controls.enablePan = true;
         controls.enabled = false;
+
+        // Doble clic o toque en el canvas 3D para enfocar y centrar la vista en cualquier objeto o terreno
+        canvas.addEventListener('dblclick', (event) => {
+          if (!this.inspectMode || !this.camera || !this.controls) return;
+          const rect = canvas.getBoundingClientRect();
+          const ndc = new THREE.Vector2(
+            ((event.clientX - rect.left) / rect.width) * 2 - 1,
+            -((event.clientY - rect.top) / rect.height) * 2 + 1
+          );
+          this.raycaster.setFromCamera(ndc, this.camera);
+          const actors = [];
+          if (this.penguinActor && this.penguinActor.group) actors.push(this.penguinActor.group);
+          if (this.machineActor && this.machineActor.group) actors.push(this.machineActor.group);
+          if (this.shipActor && this.shipActor.group) actors.push(this.shipActor.group);
+          this.sampleActors.forEach((entry) => {
+            if (entry.group && entry.group.visible) actors.push(entry.group);
+          });
+          const actorHits = this.raycaster.intersectObjects(actors, true);
+          if (actorHits.length > 0) {
+            const pt = actorHits[0].point;
+            this.focusOnPoint(pt.x, pt.y + 0.2, pt.z);
+            return;
+          }
+          if (this.terrainMeshes.length > 0) {
+            const hits = this.raycaster.intersectObjects(this.terrainMeshes, false);
+            if (hits.length > 0) {
+              const pt = hits[0].point;
+              this.focusOnPoint(pt.x, pt.y + 0.3, pt.z);
+            }
+          }
+        });
+
+        let lastInspectTap = 0;
+        canvas.addEventListener('touchend', (event) => {
+          if (!this.inspectMode || !this.camera || !this.controls) return;
+          const now = performance.now();
+          if (now - lastInspectTap < 320 && event.changedTouches && event.changedTouches.length === 1) {
+            const touch = event.changedTouches[0];
+            const rect = canvas.getBoundingClientRect();
+            const ndc = new THREE.Vector2(
+              ((touch.clientX - rect.left) / rect.width) * 2 - 1,
+              -((touch.clientY - rect.top) / rect.height) * 2 + 1
+            );
+            this.raycaster.setFromCamera(ndc, this.camera);
+            const actors = [];
+            if (this.penguinActor && this.penguinActor.group) actors.push(this.penguinActor.group);
+            if (this.machineActor && this.machineActor.group) actors.push(this.machineActor.group);
+            if (this.shipActor && this.shipActor.group) actors.push(this.shipActor.group);
+            this.sampleActors.forEach((entry) => {
+              if (entry.group && entry.group.visible) actors.push(entry.group);
+            });
+            const actorHits = this.raycaster.intersectObjects(actors, true);
+            if (actorHits.length > 0) {
+              const pt = actorHits[0].point;
+              this.focusOnPoint(pt.x, pt.y + 0.2, pt.z);
+              return;
+            }
+            if (this.terrainMeshes.length > 0) {
+              const hits = this.raycaster.intersectObjects(this.terrainMeshes, false);
+              if (hits.length > 0) {
+                const pt = hits[0].point;
+                this.focusOnPoint(pt.x, pt.y + 0.3, pt.z);
+              }
+            }
+          }
+          lastInspectTap = now;
+        });
 
         this.canvas = canvas;
         this.renderer = renderer;
@@ -2095,6 +2164,22 @@ class Terrain3DController {
     this.targetParallax.y = Math.max(-1, Math.min(1, Number(ny) || 0));
   }
 
+  focusOnPoint(x, y, z, duration = 480) {
+    if (!this.inspectMode || !this.controls) return;
+    const fromT = this.controls.target.clone();
+    const toT = new THREE.Vector3(x, y, z);
+    const startT = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, Math.max(0, (now - startT) / duration));
+      const ease = 1 - Math.pow(1 - t, 3);
+      this.controls.target.lerpVectors(fromT, toT, ease);
+      if (t < 1) {
+        requestAnimationFrame(tick);
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
   setInspectMode(enabled) {
     const next = Boolean(enabled) && Boolean(this.activeSiteId);
     if (this.inspectMode === next) return this.inspectMode;
@@ -2105,13 +2190,22 @@ class Terrain3DController {
     }
 
     if (next) {
+      // Centrar el punto focal inicial directamente en Cyberpenguin y Sojourner
+      const focusTarget = this.baseInspectTarget.clone();
+      if (this.penguinActor && this.penguinActor.group) {
+        focusTarget.x = this.penguinState.x * 0.65 + (this.machineActor ? this.machineState.x * 0.35 : 0);
+        focusTarget.z = this.penguinState.z * 0.65 + (this.machineActor ? this.machineState.z * 0.35 : 0);
+        focusTarget.y = this.getGroundHeightAt(focusTarget.x, focusTarget.z) + 0.35;
+      }
+      const initialCamPos = new THREE.Vector3(focusTarget.x + 3.4, focusTarget.y + 2.5, focusTarget.z + 5.2);
+
       this.camTransition = {
         startTime: performance.now(),
         duration: 720,
         fromPos: this.camera.position.clone(),
         fromTarget: this.controls.target.clone(),
-        toPos: this.baseInspectPos.clone(),
-        toTarget: this.baseInspectTarget.clone(),
+        toPos: initialCamPos,
+        toTarget: focusTarget,
         enableControlsOnEnd: true
       };
       this.controls.enabled = false;
@@ -2230,22 +2324,13 @@ class Terrain3DController {
             tgt.y = tgtGround + 0.25;
           }
 
-          // Colisión real de la cámara con el relieve marciano (5 puntos) para
-          // impedir que al hacer zoom o girar atraviese el suelo y lo vea transparente
+          // Colisión de la cámara con el suelo para impedir que baje por debajo del terreno
           const cx = this.camera.position.x;
           const cz = this.camera.position.z;
-          const rProbe = 1.05;
-          const localPeakY = Math.max(
-            this.getGroundHeightAt(cx, cz),
-            this.getGroundHeightAt(cx + rProbe, cz),
-            this.getGroundHeightAt(cx - rProbe, cz),
-            this.getGroundHeightAt(cx, cz + rProbe),
-            this.getGroundHeightAt(cx, cz - rProbe)
-          );
-          const minCamY = localPeakY + 0.72;
+          const groundY = this.getGroundHeightAt(cx, cz);
+          const minCamY = groundY + 0.22;
           if (this.camera.position.y < minCamY) {
             this.camera.position.y = minCamY;
-            this.camera.lookAt(tgt);
           }
         }
       }
