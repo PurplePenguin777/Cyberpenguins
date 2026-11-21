@@ -954,6 +954,9 @@
 
     // Clic / toque en el escenario para caminar sobre la superficie o flotar en caminata EVA
     dom.isoBoard.addEventListener('click', (event) => {
+      if (world3d.active && world3d.siteId === 'ares-vallis' && !marsAmbience.active) {
+        startMarsAmbience();
+      }
       if (is3dInspectMode || Date.now() < suppressBoardClickUntil) {
         return;
       }
@@ -1262,11 +1265,15 @@
 
     const presets = {
       step: { freqs: [523.25, 659.25], gain: 0.025, stepMs: 35, duration: 0.16, wave: 'sine' },
+      stepMars: { freqs: [174.61, 220.0], gain: 0.026, stepMs: 32, duration: 0.14, wave: 'sine', filterFreq: 820 },
       jump: { freqs: [440.0, 587.33, 783.99], gain: 0.036, stepMs: 38, duration: 0.24, wave: 'sine' },
-      jumpMars: { freqs: [329.63, 440.0, 523.25], gain: 0.038, stepMs: 28, duration: 0.18, wave: 'sine' },
+      jumpMars: { freqs: [220.0, 329.63, 440.0], gain: 0.034, stepMs: 32, duration: 0.22, wave: 'sine', filterFreq: 950, noisePuff: true },
       jumpMoon: { freqs: [523.25, 659.25, 880.0, 1046.5], gain: 0.034, stepMs: 52, duration: 0.36, wave: 'sine' },
-      rcs: { freqs: [880.0, 1174.66], gain: 0.018, stepMs: 28, duration: 0.14, wave: 'triangle' },
+      rcs: { freqs: [880.0, 1174.66], gain: 0.018, stepMs: 28, duration: 0.14, wave: 'triangle', noisePuff: true },
       sample: { freqs: [523.25, 659.25, 783.99, 1046.5], gain: 0.05, stepMs: 65, duration: 0.55, wave: 'sine' },
+      analyzeSample: { freqs: [392.0, 587.33, 783.99, 1174.66, 1567.98], gain: 0.046, stepMs: 56, duration: 0.5, wave: 'sine', isScan: true },
+      sojournerRadio: { freqs: [1760.0, 2217.46, 1760.0, 2637.02], gain: 0.026, stepMs: 36, duration: 0.08, wave: 'triangle' },
+      sojournerMotor: { freqs: [130.81, 196.0, 164.81], gain: 0.018, stepMs: 45, duration: 0.14, wave: 'sawtooth', filterFreq: 550 },
       arrival: { freqs: [261.63, 392.0, 493.88, 659.25], gain: 0.038, stepMs: 75, duration: 0.85, wave: 'sine' },
       launch: { freqs: [65.41, 82.41, 110.0, 146.83, 220.0, 329.63], gain: 0.05, stepMs: 80, duration: 0.9, wave: 'triangle' }
     };
@@ -1276,6 +1283,52 @@
     try {
       const now = ctx.currentTime;
       const targetGain = Math.max(0.0001, preset.gain * (soundVolume / 0.8));
+
+      // Puff sutil de gas frío comprimido (mochila EVA en saltos marcianos o maniobras RCS)
+      if (preset.noisePuff) {
+        try {
+          const puffBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.09), ctx.sampleRate);
+          const pData = puffBuf.getChannelData(0);
+          for (let i = 0; i < pData.length; i++) {
+            pData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (pData.length * 0.35));
+          }
+          const pSrc = ctx.createBufferSource();
+          pSrc.buffer = puffBuf;
+          const pFilt = ctx.createBiquadFilter();
+          pFilt.type = 'bandpass';
+          pFilt.frequency.setValueAtTime(1400, now);
+          pFilt.Q.setValueAtTime(1.5, now);
+          const pGain = ctx.createGain();
+          pGain.gain.setValueAtTime(targetGain * 0.45, now);
+          pSrc.connect(pFilt);
+          pFilt.connect(pGain);
+          pGain.connect(ctx.destination);
+          pSrc.start(now);
+        } catch (_e) { }
+      }
+
+      // Escaneo espectrométrico de rayos X alfa (APXS de Sojourner en rocas)
+      if (preset.isScan) {
+        try {
+          const scanOsc = ctx.createOscillator();
+          const scanGain = ctx.createGain();
+          scanOsc.type = 'sawtooth';
+          scanOsc.frequency.setValueAtTime(320, now);
+          scanOsc.frequency.exponentialRampToValueAtTime(1400, now + 0.28);
+          scanGain.gain.setValueAtTime(0.0001, now);
+          scanGain.gain.exponentialRampToValueAtTime(targetGain * 0.35, now + 0.05);
+          scanGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+          const scanFilter = ctx.createBiquadFilter();
+          scanFilter.type = 'lowpass';
+          scanFilter.frequency.setValueAtTime(1200, now);
+          scanOsc.connect(scanFilter);
+          scanFilter.connect(scanGain);
+          scanGain.connect(ctx.destination);
+          scanOsc.start(now);
+          scanOsc.stop(now + 0.35);
+        } catch (_e) { }
+      }
+
       preset.freqs.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gainNode = ctx.createGain();
@@ -1289,7 +1342,16 @@
         gainNode.gain.exponentialRampToValueAtTime(targetGain, start + 0.02);
         gainNode.gain.exponentialRampToValueAtTime(0.0001, stop);
 
-        osc.connect(gainNode);
+        if (preset.filterFreq) {
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(preset.filterFreq, start);
+          osc.connect(filter);
+          filter.connect(gainNode);
+        } else {
+          osc.connect(gainNode);
+        }
+
         gainNode.connect(ctx.destination);
         osc.start(start);
         osc.stop(stop + 0.02);
@@ -1297,6 +1359,205 @@
     } catch (_err) {
       // Ignorar si el navegador restringe Web Audio antes de interacción
     }
+  }
+
+  /* ========================================================================
+     Paisaje Sonoro Procedural de Marte (Ares Vallis & Sojourner)
+     - Viento marciano de baja presión (simulación acústica de CO2 basada en NASA)
+     - Música de fondo etérea procedural (pads espaciales armónicos en loop infinito)
+     ======================================================================== */
+
+  let marsAmbience = {
+    active: false,
+    masterGain: null,
+    windGain: null,
+    musicGain: null,
+    windSource: null,
+    windFilter: null,
+    windLfo: null,
+    musicTimer: null
+  };
+
+  function createNoiseBuffer(ctx, durationSec) {
+    const bufferSize = Math.floor(ctx.sampleRate * durationSec);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let lastOut = 0.0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      lastOut = (lastOut + 0.02 * white) / 1.02;
+      data[i] = lastOut * 3.5;
+    }
+    return buffer;
+  }
+
+  function startMarsAmbience() {
+    if (marsAmbience.active) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      marsAmbience.active = true;
+
+      // Master Gain para la escena de Marte
+      const master = ctx.createGain();
+      const currentVol = (soundEnabled && soundVolume > 0) ? soundVolume : 0;
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(Math.max(0.0001, currentVol * 0.18), now + 2.5);
+      master.connect(ctx.destination);
+      marsAmbience.masterGain = master;
+
+      // 1. VIENTO MARCIANO (Filtro pasa-bajos / banda modulado por LFO)
+      const windBuffer = createNoiseBuffer(ctx, 4.0);
+      const windSource = ctx.createBufferSource();
+      windSource.buffer = windBuffer;
+      windSource.loop = true;
+
+      const windFilter = ctx.createBiquadFilter();
+      windFilter.type = 'bandpass';
+      windFilter.frequency.setValueAtTime(140, now);
+      windFilter.Q.setValueAtTime(2.2, now);
+
+      // LFO para modular lentamente las ráfagas de viento entre 85 y 230 Hz
+      const windLfo = ctx.createOscillator();
+      const windLfoGain = ctx.createGain();
+      windLfo.frequency.setValueAtTime(0.14, now);
+      windLfoGain.gain.setValueAtTime(65, now);
+      windLfo.connect(windFilter.frequency);
+      windLfo.start(now);
+
+      const windGain = ctx.createGain();
+      windGain.gain.setValueAtTime(0.35, now);
+
+      windSource.connect(windFilter);
+      windFilter.connect(windGain);
+      windGain.connect(master);
+      windSource.start(now);
+
+      marsAmbience.windSource = windSource;
+      marsAmbience.windFilter = windFilter;
+      marsAmbience.windLfo = windLfo;
+      marsAmbience.windGain = windGain;
+
+      // 2. MÚSICA AMBIENTAL PROCEDURAL (Acordes etéreos espaciales)
+      const musicGain = ctx.createGain();
+      musicGain.gain.setValueAtTime(0.42, now);
+      musicGain.connect(master);
+      marsAmbience.musicGain = musicGain;
+
+      // Progresión de acordes espaciales marcianos (Dm9 -> Bbmaj7 -> Csus2 -> Am7)
+      const chords = [
+        [73.42, 146.83, 220.0, 261.63, 329.63], // Dm9
+        [58.27, 116.54, 174.61, 220.0, 293.66], // Bbmaj7
+        [65.41, 130.81, 196.0, 293.66, 329.63], // Csus2
+        [55.0, 110.0, 164.81, 261.63, 329.63]   // Am7
+      ];
+
+      let chordIdx = 0;
+
+      function playNextPad() {
+        if (!marsAmbience.active) return;
+        const padCtx = getAudioContext();
+        if (!padCtx) return;
+
+        try {
+          const tNow = padCtx.currentTime;
+          const chord = chords[chordIdx % chords.length];
+          chordIdx++;
+          const chordDuration = 7.5;
+
+          chord.forEach((freq, fIdx) => {
+            const osc = padCtx.createOscillator();
+            const gain = padCtx.createGain();
+            const filter = padCtx.createBiquadFilter();
+
+            osc.type = (fIdx === 0) ? 'sine' : (fIdx % 2 === 0 ? 'triangle' : 'sine');
+            const detune = (fIdx % 2 === 0 ? 3 : -3) + (Math.random() * 2 - 1);
+            osc.frequency.setValueAtTime(freq, tNow);
+            osc.detune.setValueAtTime(detune, tNow);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(fIdx === 0 ? 220 : 680, tNow);
+
+            const voiceGain = (fIdx === 0 ? 0.09 : 0.055) / chord.length;
+            gain.gain.setValueAtTime(0.0001, tNow);
+            gain.gain.exponentialRampToValueAtTime(voiceGain, tNow + 2.8);
+            gain.gain.setValueAtTime(voiceGain, tNow + chordDuration - 2.8);
+            gain.gain.exponentialRampToValueAtTime(0.0001, tNow + chordDuration);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(musicGain);
+
+            osc.start(tNow);
+            osc.stop(tNow + chordDuration + 0.1);
+          });
+
+          // Destello estelar armónico ocasional
+          if (chordIdx % 2 === 0) {
+            const twinkleFreqs = [587.33, 880.0, 1046.5, 1318.51];
+            const tf = twinkleFreqs[Math.floor(Math.random() * twinkleFreqs.length)];
+            const twOsc = padCtx.createOscillator();
+            const twGain = padCtx.createGain();
+            twOsc.type = 'sine';
+            twOsc.frequency.setValueAtTime(tf, tNow + 2.0);
+            twGain.gain.setValueAtTime(0.0001, tNow + 2.0);
+            twGain.gain.exponentialRampToValueAtTime(0.012, tNow + 2.3);
+            twGain.gain.exponentialRampToValueAtTime(0.0001, tNow + 5.5);
+            twOsc.connect(twGain);
+            twGain.connect(musicGain);
+            twOsc.start(tNow + 2.0);
+            twOsc.stop(tNow + 5.6);
+          }
+        } catch (_err) { }
+
+        marsAmbience.musicTimer = setTimeout(playNextPad, 5800);
+      }
+
+      playNextPad();
+    } catch (_err) {
+      marsAmbience.active = false;
+    }
+  }
+
+  function stopMarsAmbience() {
+    if (!marsAmbience.active) return;
+    marsAmbience.active = false;
+    clearTimeout(marsAmbience.musicTimer);
+    marsAmbience.musicTimer = null;
+
+    const ctx = getAudioContext();
+    if (ctx && marsAmbience.masterGain) {
+      try {
+        const now = ctx.currentTime;
+        marsAmbience.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+        setTimeout(() => {
+          if (marsAmbience.windSource) {
+            try { marsAmbience.windSource.stop(); } catch (_e) { }
+            marsAmbience.windSource = null;
+          }
+          if (marsAmbience.windLfo) {
+            try { marsAmbience.windLfo.stop(); } catch (_e) { }
+            marsAmbience.windLfo = null;
+          }
+          marsAmbience.masterGain = null;
+          marsAmbience.windGain = null;
+          marsAmbience.musicGain = null;
+        }, 1300);
+      } catch (_e) { }
+    }
+  }
+
+  function updateMarsAmbienceVolume() {
+    if (!marsAmbience.active || !marsAmbience.masterGain) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const targetVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.18) : 0.0001;
+      marsAmbience.masterGain.gain.setTargetAtTime(targetVol, now, 0.12);
+    } catch (_e) { }
   }
 
   function updateSoundUI() {
@@ -1341,6 +1602,7 @@
     if (typeof CYBERPENGUINS_TTS !== 'undefined' && typeof CYBERPENGUINS_TTS.setVolume === 'function') {
       CYBERPENGUINS_TTS.setVolume(soundVolume);
     }
+    updateMarsAmbienceVolume();
     updateSoundUI();
   }
 
@@ -1774,6 +2036,7 @@
   }
 
   function resetWorld3d(keepUiClasses) {
+    stopMarsAmbience();
     world3d.active = false;
     world3d.siteId = '';
     world3d.ship = null;
@@ -2175,7 +2438,8 @@
               dom.penguinSprite.innerHTML = MODELS.cyberpenguin(penguinDir);
               lastRenderedDir = penguinDir;
             }
-            playHarmony('step');
+            const isMars = state.currentChapterId === 'mars' || (world3d.siteId && world3d.siteId.includes('mars')) || world3d.siteId === 'ares-vallis';
+            playHarmony(isMars ? 'stepMars' : 'step');
           }
         }
       }
@@ -2243,7 +2507,8 @@
     if (dom.penguinActor) {
       dom.penguinActor.classList.add('walking');
     }
-    playHarmony('step');
+    const isMars = state.currentChapterId === 'mars' || (world3d.siteId && world3d.siteId.includes('mars')) || world3d.siteId === 'ares-vallis';
+    playHarmony(isMars ? 'stepMars' : 'step');
   }
 
   function initWorld3dAnchors(chapter, siteId) {
@@ -2325,6 +2590,11 @@
 
     world3d.active = true;
     world3d.siteId = siteId;
+    if (siteId === 'ares-vallis') {
+      startMarsAmbience();
+    } else {
+      stopMarsAmbience();
+    }
     if (dom.isoBoard) {
       dom.isoBoard.classList.add('has-3d-terrain');
     }
@@ -3874,6 +4144,18 @@
     else if (isShip) dom.stageSpeechBubble.classList.add('speaker-is-ship');
     else dom.stageSpeechBubble.classList.add('speaker-is-machine');
 
+    if (speaker === 'machine' && activeDialogueMachine && activeDialogueMachine.id === 'sojourner') {
+      playHarmony('sojournerMotor');
+    }
+
+    if (marsAmbience.active && marsAmbience.masterGain) {
+      const aCtx = getAudioContext();
+      if (aCtx) {
+        const duckVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.07) : 0.0001;
+        marsAmbience.masterGain.gain.setTargetAtTime(duckVol, aCtx.currentTime, 0.2);
+      }
+    }
+
     const isEnglish = (state.currentLanguage === 'en');
 
     if (dom.speechBubbleAvatar) {
@@ -4002,6 +4284,9 @@
 
   function startBranchingDialogue(machine) {
     activeDialogueMachine = machine;
+    if (machine && machine.id === 'sojourner') {
+      playHarmony('sojournerRadio');
+    }
     const branch = machine.branchingDialogue;
     if (!branch) {
       fallbackLinearDialogue(machine);
@@ -4344,6 +4629,13 @@
     setActiveSpeakerVisual(null);
     TTS.stop();
     activeDialogueMachine = null;
+    if (marsAmbience.active && marsAmbience.masterGain) {
+      const aCtx = getAudioContext();
+      if (aCtx) {
+        const normVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.18) : 0.0001;
+        marsAmbience.masterGain.gain.setTargetAtTime(normVol, aCtx.currentTime, 0.4);
+      }
+    }
     activeBranchState = null;
     hideSpeechBubble();
   }
@@ -4536,7 +4828,9 @@
       updateLocationPill(chapter, activeMachine);
       renderStageEntities(chapter);
       const reqs = checkSiteRequirements(chapter);
-      if (reqs.canLeave) {
+      if (isInPlaceSample(targetSample.id)) {
+        playHarmony('analyzeSample');
+      } else if (reqs.canLeave) {
         playHarmony('star');
       } else {
         playHarmony('sample');
