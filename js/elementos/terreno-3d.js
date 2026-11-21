@@ -8,9 +8,9 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import { OrbitControls } from '../vendor/three/controls/OrbitControls.js';
 
-const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121o';
-const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121o';
-const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121o';
+const PENGUIN_MODEL_URL = 'assets/models/cyberpenguin.glb?v=20261121p';
+const SOJOURNER_MODEL_URL = 'assets/models/sojourner.glb?v=20261121p';
+const SHIP_MODEL_URL = 'assets/models/nave-pinguino.glb?v=20261121p';
 
 const SITE_CONFIGS = {
   'ares-vallis': {
