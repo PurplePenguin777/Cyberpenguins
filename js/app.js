@@ -2210,42 +2210,54 @@
       const dx = target.x - cur.x;
       const dz = target.z - cur.z;
       const len = Math.hypot(dx, dz);
-      if (len < 0.12) return;
+      if (len < 0.15) return;
       const ux = dx / len;
       const uz = dz / len;
       const nx = -uz;
       const nz = ux;
 
-      const tProj = (o.cx - cur.x) * ux + (o.cz - cur.z) * uz;
-      if (tProj <= 0.1 || tProj >= len - 0.1) return;
-
-      const perpDist = (o.cx - cur.x) * nx + (o.cz - cur.z) * nz;
       const clearDist = o.r + 0.58;
-
-      const d1 = resolveWorld3dPoint(o.cx + nx * clearDist, o.cz + nz * clearDist);
-      const d2 = resolveWorld3dPoint(o.cx - nx * clearDist, o.cz - nz * clearDist);
+      const t1 = resolveWorld3dPoint(o.cx + nx * clearDist, o.cz + nz * clearDist);
+      const t2 = resolveWorld3dPoint(o.cx - nx * clearDist, o.cz - nz * clearDist);
 
       const isBlocked = (pt) => {
-        return obsList.some((other) => other !== o && Math.hypot(pt.x - other.cx, pt.z - other.cz) < (other.r + 0.42));
+        return obsList.some((other) => other !== o && Math.hypot(pt.x - other.cx, pt.z - other.cz) < (other.r + 0.45));
       };
-      const b1 = isBlocked(d1);
-      const b2 = isBlocked(d2);
+      const b1 = isBlocked(t1);
+      const b2 = isBlocked(t2);
 
-      let detour = null;
-      if (b1 && !b2) {
-        detour = d2;
-      } else if (!b1 && b2) {
-        detour = d1;
-      } else {
-        const dist1 = Math.hypot(d1.x - cur.x, d1.z - cur.z) + Math.hypot(target.x - d1.x, target.z - d1.z);
-        const dist2 = Math.hypot(d2.x - cur.x, d2.z - cur.z) + Math.hypot(target.x - d2.x, target.z - d2.z);
-        const prefer1 = (perpDist <= 0) ? (dist1 <= dist2 * 1.15) : (dist1 < dist2 * 0.85);
-        detour = prefer1 ? d1 : d2;
+      let side = 1;
+      if (b1 && !b2) side = -1;
+      else if (!b1 && b2) side = 1;
+      else {
+        const dist1 = Math.hypot(t1.x - cur.x, t1.z - cur.z) + Math.hypot(target.x - t1.x, target.z - t1.z);
+        const dist2 = Math.hypot(t2.x - cur.x, t2.z - cur.z) + Math.hypot(target.x - t2.x, target.z - t2.z);
+        const perpDist = (cur.x - o.cx) * nx + (cur.z - o.cz) * nz;
+        side = (perpDist <= 0) ? (dist1 <= dist2 * 1.15 ? 1 : -1) : (dist1 < dist2 * 0.85 ? 1 : -1);
       }
 
-      if (Math.hypot(detour.x - cur.x, detour.z - cur.z) > 0.35 && Math.hypot(detour.x - target.x, detour.z - target.z) > 0.35) {
-        waypoints.push(detour);
-        cur = detour;
+      const sx = nx * side;
+      const sz = nz * side;
+
+      // Puntos de paso para rodear la roca suavemente:
+      // 1. Ápice lateral (al lado de la roca)
+      // 2. Punto de salida (adelante de la roca en diagonal hacia el destino)
+      const apex = resolveWorld3dPoint(o.cx + sx * clearDist, o.cz + sz * clearDist);
+      const exitPt = resolveWorld3dPoint(
+        o.cx + (ux * 0.68 + sx * 0.72) * clearDist,
+        o.cz + (uz * 0.68 + sz * 0.72) * clearDist
+      );
+
+      const pAlong = (cur.x - o.cx) * ux + (cur.z - o.cz) * uz;
+      // Si el pingüino aún no ha llegado al ápice, pasar por el ápice
+      if (pAlong < 0.15 * clearDist && Math.hypot(apex.x - cur.x, apex.z - cur.z) > 0.35) {
+        waypoints.push(apex);
+        cur = apex;
+      }
+      // Siempre pasar por el punto de salida para salir librando la roca por completo
+      if (Math.hypot(exitPt.x - cur.x, exitPt.z - cur.z) > 0.32 && Math.hypot(exitPt.x - target.x, exitPt.z - target.z) > 0.35) {
+        waypoints.push(exitPt);
+        cur = exitPt;
       }
     });
     waypoints.push(target);

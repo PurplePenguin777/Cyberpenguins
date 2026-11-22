@@ -1931,13 +1931,24 @@ class Terrain3DController {
       const forwardDot = dirX * toObsX + dirZ * toObsZ;
       if (forwardDot < 0.05 && d >= safeR) return;
 
-      // Sentido de giro invariante respecto al eje obstáculo-destino para eliminar oscilaciones
-      const toTgtX = targetX - ox;
-      const toTgtZ = targetZ - oz;
-      const cross = rx * toTgtZ - rz * toTgtX;
-      const turnSign = cross >= 0 ? 1 : -1;
-      const tangX = -toObsZ * turnSign;
-      const tangZ = toObsX * turnSign;
+      // Tangente orientada siempre en el hemisferio de avance hacia el destino (evita giros hacia atrás o bucles)
+      const t1x = -toObsZ;
+      const t1z = toObsX;
+      const dot1 = t1x * dirX + t1z * dirZ;
+      let tangX = t1x;
+      let tangZ = t1z;
+      if (dot1 < 0) {
+        tangX = -t1x;
+        tangZ = -t1z;
+      } else if (Math.abs(dot1) < 1e-4) {
+        const toTgtX = targetX - ox;
+        const toTgtZ = targetZ - oz;
+        const cross = rx * toTgtZ - rz * toTgtX;
+        if (cross < 0) {
+          tangX = -t1x;
+          tangZ = -t1z;
+        }
+      }
 
       const t = clampVal(1.0 - (d - safeR) / lookHalo, 0, 1);
       const smoothT = t * t * (3 - 2 * t);
