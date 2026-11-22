@@ -2190,7 +2190,7 @@
     const t = Math.max(0, Math.min(1, ((cx - ax) * dx + (cz - az) * dz) / lenSq));
     const px = ax + t * dx;
     const pz = az + t * dz;
-    return Math.hypot(px - cx, pz - cz) < r * 0.96;
+    return Math.hypot(px - cx, pz - cz) < (r + 0.32);
   }
 
   function buildWorld3dRoute(fromW, toW) {
@@ -2203,14 +2203,35 @@
     const waypoints = [];
     let cur = { x: fromW.x, z: fromW.z };
     obsList.forEach((o) => {
+      // Si el objetivo final está justo en el objeto (p. ej. examinar la roca o rover), no rodearlo
+      if (Math.hypot(target.x - o.cx, target.z - o.cz) <= o.r + 0.52) return;
       if (!segHitsCircle2D(cur.x, cur.z, target.x, target.z, o.cx, o.cz, o.r)) return;
-      const front = resolveWorld3dPoint(o.cx, o.cz + o.r * 1.35);
-      const back = resolveWorld3dPoint(o.cx, o.cz - o.r * 1.35);
-      const avgZ = (cur.z + target.z) * 0.5;
-      const detour = (avgZ < o.cz - 0.3 && Math.hypot(back.x - o.cx, back.z - o.cz) >= o.r * 1.02)
-        ? back
-        : front;
-      if (Math.hypot(detour.x - cur.x, detour.z - cur.z) > 0.45 && Math.hypot(detour.x - target.x, detour.z - target.z) > 0.45) {
+
+      const dx = target.x - cur.x;
+      const dz = target.z - cur.z;
+      const len = Math.hypot(dx, dz);
+      if (len < 0.12) return;
+      const ux = dx / len;
+      const uz = dz / len;
+      const nx = -uz;
+      const nz = ux;
+
+      const tProj = (o.cx - cur.x) * ux + (o.cz - cur.z) * uz;
+      if (tProj <= 0.1 || tProj >= len - 0.1) return;
+
+      const perpDist = (o.cx - cur.x) * nx + (o.cz - cur.z) * nz;
+      const clearDist = o.r + 0.58;
+
+      const d1 = resolveWorld3dPoint(o.cx + nx * clearDist, o.cz + nz * clearDist);
+      const d2 = resolveWorld3dPoint(o.cx - nx * clearDist, o.cz - nz * clearDist);
+
+      const dist1 = Math.hypot(d1.x - cur.x, d1.z - cur.z) + Math.hypot(target.x - d1.x, target.z - d1.z);
+      const dist2 = Math.hypot(d2.x - cur.x, d2.z - cur.z) + Math.hypot(target.x - d2.x, target.z - d2.z);
+
+      const prefer1 = (perpDist <= 0) ? (dist1 <= dist2 * 1.15) : (dist1 < dist2 * 0.85);
+      const detour = prefer1 ? d1 : d2;
+
+      if (Math.hypot(detour.x - cur.x, detour.z - cur.z) > 0.35 && Math.hypot(detour.x - target.x, detour.z - target.z) > 0.35) {
         waypoints.push(detour);
         cur = detour;
       }
@@ -2513,7 +2534,11 @@
           wa.stallMs = 0;
         }
 
-        if (newRem <= 0.16 || (wa.stallMs || 0) > 160) {
+        const isLastWaypoint = (wa.idx >= wa.waypoints.length - 1);
+        const reachedWaypoint = (newRem <= (isLastWaypoint ? 0.22 : 0.32));
+        const stalled = (wa.stallMs || 0) > (isLastWaypoint ? 680 : 380);
+
+        if (reachedWaypoint || stalled) {
           wa.idx += 1;
           wa.stallMs = 0;
           wa.steerDir = null;
@@ -2526,7 +2551,8 @@
             }
             if (dom.penguinActor) dom.penguinActor.classList.remove('walking');
             syncDomEntitiesToWorld3d(t3d);
-            if (wa.onArrive) wa.onArrive();
+            // Solo ejecutar onArrive si realmente llegó al destino (evitar falsas aperturas al atascarse)
+            if (wa.onArrive && newRem <= 0.65) wa.onArrive();
           } else {
             const nextPt = wa.waypoints[wa.idx];
             if (nextPt.x < phys.x - 0.15) penguinDir = 'left';

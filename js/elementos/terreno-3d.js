@@ -1929,7 +1929,7 @@ class Terrain3DController {
       const toObsX = -rx / d;
       const toObsZ = -rz / d;
       const forwardDot = dirX * toObsX + dirZ * toObsZ;
-      if (forwardDot < 0.05) return;
+      if (forwardDot < 0.05 && d >= safeR) return;
 
       // Usar dirección previa (si existe) para mantener histéresis y evitar que oscile izq/der
       const refX = prevDir ? prevDir.x : dirX;
@@ -1940,12 +1940,17 @@ class Terrain3DController {
       const tangZ = toObsX * turnSign;
 
       const t = clampVal(1.0 - (d - safeR) / lookHalo, 0, 1);
-      const w = t * t * (3 - 2 * t) * 0.85;
-      dirX = dirX * (1 - w) + tangX * w;
-      dirZ = dirZ * (1 - w) + tangZ * w;
-      const len = Math.hypot(dirX, dirZ) || 1;
-      dirX /= len;
-      dirZ /= len;
+      const smoothT = t * t * (3 - 2 * t);
+      let steerX = dirX * (1 - smoothT) + tangX * smoothT;
+      let steerZ = dirZ * (1 - smoothT) + tangZ * smoothT;
+      if (d < safeR) {
+        const pushOut = Math.min(0.65, (safeR - d) * 2.5);
+        steerX += (rx / d) * pushOut;
+        steerZ += (rz / d) * pushOut;
+      }
+      const len = Math.hypot(steerX, steerZ) || 1;
+      dirX = steerX / len;
+      dirZ = steerZ / len;
     };
 
     // 1. Evitación suave alrededor de la nave Ranger
