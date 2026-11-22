@@ -182,11 +182,7 @@
     } catch (_) { }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  /* Arranque seguro al final del módulo (tras inicializar consts/lets para evitar TDZ) */
 
 
   /* ========================================================================
@@ -450,10 +446,7 @@
     }
     const hasLaunchedBefore = Boolean(
       state.launched ||
-      (typeof global.localStorage !== 'undefined' && (
-        global.localStorage.getItem('cyberpenguins_launched') === 'true' ||
-        global.localStorage.getItem(DATA.STORAGE_KEY)
-      ))
+      (typeof global.localStorage !== 'undefined' && global.localStorage.getItem('cyberpenguins_launched') === 'true')
     );
 
     if (hasLaunchedBefore) {
@@ -997,7 +990,7 @@
 
     // Clic / toque en el escenario para caminar sobre la superficie o flotar en caminata EVA
     dom.isoBoard.addEventListener('click', (event) => {
-      if (world3d.active && world3d.siteId === 'ares-vallis' && !marsAmbience.active) {
+      if (world3d.active && world3d.siteId === 'ares-vallis') {
         startMarsAmbience();
       }
       if (is3dInspectMode || Date.now() < suppressBoardClickUntil) {
@@ -1452,19 +1445,17 @@
   }
 
   function unlockAudioOnGesture() {
-    const ctx = getAudioContext();
     const music = getMusic();
     const isGameActive = Boolean(dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden'));
     const targetTrack = isGameActive ? 'scene' : 'menu';
 
-    if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
-      ctx.resume().then(() => {
-        if (music && typeof music.playTrack === 'function') {
-          music.playTrack(targetTrack);
-        }
-      }).catch(() => {});
-    } else if (music && typeof music.playTrack === 'function') {
+    // Llamar síncronamente dentro del gesto para desbloquear Web Audio en Safari
+    if (music && typeof music.playTrack === 'function') {
       music.playTrack(targetTrack);
+    }
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+      ctx.resume().catch(() => {});
     }
   }
 
@@ -4306,12 +4297,9 @@
       playHarmony('sojournerMotor');
     }
 
-    if (marsAmbience.active && marsAmbience.masterGain) {
-      const aCtx = getAudioContext();
-      if (aCtx) {
-        const duckVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.22) : 0.0001;
-        marsAmbience.masterGain.gain.setTargetAtTime(duckVol, aCtx.currentTime, 0.2);
-      }
+    const music = getMusic();
+    if (music && typeof music.setDucking === 'function') {
+      music.setDucking(true);
     }
 
     const isEnglish = (state.currentLanguage === 'en');
@@ -4857,12 +4845,9 @@
     setActiveSpeakerVisual(null);
     TTS.stop();
     activeDialogueMachine = null;
-    if (marsAmbience.active && marsAmbience.masterGain) {
-      const aCtx = getAudioContext();
-      if (aCtx) {
-        const normVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.65) : 0.0001;
-        marsAmbience.masterGain.gain.setTargetAtTime(normVol, aCtx.currentTime, 0.4);
-      }
+    const music = getMusic();
+    if (music && typeof music.setDucking === 'function') {
+      music.setDucking(false);
     }
     activeBranchState = null;
     hideSpeechBubble();
@@ -5824,5 +5809,11 @@
     if (dom.howToPlayModal) closeHowToPlayModal();
     if (dom.aboutProjectModal) closeAboutProjectModal();
     hideStageActionPrompt();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })(typeof window !== 'undefined' ? window : globalThis);

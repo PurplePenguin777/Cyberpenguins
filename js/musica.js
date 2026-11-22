@@ -17,10 +17,13 @@
 
   let audioCtx = null;
   let masterGain = null;
+  let duckGain = null;
   let limiter = null;
   let currentVolume = 0.8;
   let isMuted = false;
+  let isDucked = false;
   let currentTrackName = null; // 'menu' | 'scene' | null
+  let desiredTrackName = null;
   let schedulerTimer = null;
   let isPaused = false;
   let currentSiteId = '';
@@ -231,22 +234,26 @@
     limiter.attack.setValueAtTime(0.004, audioCtx.currentTime);
     limiter.release.setValueAtTime(0.18, audioCtx.currentTime);
 
-    // Master volume gain
+    // Master volume & ducking gain
     masterGain = audioCtx.createGain();
     const effectiveVol = isMuted ? 0.0001 : Math.max(0.0001, currentVolume * 0.75);
     masterGain.gain.setValueAtTime(effectiveVol, audioCtx.currentTime);
 
+    duckGain = audioCtx.createGain();
+    duckGain.gain.setValueAtTime(isDucked ? 0.28 : 1.0, audioCtx.currentTime);
+
+    duckGain.connect(masterGain);
     masterGain.connect(limiter);
     limiter.connect(audioCtx.destination);
 
     // Sub-gains for track crossfade
     TVA.gainNode = audioCtx.createGain();
     TVA.gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-    TVA.gainNode.connect(masterGain);
+    TVA.gainNode.connect(duckGain);
 
     AC_ZELDA.gainNode = audioCtx.createGain();
     AC_ZELDA.gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-    AC_ZELDA.gainNode.connect(masterGain);
+    AC_ZELDA.gainNode.connect(duckGain);
   }
 
   /* ========================================================================
@@ -400,20 +407,25 @@
       lfo.frequency.setValueAtTime(5.4, time);
 
       // El vibrato entra gradualmente después de 0.35s para dar emoción humana
+      const vibStart = Math.min(time + 0.35, time + duration * 0.5);
+      const vibEnd = Math.max(vibStart + 0.05, Math.min(time + 0.9, time + duration));
       lfoGain.gain.setValueAtTime(0.0, time);
-      lfoGain.gain.setValueAtTime(0.0, time + 0.35);
-      lfoGain.gain.linearRampToValueAtTime(freq * 0.016, time + 0.9);
-      lfo.connect(osc.frequency);
+      lfoGain.gain.setValueAtTime(0.0, vibStart);
+      lfoGain.gain.linearRampToValueAtTime(freq * 0.016, vibEnd);
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
       lfo.start(time);
 
+      const attackGlideEnd = Math.min(time + 0.14, time + duration * 0.6);
       osc.type = 'sine';
       // Portamento desde la nota anterior
       osc.frequency.setValueAtTime(TVA.lastThereminFreq, time);
-      osc.frequency.exponentialRampToValueAtTime(freq, time + 0.14);
+      osc.frequency.exponentialRampToValueAtTime(freq, attackGlideEnd);
       TVA.lastThereminFreq = freq;
 
-      if (glideToFreq && glideToFreq > 0) {
-        osc.frequency.setValueAtTime(freq, time + duration - 0.18);
+      if (glideToFreq && glideToFreq > 0 && duration > 0.25) {
+        const glideStart = Math.max(attackGlideEnd + 0.01, time + duration - 0.18);
+        osc.frequency.setValueAtTime(freq, glideStart);
         osc.frequency.exponentialRampToValueAtTime(glideToFreq, time + duration);
         TVA.lastThereminFreq = glideToFreq;
       }
@@ -421,9 +433,11 @@
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(1600, time);
 
+      const fadeInEnd = Math.min(time + 0.18, time + duration * 0.45);
+      const fadeOutStart = Math.max(fadeInEnd + 0.01, time + duration - 0.15);
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.14, time + 0.18);
-      gain.gain.setValueAtTime(0.14, time + duration - 0.15);
+      gain.gain.linearRampToValueAtTime(0.14, fadeInEnd);
+      gain.gain.setValueAtTime(0.14, fadeOutStart);
       gain.gain.linearRampToValueAtTime(0.0001, time + duration);
 
       osc.connect(filter);
@@ -455,12 +469,15 @@
       // Vibrato suave (4.8 Hz, lírico y dulce)
       const lfo = audioCtx.createOscillator();
       const lfoGain = audioCtx.createGain();
+      const vibStart = Math.min(time + 0.22, time + duration * 0.45);
+      const vibEnd = Math.max(vibStart + 0.05, Math.min(time + 0.65, time + duration));
       lfo.frequency.setValueAtTime(4.8, time);
       lfoGain.gain.setValueAtTime(0.0, time);
-      lfoGain.gain.setValueAtTime(0.0, time + 0.22);
-      lfoGain.gain.linearRampToValueAtTime(freq * 0.014, time + 0.65);
-      lfo.connect(osc.frequency);
-      lfo.connect(oscHarmonic.frequency);
+      lfoGain.gain.setValueAtTime(0.0, vibStart);
+      lfoGain.gain.linearRampToValueAtTime(freq * 0.014, vibEnd);
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfoGain.connect(oscHarmonic.frequency);
       lfo.start(time);
 
       osc.type = 'sine';
@@ -635,7 +652,8 @@
       const lfoGain = audioCtx.createGain();
       lfo.frequency.setValueAtTime(0.12, now);
       lfoGain.gain.setValueAtTime(60, now);
-      lfo.connect(windFilt.frequency);
+      lfo.connect(lfoGain);
+      lfoGain.connect(windFilt.frequency);
       lfo.start(now);
 
       const windGain = audioCtx.createGain();
@@ -681,13 +699,16 @@
      ======================================================================== */
 
   function tickScheduler() {
-    if (!audioCtx || isPaused) return;
+    if (!audioCtx || isPaused || audioCtx.state !== 'running') return;
 
     const currentTime = audioCtx.currentTime;
 
     // --- TRACK 1: TVA / LOKI ---
     if (TVA.active) {
       const secPer16th = (60 / TVA.bpm) / 4;
+      if (TVA.nextNoteTime < currentTime - 0.15) {
+        TVA.nextNoteTime = currentTime + 0.05;
+      }
 
       while (TVA.nextNoteTime < currentTime + SCHEDULE_AHEAD_TIME) {
         const t = TVA.nextNoteTime;
@@ -738,6 +759,9 @@
     // --- TRACK 2: ANIMAL CROSSING & OCARINA OF ZELDA ---
     if (AC_ZELDA.active) {
       const secPer16th = (60 / AC_ZELDA.bpm) / 4;
+      if (AC_ZELDA.nextNoteTime < currentTime - 0.15) {
+        AC_ZELDA.nextNoteTime = currentTime + 0.05;
+      }
 
       while (AC_ZELDA.nextNoteTime < currentTime + SCHEDULE_AHEAD_TIME) {
         const t = AC_ZELDA.nextNoteTime;
@@ -807,15 +831,15 @@
     }
   }
 
-  function playTrack(trackName) {
+  function applyTrack(trackName, forceRestart) {
     const ctx = getContext();
-    if (!ctx) return;
+    if (!ctx || !trackName) return;
 
-    if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
-      ctx.resume().catch(() => {});
-    }
-
-    if (currentTrackName === trackName && (TVA.active || AC_ZELDA.active)) {
+    if (
+      !forceRestart &&
+      currentTrackName === trackName &&
+      ((trackName === 'menu' && TVA.active) || (trackName === 'scene' && AC_ZELDA.active))
+    ) {
       return;
     }
 
@@ -830,20 +854,22 @@
       TVA.currentBar = 0;
       TVA.nextMelody16th = 4; // Entra poco después del pulso
       TVA.melodyNoteIdx = 0;
+      TVA.melodyPhraseIdx = 0;
+      TVA.lastThereminFreq = 293.66;
 
       if (TVA.gainNode) {
         TVA.gainNode.gain.cancelScheduledValues(now);
-        TVA.gainNode.gain.setValueAtTime(Math.max(0.0001, TVA.gainNode.gain.value), now);
+        TVA.gainNode.gain.setValueAtTime(Math.max(0.0001, TVA.gainNode.gain.value || 0.0001), now);
         TVA.gainNode.gain.linearRampToValueAtTime(1.0, now + fadeDuration);
       }
 
       // Desactivar Animal Crossing / Zelda
       if (AC_ZELDA.active && AC_ZELDA.gainNode) {
         AC_ZELDA.gainNode.gain.cancelScheduledValues(now);
-        AC_ZELDA.gainNode.gain.setValueAtTime(AC_ZELDA.gainNode.gain.value, now);
+        AC_ZELDA.gainNode.gain.setValueAtTime(Math.max(0.0001, AC_ZELDA.gainNode.gain.value || 0.0001), now);
         AC_ZELDA.gainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
         setTimeout(() => {
-          if (currentTrackName !== 'scene') {
+          if (desiredTrackName !== 'scene') {
             AC_ZELDA.active = false;
             stopMarsWind();
           }
@@ -859,6 +885,7 @@
       AC_ZELDA.currentBar = 0;
       AC_ZELDA.nextMelody16th = 4;
       AC_ZELDA.melodyNoteIdx = 0;
+      AC_ZELDA.melodyPhraseIdx = 0;
 
       if (currentSiteId === 'ares-vallis') {
         startMarsWind();
@@ -868,17 +895,17 @@
 
       if (AC_ZELDA.gainNode) {
         AC_ZELDA.gainNode.gain.cancelScheduledValues(now);
-        AC_ZELDA.gainNode.gain.setValueAtTime(Math.max(0.0001, AC_ZELDA.gainNode.gain.value), now);
+        AC_ZELDA.gainNode.gain.setValueAtTime(Math.max(0.0001, AC_ZELDA.gainNode.gain.value || 0.0001), now);
         AC_ZELDA.gainNode.gain.linearRampToValueAtTime(1.0, now + fadeDuration);
       }
 
       // Desactivar TVA / Loki
       if (TVA.active && TVA.gainNode) {
         TVA.gainNode.gain.cancelScheduledValues(now);
-        TVA.gainNode.gain.setValueAtTime(TVA.gainNode.gain.value, now);
+        TVA.gainNode.gain.setValueAtTime(Math.max(0.0001, TVA.gainNode.gain.value || 0.0001), now);
         TVA.gainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
         setTimeout(() => {
-          if (currentTrackName !== 'menu') {
+          if (desiredTrackName !== 'menu') {
             TVA.active = false;
           }
         }, fadeDuration * 1000 + 100);
@@ -888,7 +915,27 @@
     }
   }
 
+  function playTrack(trackName, forceRestart) {
+    desiredTrackName = trackName;
+    const ctx = getContext();
+    if (!ctx) return;
+
+    if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+      ctx.resume().then(() => {
+        if (ctx.state === 'running' && desiredTrackName) {
+          applyTrack(desiredTrackName, Boolean(forceRestart));
+        }
+      }).catch(() => {});
+      return;
+    }
+
+    if (ctx.state === 'running') {
+      applyTrack(trackName, forceRestart);
+    }
+  }
+
   function stop() {
+    desiredTrackName = null;
     const ctx = getContext();
     if (!ctx) return;
     const now = ctx.currentTime;
@@ -917,6 +964,14 @@
     }
   }
 
+  function setDucking(ducked) {
+    isDucked = Boolean(ducked);
+    if (duckGain && audioCtx) {
+      const now = audioCtx.currentTime;
+      duckGain.gain.setTargetAtTime(isDucked ? 0.28 : 1.0, now, isDucked ? 0.18 : 0.35);
+    }
+  }
+
   function setSite(siteId) {
     currentSiteId = siteId || '';
     if (currentTrackName === 'scene') {
@@ -939,47 +994,70 @@
     isPaused = false;
     if (audioCtx && typeof audioCtx.resume === 'function') {
       audioCtx.resume().then(() => {
-        if (currentTrackName) {
-          playTrack(currentTrackName);
+        const target = desiredTrackName || currentTrackName;
+        if (target && audioCtx && audioCtx.state === 'running') {
+          applyTrack(target, false);
         }
       }).catch(() => {});
     }
   }
 
-  // Desbloqueo proactivo en cualquier interacción de usuario en el documento
+  const UNLOCK_EVENTS = ['pointerdown', 'touchend', 'click', 'keydown'];
+
+  function detachUnlockListeners() {
+    if (typeof global.removeEventListener !== 'function') return;
+    UNLOCK_EVENTS.forEach((evt) => {
+      global.removeEventListener(evt, unlockOnUserGesture);
+    });
+  }
+
+  // Desbloqueo proactivo y reintento seguro en Safari / navegadores modernos
   function unlockOnUserGesture() {
     const ctx = getContext();
-    if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+    if (!ctx) return;
+
+    if (ctx.state === 'running') {
+      detachUnlockListeners();
+      applyTrack(desiredTrackName || 'menu', false);
+      return;
+    }
+
+    if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
       ctx.resume().then(() => {
-        if (!currentTrackName) {
-          playTrack('menu');
+        if (ctx.state === 'running') {
+          detachUnlockListeners();
+          applyTrack(desiredTrackName || 'menu', false);
         }
       }).catch(() => {});
-    } else if (ctx && !currentTrackName) {
-      playTrack('menu');
     }
   }
 
-  ['pointerdown', 'keydown', 'touchstart', 'click'].forEach((evt) => {
-    window.addEventListener(evt, unlockOnUserGesture, { passive: true, once: true });
-  });
+  if (typeof global.addEventListener === 'function') {
+    UNLOCK_EVENTS.forEach((evt) => {
+      global.addEventListener(evt, unlockOnUserGesture, { passive: true });
+    });
+  }
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      pause();
-    } else {
-      resume();
-    }
-  });
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        pause();
+      } else {
+        resume();
+      }
+    });
+  }
 
   global.CYBERPENGUINS_MUSIC = {
     init: getContext,
     playTrack,
     stop,
     setVolume,
+    setDucking,
     setSite,
     pause,
     resume,
+    unlock: unlockOnUserGesture,
     getCurrentTrack: () => currentTrackName
   };
 

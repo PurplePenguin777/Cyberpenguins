@@ -743,7 +743,7 @@
             <circle cx="5" cy="-29" r="1.3" fill="#38bdf8" />
           </g>
         </svg>
-        <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 0.5s ease"></canvas>
+        <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true"></canvas>
       </div>
     `;
   }
@@ -888,7 +888,7 @@
             <circle cx="21" cy="-24" r="1.4" fill="#f59e0b" />
           </g>
         </svg>
-        <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 0.5s ease"></canvas>
+        <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true"></canvas>
       </div>
     `;
   }
@@ -994,7 +994,7 @@
             <circle cx="-36" cy="34" r="1.5" fill="#f59e0b" />
           </g>
         </svg>
-        <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 0.5s ease"></canvas>
+        <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true"></canvas>
       </div>
     `;
   }
