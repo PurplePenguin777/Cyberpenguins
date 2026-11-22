@@ -899,16 +899,26 @@
       ((trackName === 'menu' && TVA.active) || (trackName === 'scene' && AC_ZELDA.active));
 
     const now = ctx.currentTime;
-    const wasSilent = (!TVA.active && !AC_ZELDA.active);
-    const fadeDuration = wasSilent ? 0.22 : 0.85;
 
     if (trackName === 'menu') {
       clearTimeout(tvaFadeTimer);
       tvaFadeTimer = null;
 
+      // 1. Corte inmediato de programación de ocarina/plucks y decaimiento exponencial natural
+      if (AC_ZELDA.active) {
+        AC_ZELDA.active = false;
+        clearTimeout(acFadeTimer);
+        stopMarsWind();
+        if (AC_ZELDA.gainNode) {
+          holdGainParam(AC_ZELDA.gainNode.gain, now);
+          AC_ZELDA.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+        }
+      }
+
+      // 2. Entrada inmediata del pulso y bajo ostinato TVA
       if (!alreadyActive) {
         TVA.active = true;
-        TVA.nextNoteTime = now + 0.015;
+        TVA.nextNoteTime = now + 0.012;
         TVA.current16th = 0;
         TVA.currentBar = 0;
         TVA.nextMelody16th = 0;
@@ -919,20 +929,9 @@
 
       if (TVA.gainNode) {
         holdGainParam(TVA.gainNode.gain, now);
-        TVA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.12 : fadeDuration));
+        TVA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.08 : 0.22));
       }
 
-      if (AC_ZELDA.active && AC_ZELDA.gainNode) {
-        clearTimeout(acFadeTimer);
-        holdGainParam(AC_ZELDA.gainNode.gain, now);
-        AC_ZELDA.gainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
-        acFadeTimer = setTimeout(() => {
-          if (desiredTrackName !== 'scene') {
-            AC_ZELDA.active = false;
-            stopMarsWind();
-          }
-        }, fadeDuration * 1000 + 80);
-      }
       currentTrackName = 'menu';
       startScheduler();
       tickScheduler();
@@ -940,14 +939,14 @@
       clearTimeout(acFadeTimer);
       acFadeTimer = null;
 
-      if (!alreadyActive) {
-        AC_ZELDA.active = true;
-        AC_ZELDA.nextNoteTime = now + 0.015;
-        AC_ZELDA.current16th = 0;
-        AC_ZELDA.currentBar = 0;
-        AC_ZELDA.nextMelody16th = 0;
-        AC_ZELDA.melodyNoteIdx = 0;
-        AC_ZELDA.melodyPhraseIdx = 0;
+      // 1. Corte inmediato de notas TVA y liberación exponencial suave
+      if (TVA.active) {
+        TVA.active = false;
+        clearTimeout(tvaFadeTimer);
+        if (TVA.gainNode) {
+          holdGainParam(TVA.gainNode.gain, now);
+          TVA.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+        }
       }
 
       if (currentSiteId === 'ares-vallis') {
@@ -956,21 +955,22 @@
         stopMarsWind();
       }
 
-      if (AC_ZELDA.gainNode) {
-        holdGainParam(AC_ZELDA.gainNode.gain, now);
-        AC_ZELDA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.12 : fadeDuration));
+      // 2. Entrada acogedora de arpegios acústicos y ocarina
+      if (!alreadyActive) {
+        AC_ZELDA.active = true;
+        AC_ZELDA.nextNoteTime = now + 0.012;
+        AC_ZELDA.current16th = 0;
+        AC_ZELDA.currentBar = 0;
+        AC_ZELDA.nextMelody16th = 0;
+        AC_ZELDA.melodyNoteIdx = 0;
+        AC_ZELDA.melodyPhraseIdx = 0;
       }
 
-      if (TVA.active && TVA.gainNode) {
-        clearTimeout(tvaFadeTimer);
-        holdGainParam(TVA.gainNode.gain, now);
-        TVA.gainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
-        tvaFadeTimer = setTimeout(() => {
-          if (desiredTrackName !== 'menu') {
-            TVA.active = false;
-          }
-        }, fadeDuration * 1000 + 80);
+      if (AC_ZELDA.gainNode) {
+        holdGainParam(AC_ZELDA.gainNode.gain, now);
+        AC_ZELDA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.08 : 0.25));
       }
+
       currentTrackName = 'scene';
       startScheduler();
       tickScheduler();
