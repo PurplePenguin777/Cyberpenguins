@@ -865,6 +865,33 @@ a:focus-visible {
   isolation: isolate;
 }
 
+.chapter-scene-3d[data-scene="moon"] {
+  background: radial-gradient(circle at 75% 24%, rgba(30, 58, 138, 0.25) 0%, #02050d 72%);
+}
+
+.chapter-scene-3d[data-scene="mars"] {
+  background: linear-gradient(180deg, #3b2e3f 0%, #956358 48%, #c27858 100%);
+}
+
+.chapter-scene-3d[data-scene="deep-space"] {
+  background: radial-gradient(circle at 60% 48%, #0c1428 0%, #02040b 80%);
+}
+
+.chapter-card-3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.38s ease;
+  pointer-events: none;
+}
+
+.chapter-card-3d-canvas.is-ready {
+  opacity: 1;
+}
+
 .scene-layer {
   position: absolute;
   inset: 0;

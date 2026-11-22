@@ -3,7 +3,7 @@
    Permite instalar la aplicación y jugar sin conexión a internet.
    ========================================================= */
 
-const CACHE_NAME = 'cyberpenguins-v99';
+const CACHE_NAME = 'cyberpenguins-v101';
 const ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const ASSETS = [
   './css/styles.css',
   './assets/textures/via-lactea.jpg',
   './assets/textures/tierra-4k.jpg',
+  './assets/textures/nubes-tierra.jpg',
   './assets/textures/luna-4k.jpg',
   './assets/textures/marte-2k.jpg',
   './assets/textures/eros.jpg',
@@ -23,6 +24,10 @@ const ASSETS = [
   './assets/models/phobos.glb',
   './assets/models/deimos.glb',
   './assets/models/mars-samples.glb',
+  './assets/models/luna-terrain.glb',
+  './assets/models/apollo-eagle.glb',
+  './assets/models/eros-433.glb',
+  './assets/models/near-shoemaker.glb',
   './js/vendor/three/three.module.min.js',
   './js/vendor/three/loaders/GLTFLoader.js',
   './js/vendor/three/loaders/KTX2Loader.js',
@@ -53,6 +58,7 @@ const ASSETS = [
   './js/models.js',
   './js/elementos/realismo.js',
   './js/elementos/terreno-3d.js',
+  './js/elementos/tarjetas-3d.js',
   './js/tts.js',
   './js/fx.js',
   './js/app.js'

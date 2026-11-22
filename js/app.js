@@ -12,6 +12,21 @@
   const TTS = global.CYBERPENGUINS_TTS;
   const FX = global.CYBERPENGUINS_FX;
   const getTerrain3D = () => global.CYBERPENGUINS_TERRAIN_3D || null;
+  const getHomeCards3D = () => global.CYBERPENGUINS_HOME_CARDS_3D || null;
+
+  function mountHomeCards3D() {
+    const cards3d = getHomeCards3D();
+    if (!cards3d || typeof cards3d.mountAll !== 'function') return;
+    if (dom.chapterNav) {
+      cards3d.mountAll(dom.chapterNav);
+    }
+    const homeVisible = Boolean(dom.homeScreen && !dom.homeScreen.classList.contains('is-hidden'));
+    if (homeVisible && typeof cards3d.resume === 'function') {
+      cards3d.resume();
+    } else if (!homeVisible && typeof cards3d.pause === 'function') {
+      cards3d.pause();
+    }
+  }
 
   const DEFAULT_STATE = {
     launched: false,
@@ -884,6 +899,10 @@
       }
     });
 
+    global.addEventListener('cyberpenguins:homecards3d-ready', () => {
+      mountHomeCards3D();
+    });
+
     // Botón flotante Liquid Glass de salto (especialmente táctil / móviles)
     if (dom.stageJumpBtn) {
       const handleJumpButton = (event) => {
@@ -1209,6 +1228,10 @@
     const targetId = chapterId || state.currentChapterId || 'moon';
     if (!isChapterUnlocked(targetId)) return;
     closeAllModals();
+    const cards3d = getHomeCards3D();
+    if (cards3d && typeof cards3d.pause === 'function') {
+      cards3d.pause();
+    }
     dom.homeScreen.classList.add('is-hidden');
     dom.launchScreen.classList.add('is-hidden');
     dom.gameScreen.classList.remove('is-hidden');
@@ -4019,11 +4042,7 @@
       const unlocked = isChapterUnlocked(chapter.id);
       const inProgress = !completed && hasChapterProgress(chapter.id);
       const isCardActive = inProgress && chapter.id === state.currentChapterId;
-      const firstMachine = chapter.machines[0];
-      const singleMachineSvg = firstMachine && typeof MODELS[firstMachine.modelKey] === 'function'
-        ? MODELS[firstMachine.modelKey]()
-        : '';
-      const sceneHtml = MODELS.chapterScene(chapter.id, singleMachineSvg);
+      const sceneHtml = MODELS.chapterScene(chapter.id);
 
       const btnLabel = !unlocked
         ? (isEn ? 'Complete previous mission to unlock' : 'Completa la misión anterior para desbloquear')
@@ -4072,6 +4091,8 @@
         enterChapterFromHome(btn.dataset.enterChapter);
       });
     });
+
+    mountHomeCards3D();
   }
 
   function updateHUD() {
