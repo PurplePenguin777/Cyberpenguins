@@ -133,6 +133,7 @@
   let cinematicTimer = null;
   let cinematicOnFinish = null;
   let activeDialogueMachine = null;
+  let activeSampleDiscovery = null;
   let activeDialogueTurn = 0;
   let activeDialogueToken = 0;
   let speakFallbackTimer = null;
@@ -2401,6 +2402,11 @@
         } else if (world3d.machine) {
           positionSpeechBubble(world3d.machine.screenX, world3d.machine.screenY, false);
         }
+      } else if (activeSpeechAnchorKind === 'sample' && activeSampleDiscovery) {
+        const sPeak = getSamplePeakPct(activeSampleDiscovery.sampleObj && activeSampleDiscovery.sampleObj.id);
+        if (sPeak) {
+          positionSpeechBubble(sPeak.x, sPeak.y, true);
+        }
       } else {
         const head = getPenguinHeadPct();
         positionSpeechBubble(head ? head.x : penguinPos.x, head ? head.y : penguinPos.y, Boolean(head));
@@ -3606,6 +3612,22 @@
     return { x: proj.pctX, y: proj.pctY };
   }
 
+  function getSamplePeakPct(sampleId) {
+    const t3d = getTerrain3D();
+    if (!world3d.active || !world3d.samples || !t3d || typeof t3d.projectWorldToScreen !== 'function') return null;
+    const sObj = sampleId ? world3d.samples[sampleId] : Object.values(world3d.samples)[0];
+    if (!sObj) return null;
+    if (typeof t3d.getSampleWorldPeak === 'function') {
+      const peak = t3d.getSampleWorldPeak(sObj.id);
+      if (peak) {
+        const proj = t3d.projectWorldToScreen(peak.x, peak.y, peak.z);
+        return { x: proj.pctX, y: proj.pctY };
+      }
+    }
+    const proj = t3d.projectWorldToScreen(sObj.x, sObj.y + 0.35, sObj.z);
+    return { x: proj.pctX, y: proj.pctY };
+  }
+
   function showStageActionPrompt(type, target, onAction) {
     if (!dom.stageActionPrompt || !dom.stageActionBtn) return;
     if (isSpeechBubbleOpen()) {
@@ -3749,6 +3771,19 @@
       const closeLimit = (world3d.active && world3d.machine) ? 3.6 : 18.5;
       if (distToMachine > closeLimit && activeDialogueMachine && activeDialogueMachine.id === activeMachine.id) {
         closeDialogueModal();
+      }
+    }
+
+    // Si nos alejamos de la roca activa mientras su globo está abierto, cerrarlo
+    if (activeSampleDiscovery) {
+      const sObj = activeSampleDiscovery.sampleObj;
+      const sA = (world3d.active && world3d.samples) ? world3d.samples[sObj.id] : null;
+      const distToSample = (world3d.active && world3d.penguin && sA)
+        ? Math.hypot(world3d.penguin.x - sA.x, world3d.penguin.z - sA.z)
+        : getDist(penguinPos, sObj.pos);
+      const closeLimit = world3d.active ? 3.2 : 18.0;
+      if (distToSample > closeLimit) {
+        closeSampleDiscoveryModal();
       }
     }
 
@@ -4126,9 +4161,8 @@
     let posX;
     let targetY;
 
-    if (world3d.active && activeDialogueMachine) {
-      // Posicionar directamente sobre el personaje que está hablando (Cyberpenguin a la izquierda o Sojourner a la derecha)
-      // dejando margen lateral para que el globo quede perfectamente dentro de pantalla
+    if (world3d.active && (activeDialogueMachine || activeSampleDiscovery)) {
+      // Posicionar directamente sobre el personaje o roca que está hablando/analizada
       const halfBubblePct = ((bubbleW / 2) / Math.max(1, boardW)) * 100;
       const minX = Math.max(22, halfBubblePct + 2.0);
       const maxX = Math.min(78, 100 - halfBubblePct - 2.0);
@@ -4136,12 +4170,12 @@
 
       dom.stageSpeechBubble.classList.remove('bubble-flipped');
       const isMachine = activeSpeechAnchorKind === 'machine';
-      // Holgura vertical limpia para que ni la antena de Sojourner ni el casco de Cyberpenguin sean tocados
-      const clearance = isMachine ? 5.2 : 4.8;
+      const isSample = activeSpeechAnchorKind === 'sample';
+      const clearance = isMachine ? 5.2 : (isSample ? 4.0 : 4.8);
       const desiredBottom = isExactTop ? (y - clearance) : (y - 8.5);
 
       // El fondo del globo garantiza comenzar debajo de los controles superiores (>= 74px)
-      // y anclarse con holgura por encima del personaje
+      // y anclarse con holgura por encima del personaje o roca
       targetY = Math.max(minSafeBottomPct, desiredBottom);
     } else {
       posX = Math.max(22, Math.min(78, x));
@@ -5023,7 +5057,7 @@
 
   function openSampleDiscoveryModal(chapter, sampleObj) {
     if (!chapter || !sampleObj) return;
-    pendingSampleToCollect = { chapter, sampleObj };
+    activeSampleDiscovery = { chapter, sampleObj };
     const isEn = (state.currentLanguage === 'en');
     const detailsMap = isEn ? SAMPLE_DETAILS_EN : SAMPLE_DETAILS;
     const fallbackSite = isEn
@@ -5037,33 +5071,14 @@
         : 'Un fragmento de roca recogido en la superficie para guardar y analizar en tu pasaporte.'
     };
 
-    if (dom.sampleDiscoveryTitle) {
-      dom.sampleDiscoveryTitle.textContent = details.title || sampleObj.label || (isEn ? 'Space rock' : 'Roca espacial');
-    }
-    if (dom.sampleDiscoverySite) {
-      dom.sampleDiscoverySite.textContent = details.site || fallbackSite;
-    }
-    if (dom.sampleDiscoveryDesc) {
-      dom.sampleDiscoveryDesc.textContent = details.desc;
-    }
     const inPlace = isInPlaceSample(sampleObj.id);
-    if (dom.sampleDiscoveryType) {
-      dom.sampleDiscoveryType.textContent = inPlace
-        ? (isEn ? 'Rock analyzed on site' : 'Roca analizada en el sitio')
-        : (isEn ? 'Rock sample' : 'Muestra de roca');
-    }
-    if (dom.sampleDiscoveryCollectBtn) {
-      dom.sampleDiscoveryCollectBtn.textContent = inPlace
-        ? (isEn ? 'Log in passport' : 'Registrar en el pasaporte')
-        : (isEn ? 'Store in backpack' : 'Guardar en la mochila');
-    }
-    if (dom.sampleDiscoveryCrystal) {
-      const variant = typeof sampleObj.variant === 'number' ? sampleObj.variant : 0;
-      dom.sampleDiscoveryCrystal.innerHTML = MODELS.sampleCrystal(chapter.id, variant);
-    }
+    const actionLabel = inPlace
+      ? (isEn ? 'Log in passport' : 'Registrar en el pasaporte')
+      : (isEn ? 'Store in backpack' : 'Guardar en la mochila');
+    const variant = typeof sampleObj.variant === 'number' ? sampleObj.variant : 0;
+    const crystalSvg = MODELS.sampleCrystal ? MODELS.sampleCrystal(chapter.id, variant) : '';
 
     hideStageActionPrompt();
-    showModal(dom.sampleDiscoveryModal);
     playHarmony('dialogue');
 
     // Zoom cinematográfico sobre Cyberpenguin y la roca analizada
@@ -5075,16 +5090,86 @@
         t3d.setDialogueZoom(true, { x: p.x, y: p.y, z: p.z }, { x: s.x, y: s.y || p.y, z: s.z });
       }
     }
+
+    showSampleSpeechBubble({
+      chapter,
+      sampleObj,
+      title: details.title || sampleObj.label || (isEn ? 'Space rock' : 'Roca espacial'),
+      desc: details.desc,
+      actionLabel,
+      crystalSvg
+    });
+  }
+
+  function showSampleSpeechBubble({ chapter, sampleObj, title, desc, actionLabel, crystalSvg }) {
+    if (!dom.stageSpeechBubble) return;
+
+    dom.stageSpeechBubble.className = 'stage-speech-bubble speaker-is-sample';
+    if (dom.speechBubbleAvatar) {
+      dom.speechBubbleAvatar.innerHTML = crystalSvg || '';
+    }
+    if (dom.speechBubbleName) {
+      dom.speechBubbleName.textContent = title || '';
+    }
+    if (dom.speechBubbleText) {
+      dom.speechBubbleText.innerHTML = formatDialogueText(desc || '');
+      dom.speechBubbleText.style.display = 'block';
+    }
+    if (dom.speechBubbleOptions) {
+      dom.speechBubbleOptions.innerHTML = '';
+      dom.speechBubbleOptions.style.display = 'none';
+    }
+    if (dom.speechBubbleActionRow && dom.speechBubbleNextBtn) {
+      dom.speechBubbleActionRow.style.display = 'flex';
+      dom.speechBubbleNextBtn.textContent = actionLabel;
+      dom.speechBubbleNextBtn.onclick = (e) => {
+        e.stopPropagation();
+        triggerHaptic('tap');
+        collectSample(chapter, sampleObj);
+        closeSampleDiscoveryModal();
+      };
+    }
+    if (dom.speechBubbleCloseBtn) {
+      dom.speechBubbleCloseBtn.onclick = (e) => {
+        e.stopPropagation();
+        triggerHaptic('tap');
+        closeSampleDiscoveryModal();
+      };
+    }
+
+    activeSpeechAnchorKind = 'sample';
+    let anchorX = sampleObj.pos ? sampleObj.pos.x : 50;
+    let anchorY = sampleObj.pos ? sampleObj.pos.y : 50;
+    let isExactTop = false;
+
+    if (world3d.active) {
+      dom.stageSpeechBubble.classList.add('is-tracking-3d');
+      const sPeak = getSamplePeakPct(sampleObj.id);
+      if (sPeak) {
+        anchorX = sPeak.x;
+        anchorY = sPeak.y;
+        isExactTop = true;
+      }
+    } else {
+      dom.stageSpeechBubble.classList.remove('is-tracking-3d');
+    }
+
+    dom.stageSpeechBubble.classList.remove('is-hidden');
+    positionSpeechBubble(anchorX, anchorY, isExactTop);
   }
 
   function closeSampleDiscoveryModal() {
-    if (!dom.sampleDiscoveryModal) return;
-    pendingSampleToCollect = null;
-    hideModal(dom.sampleDiscoveryModal);
+    activeSampleDiscovery = null;
+    if (activeSpeechAnchorKind === 'sample') {
+      if (dom.stageSpeechBubble) {
+        dom.stageSpeechBubble.classList.add('is-hidden');
+      }
+    }
     const t3d = getTerrain3D();
     if (t3d && typeof t3d.setDialogueZoom === 'function') {
       t3d.setDialogueZoom(false);
     }
+    checkSurfaceProximity();
   }
 
   function collectSample(chapter, sampleObj) {

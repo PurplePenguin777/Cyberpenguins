@@ -3625,9 +3625,34 @@ a:focus-visible {
 
 .stage-speech-bubble.speaker-is-penguin .speech-bubble-body,
 .stage-speech-bubble.speaker-is-machine .speech-bubble-body,
-.stage-speech-bubble.speaker-is-ship .speech-bubble-body {
+.stage-speech-bubble.speaker-is-ship .speech-bubble-body,
+.stage-speech-bubble.speaker-is-sample .speech-bubble-body {
   border: var(--lg-rim);
   box-shadow: var(--lg-shadow);
+}
+
+.stage-speech-bubble.speaker-is-sample .speech-bubble-avatar {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.stage-speech-bubble.speaker-is-sample .speech-bubble-avatar svg {
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+.stage-speech-bubble.speaker-is-sample .speech-speaking-wave {
+  display: none !important;
 }
 
 .speech-bubble-body {
