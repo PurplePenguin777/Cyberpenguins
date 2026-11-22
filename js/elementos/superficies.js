@@ -706,18 +706,7 @@
             <image href="assets/textures/luna-4k.jpg" x="-10" y="90" width="420" height="120" preserveAspectRatio="xMidYMid slice" opacity="0.88" />
             <rect x="-10" y="105" width="420" height="105" fill="url(#${u}-ground-shade)" />
 
-            <!-- Cráteres suaves y geológicos con relieve natural (sin polígonos) -->
-            <g transform="translate(325, 158)">
-              <ellipse cx="0" cy="0" rx="46" ry="14" fill="none" stroke="rgba(241, 245, 249, 0.45)" stroke-width="1.8" />
-              <ellipse cx="-1.5" cy="1" rx="43" ry="12.5" fill="url(#${u}-crater-1)" />
-              <ellipse cx="3" cy="2" rx="36" ry="9" fill="#010409" opacity="0.7" />
-            </g>
-
-            <g transform="translate(78, 146)">
-              <ellipse cx="0" cy="0" rx="26" ry="8" fill="none" stroke="rgba(241, 245, 249, 0.35)" stroke-width="1.4" />
-              <ellipse cx="-1" cy="0.8" rx="24" ry="7" fill="url(#${u}-crater-2)" />
-              <ellipse cx="2" cy="1.5" rx="19" ry="5" fill="#010409" opacity="0.65" />
-            </g>
+            <!-- Cráteres y relieve geológico natural provistos por la textura real 4K luna-4k.jpg (sin círculos dibujados) -->
 
             <!-- Rocas redondeadas naturales con sombra de contacto -->
             <ellipse cx="120" cy="172" rx="13" ry="4" fill="rgba(0,0,0,0.65)" />
@@ -865,54 +854,81 @@
             </g>
           </g>
 
-          <!-- Mars Pathfinder Lander (pétalos abiertos y estación) -->
-          <g transform="translate(165, 142)">
-            <ellipse cx="6" cy="18" rx="34" ry="8" fill="rgba(30, 8, 4, 0.65)" />
-            <polygon points="-28,14 -8,8 -2,18" fill="#1e293b" stroke="#f59e0b" stroke-width="0.9" />
-            <polygon points="32,14 12,8 6,18" fill="#1e293b" stroke="#f59e0b" stroke-width="0.9" />
-            <polygon points="-8,18 20,18 6,24" fill="#0f172a" stroke="#d97706" stroke-width="0.9" />
+          <!-- Rover Sojourner 3D Héroe (fiel al modelo 3D de Ares Vallis con 6 ruedas, chasis amarillo, paneles y antena) -->
+          <g transform="translate(190, 142)">
+            <!-- Sombra de contacto suave del rover -->
+            <ellipse cx="4" cy="24" rx="48" ry="11" fill="rgba(30, 8, 4, 0.78)" />
 
-            <!-- Cuerpo central de aviónica y mástil meteorológico ASI/MET -->
-            <rect x="-6" y="2" width="16" height="12" rx="1.5" fill="#f8fafc" stroke="#64748b" stroke-width="0.8" />
-            <rect x="-4" y="4" width="12" height="4" fill="#cbd5e1" />
-            <line x1="2" y1="2" x2="2" y2="-22" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" />
-            <circle cx="2" cy="-22" r="2.2" fill="#f8fafc" stroke="#475569" stroke-width="0.6" />
-          </g>
-
-          <!-- Rover Sojourner fotorrealista con sus 6 ruedas rocker-bogie -->
-          <g transform="translate(225, 154)">
-            <ellipse cx="3" cy="14" rx="22" ry="5.5" fill="rgba(30, 8, 4, 0.72)" />
-
-            <!-- Ruedas traseras (3 ruedas del lado lejano) -->
-            <ellipse cx="-13" cy="9" rx="3.8" ry="4.5" fill="#475569" stroke="#1e293b" stroke-width="0.7" />
-            <ellipse cx="0" cy="9" rx="3.8" ry="4.5" fill="#475569" stroke="#1e293b" stroke-width="0.7" />
-            <ellipse cx="13" cy="9" rx="3.8" ry="4.5" fill="#475569" stroke="#1e293b" stroke-width="0.7" />
-
-            <!-- Chasis cilíndrico / caja dorada -->
-            <rect x="-16" y="0" width="32" height="10" rx="2" fill="url(#${u}-soj-gold)" stroke="#78350f" stroke-width="0.8" />
-
-            <!-- Panel solar superior -->
-            <rect x="-18" y="-3.5" width="36" height="4.5" rx="1" fill="url(#${u}-solar)" stroke="#60a5fa" stroke-width="0.7" />
-            <line x1="-15" y1="-1.5" x2="15" y2="-1.5" stroke="#93c5fd" stroke-width="0.5" opacity="0.7" />
-
-            <!-- Mecanismo Rocker-Bogie de titanio -->
-            <line x1="-12" y1="4" x2="-14" y2="12" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-            <line x1="-2" y1="3" x2="0" y2="12" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-            <line x1="8" y1="4" x2="14" y2="12" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-
-            <!-- Ruedas delanteras con tacos metálicos (3 ruedas del lado cercano) -->
-            <g>
-              <ellipse cx="-14" cy="12" rx="4.8" ry="5.8" fill="#e2e8f0" stroke="#475569" stroke-width="0.8" />
-              <circle cx="-14" cy="12" r="2.2" fill="#2563eb" />
-              <ellipse cx="0" cy="12" rx="4.8" ry="5.8" fill="#e2e8f0" stroke="#475569" stroke-width="0.8" />
-              <circle cx="0" cy="12" r="2.2" fill="#2563eb" />
-              <ellipse cx="14" cy="12" rx="4.8" ry="5.8" fill="#e2e8f0" stroke="#475569" stroke-width="0.8" />
-              <circle cx="14" cy="12" r="2.2" fill="#2563eb" />
+            <!-- Ruedas del lado lejano (fondo) -->
+            <g opacity="0.85">
+              <ellipse cx="-28" cy="14" rx="8" ry="10" fill="#64748b" stroke="#334155" stroke-width="1" />
+              <circle cx="-28" cy="14" r="4" fill="#1d4ed8" />
+              <ellipse cx="0" cy="14" rx="8" ry="10" fill="#64748b" stroke="#334155" stroke-width="1" />
+              <circle cx="0" cy="14" r="4" fill="#1d4ed8" />
+              <ellipse cx="28" cy="14" rx="8" ry="10" fill="#64748b" stroke="#334155" stroke-width="1" />
+              <circle cx="28" cy="14" r="4" fill="#1d4ed8" />
             </g>
 
-            <!-- Antena látigo con esfera sensora -->
-            <line x1="12" y1="-3" x2="14" y2="-20" stroke="#f8fafc" stroke-width="1.1" stroke-linecap="round" />
-            <circle cx="14" cy="-20" r="1.6" fill="#facc15" />
+            <!-- Chasis cilíndrico dorado/amarillo característico de Sojourner -->
+            <rect x="-32" y="-3" width="64" height="20" rx="8" fill="url(#${u}-soj-gold)" stroke="#78350f" stroke-width="1.2" />
+            <!-- Correas / bandas térmicas negras del cuerpo -->
+            <line x1="-12" y1="-3" x2="-12" y2="17" stroke="#1c1917" stroke-width="2" />
+            <line x1="12" y1="-3" x2="12" y2="17" stroke="#1c1917" stroke-width="2" />
+
+            <!-- Ojos estereoscópicos frontales (cámaras de navegación de Sojourner) -->
+            <g transform="translate(-33, 3)">
+              <rect x="-6" y="-3" width="7" height="8" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="0.8" />
+              <circle cx="-3" cy="1" r="2" fill="#0284c7" />
+            </g>
+
+            <!-- Panel solar superior con ribete blanco y celdas fotovoltaicas -->
+            <g transform="translate(0, -9)">
+              <rect x="-38" y="-4" width="76" height="8" rx="2.5" fill="#f8fafc" stroke="#2563eb" stroke-width="1" />
+              <rect x="-35" y="-2.5" width="70" height="5" rx="1.5" fill="url(#${u}-solar)" />
+              <line x1="-18" y1="-2.5" x2="-18" y2="2.5" stroke="#93c5fd" stroke-width="0.7" opacity="0.7" />
+              <line x1="0" y1="-2.5" x2="0" y2="2.5" stroke="#93c5fd" stroke-width="0.7" opacity="0.7" />
+              <line x1="18" y1="-2.5" x2="18" y2="2.5" stroke="#93c5fd" stroke-width="0.7" opacity="0.7" />
+            </g>
+
+            <!-- Mecanismo de suspensión Rocker-Bogie (tubos blancos/aluminio del modelo 3D) -->
+            <g stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="-24" y1="6" x2="-32" y2="20" />
+              <line x1="0" y1="5" x2="0" y2="20" />
+              <line x1="20" y1="5" x2="30" y2="20" />
+              <line x1="-32" y1="20" x2="0" y2="20" stroke-width="2.5" stroke="#cbd5e1" />
+              <line x1="0" y1="20" x2="30" y2="20" stroke-width="2.5" stroke="#cbd5e1" />
+            </g>
+
+            <!-- 3 Ruedas delanteras grandes del modelo 3D (con tacos, llanta blanca y bujes azules) -->
+            <g>
+              <g transform="translate(-32, 20)">
+                <ellipse cx="0" cy="0" rx="11" ry="13" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" />
+                <circle cx="0" cy="0" r="11" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="2,3" />
+                <circle cx="0" cy="0" r="6" fill="#1e293b" />
+                <circle cx="0" cy="0" r="4.2" fill="#2563eb" />
+                <circle cx="0" cy="0" r="1.8" fill="#93c5fd" />
+              </g>
+
+              <g transform="translate(0, 20)">
+                <ellipse cx="0" cy="0" rx="11" ry="13" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" />
+                <circle cx="0" cy="0" r="11" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="2,3" />
+                <circle cx="0" cy="0" r="6" fill="#1e293b" />
+                <circle cx="0" cy="0" r="4.2" fill="#2563eb" />
+                <circle cx="0" cy="0" r="1.8" fill="#93c5fd" />
+              </g>
+
+              <g transform="translate(30, 20)">
+                <ellipse cx="0" cy="0" rx="11" ry="13" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" />
+                <circle cx="0" cy="0" r="11" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="2,3" />
+                <circle cx="0" cy="0" r="6" fill="#1e293b" />
+                <circle cx="0" cy="0" r="4.2" fill="#2563eb" />
+                <circle cx="0" cy="0" r="1.8" fill="#93c5fd" />
+              </g>
+            </g>
+
+            <!-- Mástil de antena látigo vertical con punta esférica amarilla del modelo 3D -->
+            <line x1="20" y1="-8" x2="22" y2="-48" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="22" cy="-48" r="2.5" fill="#facc15" stroke="#ca8a04" stroke-width="0.7" />
           </g>
         </svg>
       </div>
@@ -962,8 +978,7 @@
               <rect x="170" y="45" width="235" height="130" fill="#475569" />
               <image href="assets/textures/eros.jpg" x="175" y="45" width="225" height="125" preserveAspectRatio="xMidYMid slice" opacity="0.96" />
               <rect x="170" y="45" width="235" height="130" fill="url(#${u}-eros-light)" />
-              <ellipse cx="250" cy="80" rx="14" ry="8" fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.2" />
-              <ellipse cx="251" cy="81" rx="12" ry="6.5" fill="#020617" opacity="0.55" />
+              <!-- Relieve natural provisto directamente por la textura real de Eros de la NASA -->
             </g>
             <!-- Borde iluminado por el sol -->
             <path d="M 195,100 C 205,62 255,50 315,56 C 350,60 375,75 385,95" fill="none" stroke="rgba(248, 250, 252, 0.5)" stroke-width="1.2" />
