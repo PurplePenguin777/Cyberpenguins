@@ -182,7 +182,11 @@
     } catch (_) { }
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
 
   /* ========================================================================
@@ -444,10 +448,25 @@
     if (FX && typeof FX.pause === 'function') {
       FX.pause();
     }
-    if (state.launched) {
+    const hasLaunchedBefore = Boolean(
+      state.launched ||
+      (typeof global.localStorage !== 'undefined' && (
+        global.localStorage.getItem('cyberpenguins_launched') === 'true' ||
+        global.localStorage.getItem(DATA.STORAGE_KEY)
+      ))
+    );
+
+    if (hasLaunchedBefore) {
+      state.launched = true;
+      try {
+        global.localStorage.setItem('cyberpenguins_launched', 'true');
+      } catch (_) {}
+      saveState();
       dom.launchScreen.classList.add('hidden-screen', 'is-hidden');
+      if (dom.travelCinematic) dom.travelCinematic.classList.add('is-hidden');
       showHomeScreen();
     } else {
+      dom.launchScreen.classList.remove('hidden-screen', 'is-hidden');
       startLaunchCinematic();
     }
   }
@@ -1179,6 +1198,9 @@
       global.localStorage.setItem(DATA.STORAGE_KEY, JSON.stringify(state));
       global.localStorage.setItem('cyberpenguins_lang', state.currentLanguage || 'en');
       global.localStorage.setItem('cyberpenguins_cadet_name', state.cadetName || '');
+      if (state.launched) {
+        global.localStorage.setItem('cyberpenguins_launched', 'true');
+      }
     } catch (_err) {
       // Ignorar si almacenamiento privado bloquea escritura
     }
