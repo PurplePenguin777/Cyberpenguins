@@ -11,6 +11,7 @@
   const MODELS = global.CYBERPENGUINS_MODELS;
   const TTS = global.CYBERPENGUINS_TTS;
   const FX = global.CYBERPENGUINS_FX;
+  const getMusic = () => global.CYBERPENGUINS_MUSIC || null;
   const getTerrain3D = () => global.CYBERPENGUINS_TERRAIN_3D || null;
   const getHomeCards3D = () => global.CYBERPENGUINS_HOME_CARDS_3D || null;
 
@@ -1216,6 +1217,10 @@
     if (t3d && typeof t3d.pause === 'function') {
       t3d.pause();
     }
+    const music = getMusic();
+    if (music && typeof music.playTrack === 'function') {
+      music.playTrack('menu');
+    }
     saveState();
     dom.gameScreen.classList.add('is-hidden');
     dom.launchScreen.classList.add('is-hidden');
@@ -1237,6 +1242,10 @@
     dom.gameScreen.classList.remove('is-hidden');
     if (FX && typeof FX.resume === 'function') {
       FX.resume();
+    }
+    const music = getMusic();
+    if (music && typeof music.playTrack === 'function') {
+      music.playTrack('scene');
     }
     loadChapterScene(targetId, true);
     const t3d = getTerrain3D();
@@ -1389,222 +1398,47 @@
   }
 
   /* ========================================================================
-     Paisaje Sonoro Procedural de Marte (Ares Vallis & Sojourner)
-     - Viento marciano de baja presión (simulación acústica de CO2 basada en NASA)
-     - Música de fondo etérea procedural (pads espaciales armónicos en loop infinito)
+     Paisaje Sonoro y Música Espacial (TVA / Loki en Menú · Animal Crossing & Zelda en Escenas)
      ======================================================================== */
 
-  let marsAmbience = {
-    active: false,
-    masterGain: null,
-    windGain: null,
-    musicGain: null,
-    windSource: null,
-    windFilter: null,
-    windLfo: null,
-    musicTimer: null
-  };
-
-  function createNoiseBuffer(ctx, durationSec) {
-    const bufferSize = Math.floor(ctx.sampleRate * durationSec);
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    let lastOut = 0.0;
-    for (let i = 0; i < bufferSize; i++) {
-      const white = Math.random() * 2 - 1;
-      lastOut = (lastOut + 0.02 * white) / 1.02;
-      data[i] = lastOut * 5.2;
-    }
-    return buffer;
-  }
-
   function startMarsAmbience() {
-    if (marsAmbience.active) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-
-    try {
-      const now = ctx.currentTime;
-      marsAmbience.active = true;
-
-      // Master Gain para la escena de Marte
-      const master = ctx.createGain();
-      const currentVol = (soundEnabled && soundVolume > 0) ? soundVolume : 0;
-      master.gain.setValueAtTime(0.0001, now);
-      master.gain.exponentialRampToValueAtTime(Math.max(0.0001, currentVol * 0.65), now + 1.2);
-      master.connect(ctx.destination);
-      marsAmbience.masterGain = master;
-
-      // 1. VIENTO MARCIANO (Filtro pasa-bajos / banda modulado por LFO)
-      const windBuffer = createNoiseBuffer(ctx, 4.0);
-      const windSource = ctx.createBufferSource();
-      windSource.buffer = windBuffer;
-      windSource.loop = true;
-
-      const windFilter = ctx.createBiquadFilter();
-      windFilter.type = 'bandpass';
-      windFilter.frequency.setValueAtTime(140, now);
-      windFilter.Q.setValueAtTime(2.2, now);
-
-      // LFO para modular lentamente las ráfagas de viento entre 85 y 230 Hz
-      const windLfo = ctx.createOscillator();
-      const windLfoGain = ctx.createGain();
-      windLfo.frequency.setValueAtTime(0.14, now);
-      windLfoGain.gain.setValueAtTime(65, now);
-      windLfo.connect(windFilter.frequency);
-      windLfo.start(now);
-
-      const windGain = ctx.createGain();
-      windGain.gain.setValueAtTime(0.32, now);
-
-      windSource.connect(windFilter);
-      windFilter.connect(windGain);
-      windGain.connect(master);
-      windSource.start(now);
-
-      marsAmbience.windSource = windSource;
-      marsAmbience.windFilter = windFilter;
-      marsAmbience.windLfo = windLfo;
-      marsAmbience.windGain = windGain;
-
-      // 2. MÚSICA AMBIENTAL PROCEDURAL (Acordes relajantes, alegres y motivadores)
-      const musicGain = ctx.createGain();
-      musicGain.gain.setValueAtTime(0.78, now);
-      musicGain.connect(master);
-      marsAmbience.musicGain = musicGain;
-
-      // Progresión armónica motivadora, alegre, relajante y feliz (Cmaj9 -> Fmaj7 -> G6/9 -> Am9)
-      const chords = [
-        [130.81, 196.0, 246.94, 293.66, 329.63], // Cmaj9: C3, G3, B3, D4, E4 (cálido, brillante, esperanzador)
-        [87.31, 174.61, 261.63, 329.63, 392.0],  // Fmaj7: F2, F3, C4, E4, G4 (dulce, expansivo)
-        [98.0, 196.0, 246.94, 293.66, 392.0],   // G6/9: G2, G3, B3, D4, G4 (alegre, juguetón)
-        [110.0, 164.81, 220.0, 261.63, 329.63]   // Am9: A2, E3, A3, C4, E4 (sereno, tierno)
-      ];
-
-      let chordIdx = 0;
-
-      function playNextPad() {
-        if (!marsAmbience.active) return;
-        const padCtx = getAudioContext();
-        if (!padCtx) return;
-
-        try {
-          const tNow = padCtx.currentTime;
-          const chord = chords[chordIdx % chords.length];
-          chordIdx++;
-          const chordDuration = 7.5;
-
-          chord.forEach((freq, fIdx) => {
-            const osc = padCtx.createOscillator();
-            const gain = padCtx.createGain();
-            const filter = padCtx.createBiquadFilter();
-
-            osc.type = (fIdx === 0) ? 'sine' : (fIdx % 2 === 0 ? 'triangle' : 'sine');
-            const detune = (fIdx % 2 === 0 ? 2 : -2) + (Math.random() * 2 - 1);
-            osc.frequency.setValueAtTime(freq, tNow);
-            osc.detune.setValueAtTime(detune, tNow);
-
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(fIdx === 0 ? 240 : 720, tNow);
-
-            const voiceGain = (fIdx === 0 ? 0.24 : 0.18) / Math.sqrt(chord.length);
-            gain.gain.setValueAtTime(0.0001, tNow);
-            gain.gain.linearRampToValueAtTime(voiceGain, tNow + 2.4);
-            gain.gain.setValueAtTime(voiceGain, tNow + chordDuration - 2.4);
-            gain.gain.linearRampToValueAtTime(0.0001, tNow + chordDuration);
-
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(musicGain);
-
-            osc.start(tNow);
-            osc.stop(tNow + chordDuration + 0.1);
-          });
-
-          // Campanitas y destellos pentatónicos estilo Animal Crossing (dulces, alegres y motivadores)
-          if (chordIdx % 2 === 0) {
-            const chimeNotes = [523.25, 659.25, 783.99, 880.0, 1046.5];
-            const noteCount = 2;
-            for (let cI = 0; cI < noteCount; cI++) {
-              const cf = chimeNotes[Math.floor(Math.random() * chimeNotes.length)];
-              const cOsc = padCtx.createOscillator();
-              const cGain = padCtx.createGain();
-              cOsc.type = 'sine';
-              const noteOffset = 1.6 + cI * 0.38;
-              cOsc.frequency.setValueAtTime(cf, tNow + noteOffset);
-              cGain.gain.setValueAtTime(0.0001, tNow + noteOffset);
-              cGain.gain.linearRampToValueAtTime(0.055, tNow + noteOffset + 0.04);
-              cGain.gain.exponentialRampToValueAtTime(0.0001, tNow + noteOffset + 1.2);
-              cOsc.connect(cGain);
-              cGain.connect(musicGain);
-              cOsc.start(tNow + noteOffset);
-              cOsc.stop(tNow + noteOffset + 1.25);
-            }
-          }
-        } catch (_err) { }
-
-        marsAmbience.musicTimer = setTimeout(playNextPad, 5800);
-      }
-
-      playNextPad();
-    } catch (_err) {
-      marsAmbience.active = false;
+    const music = getMusic();
+    if (music && typeof music.setSite === 'function') {
+      music.setSite('ares-vallis');
+    }
+    if (music && typeof music.playTrack === 'function') {
+      music.playTrack('scene');
     }
   }
 
   function stopMarsAmbience() {
-    if (!marsAmbience.active) return;
-    marsAmbience.active = false;
-    clearTimeout(marsAmbience.musicTimer);
-    marsAmbience.musicTimer = null;
-
-    const ctx = getAudioContext();
-    if (ctx && marsAmbience.masterGain) {
-      try {
-        const now = ctx.currentTime;
-        marsAmbience.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
-        setTimeout(() => {
-          if (marsAmbience.windSource) {
-            try { marsAmbience.windSource.stop(); } catch (_e) { }
-            marsAmbience.windSource = null;
-          }
-          if (marsAmbience.windLfo) {
-            try { marsAmbience.windLfo.stop(); } catch (_e) { }
-            marsAmbience.windLfo = null;
-          }
-          marsAmbience.masterGain = null;
-          marsAmbience.windGain = null;
-          marsAmbience.musicGain = null;
-        }, 1300);
-      } catch (_e) { }
+    const music = getMusic();
+    if (music && typeof music.setSite === 'function') {
+      music.setSite('');
     }
   }
 
   function updateMarsAmbienceVolume() {
-    if (!marsAmbience.active || !marsAmbience.masterGain) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      const targetVol = (soundEnabled && soundVolume > 0) ? (soundVolume * 0.65) : 0.0001;
-      marsAmbience.masterGain.gain.setTargetAtTime(targetVol, now, 0.08);
-    } catch (_e) { }
+    const music = getMusic();
+    if (music && typeof music.setVolume === 'function') {
+      music.setVolume(soundVolume);
+    }
   }
 
   function unlockAudioOnGesture() {
     const ctx = getAudioContext();
+    const music = getMusic();
+    const isGameActive = Boolean(dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden'));
+    const targetTrack = isGameActive ? 'scene' : 'menu';
+
     if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
       ctx.resume().then(() => {
-        if (world3d.active && world3d.siteId === 'ares-vallis') {
-          if (!marsAmbience.active) {
-            startMarsAmbience();
-          } else {
-            updateMarsAmbienceVolume();
-          }
+        if (music && typeof music.playTrack === 'function') {
+          music.playTrack(targetTrack);
         }
       }).catch(() => {});
-    } else if (ctx && world3d.active && world3d.siteId === 'ares-vallis' && !marsAmbience.active) {
-      startMarsAmbience();
+    } else if (music && typeof music.playTrack === 'function') {
+      music.playTrack(targetTrack);
     }
   }
 
@@ -1654,7 +1488,10 @@
     if (typeof CYBERPENGUINS_TTS !== 'undefined' && typeof CYBERPENGUINS_TTS.setVolume === 'function') {
       CYBERPENGUINS_TTS.setVolume(soundVolume);
     }
-    updateMarsAmbienceVolume();
+    const music = getMusic();
+    if (music && typeof music.setVolume === 'function') {
+      music.setVolume(soundVolume);
+    }
     updateSoundUI();
   }
 
@@ -2819,6 +2656,13 @@
 
     dom.stageBackdropLayer.innerHTML = MODELS.stageBackdrop(chapter.id, siteId || undefined);
     syncStage3dMount(siteId);
+    const music = getMusic();
+    if (music && typeof music.setSite === 'function') {
+      music.setSite(siteId);
+    }
+    if (music && typeof music.playTrack === 'function' && dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden')) {
+      music.playTrack('scene');
+    }
     if (FX && typeof FX.setScene === 'function') {
       FX.setScene(chapter.id, siteId);
       if (dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden') && typeof FX.resume === 'function') {
