@@ -348,15 +348,14 @@
       renderCertificateSvgPreview();
     }
 
-    // Re-renderizar elementos de la interfaz según pantalla activa
-    renderChapterNav();
+    // Re-renderizar textos de la interfaz sin recargar tarjetas ni entidades 3D/vectorizadas
     updateHUD();
 
     if (dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden')) {
       const chapter = getChapter(state.currentChapterId);
       const { activeMachine } = getActiveSite(chapter);
       updateLocationPill(chapter, activeMachine);
-      renderStageEntities(chapter);
+      updateStageEntityLabels(chapter);
 
       if (dom.speechBubbleNextBtn) {
         dom.speechBubbleNextBtn.textContent = isEn ? 'Continue' : 'Continuar';
@@ -1263,8 +1262,16 @@
       FX.resume();
     }
     const music = getMusic();
-    if (music && typeof music.playTrack === 'function') {
-      music.playTrack('scene');
+    if (music) {
+      const targetChapter = getChapter(targetId);
+      const { activeMachine } = getActiveSite(targetChapter);
+      const targetSiteId = activeMachine ? activeMachine.siteId : '';
+      if (typeof music.setSite === 'function') {
+        music.setSite(targetSiteId);
+      }
+      if (typeof music.playTrack === 'function') {
+        music.playTrack('scene');
+      }
     }
     loadChapterScene(targetId, true);
     const t3d = getTerrain3D();
@@ -1449,18 +1456,22 @@
     const isGameActive = Boolean(dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden'));
     const targetTrack = isGameActive ? 'scene' : 'menu';
 
-    // Llamar síncronamente dentro del gesto para desbloquear Web Audio en Safari
-    if (music && typeof music.playTrack === 'function') {
-      music.playTrack(targetTrack);
+    // Llamar síncronamente dentro del gesto para desbloquear y sostener Web Audio en Safari
+    if (music) {
+      if (typeof music.getCurrentTrack === 'function' && music.getCurrentTrack() === targetTrack && typeof music.unlock === 'function') {
+        music.unlock();
+      } else if (typeof music.playTrack === 'function') {
+        music.playTrack(targetTrack);
+      }
     }
     const ctx = getAudioContext();
-    if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+    if (ctx && ctx.state !== 'running' && typeof ctx.resume === 'function') {
       ctx.resume().catch(() => {});
     }
   }
 
-  ['click', 'pointerdown', 'touchstart', 'keydown'].forEach((evt) => {
-    window.addEventListener(evt, unlockAudioOnGesture, { passive: true });
+  ['click', 'pointerdown', 'touchstart', 'touchend', 'keydown'].forEach((evt) => {
+    window.addEventListener(evt, unlockAudioOnGesture, { capture: true, passive: true });
   });
 
   function updateSoundUI() {
@@ -1947,7 +1958,6 @@
   }
 
   function resetWorld3d(keepUiClasses) {
-    stopMarsAmbience();
     world3d.active = false;
     world3d.siteId = '';
     world3d.ship = null;
@@ -3057,16 +3067,19 @@
       syncDomEntitiesToWorld3d(getTerrain3D());
     }
 
-    // Listeners de entidades recién creadas
+    // Listeners de entidades recién creadas (resuelven textos/datos vivos del idioma actual al hacer clic)
     const hatchBtn = document.getElementById('ship-hatch-btn');
     if (hatchBtn) {
       hatchBtn.addEventListener('click', () => {
         if (is3dInspectMode) return;
+        const liveChapter = getChapter(state.currentChapterId);
+        const { activeMachine: liveMachine } = getActiveSite(liveChapter);
+        const liveShipPos = (liveMachine && liveMachine.shipPos) || liveChapter.shipPos;
         const finishHatch = () => {
           checkSurfaceProximity();
-          const r = checkSiteRequirements(chapter);
+          const r = checkSiteRequirements(liveChapter);
           if (!r.canLeave) {
-            showPendingTasksNotice(chapter, r.missing);
+            showPendingTasksNotice(liveChapter, r.missing);
           }
         };
         if (world3d.active && world3d.ship) {
@@ -3081,7 +3094,7 @@
           });
           return;
         }
-        const boardingPoint = resolveSurfacePoint(shipPos.x + 9.5, shipPos.y + 4.8, chapter);
+        const boardingPoint = resolveSurfacePoint(liveShipPos.x + 9.5, liveShipPos.y + 4.8, liveChapter);
         routeAndMove(boardingPoint.x, boardingPoint.y, finishHatch);
       });
     }
@@ -3089,7 +3102,8 @@
     document.querySelectorAll('.machine-hotspot').forEach((btn) => {
       btn.addEventListener('click', () => {
         if (is3dInspectMode) return;
-        const machine = chapter.machines.find((m) => m.id === btn.dataset.machineId);
+        const liveChapter = getChapter(state.currentChapterId);
+        const machine = liveChapter.machines.find((m) => m.id === btn.dataset.machineId);
         if (!machine) return;
         if (world3d.active && world3d.machine && world3d.penguin) {
           const destW = resolveWorld3dPoint(world3d.machine.x - 1.15, world3d.machine.z);
@@ -3106,10 +3120,10 @@
           'sojourner':       { x: 6.2,  y: 4.2 },
           'near-shoemaker':  { x: 11.5, y: 5.5 }
         };
-        const off = approachOffsets[machine.id] || { x: 9.5, y: chapter.hasSurface ? 5.5 : 4.8 };
+        const off = approachOffsets[machine.id] || { x: 9.5, y: liveChapter.hasSurface ? 5.5 : 4.8 };
         const offsetX = machine.pos.x > penguinPos.x ? -off.x : off.x;
         const approachY = machine.pos.y + off.y;
-        const target = resolveSurfacePoint(machine.pos.x + offsetX, approachY, chapter);
+        const target = resolveSurfacePoint(machine.pos.x + offsetX, approachY, liveChapter);
         routeAndMove(target.x, target.y, () => {
           openDialogueModal(machine);
         });
@@ -3119,7 +3133,10 @@
     document.querySelectorAll('.sample-hotspot').forEach((btn) => {
       btn.addEventListener('click', () => {
         if (is3dInspectMode) return;
-        const sampleObj = siteSamples.find((s) => s.id === btn.dataset.sampleId);
+        const liveChapter = getChapter(state.currentChapterId);
+        const { activeMachine: liveMachine } = getActiveSite(liveChapter);
+        const liveSamples = getSiteSamples(liveChapter, liveMachine);
+        const sampleObj = liveSamples.find((s) => s.id === btn.dataset.sampleId);
         if (!sampleObj) return;
         if (world3d.active && world3d.samples[sampleObj.id]) {
           const sW = world3d.samples[sampleObj.id];
@@ -3139,15 +3156,42 @@
             if (world3d.penguin) {
               world3d.penguin.yaw = Math.atan2(sW.x - world3d.penguin.x, sW.z - world3d.penguin.z);
             }
-            openSampleDiscoveryModal(chapter, sampleObj);
+            openSampleDiscoveryModal(liveChapter, sampleObj);
           });
           return;
         }
-        const sampleTarget = resolveSurfacePoint(sampleObj.pos.x, sampleObj.pos.y, chapter);
+        const sampleTarget = resolveSurfacePoint(sampleObj.pos.x, sampleObj.pos.y, liveChapter);
         routeAndMove(sampleTarget.x, sampleTarget.y, () => {
-          openSampleDiscoveryModal(chapter, sampleObj);
+          openSampleDiscoveryModal(liveChapter, sampleObj);
         });
       });
+    });
+  }
+
+  function updateStageEntityLabels(chapter) {
+    if (!dom.stageEntitiesLayer || !chapter) return;
+    const { siteIdx, activeMachine } = getActiveSite(chapter);
+    const isFirstStop = siteIdx === 0 && chapter.machines.length > 1;
+    const nextMachine = isFirstStop ? chapter.machines[1] : null;
+    const isEn = state.currentLanguage === 'en';
+    const hatchAriaLabel = isFirstStop && nextMachine
+      ? (isEn ? `Hatch · Travel to ${nextMachine.name}` : `Escotilla · Viajar a ${nextMachine.name}`)
+      : (isEn ? 'Hatch · Quiz and Travel' : 'Escotilla · Quiz y Viaje');
+
+    const hatchBtn = document.getElementById('ship-hatch-btn');
+    if (hatchBtn) {
+      hatchBtn.setAttribute('aria-label', hatchAriaLabel);
+    }
+
+    document.querySelectorAll('.machine-hotspot').forEach((btn) => {
+      const m = chapter.machines.find((item) => item.id === btn.dataset.machineId);
+      if (m) btn.setAttribute('aria-label', m.name);
+    });
+
+    const siteSamples = getSiteSamples(chapter, activeMachine);
+    document.querySelectorAll('.sample-hotspot').forEach((btn) => {
+      const s = siteSamples.find((item) => item.id === btn.dataset.sampleId);
+      if (s) btn.setAttribute('aria-label', s.label);
     });
   }
 
@@ -3878,8 +3922,12 @@
 
   function renderHomeBackground() {
     if (typeof MODELS.homeBackdrop !== 'function') return;
-    if (dom.homeBgLandscape) dom.homeBgLandscape.innerHTML = MODELS.homeBackdrop('landscape');
-    if (dom.homeBgPortrait) dom.homeBgPortrait.innerHTML = MODELS.homeBackdrop('portrait');
+    if (dom.homeBgLandscape && !dom.homeBgLandscape.innerHTML.trim()) {
+      dom.homeBgLandscape.innerHTML = MODELS.homeBackdrop('landscape');
+    }
+    if (dom.homeBgPortrait && !dom.homeBgPortrait.innerHTML.trim()) {
+      dom.homeBgPortrait.innerHTML = MODELS.homeBackdrop('portrait');
+    }
   }
 
   function isChapterUnlocked(chapterId) {
@@ -3902,14 +3950,19 @@
   }
 
   function renderChapterNav() {
+    if (!dom.chapterNav) return;
     const isEn = (state.currentLanguage === 'en');
-    dom.chapterNav.innerHTML = getChaptersList().map((chapter) => {
+    const chapters = getChaptersList();
+    const existingCards = dom.chapterNav.querySelectorAll('.home-chapter-card[data-chapter-card]');
+    const canPatchInPlace =
+      existingCards.length === chapters.length &&
+      chapters.every((ch, idx) => existingCards[idx] && existingCards[idx].dataset.chapterCard === ch.id);
+
+    const getChapterMeta = (chapter) => {
       const completed = isChapterCompleted(chapter.id);
       const unlocked = isChapterUnlocked(chapter.id);
       const inProgress = !completed && hasChapterProgress(chapter.id);
       const isCardActive = inProgress && chapter.id === state.currentChapterId;
-      const sceneHtml = MODELS.chapterScene(chapter.id);
-
       const btnLabel = !unlocked
         ? (isEn ? 'Complete previous mission to unlock' : 'Completa la misión anterior para desbloquear')
         : completed
@@ -3917,12 +3970,57 @@
           : inProgress
             ? (isEn ? 'Continue' : 'Continuar')
             : (isEn ? 'Explore' : 'Explorar');
+      const btnClass = `squircle-btn home-chapter-enter-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 px-3 sm:px-4 font-medium transition-colors ${
+        !unlocked
+          ? 'home-chapter-btn-locked'
+          : isCardActive
+            ? 'bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm text-xs sm:text-sm'
+            : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-200 border border-white/[0.08] text-xs sm:text-sm'
+      }`;
+      return { unlocked, isCardActive, btnLabel, btnClass };
+    };
+
+    if (canPatchInPlace) {
+      chapters.forEach((chapter, idx) => {
+        const card = existingCards[idx];
+        const { unlocked, isCardActive, btnLabel, btnClass } = getChapterMeta(chapter);
+        card.classList.toggle('is-active', isCardActive);
+        card.classList.toggle('is-locked', !unlocked);
+
+        const titleEl = card.querySelector('.home-chapter-title');
+        if (titleEl) titleEl.textContent = chapter.name;
+
+        const emblemEl = card.querySelector('.home-chapter-emblem');
+        if (emblemEl) emblemEl.classList.toggle('opacity-55', !unlocked);
+
+        const btn = card.querySelector('.home-chapter-enter-btn');
+        if (btn) {
+          btn.disabled = !unlocked;
+          btn.className = btnClass;
+          const lockIcon = btn.querySelector('.home-chapter-btn-lock');
+          if (lockIcon) lockIcon.classList.toggle('hidden', unlocked);
+          const labelEl = btn.querySelector('.home-chapter-btn-label');
+          if (labelEl) labelEl.textContent = btnLabel;
+        }
+      });
+
+      const homeVisible = Boolean(dom.homeScreen && !dom.homeScreen.classList.contains('is-hidden'));
+      const cards3d = getHomeCards3D();
+      if (homeVisible && cards3d && typeof cards3d.resume === 'function' && typeof cards3d.getStats === 'function' && cards3d.getStats().isPaused) {
+        cards3d.resume();
+      }
+      return;
+    }
+
+    dom.chapterNav.innerHTML = chapters.map((chapter) => {
+      const { unlocked, isCardActive, btnLabel, btnClass } = getChapterMeta(chapter);
+      const sceneHtml = MODELS.chapterScene(chapter.id);
 
       return `
         <div class="home-chapter-card p-5 sm:p-6 flex flex-col items-center justify-between text-center gap-4 h-full ${isCardActive ? 'is-active' : ''
-        } ${!unlocked ? 'is-locked' : ''}">
+        } ${!unlocked ? 'is-locked' : ''}" data-chapter-card="${chapter.id}">
           <div class="w-full flex items-center justify-center">
-            <h3 class="text-xs sm:text-sm font-semibold tracking-wide text-slate-200 text-center">${chapter.name}</h3>
+            <h3 class="home-chapter-title text-xs sm:text-sm font-semibold tracking-wide text-slate-200 text-center">${chapter.name}</h3>
           </div>
 
           <div class="home-chapter-emblem relative w-full ${!unlocked ? 'opacity-55' : ''}">
@@ -3931,21 +4029,14 @@
 
           <div class="flex flex-col items-center gap-3 w-full">
             <button type="button"
-              class="squircle-btn rounded-full w-full inline-flex items-center justify-center text-center py-2.5 px-3 sm:px-4 font-medium transition-colors ${!unlocked
-          ? 'home-chapter-btn-locked'
-          : isCardActive
-            ? 'bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm text-xs sm:text-sm'
-            : 'bg-white/[0.06] hover:bg-white/[0.14] text-slate-200 border border-white/[0.08] text-xs sm:text-sm'
-        }"
+              class="${btnClass}"
               ${!unlocked ? 'disabled' : ''}
               data-enter-chapter="${chapter.id}">
-              ${!unlocked ? `
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 opacity-90 inline-block flex-shrink-0" aria-hidden="true">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-              ` : ''}
-              <span>${btnLabel}</span>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="home-chapter-btn-lock mr-1.5 opacity-90 inline-block flex-shrink-0 ${unlocked ? 'hidden' : ''}" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <span class="home-chapter-btn-label">${btnLabel}</span>
             </button>
           </div>
         </div>
@@ -3981,27 +4072,58 @@
       dom.homeChaptersCompletedCount.textContent = `${completedCount}/${chaptersList.length}`;
     }
     if (dom.homePassportSlots) {
-      dom.homePassportSlots.innerHTML = chaptersList.map((chapter) => {
-        const stamped = hasChapterPassportStamp(chapter);
-        return `
-          <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-1.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center">
-            <div class="flex items-center justify-center">${MODELS.penguinPawStamp(stamped, 24)}</div>
-            <span class="text-[10px] font-normal text-slate-300 text-center leading-tight">${chapter.name}</span>
-          </div>
-        `;
-      }).join('');
+      const existingSlots = dom.homePassportSlots.querySelectorAll('[data-passport-chapter]');
+      const canPatchPassport =
+        existingSlots.length === chaptersList.length &&
+        chaptersList.every((ch, idx) => {
+          const el = existingSlots[idx];
+          return el && el.dataset.passportChapter === ch.id && el.dataset.stamped === String(hasChapterPassportStamp(ch));
+        });
+      if (canPatchPassport) {
+        chaptersList.forEach((chapter, idx) => {
+          const label = existingSlots[idx].querySelector('span');
+          if (label) label.textContent = chapter.name;
+        });
+      } else {
+        dom.homePassportSlots.innerHTML = chaptersList.map((chapter) => {
+          const stamped = hasChapterPassportStamp(chapter);
+          return `
+            <div data-passport-chapter="${chapter.id}" data-stamped="${stamped}" class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-1.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center">
+              <div class="flex items-center justify-center">${MODELS.penguinPawStamp(stamped, 24)}</div>
+              <span class="text-[10px] font-normal text-slate-300 text-center leading-tight">${chapter.name}</span>
+            </div>
+          `;
+        }).join('');
+      }
     }
     if (dom.homeBadgesGrid) {
-      dom.homeBadgesGrid.innerHTML = badgesList.map((item) => {
-        const unlocked = totalStars >= item.minStars;
-        return `
-          <div class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-0.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center ${unlocked ? '' : 'opacity-40'
-          }" title="${item.name}">
-            <div class="w-6 h-6 flex items-center justify-center [&_svg]:w-6 [&_svg]:h-6">${MODELS.badgeIcon(item.id, unlocked)}</div>
-            <span class="text-[9px] font-normal text-slate-300 text-center leading-tight">${item.name}</span>
-          </div>
-        `;
-      }).join('');
+      const existingBadges = dom.homeBadgesGrid.querySelectorAll('[data-badge-id]');
+      const canPatchBadges =
+        existingBadges.length === badgesList.length &&
+        badgesList.every((item, idx) => {
+          const el = existingBadges[idx];
+          const unlocked = totalStars >= item.minStars;
+          return el && el.dataset.badgeId === item.id && el.dataset.unlocked === String(unlocked);
+        });
+      if (canPatchBadges) {
+        badgesList.forEach((item, idx) => {
+          const el = existingBadges[idx];
+          el.title = item.name;
+          const label = el.querySelector('span');
+          if (label) label.textContent = item.name;
+        });
+      } else {
+        dom.homeBadgesGrid.innerHTML = badgesList.map((item) => {
+          const unlocked = totalStars >= item.minStars;
+          return `
+            <div data-badge-id="${item.id}" data-unlocked="${unlocked}" class="rounded-xl bg-white/[0.03] border border-white/[0.06] min-h-[54px] px-0.5 py-1.5 flex flex-col items-center justify-center gap-1 text-center ${unlocked ? '' : 'opacity-40'
+            }" title="${item.name}">
+              <div class="w-6 h-6 flex items-center justify-center [&_svg]:w-6 [&_svg]:h-6">${MODELS.badgeIcon(item.id, unlocked)}</div>
+              <span class="text-[9px] font-normal text-slate-300 text-center leading-tight">${item.name}</span>
+            </div>
+          `;
+        }).join('');
+      }
     }
     const certPreview = document.getElementById('home-certificate-preview');
     if (certPreview) {
@@ -4009,9 +4131,12 @@
       certPreview.title = allCompleted
         ? (isEn ? 'Tap to view diploma' : 'Toca para ver el diploma')
         : (isEn ? 'Available upon completing all chapters' : 'Disponible al completar todos los capítulos');
-      certPreview.innerHTML = `
-        <div class="flex items-center justify-center">${MODELS.penguinPawStamp(allCompleted, 26)}</div>
-      `;
+      if (certPreview.dataset.unlocked !== String(allCompleted) || !certPreview.querySelector('svg')) {
+        certPreview.dataset.unlocked = String(allCompleted);
+        certPreview.innerHTML = `
+          <div class="flex items-center justify-center">${MODELS.penguinPawStamp(allCompleted, 26)}</div>
+        `;
+      }
     }
     const certActions = document.getElementById('home-certificate-actions');
     if (dom.homeCertificateStatus) {

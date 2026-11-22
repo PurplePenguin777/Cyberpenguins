@@ -16,7 +16,10 @@
       currentAudio.currentTime = 0;
       currentAudio = null;
     }
-    if (typeof global.speechSynthesis !== 'undefined') {
+    if (
+      typeof global.speechSynthesis !== 'undefined' &&
+      (global.speechSynthesis.speaking || global.speechSynthesis.pending)
+    ) {
       global.speechSynthesis.cancel();
     }
   }

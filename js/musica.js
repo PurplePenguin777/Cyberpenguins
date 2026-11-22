@@ -25,6 +25,10 @@
   let currentTrackName = null; // 'menu' | 'scene' | null
   let desiredTrackName = null;
   let schedulerTimer = null;
+  let tvaFadeTimer = null;
+  let acFadeTimer = null;
+  let marsWindTimer = null;
+  let marsWindGen = 0;
   let isPaused = false;
   let currentSiteId = '';
 
@@ -207,6 +211,48 @@
     }
   };
 
+  function holdGainParam(param, now) {
+    if (!param) return 0.0001;
+    const current = Math.max(0.0001, Number(param.value) || 0.0001);
+    try {
+      if (typeof param.cancelAndHoldAtTime === 'function') {
+        param.cancelAndHoldAtTime(now);
+        return Math.max(0.0001, Number(param.value) || current);
+      }
+    } catch (_e) { }
+    try {
+      param.cancelScheduledValues(now);
+      param.setValueAtTime(current, now);
+    } catch (_e) { }
+    return current;
+  }
+
+  function isDesiredTrackPlaying() {
+    if (!desiredTrackName || currentTrackName !== desiredTrackName) return false;
+    return desiredTrackName === 'menu' ? TVA.active : (desiredTrackName === 'scene' && AC_ZELDA.active);
+  }
+
+  function handleContextStateChange() {
+    if (!audioCtx || isPaused) return;
+    if (audioCtx.state === 'running') {
+      const target = desiredTrackName || currentTrackName;
+      if (target) {
+        const now = audioCtx.currentTime;
+        if (TVA.active && TVA.nextNoteTime < now - 0.15) {
+          TVA.nextNoteTime = now + 0.015;
+        }
+        if (AC_ZELDA.active && AC_ZELDA.nextNoteTime < now - 0.15) {
+          AC_ZELDA.nextNoteTime = now + 0.015;
+        }
+        applyTrack(target, false);
+      }
+      return;
+    }
+    if ((audioCtx.state === 'interrupted' || audioCtx.state === 'suspended') && typeof audioCtx.resume === 'function') {
+      audioCtx.resume().catch(() => {});
+    }
+  }
+
   /* ========================================================================
      AUDIO CONTEXT & MASTER CHAIN SETUP
      ======================================================================== */
@@ -215,6 +261,7 @@
       const Ctx = global.AudioContext || global.webkitAudioContext;
       if (Ctx) {
         audioCtx = new Ctx();
+        audioCtx.onstatechange = handleContextStateChange;
       }
     }
     if (audioCtx && !masterGain) {
@@ -340,9 +387,10 @@
    * 3. Capas Armónicas Orquestales Oscuras (Brass & Cinematic Strings)
    * Acordes solemnes con sub-bajo cinematográfico de 36Hz para peso masivo.
    */
-  function scheduleTvaChords(time, chord, duration) {
+  function scheduleTvaChords(time, chord, duration, isFirstBar) {
     if (!audioCtx || !TVA.gainNode) return;
     try {
+      const attack = isFirstBar ? 0.18 : 0.65;
       // Sub-bajo de profundidad cinematográfica
       const subOsc = audioCtx.createOscillator();
       const subGain = audioCtx.createGain();
@@ -350,8 +398,8 @@
       subOsc.frequency.setValueAtTime(chord.sub, time);
 
       subGain.gain.setValueAtTime(0.0001, time);
-      subGain.gain.linearRampToValueAtTime(0.18, time + 0.8);
-      subGain.gain.setValueAtTime(0.18, time + duration - 0.8);
+      subGain.gain.linearRampToValueAtTime(0.18, time + attack);
+      subGain.gain.setValueAtTime(0.18, Math.max(time + attack + 0.02, time + duration - 0.7));
       subGain.gain.linearRampToValueAtTime(0.0001, time + duration);
 
       subOsc.connect(subGain);
@@ -376,8 +424,8 @@
 
         const vGain = 0.065 / Math.sqrt(chord.notes.length);
         gain.gain.setValueAtTime(0.0001, time);
-        gain.gain.linearRampToValueAtTime(vGain, time + 0.9);
-        gain.gain.setValueAtTime(vGain, time + duration - 0.9);
+        gain.gain.linearRampToValueAtTime(vGain, time + attack);
+        gain.gain.setValueAtTime(vGain, Math.max(time + attack + 0.02, time + duration - 0.75));
         gain.gain.linearRampToValueAtTime(0.0001, time + duration);
 
         osc.connect(filter);
@@ -626,6 +674,9 @@
    * 5. Viento Marciano de Baja Presión (CO2 Acústica NASA)
    */
   function startMarsWind() {
+    clearTimeout(marsWindTimer);
+    marsWindTimer = null;
+    marsWindGen += 1;
     if (AC_ZELDA.marsWind.active || !audioCtx || !AC_ZELDA.gainNode) return;
     try {
       const now = audioCtx.currentTime;
@@ -658,7 +709,7 @@
 
       const windGain = audioCtx.createGain();
       windGain.gain.setValueAtTime(0.0001, now);
-      windGain.gain.linearRampToValueAtTime(0.16, now + 1.5);
+      windGain.gain.linearRampToValueAtTime(0.16, now + 0.8);
 
       windSrc.connect(windFilt);
       windFilt.connect(windGain);
@@ -674,13 +725,18 @@
   }
 
   function stopMarsWind() {
+    clearTimeout(marsWindTimer);
+    marsWindTimer = null;
+    const gen = ++marsWindGen;
     if (!AC_ZELDA.marsWind.active) return;
     AC_ZELDA.marsWind.active = false;
     if (AC_ZELDA.marsWind.gain && audioCtx) {
       try {
         const now = audioCtx.currentTime;
-        AC_ZELDA.marsWind.gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
-        setTimeout(() => {
+        holdGainParam(AC_ZELDA.marsWind.gain.gain, now);
+        AC_ZELDA.marsWind.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+        marsWindTimer = setTimeout(() => {
+          if (gen !== marsWindGen) return;
           try {
             if (AC_ZELDA.marsWind.source) AC_ZELDA.marsWind.source.stop();
             if (AC_ZELDA.marsWind.lfo) AC_ZELDA.marsWind.lfo.stop();
@@ -689,7 +745,7 @@
           AC_ZELDA.marsWind.lfo = null;
           AC_ZELDA.marsWind.filter = null;
           AC_ZELDA.marsWind.gain = null;
-        }, 1100);
+        }, 780);
       } catch (_e) { }
     }
   }
@@ -707,7 +763,7 @@
     if (TVA.active) {
       const secPer16th = (60 / TVA.bpm) / 4;
       if (TVA.nextNoteTime < currentTime - 0.15) {
-        TVA.nextNoteTime = currentTime + 0.05;
+        TVA.nextNoteTime = currentTime + 0.015;
       }
 
       while (TVA.nextNoteTime < currentTime + SCHEDULE_AHEAD_TIME) {
@@ -729,7 +785,7 @@
         // 3. Cinematic Chords & Sub-bass on the first 16th of each bar (every 16 steps)
         if (stepInBar === 0) {
           const chordDuration = secPer16th * 16;
-          scheduleTvaChords(t, currentChord, chordDuration);
+          scheduleTvaChords(t, currentChord, chordDuration, TVA.currentBar === 0);
           TVA.currentBar++;
         }
 
@@ -835,57 +891,62 @@
     const ctx = getContext();
     if (!ctx || !trackName) return;
 
-    if (
+    const alreadyActive =
       !forceRestart &&
       currentTrackName === trackName &&
-      ((trackName === 'menu' && TVA.active) || (trackName === 'scene' && AC_ZELDA.active))
-    ) {
-      return;
-    }
+      ((trackName === 'menu' && TVA.active) || (trackName === 'scene' && AC_ZELDA.active));
 
     const now = ctx.currentTime;
-    const fadeDuration = 1.35;
+    const wasSilent = (!TVA.active && !AC_ZELDA.active);
+    const fadeDuration = wasSilent ? 0.22 : 0.85;
 
     if (trackName === 'menu') {
-      // Activar TVA / Loki
-      TVA.active = true;
-      TVA.nextNoteTime = now + 0.05;
-      TVA.current16th = 0;
-      TVA.currentBar = 0;
-      TVA.nextMelody16th = 4; // Entra poco después del pulso
-      TVA.melodyNoteIdx = 0;
-      TVA.melodyPhraseIdx = 0;
-      TVA.lastThereminFreq = 293.66;
+      clearTimeout(tvaFadeTimer);
+      tvaFadeTimer = null;
 
-      if (TVA.gainNode) {
-        TVA.gainNode.gain.cancelScheduledValues(now);
-        TVA.gainNode.gain.setValueAtTime(Math.max(0.0001, TVA.gainNode.gain.value || 0.0001), now);
-        TVA.gainNode.gain.linearRampToValueAtTime(1.0, now + fadeDuration);
+      if (!alreadyActive) {
+        TVA.active = true;
+        TVA.nextNoteTime = now + 0.015;
+        TVA.current16th = 0;
+        TVA.currentBar = 0;
+        TVA.nextMelody16th = 0;
+        TVA.melodyNoteIdx = 0;
+        TVA.melodyPhraseIdx = 0;
+        TVA.lastThereminFreq = 293.66;
       }
 
-      // Desactivar Animal Crossing / Zelda
+      if (TVA.gainNode) {
+        holdGainParam(TVA.gainNode.gain, now);
+        TVA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.12 : fadeDuration));
+      }
+
       if (AC_ZELDA.active && AC_ZELDA.gainNode) {
-        AC_ZELDA.gainNode.gain.cancelScheduledValues(now);
-        AC_ZELDA.gainNode.gain.setValueAtTime(Math.max(0.0001, AC_ZELDA.gainNode.gain.value || 0.0001), now);
+        clearTimeout(acFadeTimer);
+        holdGainParam(AC_ZELDA.gainNode.gain, now);
         AC_ZELDA.gainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
-        setTimeout(() => {
+        acFadeTimer = setTimeout(() => {
           if (desiredTrackName !== 'scene') {
             AC_ZELDA.active = false;
             stopMarsWind();
           }
-        }, fadeDuration * 1000 + 100);
+        }, fadeDuration * 1000 + 80);
       }
       currentTrackName = 'menu';
       startScheduler();
+      tickScheduler();
     } else if (trackName === 'scene') {
-      // Activar Animal Crossing / Zelda Ocarina
-      AC_ZELDA.active = true;
-      AC_ZELDA.nextNoteTime = now + 0.05;
-      AC_ZELDA.current16th = 0;
-      AC_ZELDA.currentBar = 0;
-      AC_ZELDA.nextMelody16th = 4;
-      AC_ZELDA.melodyNoteIdx = 0;
-      AC_ZELDA.melodyPhraseIdx = 0;
+      clearTimeout(acFadeTimer);
+      acFadeTimer = null;
+
+      if (!alreadyActive) {
+        AC_ZELDA.active = true;
+        AC_ZELDA.nextNoteTime = now + 0.015;
+        AC_ZELDA.current16th = 0;
+        AC_ZELDA.currentBar = 0;
+        AC_ZELDA.nextMelody16th = 0;
+        AC_ZELDA.melodyNoteIdx = 0;
+        AC_ZELDA.melodyPhraseIdx = 0;
+      }
 
       if (currentSiteId === 'ares-vallis') {
         startMarsWind();
@@ -894,24 +955,23 @@
       }
 
       if (AC_ZELDA.gainNode) {
-        AC_ZELDA.gainNode.gain.cancelScheduledValues(now);
-        AC_ZELDA.gainNode.gain.setValueAtTime(Math.max(0.0001, AC_ZELDA.gainNode.gain.value || 0.0001), now);
-        AC_ZELDA.gainNode.gain.linearRampToValueAtTime(1.0, now + fadeDuration);
+        holdGainParam(AC_ZELDA.gainNode.gain, now);
+        AC_ZELDA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.12 : fadeDuration));
       }
 
-      // Desactivar TVA / Loki
       if (TVA.active && TVA.gainNode) {
-        TVA.gainNode.gain.cancelScheduledValues(now);
-        TVA.gainNode.gain.setValueAtTime(Math.max(0.0001, TVA.gainNode.gain.value || 0.0001), now);
+        clearTimeout(tvaFadeTimer);
+        holdGainParam(TVA.gainNode.gain, now);
         TVA.gainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
-        setTimeout(() => {
+        tvaFadeTimer = setTimeout(() => {
           if (desiredTrackName !== 'menu') {
             TVA.active = false;
           }
-        }, fadeDuration * 1000 + 100);
+        }, fadeDuration * 1000 + 80);
       }
       currentTrackName = 'scene';
       startScheduler();
+      tickScheduler();
     }
   }
 
@@ -920,9 +980,9 @@
     const ctx = getContext();
     if (!ctx) return;
 
-    if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+    if (ctx.state !== 'running' && typeof ctx.resume === 'function') {
       ctx.resume().then(() => {
-        if (ctx.state === 'running' && desiredTrackName) {
+        if (ctx.state === 'running' && desiredTrackName && !isPaused) {
           applyTrack(desiredTrackName, Boolean(forceRestart));
         }
       }).catch(() => {});
@@ -936,21 +996,27 @@
 
   function stop() {
     desiredTrackName = null;
+    clearTimeout(tvaFadeTimer);
+    clearTimeout(acFadeTimer);
     const ctx = getContext();
     if (!ctx) return;
     const now = ctx.currentTime;
     if (TVA.gainNode) {
-      TVA.gainNode.gain.linearRampToValueAtTime(0.0001, now + 0.8);
+      holdGainParam(TVA.gainNode.gain, now);
+      TVA.gainNode.gain.linearRampToValueAtTime(0.0001, now + 0.5);
     }
     if (AC_ZELDA.gainNode) {
-      AC_ZELDA.gainNode.gain.linearRampToValueAtTime(0.0001, now + 0.8);
+      holdGainParam(AC_ZELDA.gainNode.gain, now);
+      AC_ZELDA.gainNode.gain.linearRampToValueAtTime(0.0001, now + 0.5);
     }
     stopMarsWind();
-    setTimeout(() => {
-      TVA.active = false;
-      AC_ZELDA.active = false;
-      currentTrackName = null;
-    }, 900);
+    tvaFadeTimer = setTimeout(() => {
+      if (!desiredTrackName) {
+        TVA.active = false;
+        AC_ZELDA.active = false;
+        currentTrackName = null;
+      }
+    }, 560);
   }
 
   function setVolume(vol) {
@@ -1002,31 +1068,31 @@
     }
   }
 
-  const UNLOCK_EVENTS = ['pointerdown', 'touchend', 'click', 'keydown'];
+  const UNLOCK_EVENTS = ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown'];
 
-  function detachUnlockListeners() {
-    if (typeof global.removeEventListener !== 'function') return;
-    UNLOCK_EVENTS.forEach((evt) => {
-      global.removeEventListener(evt, unlockOnUserGesture);
-    });
-  }
-
-  // Desbloqueo proactivo y reintento seguro en Safari / navegadores modernos
+  // Desbloqueo proactivo y recuperación continua ante interrupciones en fase de captura (Safari/iOS/macOS)
   function unlockOnUserGesture() {
+    if (isPaused) return;
     const ctx = getContext();
     if (!ctx) return;
 
-    if (ctx.state === 'running') {
-      detachUnlockListeners();
-      applyTrack(desiredTrackName || 'menu', false);
+    // Salida O(1) si ya está sonando la pista esperada sin interrupciones
+    if (ctx.state === 'running' && isDesiredTrackPlaying()) {
       return;
     }
 
-    if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+    const target = desiredTrackName || currentTrackName || 'menu';
+    desiredTrackName = target;
+
+    if (ctx.state === 'running') {
+      applyTrack(target, false);
+      return;
+    }
+
+    if (typeof ctx.resume === 'function') {
       ctx.resume().then(() => {
-        if (ctx.state === 'running') {
-          detachUnlockListeners();
-          applyTrack(desiredTrackName || 'menu', false);
+        if (ctx.state === 'running' && !isPaused) {
+          applyTrack(desiredTrackName || target, false);
         }
       }).catch(() => {});
     }
@@ -1034,7 +1100,7 @@
 
   if (typeof global.addEventListener === 'function') {
     UNLOCK_EVENTS.forEach((evt) => {
-      global.addEventListener(evt, unlockOnUserGesture, { passive: true });
+      global.addEventListener(evt, unlockOnUserGesture, { capture: true, passive: true });
     });
   }
 
