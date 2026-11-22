@@ -31,6 +31,26 @@
   let marsWindGen = 0;
   let isPaused = false;
   let currentSiteId = '';
+  let activeSceneVoices = [];
+
+  function registerSceneVoice(gain, stopTime) {
+    if (!gain) return;
+    activeSceneVoices.push({ gain, stopTime });
+    if (activeSceneVoices.length > 24) {
+      const now = audioCtx ? audioCtx.currentTime : 0;
+      activeSceneVoices = activeSceneVoices.filter((v) => v.stopTime > now);
+    }
+  }
+
+  function killSceneVoices(now) {
+    activeSceneVoices.forEach((v) => {
+      try {
+        holdGainParam(v.gain.gain, now);
+        v.gain.gain.linearRampToValueAtTime(0.0001, now + 0.06);
+      } catch (_e) {}
+    });
+    activeSceneVoices = [];
+  }
 
   // Lookahead timing configuration (Web Audio scheduler pattern)
   const LOOKAHEAD_MS = 60;
@@ -325,9 +345,9 @@
 
       filter.type = 'bandpass';
       filter.frequency.setValueAtTime(freq, time);
-      filter.Q.setValueAtTime(14.0, time);
+      filter.Q.setValueAtTime(7.0, time);
 
-      const peakGain = 0.08 * accent;
+      const peakGain = 0.16 * accent;
       gain.gain.setValueAtTime(0.0001, time);
       gain.gain.linearRampToValueAtTime(peakGain, time + 0.003);
       gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.028);
@@ -362,11 +382,11 @@
       // Filtro pasa-bajos analógico con resonancia agresiva (Q = 4.2)
       filter.type = 'lowpass';
       filter.Q.setValueAtTime(3.8, time);
-      const cutoffStart = Math.min(1800, freq * 8 * accent);
+      const cutoffStart = Math.min(2400, Math.max(1200, freq * 12 * accent));
       filter.frequency.setValueAtTime(cutoffStart, time);
-      filter.frequency.exponentialRampToValueAtTime(120, time + duration * 0.85);
+      filter.frequency.exponentialRampToValueAtTime(260, time + duration * 0.85);
 
-      const peakGain = 0.28 * accent;
+      const peakGain = 0.35 * accent;
       gain.gain.setValueAtTime(0.0001, time);
       gain.gain.linearRampToValueAtTime(peakGain, time + 0.006);
       gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
@@ -390,7 +410,7 @@
   function scheduleTvaChords(time, chord, duration, isFirstBar) {
     if (!audioCtx || !TVA.gainNode) return;
     try {
-      const attack = isFirstBar ? 0.18 : 0.65;
+      const attack = isFirstBar ? 0.03 : 0.45;
       // Sub-bajo de profundidad cinematográfica
       const subOsc = audioCtx.createOscillator();
       const subGain = audioCtx.createGain();
@@ -398,7 +418,7 @@
       subOsc.frequency.setValueAtTime(chord.sub, time);
 
       subGain.gain.setValueAtTime(0.0001, time);
-      subGain.gain.linearRampToValueAtTime(0.18, time + attack);
+      subGain.gain.linearRampToValueAtTime(0.24, time + attack);
       subGain.gain.setValueAtTime(0.18, Math.max(time + attack + 0.02, time + duration - 0.7));
       subGain.gain.linearRampToValueAtTime(0.0001, time + duration);
 
@@ -464,7 +484,7 @@
       lfoGain.connect(osc.frequency);
       lfo.start(time);
 
-      const attackGlideEnd = Math.min(time + 0.14, time + duration * 0.6);
+      const attackGlideEnd = Math.min(time + 0.04, time + duration * 0.4);
       osc.type = 'sine';
       // Portamento desde la nota anterior
       osc.frequency.setValueAtTime(TVA.lastThereminFreq, time);
@@ -481,10 +501,10 @@
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(1600, time);
 
-      const fadeInEnd = Math.min(time + 0.18, time + duration * 0.45);
+      const fadeInEnd = Math.min(time + 0.05, time + duration * 0.3);
       const fadeOutStart = Math.max(fadeInEnd + 0.01, time + duration - 0.15);
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.24, fadeInEnd);
+      gain.gain.linearRampToValueAtTime(0.28, fadeInEnd);
       gain.gain.setValueAtTime(0.24, fadeOutStart);
       gain.gain.linearRampToValueAtTime(0.0001, time + duration);
 
@@ -550,6 +570,7 @@
       oscHarmonic.connect(filter);
       filter.connect(gain);
       gain.connect(AC_ZELDA.gainNode);
+      registerSceneVoice(gain, time + duration + 0.05);
 
       osc.start(time);
       oscHarmonic.start(time);
@@ -643,6 +664,7 @@
       osc.connect(filter);
       filter.connect(gain);
       gain.connect(AC_ZELDA.gainNode);
+      registerSceneVoice(gain, time + duration + 0.02);
 
       osc.start(time);
       osc.stop(time + duration + 0.02);
@@ -904,21 +926,22 @@
       clearTimeout(tvaFadeTimer);
       tvaFadeTimer = null;
 
-      // 1. Corte inmediato de programación de ocarina/plucks y decaimiento exponencial natural
-      if (AC_ZELDA.active) {
+      // Silenciar de inmediato cualquier voz de ocarina/escena residual
+      if (AC_ZELDA.active || activeSceneVoices.length > 0) {
         AC_ZELDA.active = false;
         clearTimeout(acFadeTimer);
         stopMarsWind();
+        killSceneVoices(now);
         if (AC_ZELDA.gainNode) {
           holdGainParam(AC_ZELDA.gainNode.gain, now);
-          AC_ZELDA.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+          AC_ZELDA.gainNode.gain.linearRampToValueAtTime(0.0001, now + 0.06);
         }
       }
 
-      // 2. Entrada inmediata del pulso y bajo ostinato TVA
+      // Iniciar el pulso y ostinato de TVA sin retraso
       if (!alreadyActive) {
         TVA.active = true;
-        TVA.nextNoteTime = now + 0.012;
+        TVA.nextNoteTime = now + 0.004;
         TVA.current16th = 0;
         TVA.currentBar = 0;
         TVA.nextMelody16th = 0;
@@ -929,7 +952,7 @@
 
       if (TVA.gainNode) {
         holdGainParam(TVA.gainNode.gain, now);
-        TVA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.08 : 0.22));
+        TVA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.03 : 0.09));
       }
 
       currentTrackName = 'menu';
@@ -939,13 +962,12 @@
       clearTimeout(acFadeTimer);
       acFadeTimer = null;
 
-      // 1. Corte inmediato de notas TVA y liberación exponencial suave
       if (TVA.active) {
         TVA.active = false;
         clearTimeout(tvaFadeTimer);
         if (TVA.gainNode) {
           holdGainParam(TVA.gainNode.gain, now);
-          TVA.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+          TVA.gainNode.gain.linearRampToValueAtTime(0.0001, now + 0.08);
         }
       }
 
@@ -955,10 +977,9 @@
         stopMarsWind();
       }
 
-      // 2. Entrada acogedora de arpegios acústicos y ocarina
       if (!alreadyActive) {
         AC_ZELDA.active = true;
-        AC_ZELDA.nextNoteTime = now + 0.012;
+        AC_ZELDA.nextNoteTime = now + 0.008;
         AC_ZELDA.current16th = 0;
         AC_ZELDA.currentBar = 0;
         AC_ZELDA.nextMelody16th = 0;
@@ -968,7 +989,7 @@
 
       if (AC_ZELDA.gainNode) {
         holdGainParam(AC_ZELDA.gainNode.gain, now);
-        AC_ZELDA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.08 : 0.25));
+        AC_ZELDA.gainNode.gain.linearRampToValueAtTime(1.0, now + (alreadyActive ? 0.04 : 0.16));
       }
 
       currentTrackName = 'scene';

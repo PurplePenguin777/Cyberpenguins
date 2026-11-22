@@ -989,9 +989,6 @@
 
     // Clic / toque en el escenario para caminar sobre la superficie o flotar en caminata EVA
     dom.isoBoard.addEventListener('click', (event) => {
-      if (world3d.active && world3d.siteId === 'ares-vallis') {
-        startMarsAmbience();
-      }
       if (is3dInspectMode || Date.now() < suppressBoardClickUntil) {
         return;
       }
@@ -1231,17 +1228,17 @@
     if (t3d && typeof t3d.pause === 'function') {
       t3d.pause();
     }
-    const music = getMusic();
-    if (music && typeof music.playTrack === 'function') {
-      music.playTrack('menu');
-    }
-    saveState();
     dom.gameScreen.classList.add('is-hidden');
     dom.launchScreen.classList.add('is-hidden');
     if (dom.travelCinematic) {
       dom.travelCinematic.classList.add('is-hidden');
     }
     dom.homeScreen.classList.remove('is-hidden');
+    const music = getMusic();
+    if (music && typeof music.playTrack === 'function') {
+      music.playTrack('menu', true);
+    }
+    saveState();
     renderHomeBackground();
     renderChapterNav();
     updateHUD();
@@ -1460,7 +1457,10 @@
     }
   }
 
-  function unlockAudioOnGesture() {
+  function unlockAudioOnGesture(event) {
+    if (event && event.target && event.target.closest && event.target.closest('#back-home-btn, .back-home-btn')) {
+      return;
+    }
     const music = getMusic();
     const isGameActive = Boolean(dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden'));
     const targetTrack = isGameActive ? 'scene' : 'menu';
@@ -2629,7 +2629,7 @@
 
     world3d.active = true;
     world3d.siteId = siteId;
-    if (siteId === 'ares-vallis') {
+    if (siteId === 'ares-vallis' && dom.gameScreen && !dom.gameScreen.classList.contains('is-hidden')) {
       startMarsAmbience();
     } else {
       stopMarsAmbience();
