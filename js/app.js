@@ -4164,14 +4164,27 @@
     if (world3d.active && (activeDialogueMachine || activeSampleDiscovery)) {
       // Posicionar directamente sobre el personaje o roca que está hablando/analizada
       const halfBubblePct = ((bubbleW / 2) / Math.max(1, boardW)) * 100;
-      const minX = Math.max(22, halfBubblePct + 2.0);
+      const isMachine = activeSpeechAnchorKind === 'machine';
+      const isSample = activeSpeechAnchorKind === 'sample';
+
+      let minX = Math.max(22, halfBubblePct + 2.0);
       const maxX = Math.min(78, 100 - halfBubblePct - 2.0);
+
+      if (isSample) {
+        // Al analizar una roca, Cyberpenguin está a la izquierda observándola.
+        // Garantizar que el borde izquierdo del globo quede holgadamente a la derecha de Cyberpenguin
+        // para jamás tapar su casco, visera o cuerpo
+        const head = getPenguinHeadPct();
+        if (head && typeof head.x === 'number') {
+          const penguinRightEdge = head.x + 8.0;
+          minX = Math.max(minX, penguinRightEdge + halfBubblePct + 1.5);
+        }
+      }
+
       posX = Math.max(minX, Math.min(maxX, x));
 
       dom.stageSpeechBubble.classList.remove('bubble-flipped');
-      const isMachine = activeSpeechAnchorKind === 'machine';
-      const isSample = activeSpeechAnchorKind === 'sample';
-      const clearance = isMachine ? 5.2 : (isSample ? 4.0 : 4.8);
+      const clearance = isMachine ? 5.2 : (isSample ? 4.5 : 4.8);
       const desiredBottom = isExactTop ? (y - clearance) : (y - 8.5);
 
       // El fondo del globo garantiza comenzar debajo de los controles superiores (>= 74px)

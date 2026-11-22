@@ -3631,6 +3631,10 @@ a:focus-visible {
   box-shadow: var(--lg-shadow);
 }
 
+.stage-speech-bubble.speaker-is-sample {
+  max-width: min(88vw, 380px);
+}
+
 .stage-speech-bubble.speaker-is-sample .speech-bubble-avatar {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.28);

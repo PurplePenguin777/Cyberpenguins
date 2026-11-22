@@ -1497,15 +1497,15 @@ class Terrain3DController {
       }
 
       // Distancia de encuadre con zoom moderado (alejado un poco para dar holgura a los globos encima de cada uno)
-      const camDist = Math.max(4.2, Math.min(4.8, dist * 3.5));
+      const camDist = Math.max(4.6, Math.min(5.2, dist * 3.8));
       this.dialogueZoom.camPos.set(
         midX + nx * camDist,
-        midY + 0.96,
+        midY + 0.95,
         midZ + nz * camDist
       );
       this.dialogueZoom.targetPos.set(
         midX,
-        midY + 0.64,
+        midY + 0.62,
         midZ
       );
     } else {
