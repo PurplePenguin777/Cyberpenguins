@@ -3,7 +3,7 @@
    Permite instalar la aplicación y jugar sin conexión a internet.
    ========================================================= */
 
-const CACHE_NAME = 'cyberpenguins-v106';
+const CACHE_NAME = 'cyberpenguins-v107';
 const ASSETS = [
   './',
   './index.html',

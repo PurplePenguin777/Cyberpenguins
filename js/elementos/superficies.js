@@ -599,411 +599,381 @@
   /* ---------- Portadas de misión vectorizadas ultra-rápidas con realismo fotográfico ---------- */
 
   function realisticMoonCard() {
-    const u = 'card-luna';
-    return `
-      <div class="chapter-scene chapter-scene-3d" data-scene="moon" style="background:#02050e;position:relative" aria-hidden="true">
-        <svg class="w-full h-full block" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="${u}-sky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#020617" stop-opacity="0.3" />
-              <stop offset="60%" stop-color="#020617" stop-opacity="0.55" />
-              <stop offset="100%" stop-color="#030712" stop-opacity="0.95" />
-            </linearGradient>
-            <clipPath id="${u}-earth-clip">
-              <circle cx="380" cy="54" r="28" />
-            </clipPath>
-            <clipPath id="${u}-ground-clip">
-              <path d="M -10,138 Q 110,122 230,132 Q 350,126 490,134 L 490,250 L -10,250 Z" />
-            </clipPath>
-            <linearGradient id="${u}-ground-shade" x1="0" y1="0" x2="0.3" y2="1">
-              <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.22" />
-              <stop offset="35%" stop-color="#0f172a" stop-opacity="0" />
-              <stop offset="85%" stop-color="#020617" stop-opacity="0.6" />
-              <stop offset="100%" stop-color="#020617" stop-opacity="0.9" />
-            </linearGradient>
-            <!-- Gradientes para láminas doradas Kapton MLI de Apollo 11 -->
-            <linearGradient id="${u}-kapton" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#fef08a" />
-              <stop offset="30%" stop-color="#f59e0b" />
-              <stop offset="70%" stop-color="#b45309" />
-              <stop offset="100%" stop-color="#78350f" />
-            </linearGradient>
-            <linearGradient id="${u}-aluminum" x1="0" y1="0" x2="0.8" y2="1">
-              <stop offset="0%" stop-color="#ffffff" />
-              <stop offset="45%" stop-color="#cbd5e1" />
-              <stop offset="100%" stop-color="#475569" />
-            </linearGradient>
-          </defs>
+  const u = 'card-moon';
+  return `
+    <div class="chapter-scene" data-scene="moon" style="background:#01040a" aria-hidden="true">
+      <svg class="w-full h-full block" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="${u}-space-tint" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#020617" stop-opacity="0.25" />
+            <stop offset="55%" stop-color="#020617" stop-opacity="0.5" />
+            <stop offset="100%" stop-color="#030712" stop-opacity="0.95" />
+          </linearGradient>
+          <clipPath id="${u}-earth-c">
+            <circle cx="316" cy="46" r="23" />
+          </clipPath>
+          <clipPath id="${u}-ground-c">
+            <path d="M -10,122 Q 95,108 200,118 Q 300,112 410,118 L 410,210 L -10,210 Z" />
+          </clipPath>
+          <linearGradient id="${u}-ground-shade" x1="0" y1="0" x2="0.35" y2="1">
+            <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.2" />
+            <stop offset="40%" stop-color="#0f172a" stop-opacity="0" />
+            <stop offset="80%" stop-color="#020617" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#020617" stop-opacity="0.85" />
+          </linearGradient>
+          <linearGradient id="${u}-mli-gold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fef08a" />
+            <stop offset="35%" stop-color="#f59e0b" />
+            <stop offset="75%" stop-color="#b45309" />
+            <stop offset="100%" stop-color="#78350f" />
+          </linearGradient>
+          <linearGradient id="${u}-strut" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="45%" stop-color="#cbd5e1" />
+            <stop offset="100%" stop-color="#475569" />
+          </linearGradient>
+          <linearGradient id="${u}-solar" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3b82f6" />
+            <stop offset="50%" stop-color="#1d4ed8" />
+            <stop offset="100%" stop-color="#0f172a" />
+          </linearGradient>
+        </defs>
 
-          <!-- Vía Láctea estelar fotográfica real -->
-          <rect width="480" height="240" fill="#01040a" />
-          <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="480" height="240" preserveAspectRatio="xMidYMid slice" opacity="0.85" />
-          <rect width="480" height="240" fill="url(#${u}-sky)" />
+        <!-- Fondo estelar real de la Vía Láctea -->
+        <rect width="400" height="200" fill="#01040a" />
+        <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="400" height="200" preserveAspectRatio="xMidYMid slice" opacity="0.85" />
+        <rect width="400" height="200" fill="url(#${u}-space-tint)" />
 
-          <!-- Salida de la Tierra (Earthrise) fotográfica 4K con halo atmosférico -->
+        <!-- Salida de la Tierra (Earthrise) con atmósfera y textura fotográfica real 4K -->
+        <g>
+          <circle cx="316" cy="46" r="25.5" fill="none" stroke="rgba(96, 165, 250, 0.45)" stroke-width="2.5" />
+          <circle cx="316" cy="46" r="24.2" fill="none" stroke="rgba(191, 219, 254, 0.6)" stroke-width="0.8" />
+          <g clip-path="url(#${u}-earth-c)">
+            <rect x="290" y="20" width="52" height="52" fill="#0c4a6e" />
+            <image href="assets/textures/tierra-4k.jpg" x="290" y="20" width="52" height="52" preserveAspectRatio="xMidYMid slice" />
+            <image href="assets/textures/nubes-tierra.jpg" x="290" y="20" width="52" height="52" preserveAspectRatio="xMidYMid slice" opacity="0.55" style="mix-blend-mode:screen" />
+            <path d="M 316,23 A 23 23 0 0 1 316,69 A 15 23 0 0 1 316,23 Z" fill="#020617" opacity="0.78" />
+          </g>
+        </g>
+
+        <!-- Relieve lunar lejano en el horizonte -->
+        <path d="M -10,112 Q 70,98 160,106 T 410,104 L 410,210 L -10,210 Z" fill="#151d2b" opacity="0.75" />
+        <path d="M -10,118 Q 80,106 180,114 T 410,111 L 410,210 L -10,210 Z" fill="#1e293b" opacity="0.88" />
+
+        <!-- Suelo lunar realista con textura fotográfica real 4K (sin círculos dibujados) -->
+        <g clip-path="url(#${u}-ground-c)">
+          <rect x="-10" y="105" width="420" height="105" fill="#334155" />
+          <image href="assets/textures/luna-4k.jpg" x="-10" y="85" width="420" height="130" preserveAspectRatio="xMidYMid slice" opacity="0.92" />
+          <rect x="-10" y="105" width="420" height="105" fill="url(#${u}-ground-shade)" />
+
+          <!-- Rocas redondeadas naturales con sombra de contacto suave -->
+          <ellipse cx="120" cy="172" rx="13" ry="4" fill="rgba(0,0,0,0.65)" />
+          <path d="M 109,170 Q 112,160 120,161 Q 128,162 131,170 Q 126,174 116,173 Z" fill="#64748b" stroke="#334155" stroke-width="0.7" />
+          <path d="M 112,163 Q 117,161 123,162" fill="none" stroke="#f1f5f9" stroke-width="1.2" opacity="0.8" stroke-linecap="round" />
+
+          <ellipse cx="264" cy="138" rx="8" ry="2.6" fill="rgba(0,0,0,0.55)" />
+          <path d="M 257,137 Q 260,131 265,132 Q 270,133 271,137 Q 267,140 261,139 Z" fill="#475569" stroke="#1e293b" stroke-width="0.6" />
+        </g>
+
+        <!-- Sonda Lunar Surveyor 3 / Chang'e realista integrada en el escenario -->
+        <g transform="translate(195, 144)">
+          <ellipse cx="12" cy="19" rx="38" ry="8" fill="rgba(2, 6, 23, 0.65)" />
+          <polygon points="-8,18 36,22 48,19 8,16" fill="rgba(2, 6, 23, 0.45)" />
+
+          <ellipse cx="-34" cy="17" rx="8" ry="3" fill="#0f172a" />
+          <ellipse cx="32" cy="17" rx="8" ry="3" fill="#0f172a" />
+          <ellipse cx="2" cy="20" rx="9" ry="3.5" fill="#0f172a" />
+
+          <ellipse cx="-34" cy="16" rx="7.5" ry="2.6" fill="#e2e8f0" stroke="#64748b" stroke-width="0.8" />
+          <ellipse cx="32" cy="16" rx="7.5" ry="2.6" fill="#cbd5e1" stroke="#475569" stroke-width="0.8" />
+          <ellipse cx="2" cy="19" rx="8.5" ry="2.8" fill="#f8fafc" stroke="#64748b" stroke-width="0.8" />
+
+          <line x1="-12" y1="-8" x2="-34" y2="16" stroke="url(#${u}-strut)" stroke-width="3" stroke-linecap="round" />
+          <line x1="12" y1="-8" x2="32" y2="16" stroke="url(#${u}-strut)" stroke-width="3" stroke-linecap="round" />
+          <line x1="0" y1="-2" x2="2" y2="19" stroke="url(#${u}-strut)" stroke-width="3.2" stroke-linecap="round" />
+          <line x1="-6" y1="-12" x2="-26" y2="10" stroke="#64748b" stroke-width="1.3" />
+          <line x1="6" y1="-12" x2="24" y2="10" stroke="#475569" stroke-width="1.3" />
+
+          <polygon points="-16,-12 0,-20 16,-12 14,2 0,6 -14,2" fill="url(#${u}-mli-gold)" stroke="#78350f" stroke-width="0.9" stroke-linejoin="round" />
+          <polygon points="-16,-12 0,-20 0,6 -14,2" fill="rgba(255, 255, 255, 0.22)" />
+          <path d="M -12,-8 L -4,-14 L -6,-2" fill="none" stroke="#fef08a" stroke-width="0.9" opacity="0.8" />
+          <path d="M 2,-14 L 10,-8 L 8,-1" fill="none" stroke="#b45309" stroke-width="0.8" opacity="0.9" />
+
+          <rect x="-8" y="-10" width="7" height="9" rx="1" fill="#f8fafc" stroke="#64748b" stroke-width="0.7" />
+          <rect x="2" y="-10" width="7" height="9" rx="1" fill="#e2e8f0" stroke="#64748b" stroke-width="0.7" />
+
+          <line x1="0" y1="-20" x2="0" y2="-44" stroke="#e2e8f0" stroke-width="2.2" stroke-linecap="round" />
+
+          <g transform="translate(0, -42) rotate(-14)">
+            <rect x="-14" y="-11" width="28" height="15" rx="1.2" fill="url(#${u}-solar)" stroke="#60a5fa" stroke-width="0.8" />
+            <line x1="-5" y1="-11" x2="-5" y2="4" stroke="#93c5fd" stroke-width="0.6" opacity="0.6" />
+            <line x1="5" y1="-11" x2="5" y2="4" stroke="#93c5fd" stroke-width="0.6" opacity="0.6" />
+            <line x1="-14" y1="-3" x2="14" y2="-3" stroke="#93c5fd" stroke-width="0.6" opacity="0.6" />
+            <line x1="-12" y1="-9" x2="-2" y2="-9" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.85" />
+          </g>
+
+          <g transform="translate(10, -32) rotate(22)">
+            <ellipse cx="0" cy="0" rx="9" ry="5.5" fill="#cbd5e1" stroke="#475569" stroke-width="0.8" />
+            <ellipse cx="-1.5" cy="-0.5" rx="6.5" ry="3.8" fill="#f8fafc" />
+            <line x1="0" y1="0" x2="5" y2="-3" stroke="#e2e8f0" stroke-width="1.2" />
+          </g>
+        </g>
+      </svg>
+        <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true"></canvas>
+      </div>
+  `;
+}
+
+function realisticMarsCard() {
+  const u = 'card-mars';
+  return `
+    <div class="chapter-scene" data-scene="mars" style="background:#150604" aria-hidden="true">
+      <svg class="w-full h-full block" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="${u}-sky-3d" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3b221a" />
+            <stop offset="35%" stop-color="#693322" />
+            <stop offset="70%" stop-color="#a45330" />
+            <stop offset="100%" stop-color="#c9774d" />
+          </linearGradient>
+          <linearGradient id="${u}-mountain-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#a84323" />
+            <stop offset="45%" stop-color="#7a2b13" />
+            <stop offset="100%" stop-color="#4d1607" />
+          </linearGradient>
+          <clipPath id="${u}-ground-3d">
+            <path d="M -10,118 Q 80,105 170,115 Q 260,108 410,116 L 410,210 L -10,210 Z" />
+          </clipPath>
+          <linearGradient id="${u}-ground-shade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d97706" stop-opacity="0.25" />
+            <stop offset="40%" stop-color="#000000" stop-opacity="0" />
+            <stop offset="85%" stop-color="#451a03" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#2c0b02" stop-opacity="0.8" />
+          </linearGradient>
+          <linearGradient id="${u}-soj-body" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#facc15" />
+            <stop offset="45%" stop-color="#eab308" />
+            <stop offset="85%" stop-color="#ca8a04" />
+            <stop offset="100%" stop-color="#854d0e" />
+          </linearGradient>
+          <linearGradient id="${u}-soj-solar" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2563eb" />
+            <stop offset="50%" stop-color="#1d4ed8" />
+            <stop offset="100%" stop-color="#0f172a" />
+          </linearGradient>
+          <linearGradient id="${u}-wheel-rim" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="50%" stop-color="#cbd5e1" />
+            <stop offset="100%" stop-color="#64748b" />
+          </linearGradient>
+        </defs>
+
+        <!-- Atmósfera marciana idéntica al render 3D de Ares Vallis -->
+        <rect width="400" height="200" fill="url(#${u}-sky-3d)" />
+
+        <!-- Montaña/Colina 3D de Ares Vallis en el fondo derecho (Twin Peaks) -->
+        <path d="M 210,122 Q 275,60 340,78 Q 380,95 410,120 L 410,200 L 210,200 Z" fill="url(#${u}-mountain-grad)" opacity="0.95" />
+        <path d="M 275,60 Q 300,75 330,120" fill="none" stroke="#e07a52" stroke-width="2" opacity="0.65" />
+
+        <!-- Terreno 3D ondulado con la textura de Marte (marte-2k.jpg) -->
+        <g clip-path="url(#${u}-ground-3d)">
+          <rect x="-10" y="105" width="420" height="105" fill="#a84323" />
+          <image href="assets/textures/marte-2k.jpg" x="-10" y="80" width="420" height="130" preserveAspectRatio="xMidYMid slice" opacity="0.94" />
+          <rect x="-10" y="105" width="420" height="105" fill="url(#${u}-ground-shade)" />
+
+          <!-- Ondulaciones suaves de dunas -->
+          <path d="M -10,142 Q 70,132 160,146 Q 250,136 340,150 T 410,142" fill="none" stroke="#ea580c" stroke-width="1.8" opacity="0.45" />
+
+          <!-- Megabloque basáltico "Yogi" integrado en la arena a la derecha -->
+          <g transform="translate(325, 150)">
+            <ellipse cx="2" cy="12" rx="28" ry="8" fill="rgba(35, 10, 5, 0.75)" />
+            <path d="M -24,8 C -27,-10 -14,-17 3,-14 C 18,-11 25,-3 23,8 C 14,15 -16,15 -24,8 Z" fill="#451a03" stroke="#261005" stroke-width="0.8" />
+            <path d="M -16,-5 Q 3,-13 16,-7" fill="none" stroke="#fb923c" stroke-width="1.8" opacity="0.8" stroke-linecap="round" />
+          </g>
+        </g>
+
+        <!-- Rover Sojourner 3D Héroe (fiel al modelo 3D del juego con 6 ruedas, chasis amarillo y antena) -->
+        <g transform="translate(180, 142)">
+          <!-- Sombra de contacto suave del rover -->
+          <ellipse cx="4" cy="24" rx="48" ry="11" fill="rgba(30, 8, 4, 0.78)" />
+
+          <!-- Ruedas del lado lejano (fondo) -->
+          <g opacity="0.85">
+            <ellipse cx="-28" cy="14" rx="8" ry="10" fill="#64748b" stroke="#334155" stroke-width="1" />
+            <circle cx="-28" cy="14" r="4" fill="#1d4ed8" />
+            <ellipse cx="0" cy="14" rx="8" ry="10" fill="#64748b" stroke="#334155" stroke-width="1" />
+            <circle cx="0" cy="14" r="4" fill="#1d4ed8" />
+            <ellipse cx="28" cy="14" rx="8" ry="10" fill="#64748b" stroke="#334155" stroke-width="1" />
+            <circle cx="28" cy="14" r="4" fill="#1d4ed8" />
+          </g>
+
+          <!-- Chasis cilíndrico dorado/amarillo característico de Sojourner -->
+          <rect x="-32" y="-3" width="64" height="20" rx="8" fill="url(#${u}-soj-body)" stroke="#78350f" stroke-width="1.2" />
+          <!-- Correas / bandas térmicas negras del cuerpo -->
+          <line x1="-12" y1="-3" x2="-12" y2="17" stroke="#1c1917" stroke-width="2" />
+          <line x1="12" y1="-3" x2="12" y2="17" stroke="#1c1917" stroke-width="2" />
+
+          <!-- Ojos estereoscópicos frontales (cámaras de navegación de Sojourner) -->
+          <g transform="translate(-33, 3)">
+            <rect x="-6" y="-3" width="7" height="8" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="0.8" />
+            <circle cx="-3" cy="1" r="2" fill="#0284c7" />
+          </g>
+
+          <!-- Panel solar superior con ribete blanco y celdas fotovoltaicas -->
+          <g transform="translate(0, -9)">
+            <!-- Borde blanco/azul del panel -->
+            <rect x="-38" y="-4" width="76" height="8" rx="2.5" fill="#f8fafc" stroke="#2563eb" stroke-width="1" />
+            <!-- Superficie solar azul -->
+            <rect x="-35" y="-2.5" width="70" height="5" rx="1.5" fill="url(#${u}-soj-solar)" />
+            <!-- Celdas solares -->
+            <line x1="-18" y1="-2.5" x2="-18" y2="2.5" stroke="#93c5fd" stroke-width="0.7" opacity="0.7" />
+            <line x1="0" y1="-2.5" x2="0" y2="2.5" stroke="#93c5fd" stroke-width="0.7" opacity="0.7" />
+            <line x1="18" y1="-2.5" x2="18" y2="2.5" stroke="#93c5fd" stroke-width="0.7" opacity="0.7" />
+          </g>
+
+          <!-- Mecanismo de suspensión Rocker-Bogie (tubos blancos/aluminio del modelo 3D) -->
+          <g stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="-24" y1="6" x2="-32" y2="20" />
+            <line x1="0" y1="5" x2="0" y2="20" />
+            <line x1="20" y1="5" x2="30" y2="20" />
+            <line x1="-32" y1="20" x2="0" y2="20" stroke-width="2.5" stroke="#cbd5e1" />
+            <line x1="0" y1="20" x2="30" y2="20" stroke-width="2.5" stroke="#cbd5e1" />
+          </g>
+
+          <!-- 3 Ruedas delanteras grandes del modelo 3D (con tacos, llanta blanca y bujes azules) -->
           <g>
-            <circle cx="380" cy="54" r="30.5" fill="none" stroke="rgba(96, 165, 250, 0.45)" stroke-width="2.5" />
-            <circle cx="380" cy="54" r="29.2" fill="none" stroke="rgba(191, 219, 254, 0.6)" stroke-width="0.8" />
-            <g clip-path="url(#${u}-earth-clip)">
-              <rect x="350" y="24" width="60" height="60" fill="#0c4a6e" />
-              <image href="assets/textures/tierra-4k.jpg" x="350" y="24" width="60" height="60" preserveAspectRatio="xMidYMid slice" />
-              <image href="assets/textures/nubes-tierra.jpg" x="350" y="24" width="60" height="60" preserveAspectRatio="xMidYMid slice" opacity="0.55" style="mix-blend-mode:screen" />
-              <path d="M 380,26 A 28 28 0 0 1 380,82 A 18 28 0 0 1 380,26 Z" fill="#020617" opacity="0.75" />
+            <!-- Rueda 1 (delantera) -->
+            <g transform="translate(-32, 20)">
+              <ellipse cx="0" cy="0" rx="11" ry="13" fill="url(#${u}-wheel-rim)" stroke="#475569" stroke-width="1.2" />
+              <!-- Tacos / tacos de tracción metálicos -->
+              <circle cx="0" cy="0" r="11" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="2,3" />
+              <circle cx="0" cy="0" r="6" fill="#1e293b" />
+              <circle cx="0" cy="0" r="4.2" fill="#2563eb" />
+              <circle cx="0" cy="0" r="1.8" fill="#93c5fd" />
+            </g>
+
+            <!-- Rueda 2 (media) -->
+            <g transform="translate(0, 20)">
+              <ellipse cx="0" cy="0" rx="11" ry="13" fill="url(#${u}-wheel-rim)" stroke="#475569" stroke-width="1.2" />
+              <circle cx="0" cy="0" r="11" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="2,3" />
+              <circle cx="0" cy="0" r="6" fill="#1e293b" />
+              <circle cx="0" cy="0" r="4.2" fill="#2563eb" />
+              <circle cx="0" cy="0" r="1.8" fill="#93c5fd" />
+            </g>
+
+            <!-- Rueda 3 (trasera) -->
+            <g transform="translate(30, 20)">
+              <ellipse cx="0" cy="0" rx="11" ry="13" fill="url(#${u}-wheel-rim)" stroke="#475569" stroke-width="1.2" />
+              <circle cx="0" cy="0" r="11" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="2,3" />
+              <circle cx="0" cy="0" r="6" fill="#1e293b" />
+              <circle cx="0" cy="0" r="4.2" fill="#2563eb" />
+              <circle cx="0" cy="0" r="1.8" fill="#93c5fd" />
             </g>
           </g>
 
-          <!-- Relieve lunar lejano suave (macizos de Mare Tranquillitatis) -->
-          <path d="M -10,126 Q 90,112 210,120 T 490,116 L 490,250 L -10,250 Z" fill="#151d2b" opacity="0.75" />
-          <path d="M -10,132 Q 100,119 220,127 T 490,124 L 490,250 L -10,250 Z" fill="#1e293b" opacity="0.9" />
-
-          <!-- Suelo lunar realista continuo con textura 4K (luna-4k.jpg) sin círculos low-poly -->
-          <g clip-path="url(#${u}-ground-clip)">
-            <rect x="-10" y="125" width="500" height="125" fill="#334155" />
-            <image href="assets/textures/luna-4k.jpg" x="-10" y="115" width="500" height="135" preserveAspectRatio="xMidYMid slice" opacity="0.88" />
-            <rect x="-10" y="125" width="500" height="125" fill="url(#${u}-ground-shade)" />
-
-            <!-- Rocas redondeadas con sombra de contacto -->
-            <ellipse cx="112" cy="195" rx="14" ry="4.5" fill="rgba(0,0,0,0.65)" />
-            <path d="M 100,193 Q 104,181 112,182 Q 120,183 124,193 Q 118,198 107,196 Z" fill="#64748b" stroke="#334155" stroke-width="0.8" />
-            <path d="M 104,185 Q 109,183 116,184" fill="none" stroke="#f1f5f9" stroke-width="1.3" opacity="0.85" stroke-linecap="round" />
-
-            <ellipse cx="334" cy="162" rx="9" ry="3" fill="rgba(0,0,0,0.55)" />
-            <path d="M 326,160 Q 330,153 335,154 Q 341,155 342,160 Q 338,164 330,163 Z" fill="#475569" stroke="#1e293b" stroke-width="0.6" />
-          </g>
-
-          <!-- Módulo Lunar Apollo 11 «Eagle» (LM-5) realista -->
-          <g transform="translate(225, 126)">
-            <!-- Sombra de contacto suave -->
-            <ellipse cx="10" cy="46" rx="55" ry="11" fill="rgba(2, 6, 23, 0.72)" />
-
-            <!-- Patas de aterrizaje y platos circulares al ras del regolito -->
-            <!-- Pata izquierda -->
-            <line x1="-18" y1="20" x2="-48" y2="44" stroke="url(#${u}-aluminum)" stroke-width="2.6" stroke-linecap="round" />
-            <line x1="-18" y1="28" x2="-35" y2="34" stroke="url(#${u}-aluminum)" stroke-width="1.6" />
-            <ellipse cx="-48" cy="44" rx="8" ry="3.2" fill="#94a3b8" stroke="#475569" stroke-width="0.8" />
-
-            <!-- Pata derecha -->
-            <line x1="28" y1="20" x2="62" y2="44" stroke="url(#${u}-aluminum)" stroke-width="2.6" stroke-linecap="round" />
-            <line x1="28" y1="28" x2="48" y2="34" stroke="url(#${u}-aluminum)" stroke-width="1.6" />
-            <ellipse cx="62" cy="44" rx="8" ry="3.2" fill="#94a3b8" stroke="#475569" stroke-width="0.8" />
-
-            <!-- Pata frontal con escalera -->
-            <line x1="6" y1="22" x2="10" y2="46" stroke="url(#${u}-aluminum)" stroke-width="3" stroke-linecap="round" />
-            <line x1="2" y1="24" x2="6" y2="44" stroke="#64748b" stroke-width="1.2" />
-            <line x1="10" y1="24" x2="14" y2="44" stroke="#64748b" stroke-width="1.2" />
-            <!-- Peldaños de la escalera -->
-            <line x1="2" y1="27" x2="10" y2="27" stroke="#cbd5e1" stroke-width="1.1" />
-            <line x1="3" y1="31" x2="11" y2="31" stroke="#cbd5e1" stroke-width="1.1" />
-            <line x1="4" y1="35" x2="12" y2="35" stroke="#cbd5e1" stroke-width="1.1" />
-            <line x1="5" y1="39" x2="13" y2="39" stroke="#cbd5e1" stroke-width="1.1" />
-            <line x1="6" y1="43" x2="14" y2="43" stroke="#cbd5e1" stroke-width="1.1" />
-            <ellipse cx="10" cy="46" rx="9" ry="3.5" fill="#cbd5e1" stroke="#475569" stroke-width="0.9" />
-
-            <!-- Pata trasera -->
-            <line x1="-4" y1="16" x2="-8" y2="38" stroke="url(#${u}-aluminum)" stroke-width="2" opacity="0.6" />
-            <ellipse cx="-8" cy="38" rx="6" ry="2.5" fill="#475569" opacity="0.6" />
-
-            <!-- Etapa de Descenso (cuerpo octagonal con láminas doradas Kapton MLI) -->
-            <polygon points="-24,10 32,10 36,28 26,34 -18,34 -28,28" fill="url(#${u}-kapton)" stroke="#78350f" stroke-width="0.9" />
-            <!-- Panel facetado central con reflejo -->
-            <polygon points="-12,12 20,12 22,32 -10,32" fill="#d97706" opacity="0.85" />
-            <polygon points="-2,13 10,13 11,31 -1,31" fill="#fef08a" opacity="0.65" />
-            <!-- Tobera de descenso cónica -->
-            <polygon points="1,34 9,34 12,41 -2,41" fill="#1f2937" stroke="#111827" stroke-width="0.8" />
-
-            <!-- Etapa de Ascenso (cabina superior plateada de aluminio) -->
-            <path d="M -18,10 L -18,-10 L -12,-18 L 22,-18 L 28,-10 L 28,10 Z" fill="url(#${u}-aluminum)" stroke="#334155" stroke-width="1" />
-            <!-- Paneles térmicos frontales oscuros -->
-            <polygon points="-16,-6 -6,-6 -6,8 -16,8" fill="#1e293b" />
-            <polygon points="16,-6 26,-6 26,8 16,8" fill="#1e293b" />
-            <!-- Ventanas triangulares cantadas de la cabina -->
-            <polygon points="-10,-12 -2,-12 -4,-4 -12,-4" fill="#0284c7" stroke="#0369a1" stroke-width="0.8" />
-            <polygon points="14,-12 6,-12 8,-4 16,-4" fill="#0284c7" stroke="#0369a1" stroke-width="0.8" />
-            <polygon points="-8,-11 -4,-11 -5,-6 -9,-6" fill="#7dd3fc" opacity="0.75" />
-            <polygon points="12,-11 8,-11 9,-6 13,-6" fill="#7dd3fc" opacity="0.75" />
-
-            <!-- Escotilla de salida del astronauta -->
-            <rect x="1" y="-4" width="8" height="12" rx="1.5" fill="#334155" stroke="#1e293b" stroke-width="0.8" />
-
-            <!-- Propulsores RCS cuádruples en cruceta -->
-            <g transform="translate(-24, 0)">
-              <circle cx="0" cy="0" r="2.2" fill="#cbd5e1" />
-              <line x1="-4" y1="0" x2="4" y2="0" stroke="#f8fafc" stroke-width="1" />
-              <line x1="0" y1="-4" x2="0" y2="4" stroke="#f8fafc" stroke-width="1" />
-            </g>
-            <g transform="translate(34, 0)">
-              <circle cx="0" cy="0" r="2.2" fill="#cbd5e1" />
-              <line x1="-4" y1="0" x2="4" y2="0" stroke="#f8fafc" stroke-width="1" />
-              <line x1="0" y1="-4" x2="0" y2="4" stroke="#f8fafc" stroke-width="1" />
-            </g>
-
-            <!-- Antena de radar parabólica de encuentro (rendezvous) en el techo -->
-            <line x1="5" y1="-18" x2="5" y2="-27" stroke="#94a3b8" stroke-width="1.4" />
-            <path d="M -1,-29 Q 5,-33 11,-29" fill="none" stroke="#f8fafc" stroke-width="2.2" stroke-linecap="round" />
-            <circle cx="5" cy="-29" r="1.3" fill="#38bdf8" />
-          </g>
-        </svg>
+          <!-- Mástil de antena látigo vertical con punta esférica amarilla del modelo 3D -->
+          <line x1="20" y1="-8" x2="22" y2="-48" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="22" cy="-48" r="2.5" fill="#facc15" stroke="#ca8a04" stroke-width="0.7" />
+        </g>
+      </svg>
         <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true"></canvas>
       </div>
-    `;
-  }
+  `;
+}
 
-  function realisticMarsCard() {
-    const u = 'card-marte';
-    return `
-      <div class="chapter-scene chapter-scene-3d" data-scene="mars" style="background:#130603;position:relative" aria-hidden="true">
-        <svg class="w-full h-full block" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="${u}-sky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#05060f" />
-              <stop offset="35%" stop-color="#1c0b10" />
-              <stop offset="70%" stop-color="#581c0c" />
-              <stop offset="100%" stop-color="#9a3412" />
-            </linearGradient>
-            <clipPath id="${u}-phobos-clip">
-              <path d="M 0,0 Q 14,-2 24,6 Q 30,16 22,26 Q 10,32 2,24 Q -6,14 0,0 Z" />
-            </clipPath>
-            <clipPath id="${u}-ground-clip">
-              <path d="M -10,136 Q 120,118 240,130 Q 360,122 490,132 L 490,250 L -10,250 Z" />
-            </clipPath>
-            <linearGradient id="${u}-ground-shade" x1="0" y1="0" x2="0.3" y2="1">
-              <stop offset="0%" stop-color="#fed7aa" stop-opacity="0.25" />
-              <stop offset="40%" stop-color="#7c2d12" stop-opacity="0" />
-              <stop offset="85%" stop-color="#2e0a03" stop-opacity="0.65" />
-              <stop offset="100%" stop-color="#1c0502" stop-opacity="0.9" />
-            </linearGradient>
-            <linearGradient id="${u}-soj-panel" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#1e3a8a" />
-              <stop offset="50%" stop-color="#172554" />
-              <stop offset="100%" stop-color="#0f172a" />
-            </linearGradient>
-            <linearGradient id="${u}-soj-body" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#fef08a" />
-              <stop offset="50%" stop-color="#eab308" />
-              <stop offset="100%" stop-color="#a16207" />
-            </linearGradient>
-            <linearGradient id="${u}-rock-yogi" x1="0" y1="0" x2="0.8" y2="1">
-              <stop offset="0%" stop-color="#c2410c" />
-              <stop offset="40%" stop-color="#9a3412" />
-              <stop offset="80%" stop-color="#67250e" />
-              <stop offset="100%" stop-color="#3b1104" />
-            </linearGradient>
-          </defs>
+function realisticDeepSpaceCard() {
+  const u = 'card-deep';
+  return `
+    <div class="chapter-scene" data-scene="deep-space" style="background:#010309" aria-hidden="true">
+      <svg class="w-full h-full block" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="${u}-eros-c">
+            <path d="M 195,100 C 205,62 255,50 315,56 C 365,62 395,85 390,118 C 385,152 335,162 280,146 C 248,136 215,150 196,132 C 178,116 184,106 195,100 Z" />
+          </clipPath>
+          <radialGradient id="${u}-eros-light" cx="32%" cy="26%" r="72%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18" />
+            <stop offset="42%" stop-color="#0f172a" stop-opacity="0" />
+            <stop offset="76%" stop-color="#020617" stop-opacity="0.75" />
+            <stop offset="100%" stop-color="#000000" stop-opacity="0.96" />
+          </radialGradient>
+          <linearGradient id="${u}-dish-metal" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f8fafc" />
+            <stop offset="35%" stop-color="#cbd5e1" />
+            <stop offset="75%" stop-color="#64748b" />
+            <stop offset="100%" stop-color="#1e293b" />
+          </linearGradient>
+          <linearGradient id="${u}-pioneer-gold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fef08a" />
+            <stop offset="35%" stop-color="#f59e0b" />
+            <stop offset="75%" stop-color="#b45309" />
+            <stop offset="100%" stop-color="#78350f" />
+          </linearGradient>
+        </defs>
 
-          <!-- Cielo y horizonte crepuscular marciano -->
-          <rect width="480" height="240" fill="url(#${u}-sky)" />
+        <!-- Fondo estelar real de la Vía Láctea -->
+        <rect width="400" height="200" fill="#010309" />
+        <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="400" height="200" preserveAspectRatio="xMidYMid slice" opacity="0.95" />
+        <rect width="400" height="200" fill="radial-gradient(ellipse at 50% 50%, rgba(1,3,10,0.1) 0%, rgba(1,3,10,0.65) 100%)" />
 
-          <!-- Luna marciana Fobos en el cielo -->
-          <g transform="translate(68, 38) scale(0.65)">
-            <g clip-path="url(#${u}-phobos-clip)">
-              <rect x="-10" y="-10" width="45" height="45" fill="#78716c" />
-              <image href="assets/textures/marte-mini.jpg" x="-10" y="-10" width="45" height="45" preserveAspectRatio="xMidYMid slice" opacity="0.65" />
-              <path d="M 0,0 Q 14,-2 24,6 Q 30,16 22,26 Q 10,32 2,24 Z" fill="#1c1917" opacity="0.55" />
-            </g>
+        <!-- Asteroide 433 Eros en 3D con textura real NASA fotográfica (eros.jpg) sin círculos dibujados -->
+        <g>
+          <ellipse cx="290" cy="106" rx="98" ry="54" fill="rgba(148, 163, 184, 0.08)" filter="blur(6px)" />
+
+          <!-- Cuerpo volumétrico de Eros con textura real y terminador de sombra solar -->
+          <g clip-path="url(#${u}-eros-c)">
+            <rect x="170" y="45" width="235" height="130" fill="#475569" />
+            <image href="assets/textures/eros.jpg" x="175" y="45" width="225" height="125" preserveAspectRatio="xMidYMid slice" opacity="0.96" />
+            <rect x="170" y="45" width="235" height="130" fill="url(#${u}-eros-light)" />
           </g>
+          <!-- Borde iluminado por el sol -->
+          <path d="M 195,100 C 205,62 255,50 315,56 C 350,60 375,75 385,95" fill="none" stroke="rgba(248, 250, 252, 0.5)" stroke-width="1.2" />
+        </g>
 
-          <!-- Dunas lejanas de Ares Vallis -->
-          <path d="M -10,122 Q 110,108 230,118 T 490,112 L 490,250 L -10,250 Z" fill="#451a03" opacity="0.75" />
-          <path d="M -10,128 Q 120,114 240,124 T 490,120 L 490,250 L -10,250 Z" fill="#782a0b" opacity="0.9" />
+        <!-- Sonda Pioneer 10 / NEAR Shoemaker en gravedad cero -->
+        <g transform="translate(105, 96)">
+          <ellipse cx="4" cy="18" rx="28" ry="10" fill="rgba(96, 165, 250, 0.12)" filter="blur(3px)" />
 
-          <!-- Suelo marciano con textura real 2K (marte-2k.jpg) y dunas suaves -->
-          <g clip-path="url(#${u}-ground-clip)">
-            <rect x="-10" y="120" width="500" height="130" fill="#9a3412" />
-            <image href="assets/textures/marte-2k.jpg" x="-10" y="110" width="500" height="140" preserveAspectRatio="xMidYMid slice" opacity="0.88" />
-            <rect x="-10" y="120" width="500" height="130" fill="url(#${u}-ground-shade)" />
+          <!-- Pluma de RTGs en celosía -->
+          <line x1="-12" y1="8" x2="-44" y2="28" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+          <line x1="-10" y1="12" x2="-42" y2="32" stroke="#64748b" stroke-width="1.4" stroke-linecap="round" />
+          <rect x="-52" y="24" width="12" height="7" rx="1.5" fill="#475569" stroke="#94a3b8" stroke-width="0.8" />
+          <rect x="-48" y="32" width="12" height="7" rx="1.5" fill="#334155" stroke="#64748b" stroke-width="0.8" />
 
-            <!-- Megabloque basáltico «Yogi» con estratos y sombra de contacto -->
-            <ellipse cx="370" cy="188" rx="28" ry="8" fill="rgba(24, 6, 2, 0.75)" />
-            <path d="M 344,185 Q 352,156 370,158 Q 388,160 396,184 Q 386,194 354,191 Z" fill="url(#${u}-rock-yogi)" stroke="#431407" stroke-width="0.8" />
-            <!-- Estratos geológicos pulidos por inundación -->
-            <path d="M 350,172 Q 368,168 388,171" fill="none" stroke="#ea580c" stroke-width="1.3" opacity="0.75" />
-            <path d="M 354,180 Q 372,176 392,179" fill="none" stroke="#ea580c" stroke-width="1.3" opacity="0.75" />
+          <!-- Pluma del magnetómetro -->
+          <line x1="8" y1="-8" x2="38" y2="-38" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+          <circle cx="38" cy="-38" r="2.2" fill="#f8fafc" />
 
-            <!-- Roca sedimentaria dura «Scooby Doo» plana -->
-            <ellipse cx="118" cy="192" rx="16" ry="5.5" fill="rgba(24, 6, 2, 0.65)" />
-            <path d="M 104,190 Q 110,183 118,184 Q 126,185 130,191 Q 124,196 110,195 Z" fill="#b45309" stroke="#78350f" stroke-width="0.7" />
+          <!-- Bus hexagonal dorado -->
+          <polygon points="-16,-6 4,-14 20,-6 16,12 -4,18 -18,10" fill="url(#${u}-pioneer-gold)" stroke="#78350f" stroke-width="0.9" stroke-linejoin="round" />
+          <polygon points="-16,-6 4,-14 4,18 -18,10" fill="rgba(255, 255, 255, 0.22)" />
+          <circle cx="-2" cy="2" r="3.2" fill="#d97706" />
+
+          <!-- Antena parabólica -->
+          <g transform="translate(2, -2) rotate(-16)">
+            <ellipse cx="0" cy="0" rx="30" ry="22" fill="url(#${u}-dish-metal)" stroke="#94a3b8" stroke-width="1" />
+            <ellipse cx="-1.5" cy="-0.5" rx="27" ry="19.5" fill="#334155" />
+            <ellipse cx="-4" cy="-2" rx="24" ry="17" fill="#64748b" opacity="0.65" />
+            <ellipse cx="-6" cy="-3" rx="20" ry="14" fill="#cbd5e1" opacity="0.5" />
+            <ellipse cx="-8" cy="-4" rx="15" ry="10" fill="#f8fafc" opacity="0.6" />
+
+            <line x1="0" y1="0" x2="-6" y2="-12" stroke="#f1f5f9" stroke-width="1.3" />
+            <line x1="-14" y1="4" x2="-6" y2="-12" stroke="#cbd5e1" stroke-width="1.3" />
+            <line x1="14" y1="4" x2="-6" y2="-12" stroke="#94a3b8" stroke-width="1.3" />
+            <circle cx="-6" cy="-12" r="3" fill="#f8fafc" stroke="#475569" stroke-width="0.8" />
+            <path d="M -24,-12 C -12,-20 8,-20 22,-12" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.85" stroke-linecap="round" />
           </g>
-
-          <!-- Pétalo del aterrizador Pathfinder con airbags desinflados en segundo plano -->
-          <g transform="translate(148, 148)">
-            <ellipse cx="0" cy="12" rx="36" ry="8" fill="rgba(24, 6, 2, 0.55)" />
-            <polygon points="-32,10 0,-4 32,10 0,16" fill="#cbd5e1" stroke="#64748b" stroke-width="0.9" />
-            <!-- Airbags blancos en los bordes -->
-            <ellipse cx="-28" cy="11" rx="8" ry="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.6" />
-            <ellipse cx="28" cy="11" rx="8" ry="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.6" />
-            <ellipse cx="0" cy="15" rx="9" ry="4.5" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.6" />
-            <!-- Mástil central Pathfinder -->
-            <line x1="0" y1="2" x2="0" y2="-22" stroke="#94a3b8" stroke-width="1.6" />
-            <circle cx="0" cy="-22" r="2.5" fill="#e2e8f0" />
-          </g>
-
-          <!-- Rover Sojourner en primer plano en Ares Vallis -->
-          <g transform="translate(230, 158)">
-            <!-- Sombra de contacto de las 6 ruedas -->
-            <ellipse cx="14" cy="22" rx="36" ry="7" fill="rgba(20, 4, 1, 0.78)" />
-
-            <!-- Suspensión Rocker-Bogie de titanio -->
-            <line x1="-10" y1="8" x2="-22" y2="18" stroke="#cbd5e1" stroke-width="2.4" stroke-linecap="round" />
-            <line x1="-10" y1="8" x2="6" y2="18" stroke="#cbd5e1" stroke-width="2.4" stroke-linecap="round" />
-            <line x1="18" y1="8" x2="34" y2="18" stroke="#cbd5e1" stroke-width="2.4" stroke-linecap="round" />
-
-            <!-- Las 6 ruedas metálicas con tacos/clavos y cubos azules -->
-            <!-- Rueda 1 (trasera izq) -->
-            <g transform="translate(-22, 18)">
-              <circle cx="0" cy="0" r="7.2" fill="#94a3b8" stroke="#e2e8f0" stroke-width="1.2" />
-              <circle cx="0" cy="0" r="3.2" fill="#2563eb" />
-            </g>
-            <!-- Rueda 2 (media izq) -->
-            <g transform="translate(6, 18)">
-              <circle cx="0" cy="0" r="7.2" fill="#94a3b8" stroke="#e2e8f0" stroke-width="1.2" />
-              <circle cx="0" cy="0" r="3.2" fill="#2563eb" />
-            </g>
-            <!-- Rueda 3 (delantera izq) -->
-            <g transform="translate(34, 18)">
-              <circle cx="0" cy="0" r="7.2" fill="#94a3b8" stroke="#e2e8f0" stroke-width="1.2" />
-              <circle cx="0" cy="0" r="3.2" fill="#2563eb" />
-            </g>
-
-            <!-- Chasis aislado dorado (Warm Electronics Box - WEB) -->
-            <rect x="-18" y="0" width="46" height="13" rx="2" fill="url(#${u}-soj-body)" stroke="#854d0e" stroke-width="0.9" />
-
-            <!-- Panel solar fotovoltaico superior azul marino oscuro -->
-            <polygon points="-21,0 29,0 33,-2 -17,-2" fill="url(#${u}-soj-panel)" stroke="#38bdf8" stroke-width="0.7" />
-            <!-- Rejilla de celdas solares GaAs -->
-            <line x1="-11" y1="0" x2="-7" y2="-2" stroke="#60a5fa" stroke-width="0.6" opacity="0.7" />
-            <line x1="-1" y1="0" x2="3" y2="-2" stroke="#60a5fa" stroke-width="0.6" opacity="0.7" />
-            <line x1="9" y1="0" x2="13" y2="-2" stroke="#60a5fa" stroke-width="0.6" opacity="0.7" />
-            <line x1="19" y1="0" x2="23" y2="-2" stroke="#60a5fa" stroke-width="0.6" opacity="0.7" />
-
-            <!-- Sensor APXS en la parte posterior -->
-            <rect x="-24" y="5" width="6" height="5" rx="1" fill="#475569" stroke="#334155" stroke-width="0.6" />
-
-            <!-- Mástil de antena y cámaras frontales de navegación estéreo -->
-            <rect x="25" y="2" width="6" height="5" rx="1" fill="#f8fafc" stroke="#475569" stroke-width="0.7" />
-            <circle cx="27" cy="4.5" r="1.3" fill="#0284c7" />
-            <circle cx="29.5" cy="4.5" r="1.3" fill="#0284c7" />
-
-            <!-- Antena UHF de varilla -->
-            <line x1="18" y1="-2" x2="21" y2="-24" stroke="#e2e8f0" stroke-width="1.2" />
-            <circle cx="21" cy="-24" r="1.4" fill="#f59e0b" />
-          </g>
-        </svg>
+        </g>
+      </svg>
         <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true"></canvas>
       </div>
-    `;
-  }
-
-  function realisticDeepSpaceCard() {
-    const u = 'card-eros';
-    return `
-      <div class="chapter-scene chapter-scene-3d" data-scene="deep-space" style="background:#020409;position:relative" aria-hidden="true">
-        <svg class="w-full h-full block" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="${u}-sky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#020617" stop-opacity="0.25" />
-              <stop offset="70%" stop-color="#020617" stop-opacity="0.5" />
-              <stop offset="100%" stop-color="#030712" stop-opacity="0.95" />
-            </linearGradient>
-            <!-- Silueta curvada de cacahuate / plátano de 433 Eros -->
-            <clipPath id="${u}-eros-clip">
-              <path d="M 285,125 C 275,80 325,58 375,64 C 420,70 455,95 448,135 C 442,168 395,190 355,182 C 322,175 292,158 285,125 Z" />
-            </clipPath>
-            <radialGradient id="${u}-eros-shade" cx="35%" cy="32%" r="75%">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.2" />
-              <stop offset="42%" stop-color="#0f172a" stop-opacity="0" />
-              <stop offset="78%" stop-color="#020617" stop-opacity="0.75" />
-              <stop offset="100%" stop-color="#000000" stop-opacity="0.95" />
-            </radialGradient>
-            <linearGradient id="${u}-near-solar" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#1e40af" />
-              <stop offset="50%" stop-color="#172554" />
-              <stop offset="100%" stop-color="#0f172a" />
-            </linearGradient>
-            <linearGradient id="${u}-near-gold" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#fef08a" />
-              <stop offset="45%" stop-color="#d97706" />
-              <stop offset="100%" stop-color="#78350f" />
-            </linearGradient>
-            <linearGradient id="${u}-dish" x1="0" y1="0" x2="0.8" y2="1">
-              <stop offset="0%" stop-color="#ffffff" />
-              <stop offset="60%" stop-color="#cbd5e1" />
-              <stop offset="100%" stop-color="#64748b" />
-            </linearGradient>
-          </defs>
-
-          <!-- Espacio profundo con Vía Láctea estelar fotográfica real -->
-          <rect width="480" height="240" fill="#01040a" />
-          <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="480" height="240" preserveAspectRatio="xMidYMid slice" opacity="0.88" />
-          <rect width="480" height="240" fill="url(#${u}-sky)" />
-
-          <!-- Asteroide 433 Eros fotorrealista con textura real NASA eros.jpg -->
-          <g>
-            <!-- Silueta recortada con textura de NASA de Eros -->
-            <g clip-path="url(#${u}-eros-clip)">
-              <rect x="270" y="50" width="190" height="145" fill="#334155" />
-              <image href="assets/textures/eros.jpg" x="270" y="50" width="190" height="145" preserveAspectRatio="xMidYMid slice" opacity="0.92" />
-              <!-- Sombreado 3D de esferoide elongado -->
-              <rect x="270" y="50" width="190" height="145" fill="url(#${u}-eros-shade)" />
-
-              <!-- Depresión Himeros y cráter Shoemaker tallados en el relieve -->
-              <ellipse cx="365" cy="115" rx="24" ry="14" fill="#0f172a" opacity="0.32" />
-              <ellipse cx="330" cy="140" rx="15" ry="9" fill="#0f172a" opacity="0.38" />
-            </g>
-          </g>
-
-          <!-- Sonda espacial NEAR Shoemaker en aproximación a Eros -->
-          <g transform="translate(142, 115) rotate(-16)">
-            <!-- Alas de paneles solares GaAs (4 paneles en cruz/alas) -->
-            <!-- Ala izquierda superior -->
-            <polygon points="-70,-32 -26,-14 -24,-8 -68,-26" fill="url(#${u}-near-solar)" stroke="#60a5fa" stroke-width="0.8" />
-            <line x1="-48" y1="-23" x2="-46" y2="-17" stroke="#fbbf24" stroke-width="0.6" opacity="0.8" />
-
-            <!-- Ala izquierda inferior -->
-            <polygon points="-70,26 -26,8 -24,14 -68,32" fill="url(#${u}-near-solar)" stroke="#60a5fa" stroke-width="0.8" />
-            <line x1="-48" y1="17" x2="-46" y2="23" stroke="#fbbf24" stroke-width="0.6" opacity="0.8" />
-
-            <!-- Ala derecha superior -->
-            <polygon points="26,-14 70,-32 68,-26 24,-8" fill="url(#${u}-near-solar)" stroke="#60a5fa" stroke-width="0.8" />
-            <line x1="48" y1="-23" x2="46" y2="-17" stroke="#fbbf24" stroke-width="0.6" opacity="0.8" />
-
-            <!-- Ala derecha inferior -->
-            <polygon points="26,8 70,26 68,32 24,14" fill="url(#${u}-near-solar)" stroke="#60a5fa" stroke-width="0.8" />
-            <line x1="48" y1="17" x2="46" y2="23" stroke="#fbbf24" stroke-width="0.6" opacity="0.8" />
-
-            <!-- Antena de Alta Ganancia parabólica blanca orientada a la Tierra -->
-            <ellipse cx="-4" cy="-6" rx="22" ry="14" fill="url(#${u}-dish)" stroke="#475569" stroke-width="1" />
-            <ellipse cx="-4" cy="-6" rx="16" ry="10" fill="#f8fafc" opacity="0.9" />
-            <circle cx="-4" cy="-6" r="3.2" fill="#1e293b" />
-            <!-- Trípode alimentador del foco -->
-            <line x1="-4" y1="-6" x2="-4" y2="-18" stroke="#334155" stroke-width="1.2" />
-            <circle cx="-4" cy="-18" r="1.6" fill="#0284c7" />
-
-            <!-- Cuerpo principal (Bus cúbico con mantas térmicas doradas Kapton) -->
-            <rect x="-14" y="0" width="28" height="24" rx="2" fill="url(#${u}-near-gold)" stroke="#78350f" stroke-width="0.9" />
-            <!-- Radiador térmico plateado de instrumentos -->
-            <rect x="-8" y="4" width="16" height="12" rx="1" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.7" />
-
-            <!-- Sensores científicos ópticos (MSI y NLR) apuntando hacia Eros -->
-            <rect x="12" y="6" width="6" height="5" rx="1" fill="#334155" stroke="#1e293b" stroke-width="0.7" />
-            <circle cx="15" cy="8.5" r="1.5" fill="#38bdf8" />
-            <rect x="12" y="13" width="7" height="4" rx="1" fill="#334155" stroke="#1e293b" stroke-width="0.7" />
-            <circle cx="16" cy="15" r="1.3" fill="#22d3ee" />
-
-            <!-- Mástil del magnetómetro extendido -->
-            <line x1="-14" y1="20" x2="-36" y2="34" stroke="#cbd5e1" stroke-width="1.3" />
-            <circle cx="-36" cy="34" r="1.5" fill="#f59e0b" />
-          </g>
-        </svg>
-        <canvas class="chapter-card-3d-canvas" width="480" height="240" aria-hidden="true"></canvas>
-      </div>
-    `;
-  }
+  `;
+}
 
   function chapterScene(chapterId) {
-    if (chapterId === 'moon') {
+    if (chapterId === "moon") {
       return realisticMoonCard();
     }
-    if (chapterId === 'mars') {
+    if (chapterId === "mars") {
       return realisticMarsCard();
     }
     return realisticDeepSpaceCard();

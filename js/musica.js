@@ -215,12 +215,6 @@
     if (!param) return 0.0001;
     const current = Math.max(0.0001, Number(param.value) || 0.0001);
     try {
-      if (typeof param.cancelAndHoldAtTime === 'function') {
-        param.cancelAndHoldAtTime(now);
-        return Math.max(0.0001, Number(param.value) || current);
-      }
-    } catch (_e) { }
-    try {
       param.cancelScheduledValues(now);
       param.setValueAtTime(current, now);
     } catch (_e) { }
@@ -258,9 +252,16 @@
      ======================================================================== */
   function getContext() {
     if (!audioCtx) {
-      const Ctx = global.AudioContext || global.webkitAudioContext;
-      if (Ctx) {
-        audioCtx = new Ctx();
+      if (typeof global !== "undefined" && global.CYBERPENGUINS_AUDIO_CTX) {
+        audioCtx = global.CYBERPENGUINS_AUDIO_CTX;
+      } else {
+        const Ctx = global.AudioContext || global.webkitAudioContext;
+        if (Ctx) {
+          audioCtx = new Ctx();
+          global.CYBERPENGUINS_AUDIO_CTX = audioCtx;
+        }
+      }
+      if (audioCtx) {
         audioCtx.onstatechange = handleContextStateChange;
       }
     }
@@ -290,8 +291,7 @@
     duckGain.gain.setValueAtTime(isDucked ? 0.28 : 1.0, audioCtx.currentTime);
 
     duckGain.connect(masterGain);
-    masterGain.connect(limiter);
-    limiter.connect(audioCtx.destination);
+    masterGain.connect(audioCtx.destination);
 
     // Sub-gains for track crossfade
     TVA.gainNode = audioCtx.createGain();
@@ -327,7 +327,7 @@
       filter.frequency.setValueAtTime(freq, time);
       filter.Q.setValueAtTime(14.0, time);
 
-      const peakGain = 0.045 * accent;
+      const peakGain = 0.08 * accent;
       gain.gain.setValueAtTime(0.0001, time);
       gain.gain.linearRampToValueAtTime(peakGain, time + 0.003);
       gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.028);
@@ -366,7 +366,7 @@
       filter.frequency.setValueAtTime(cutoffStart, time);
       filter.frequency.exponentialRampToValueAtTime(120, time + duration * 0.85);
 
-      const peakGain = 0.16 * accent;
+      const peakGain = 0.28 * accent;
       gain.gain.setValueAtTime(0.0001, time);
       gain.gain.linearRampToValueAtTime(peakGain, time + 0.006);
       gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
@@ -484,8 +484,8 @@
       const fadeInEnd = Math.min(time + 0.18, time + duration * 0.45);
       const fadeOutStart = Math.max(fadeInEnd + 0.01, time + duration - 0.15);
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.14, fadeInEnd);
-      gain.gain.setValueAtTime(0.14, fadeOutStart);
+      gain.gain.linearRampToValueAtTime(0.24, fadeInEnd);
+      gain.gain.setValueAtTime(0.24, fadeOutStart);
       gain.gain.linearRampToValueAtTime(0.0001, time + duration);
 
       osc.connect(filter);
@@ -539,9 +539,11 @@
       filter.frequency.setValueAtTime(freq * 3.4, time);
 
       // Envolvente suave y respirada de ocarina
+      const fadeInEnd = time + Math.min(0.06, duration * 0.2);
+      const fadeOutStart = Math.max(fadeInEnd + 0.01, time + duration - 0.08);
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.15, time + 0.05);
-      gain.gain.setValueAtTime(0.13, time + duration - 0.08);
+      gain.gain.linearRampToValueAtTime(0.26, fadeInEnd);
+      gain.gain.setValueAtTime(0.23, fadeOutStart);
       gain.gain.linearRampToValueAtTime(0.0001, time + duration);
 
       osc.connect(filter);
@@ -635,7 +637,7 @@
       filter.frequency.setValueAtTime(260, time);
 
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.18, time + 0.015);
+      gain.gain.linearRampToValueAtTime(0.26, time + 0.015);
       gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
 
       osc.connect(filter);
@@ -1076,25 +1078,22 @@
     const ctx = getContext();
     if (!ctx) return;
 
-    // Salida O(1) si ya está sonando la pista esperada sin interrupciones
-    if (ctx.state === 'running' && isDesiredTrackPlaying()) {
-      return;
-    }
-
     const target = desiredTrackName || currentTrackName || 'menu';
     desiredTrackName = target;
 
-    if (ctx.state === 'running') {
-      applyTrack(target, false);
-      return;
-    }
-
-    if (typeof ctx.resume === 'function') {
+    // Llamar síncronamente dentro del gesto de usuario para Safari/WebKit
+    if (typeof ctx.resume === 'function' && ctx.state !== 'running') {
       ctx.resume().then(() => {
         if (ctx.state === 'running' && !isPaused) {
-          applyTrack(desiredTrackName || target, false);
+          applyTrack(desiredTrackName || target, true);
         }
       }).catch(() => {});
+    }
+
+    if (ctx.state === 'running') {
+      if (!schedulerTimer || (!TVA.active && !AC_ZELDA.active)) {
+        applyTrack(target, true);
+      }
     }
   }
 

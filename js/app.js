@@ -1305,11 +1305,20 @@
 
   function getAudioContext() {
     if (!soundEnabled) return null;
+    const music = getMusic();
+    if (music && typeof music.init === 'function') {
+      const mCtx = music.init();
+      if (mCtx) {
+        audioCtx = mCtx;
+        return audioCtx;
+      }
+    }
     try {
       const Ctx = global.AudioContext || global.webkitAudioContext;
       if (!Ctx) return null;
       if (!audioCtx) {
-        audioCtx = new Ctx();
+        audioCtx = (typeof global !== 'undefined' && global.CYBERPENGUINS_AUDIO_CTX) || new Ctx();
+        global.CYBERPENGUINS_AUDIO_CTX = audioCtx;
       }
       if (audioCtx.state === 'suspended' && typeof audioCtx.resume === 'function') {
         audioCtx.resume().catch(() => { });
@@ -1597,6 +1606,13 @@
   function startLaunchCinematic() {
     clearLaunchTimers();
     isOpeningLaunch = true;
+    state.launched = true;
+    try {
+      if (typeof global.localStorage !== 'undefined') {
+        global.localStorage.setItem('cyberpenguins_launched', 'true');
+      }
+    } catch (_) {}
+    saveState();
     dom.homeScreen.classList.add('is-hidden');
     dom.gameScreen.classList.add('is-hidden');
     dom.launchScreen.classList.remove('hidden-screen', 'is-hidden', 'igniting-pad');
