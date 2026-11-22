@@ -467,31 +467,27 @@
       featuresSvg = renderEarthFeatures(proj, r);
     }
 
-    const atmoRim = '';
-
     return `
       <g id="${uid}">
         <defs>
           <clipPath id="clip-${uid}">
-            <circle r="${n(r * 0.99)}" />
-          </clipPath>
+            <circle r="${n(r)}" />
+          </clipPath>${baseConfig.texture ? '' : `
           <radialGradient id="sphereLight-${uid}" cx="35%" cy="32%" r="68%">
             <stop offset="0%" stop-color="${baseConfig.lightGrad}" />
             <stop offset="55%" stop-color="${baseConfig.midGrad}" />
             <stop offset="100%" stop-color="${baseConfig.darkGrad}" />
-          </radialGradient>
+          </radialGradient>`}
           <radialGradient id="sphereShade-${uid}" cx="32%" cy="30%" r="80%">
             <stop offset="42%" stop-color="#020617" stop-opacity="0" />
             <stop offset="82%" stop-color="#020617" stop-opacity="0.48" />
             <stop offset="100%" stop-color="#020617" stop-opacity="0.82" />
           </radialGradient>
         </defs>
-        <!-- Base esférica continua -->
-        <circle r="${n(r)}" fill="url(#sphereLight-${uid})" />
         <g clip-path="url(#clip-${uid})">
           ${baseConfig.texture
-            ? `<image href="${baseConfig.texture}" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" />`
-            : `${featuresSvg}${M.facetShade ? M.facetShade(r, { seed: seed + 7, strength: kind === 'earth' ? 0.12 : 0.18 }) : ''}`
+            ? `<image href="${baseConfig.texture}" x="${-r - 1}" y="${-r - 1}" width="${2 * r + 2}" height="${2 * r + 2}" preserveAspectRatio="xMidYMid slice" />`
+            : `<circle r="${n(r)}" fill="url(#sphereLight-${uid})" />${featuresSvg}${M.facetShade ? M.facetShade(r, { seed: seed + 7, strength: kind === 'earth' ? 0.12 : 0.18 }) : ''}`
           }
           <!-- Terminador nocturno y sombreado esférico tridimensional -->
           <circle r="${n(r)}" fill="url(#sphereShade-${uid})" />
@@ -644,7 +640,6 @@
         <!-- Salida de la Tierra (Earthrise) con textura fotográfica real 4K sin contornos -->
         <g>
           <g clip-path="url(#${u}-earth-c)">
-            <rect x="290" y="20" width="52" height="52" fill="#0c4a6e" />
             <image href="assets/textures/tierra-4k.jpg" x="290" y="20" width="52" height="52" preserveAspectRatio="xMidYMid slice" />
             <image href="assets/textures/nubes-tierra.jpg" x="290" y="20" width="52" height="52" preserveAspectRatio="xMidYMid slice" opacity="0.55" style="mix-blend-mode:screen" />
             <path d="M 316,23 A 23 23 0 0 1 316,69 A 15 23 0 0 1 316,23 Z" fill="#020617" opacity="0.78" />
@@ -912,12 +907,9 @@ function realisticDeepSpaceCard() {
 
         <!-- Asteroide 433 Eros en 3D con textura real NASA fotográfica (eros.jpg) sin círculos dibujados -->
         <g>
-          <ellipse cx="290" cy="106" rx="98" ry="54" fill="rgba(148, 163, 184, 0.08)" filter="blur(6px)" />
-
           <!-- Cuerpo volumétrico de Eros con textura real y terminador de sombra solar -->
           <g clip-path="url(#${u}-eros-c)">
-            <rect x="170" y="45" width="235" height="130" fill="#475569" />
-            <image href="assets/textures/eros.jpg" x="175" y="45" width="225" height="125" preserveAspectRatio="xMidYMid slice" opacity="0.96" />
+            <image href="assets/textures/eros.jpg" x="170" y="45" width="235" height="130" preserveAspectRatio="xMidYMid slice" opacity="1" />
             <rect x="170" y="45" width="235" height="130" fill="url(#${u}-eros-light)" />
           </g>
         </g>
