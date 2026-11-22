@@ -626,25 +626,55 @@
   };
 
   function surfaceScene(cfg, chapterId, machineSvg) {
-    const far =
-      stars(cfg.seed, 34, 78, 300, cfg.starColors) +
-      (chapterId === 'moon'
-        ? `<g transform="translate(246,34)">${planetBody('earth', 13, { seed: 5, uid: 'cardearth' })}</g>`
-        : `<g transform="translate(40,38)">${lowPolyBody({ r: 7, rings: 2, seg: 7, seed: 9, dark: '#3f3f46', mid: '#78716c', light: '#d6d3d1', jitter: 0.4 })}</g>`) +
-      ridge({ y0: 96, amp: 14, seed: cfg.seed + 1, color: cfg.ridgeFar, steps: 20 });
-    const mid = ridge({ y0: 104, amp: 10, seed: cfg.seed + 2, color: cfg.ridgeMid, steps: 18 });
-    const ground =
-      groundMesh({ x0: -40, y0: 104, w: 380, h: 52, cols: 14, rows: 5, seed: cfg.seed + 3, dark: cfg.dark, light: cfg.light, persp: true }) +
-      crater(60, 124, 18, 4.6, cfg.craterDark, cfg.craterRim) +
-      crater(238, 134, 24, 5.8, cfg.craterDark, cfg.craterRim) +
-      rock(118, 143, 5.5, cfg.rock[0], cfg.rock[1], cfg.rock[2]) +
-      rock(206, 119, 3.6, cfg.rock[0], cfg.rock[1], cfg.rock[2]) +
-      rock(278, 148, 6.2, cfg.rock[0], cfg.rock[1], cfg.rock[2]);
+    const isMoon = (chapterId === 'moon');
+    const u = isMoon ? 'card-moon' : 'card-mars';
+
+    // Fondo estelar real fotográfico y atmósfera
+    const sky = isMoon
+      ? `<image href="assets/textures/via-lactea.jpg" x="0" y="0" width="300" height="150" preserveAspectRatio="xMidYMid slice" opacity="0.75" />
+         <rect width="300" height="150" fill="rgba(2, 5, 16, 0.32)" />
+         <g transform="translate(242, 32)">${planetBody('earth', 18, { seed: 5, uid: `${u}-earth` })}</g>
+         <path d="M -10,95 Q 65,82 140,89 T 310,91 L 310,150 L -10,150 Z" fill="#1b2436" opacity="0.65" />`
+      : `<linearGradient id="${u}-sky" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0%" stop-color="#120608" />
+           <stop offset="42%" stop-color="#32120b" />
+           <stop offset="78%" stop-color="#5f2516" />
+           <stop offset="100%" stop-color="#964024" />
+         </linearGradient>
+         <rect width="300" height="150" fill="url(#${u}-sky)" />
+         <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="300" height="75" preserveAspectRatio="xMidYMid slice" opacity="0.25" />
+         <g transform="translate(48, 28)" opacity="0.92"><circle cx="0" cy="0" r="6" fill="#e8d5c4" /><circle cx="1.4" cy="1" r="5.2" fill="#3b2016" opacity="0.65" /></g>
+         <path d="M -10,96 Q 75,86 150,92 T 310,93 L 310,150 L -10,150 Z" fill="#4d1c10" opacity="0.65" />`;
+
+    const textureUrl = isMoon ? 'assets/textures/luna-4k.jpg' : 'assets/textures/marte-2k.jpg';
+    const groundBase = isMoon ? '#374151' : '#b45309';
+    const groundDark = isMoon ? '#111827' : '#451a03';
+
+    const ground = `
+      <defs>
+        <clipPath id="${u}-clip">
+          <path d="M -10,${isMoon ? 97 : 98} Q 70,${isMoon ? 87 : 89} 145,${isMoon ? 93 : 94} T 310,${isMoon ? 95 : 96} L 310,155 L -10,155 Z" />
+        </clipPath>
+        <linearGradient id="${u}-gg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${groundBase}" />
+          <stop offset="100%" stop-color="${groundDark}" />
+        </linearGradient>
+      </defs>
+      <g clip-path="url(#${u}-clip)">
+        <rect x="-10" y="85" width="330" height="70" fill="url(#${u}-gg)" />
+        <image href="${textureUrl}" x="-10" y="80" width="330" height="75" preserveAspectRatio="xMidYMid slice" opacity="${isMoon ? 0.48 : 0.42}" />
+        <rect x="-10" y="85" width="330" height="70" fill="linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.48) 100%)" />
+        ${crater(58, 126, 16, 4.2, cfg.craterDark, cfg.craterRim)}
+        ${crater(240, 134, 22, 5.2, cfg.craterDark, cfg.craterRim)}
+        ${rock(116, 142, 5.2, cfg.rock[0], cfg.rock[1], cfg.rock[2])}
+        ${rock(212, 118, 3.4, cfg.rock[0], cfg.rock[1], cfg.rock[2])}
+        ${rock(280, 146, 5.8, cfg.rock[0], cfg.rock[1], cfg.rock[2])}
+      </g>
+    `;
 
     return `
-      <div class="chapter-scene" data-scene="${chapterId}" style="background:${cfg.sky}" aria-hidden="true">
-        <svg class="scene-layer scene-far" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${far}</svg>
-        <svg class="scene-layer scene-mid" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${mid}</svg>
+      <div class="chapter-scene" data-scene="${chapterId}" style="background:${isMoon ? '#020510' : '#140608'}" aria-hidden="true">
+        <svg class="scene-layer scene-far" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${sky}</svg>
         <svg class="scene-layer scene-ground" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${ground}</svg>
         <div class="scene-shadow"></div>
         <div class="scene-machine"><div class="scene-machine-inner">${machineSvg}</div></div>
@@ -653,26 +683,17 @@
   }
 
   function frontierScene(machineSvg) {
-    const far = stars(41, 78, 150, 300, ['#ffffff', '#e0f2fe', '#7ee8fa', '#fed7aa', '#bae6fd']);
-    let dust = '';
-    [
-      { x: 52, y: 96, r: 8, s: 3 },
-      { x: 248, y: 112, r: 6, s: 4 },
-      { x: 222, y: 40, r: 5, s: 6 }
-    ].forEach((a) => {
-      dust += `<g transform="translate(${a.x},${a.y})" opacity="0.65">${M.asteroidBody(a.r, { seed: a.s, uid: `carddust${a.s}` })}
-        </g>`;
-    });
-    const mid =
-      dust +
-      `<g transform="translate(262,26)"><polygon points="0,-9 2.4,-2.4 9,0 2.4,2.4 0,9 -2.4,2.4 -9,0 -2.4,-2.4" fill="#fb923c" opacity="0.5" /><polygon points="0,-4.5 1.3,-1.3 4.5,0 1.3,1.3 0,4.5 -1.3,1.3 -4.5,0 -1.3,-1.3" fill="#fef08a" /></g>`;
-    const near = stars(77, 14, 150, 300, ['#ffffff', '#e0f2fe']).replace(/r="([0-9.]+)"/g, (m, v) => `r="${n(Number(v) * 1.5)}"`);
+    const sky = `
+      <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="300" height="150" preserveAspectRatio="xMidYMid slice" opacity="0.95" />
+      <rect width="300" height="150" fill="rgba(2, 4, 18, 0.22)" />
+    `;
+    // Asteroide 433 Eros con textura real NASA fotográfica
+    const eros = `<g transform="translate(204, 74) rotate(-16)">${asteroidErosBody(36, { seed: 303, uid: 'card-eros-real', texture: 'assets/textures/eros.jpg' })}</g>`;
 
     return `
-      <div class="chapter-scene" data-scene="deep-space" style="background:linear-gradient(180deg, #020412 0%, #060b1f 100%)" aria-hidden="true">
-        <svg class="scene-layer scene-far" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${far}</svg>
-        <svg class="scene-layer scene-mid" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${mid}</svg>
-        <svg class="scene-layer scene-ground" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${near}</svg>
+      <div class="chapter-scene" data-scene="deep-space" style="background:#020412" aria-hidden="true">
+        <svg class="scene-layer scene-far" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${sky}</svg>
+        <svg class="scene-layer scene-mid" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">${eros}</svg>
         <div class="scene-glow"></div>
         <div class="scene-machine"><div class="scene-machine-inner">${machineSvg}</div></div>
       </div>
@@ -694,37 +715,25 @@
     const H = land ? 1080 : 1920;
     const k = land ? 'l' : 'p';
     const pos = land
-      ? { moon: [215, 200, 96], earth: [150, 1085, 310], eros: [1525, 240], ald: [1690, 185], mars: [1735, 595, 118] }
-      : { moon: [200, 300, 120], earth: [90, 2040, 420], eros: [800, 380], ald: [930, 260], mars: [900, 1180, 150] };
+      ? { moon: [215, 200, 96], earth: [150, 1085, 310], eros: [1525, 240], mars: [1735, 595, 118] }
+      : { moon: [200, 300, 120], earth: [90, 2040, 420], eros: [800, 380], mars: [900, 1180, 150] };
 
     const moon = `<g transform="translate(${pos.moon[0]},${pos.moon[1]})" opacity="0.94">${planetBody('moon', pos.moon[2], { seed: 101, uid: 'bgmoon' + k })}</g>`;
     const earth =
       `<g transform="translate(${pos.earth[0]},${pos.earth[1]})">` +
       planetBody('earth', pos.earth[2], { seed: 202, uid: 'bgearth' + k }) +
       '</g>';
-    // Asteroide 433 Eros realista (con su forma alargada en silla de montar Himeros)
-    const eros = `<g transform="translate(${pos.eros[0]},${pos.eros[1]}) rotate(-14)" opacity="0.9">${asteroidErosBody(pos.eros[2] || 32, { seed: 303, uid: 'bgeros' + k })}</g>`;
-    const aldebaran = `<g transform="translate(${pos.ald[0]},${pos.ald[1]})"><polygon points="0,-24 6,-6 24,0 6,6 0,24 -6,6 -24,0 -6,-6" fill="#fb923c" opacity="0.55" /><polygon points="0,-13 3.5,-3.5 13,0 3.5,3.5 0,13 -3.5,3.5 -13,0 -3.5,-3.5" fill="#fef08a" /><polygon points="0,-5 5,0 0,5 -5,0" fill="#ffffff" /></g>`;
-    // Marte volumétrico sin líneas radiales en el centro, sin bolas blancas y sin mallas de terreno alrededor
+    // Asteroide 433 Eros realista con textura real NASA
+    const eros = `<g transform="translate(${pos.eros[0]},${pos.eros[1]}) rotate(-14)" opacity="0.92">${asteroidErosBody(pos.eros[2] || 38, { seed: 303, uid: 'bgeros' + k, texture: 'assets/textures/eros.jpg' })}</g>`;
+    // Marte volumétrico con textura real 2K
     const mars = `<g transform="translate(${pos.mars[0]},${pos.mars[1]})" opacity="0.96">${planetBody('mars', pos.mars[2], { seed: 404, uid: 'bgmars' + k })}</g>`;
 
     return `
-      <defs>
-        <linearGradient id="bgCosmosGrad-${k}" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#050814" />
-          <stop offset="42%" stop-color="#070c1d" />
-          <stop offset="85%" stop-color="#091228" />
-          <stop offset="100%" stop-color="#0d1834" />
-        </linearGradient>
-      </defs>
-      <!-- Espacio exterior profundo y limpio (sin texturas poligonales extrañas alrededor de Marte) -->
-      <rect width="${W}" height="${H}" fill="url(#bgCosmosGrad-${k})" />
-      <ellipse cx="${W / 2}" cy="${H * 0.52}" rx="${W * 0.53}" ry="${H * 0.31}" transform="rotate(-12 ${W / 2} ${H * 0.52})" fill="none" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
-      <ellipse cx="${W / 2}" cy="${H * 0.5}" rx="${W * 0.4}" ry="${H * 0.21}" transform="rotate(7 ${W / 2} ${H * 0.5})" fill="none" stroke="rgba(126, 232, 250, 0.06)" stroke-width="1" />
-      <g>${stars(land ? 61 : 62, land ? 95 : 125, H, W, ['#f8fafc', '#bae6fd', '#7ee8fa', '#fed7aa'])}</g>
+      <!-- Fondo de estrellas real fotográfico de la Vía Láctea (sin líneas orbitales ni formas geométricas sintéticas) -->
+      <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice" opacity="0.9" />
+      <rect width="${W}" height="${H}" fill="rgba(3, 7, 18, 0.36)" />
       ${moon}
       ${earth}
-      ${aldebaran}
       ${eros}
       ${mars}
     `;
