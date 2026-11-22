@@ -4429,7 +4429,7 @@
     const isPenguin = speaker === 'penguin';
     const isShip = speaker === 'ship';
 
-    dom.stageSpeechBubble.classList.remove('speaker-is-penguin', 'speaker-is-machine', 'speaker-is-ship');
+    dom.stageSpeechBubble.classList.remove('speaker-is-penguin', 'speaker-is-machine', 'speaker-is-ship', 'speaker-is-sample');
     if (isPenguin) dom.stageSpeechBubble.classList.add('speaker-is-penguin');
     else if (isShip) dom.stageSpeechBubble.classList.add('speaker-is-ship');
     else dom.stageSpeechBubble.classList.add('speaker-is-machine');
@@ -4502,6 +4502,7 @@
     if (dom.speechBubbleOptions) {
       dom.speechBubbleOptions.innerHTML = '';
       if (Array.isArray(choices) && choices.length > 0) {
+        dom.speechBubbleOptions.style.display = 'flex';
         choices.forEach((c) => {
           const btn = document.createElement('button');
           btn.type = 'button';
@@ -4515,6 +4516,8 @@
           });
           dom.speechBubbleOptions.appendChild(btn);
         });
+      } else {
+        dom.speechBubbleOptions.style.display = 'none';
       }
     }
 
@@ -4533,6 +4536,9 @@
       }
     }
 
+    if (dom.speechBubbleCloseBtn) {
+      dom.speechBubbleCloseBtn.onclick = null;
+    }
     dom.stageSpeechBubble.classList.remove('is-hidden');
 
     const pitch = isPenguin ? 1.22 : isShip ? 0.92 : 0.98;
@@ -5229,10 +5235,15 @@
 
   function closeSampleDiscoveryModal() {
     activeSampleDiscovery = null;
+    if (dom.speechBubbleCloseBtn) {
+      dom.speechBubbleCloseBtn.onclick = null;
+    }
     if (activeSpeechAnchorKind === 'sample') {
       if (dom.stageSpeechBubble) {
+        dom.stageSpeechBubble.classList.remove('speaker-is-sample');
         dom.stageSpeechBubble.classList.add('is-hidden');
       }
+      activeSpeechAnchorKind = null;
     }
     const t3d = getTerrain3D();
     if (t3d && typeof t3d.setDialogueZoom === 'function') {
