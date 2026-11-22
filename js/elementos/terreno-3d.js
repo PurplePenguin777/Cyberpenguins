@@ -1931,10 +1931,10 @@ class Terrain3DController {
       const forwardDot = dirX * toObsX + dirZ * toObsZ;
       if (forwardDot < 0.05 && d >= safeR) return;
 
-      // Usar dirección previa (si existe) para mantener histéresis y evitar que oscile izq/der
-      const refX = prevDir ? prevDir.x : dirX;
-      const refZ = prevDir ? prevDir.z : dirZ;
-      const cross = refX * toObsZ - refZ * toObsX;
+      // Sentido de giro invariante respecto al eje obstáculo-destino para eliminar oscilaciones
+      const toTgtX = targetX - ox;
+      const toTgtZ = targetZ - oz;
+      const cross = rx * toTgtZ - rz * toTgtX;
       const turnSign = cross >= 0 ? 1 : -1;
       const tangX = -toObsZ * turnSign;
       const tangZ = toObsX * turnSign;
@@ -1944,7 +1944,7 @@ class Terrain3DController {
       let steerX = dirX * (1 - smoothT) + tangX * smoothT;
       let steerZ = dirZ * (1 - smoothT) + tangZ * smoothT;
       if (d < safeR) {
-        const pushOut = Math.min(0.65, (safeR - d) * 2.5);
+        const pushOut = Math.min(0.35, (safeR - d) * 1.5);
         steerX += (rx / d) * pushOut;
         steerZ += (rz / d) * pushOut;
       }

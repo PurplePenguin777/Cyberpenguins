@@ -2225,11 +2225,23 @@
       const d1 = resolveWorld3dPoint(o.cx + nx * clearDist, o.cz + nz * clearDist);
       const d2 = resolveWorld3dPoint(o.cx - nx * clearDist, o.cz - nz * clearDist);
 
-      const dist1 = Math.hypot(d1.x - cur.x, d1.z - cur.z) + Math.hypot(target.x - d1.x, target.z - d1.z);
-      const dist2 = Math.hypot(d2.x - cur.x, d2.z - cur.z) + Math.hypot(target.x - d2.x, target.z - d2.z);
+      const isBlocked = (pt) => {
+        return obsList.some((other) => other !== o && Math.hypot(pt.x - other.cx, pt.z - other.cz) < (other.r + 0.42));
+      };
+      const b1 = isBlocked(d1);
+      const b2 = isBlocked(d2);
 
-      const prefer1 = (perpDist <= 0) ? (dist1 <= dist2 * 1.15) : (dist1 < dist2 * 0.85);
-      const detour = prefer1 ? d1 : d2;
+      let detour = null;
+      if (b1 && !b2) {
+        detour = d2;
+      } else if (!b1 && b2) {
+        detour = d1;
+      } else {
+        const dist1 = Math.hypot(d1.x - cur.x, d1.z - cur.z) + Math.hypot(target.x - d1.x, target.z - d1.z);
+        const dist2 = Math.hypot(d2.x - cur.x, d2.z - cur.z) + Math.hypot(target.x - d2.x, target.z - d2.z);
+        const prefer1 = (perpDist <= 0) ? (dist1 <= dist2 * 1.15) : (dist1 < dist2 * 0.85);
+        detour = prefer1 ? d1 : d2;
+      }
 
       if (Math.hypot(detour.x - cur.x, detour.z - cur.z) > 0.35 && Math.hypot(detour.x - target.x, detour.z - target.z) > 0.35) {
         waypoints.push(detour);
@@ -2476,22 +2488,6 @@
           wa.steerDir = { x: phys.dirX, z: phys.dirZ };
         }
 
-        // Colisión física en tiempo real contra obstáculos 3D (patas de la nave, casco, rocas)
-        const obstacles = getWorld3dObstacles();
-        obstacles.forEach((o) => {
-          const d = Math.hypot(phys.x - o.cx, phys.z - o.cz);
-          const minD = o.r + 0.16;
-          if (d < minD) {
-            if (d > 1e-4) {
-              phys.x = o.cx + ((phys.x - o.cx) / d) * minD;
-              phys.z = o.cz + ((phys.z - o.cz) / d) * minD;
-            } else {
-              phys.x = o.cx + minD;
-            }
-            phys.y = t3d.getGroundHeightAt(phys.x, phys.z);
-          }
-        });
-
         const moveDx = phys.x - curX;
         const moveDz = phys.z - curZ;
         const moved = Math.hypot(moveDx, moveDz);
@@ -2499,8 +2495,8 @@
           ? Math.atan2(moveDx, moveDz)
           : world3d.penguin.yaw;
 
-        if (moveDx < -0.003) penguinDir = 'left';
-        else if (moveDx > 0.003) penguinDir = 'right';
+        if (moveDx < -0.012) penguinDir = 'left';
+        else if (moveDx > 0.012) penguinDir = 'right';
 
         world3d.penguin = {
           x: phys.x,
