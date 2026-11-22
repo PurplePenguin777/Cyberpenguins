@@ -1224,7 +1224,11 @@
     saveState();
     dom.gameScreen.classList.add('is-hidden');
     dom.launchScreen.classList.add('is-hidden');
+    if (dom.travelCinematic) {
+      dom.travelCinematic.classList.add('is-hidden');
+    }
     dom.homeScreen.classList.remove('is-hidden');
+    renderHomeBackground();
     renderChapterNav();
     updateHUD();
   }
@@ -1536,10 +1540,15 @@
   function finishOpeningLaunch() {
     isOpeningLaunch = false;
     clearLaunchTimers();
+    clearTimeout(cinematicTimer);
     state.launched = true;
     saveState();
-    dom.launchScreen.classList.add('hidden-screen');
-    dom.launchScreen.classList.add('is-hidden');
+    if (dom.travelCinematic) {
+      dom.travelCinematic.classList.add('is-hidden');
+    }
+    if (dom.launchScreen) {
+      dom.launchScreen.classList.add('hidden-screen', 'is-hidden');
+    }
     showHomeScreen();
   }
 

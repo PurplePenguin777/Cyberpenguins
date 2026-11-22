@@ -32,14 +32,24 @@
 
   // Escenas cinemáticas de despegue, salida de la atmósfera y viaje entre astros
   function renderTravelPhaseSvg(phaseKey) {
-    return (
-      (M.travelPhaseTierra && M.travelPhaseTierra(phaseKey)) ||
-      (M.travelPhaseLuna && M.travelPhaseLuna(phaseKey)) ||
-      (M.travelPhaseMarte && M.travelPhaseMarte(phaseKey)) ||
-      (M.travelPhaseAsteroideEros && M.travelPhaseAsteroideEros(phaseKey)) ||
-      (M.travelPhaseEspacioProfundo && M.travelPhaseEspacioProfundo(phaseKey)) ||
-      M.travelPhaseEspacioProfundo('deep-space-arrival')
-    );
+    try {
+      const fromTierra = (typeof M.travelPhaseTierra === 'function') ? M.travelPhaseTierra(phaseKey) : '';
+      if (fromTierra) return fromTierra;
+      const fromLuna = (typeof M.travelPhaseLuna === 'function') ? M.travelPhaseLuna(phaseKey) : '';
+      if (fromLuna) return fromLuna;
+      const fromMarte = (typeof M.travelPhaseMarte === 'function') ? M.travelPhaseMarte(phaseKey) : '';
+      if (fromMarte) return fromMarte;
+      const fromEros = (typeof M.travelPhaseAsteroideEros === 'function') ? M.travelPhaseAsteroideEros(phaseKey) : '';
+      if (fromEros) return fromEros;
+      const fromEspacio = (typeof M.travelPhaseEspacioProfundo === 'function') ? M.travelPhaseEspacioProfundo(phaseKey) : '';
+      if (fromEspacio) return fromEspacio;
+      if (typeof M.travelPhaseEspacioProfundo === 'function') {
+        return M.travelPhaseEspacioProfundo('deep-space-arrival') || '';
+      }
+      return '';
+    } catch (_err) {
+      return '';
+    }
   }
 
   function travelCinematicSvg(phaseKey) {
