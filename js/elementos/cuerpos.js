@@ -278,7 +278,6 @@
             : `<g>${faces}</g>${extras}`
           }
         </g>
-        <polygon points="${polyStr(finalBoundary)}" fill="none" stroke="#0b1220" stroke-opacity="0.45" stroke-width="0.7" stroke-linejoin="round" />
       </g>
     `;
   }

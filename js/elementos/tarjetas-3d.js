@@ -683,7 +683,6 @@ class HomeCards3DController {
     );
     cloudsMesh.rotation.y = 1.05;
     earthGroup.add(cloudsMesh);
-    earthGroup.add(createEarthAtmosphereRim());
     scene.add(earthGroup);
 
     // Iluminación solar en el vacío lunar: sol lateral marcado + luz refleja azul de la Tierra

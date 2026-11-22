@@ -467,9 +467,7 @@
       featuresSvg = renderEarthFeatures(proj, r);
     }
 
-    const atmoRim = baseConfig.atmoOp > 0
-      ? `<circle r="${n(r * 1.008)}" fill="none" stroke="${baseConfig.atmoColor}" stroke-width="1.2" opacity="${n(baseConfig.atmoOp * 1.2)}" />`
-      : '';
+    const atmoRim = '';
 
     return `
       <g id="${uid}">
@@ -488,7 +486,6 @@
             <stop offset="100%" stop-color="#020617" stop-opacity="0.82" />
           </radialGradient>
         </defs>
-        ${atmoRim}
         <!-- Base esférica continua -->
         <circle r="${n(r)}" fill="url(#sphereLight-${uid})" />
         <g clip-path="url(#clip-${uid})">
@@ -644,10 +641,8 @@
         <image href="assets/textures/via-lactea.jpg" x="0" y="0" width="400" height="200" preserveAspectRatio="xMidYMid slice" opacity="0.85" />
         <rect width="400" height="200" fill="url(#${u}-space-tint)" />
 
-        <!-- Salida de la Tierra (Earthrise) con atmósfera y textura fotográfica real 4K -->
+        <!-- Salida de la Tierra (Earthrise) con textura fotográfica real 4K sin contornos -->
         <g>
-          <circle cx="316" cy="46" r="25.5" fill="none" stroke="rgba(96, 165, 250, 0.45)" stroke-width="2.5" />
-          <circle cx="316" cy="46" r="24.2" fill="none" stroke="rgba(191, 219, 254, 0.6)" stroke-width="0.8" />
           <g clip-path="url(#${u}-earth-c)">
             <rect x="290" y="20" width="52" height="52" fill="#0c4a6e" />
             <image href="assets/textures/tierra-4k.jpg" x="290" y="20" width="52" height="52" preserveAspectRatio="xMidYMid slice" />
@@ -925,8 +920,6 @@ function realisticDeepSpaceCard() {
             <image href="assets/textures/eros.jpg" x="175" y="45" width="225" height="125" preserveAspectRatio="xMidYMid slice" opacity="0.96" />
             <rect x="170" y="45" width="235" height="130" fill="url(#${u}-eros-light)" />
           </g>
-          <!-- Borde iluminado por el sol -->
-          <path d="M 195,100 C 205,62 255,50 315,56 C 350,60 375,75 385,95" fill="none" stroke="rgba(248, 250, 252, 0.5)" stroke-width="1.2" />
         </g>
 
         <!-- Sonda Pioneer 10 / NEAR Shoemaker en gravedad cero -->
